@@ -20,12 +20,6 @@ namespace sx
 
         // Properties
 
-        public bool Connected
-        {
-            get;
-            private set;
-        }
-
         public string description
         {
             get
@@ -212,13 +206,19 @@ namespace sx
 
         public object ImageArray
         {
-            get { return imageData; }
+            get
+            {
+                if (!imageDataValid)
+                {
+                    throw new ArgumentException("ImageArray not valid");
+                }
+
+                return imageData; 
+            }
         }
 
         public Camera(Controller controller, Int16 cameraIdx)
         {
-            Connected = false;
-
             idx = cameraIdx;
 
             try
@@ -229,7 +229,6 @@ namespace sx
                 getParams(ref ccdParms);
                 buildReadDelayedBlock(out readDelayedBlock, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
                 imageDataValid = false;
-                Connected = true;
             }
             catch (Exception ex)
             {
