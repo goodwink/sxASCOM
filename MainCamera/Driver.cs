@@ -1,4 +1,3 @@
-/* -*- Mode: C; tab-width: 4 -*- */ 
 //tabs=4
 // --------------------------------------------------------------------------------
 // TODO fill in this information for your driver, then remove this line!
@@ -66,13 +65,14 @@ namespace ASCOM.SXMainCamera
         //
         public Camera()
         {
+            //Thread.Sleep(15000);
+            SXCamera.SharedResources.LogWrite("In Main Camera Constructor\n");
+
             binX = binY = 1;
-            NumX =  sxCamera.ccdWidth;
-            NumY =  sxCamera.ccdHeight;
             oStateLock = new Object();
             state = CameraStates.cameraIdle;
 
-            SXCamera.SharedResources.LogWrite("In Main Camera Constructor\n");
+            
         }
         #endregion
 
@@ -339,6 +339,8 @@ namespace ASCOM.SXMainCamera
                     if (sxCamera == null)
                     {
                         sxCamera = new sx.Camera(SXCamera.SharedResources.controller, 1);
+                        NumX = sxCamera.ccdWidth;
+                        NumY = sxCamera.ccdHeight;
                     }
                 }
                 else
@@ -750,8 +752,10 @@ namespace ASCOM.SXMainCamera
                     // sleep in small chunks so that we are responsive to abort and stop requests
                     if (remainingExposureTime.TotalMilliseconds > 75)
                     {
+                        SXCamera.SharedResources.LogWrite("Before Sleep(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         Thread.Sleep(50);
                     }
+
 
                     if (bAbortRequested || bStopRequested)
                     {
@@ -759,7 +763,7 @@ namespace ASCOM.SXMainCamera
                     }
                 }
 
-                SXCamera.SharedResources.LogWrite("capture delay ends, actualExposureLength=" + actualExposureLength + "\n");
+                
 
                 lock (oStateLock)
                 {
@@ -772,6 +776,8 @@ namespace ASCOM.SXMainCamera
                 
                 sxCamera.recordPixels(out exposureEnd);
                 actualExposureLength = exposureEnd - exposureStart;
+
+                SXCamera.SharedResources.LogWrite("capture delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
                 
                 bImageValid = true;
             }
@@ -814,8 +820,12 @@ namespace ASCOM.SXMainCamera
                 sxCamera.yOffset = (ushort)(binY*StartY);
                 
                 CaptureDelegate captureDelegate = new CaptureDelegate(caputure);
-
+                
+                SXCamera.SharedResources.LogWrite("StartExposure() about to BeginInvode delgate\n");
+                
                 captureDelegate.BeginInvoke(Duration, Light, null, null);
+
+                SXCamera.SharedResources.LogWrite("StartExposure() after delegae BeginInvoke\n");
             }
             catch (Exception ex)
             {

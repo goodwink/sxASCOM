@@ -208,6 +208,8 @@ namespace sx
         {
             get
             {
+                Log.Write("ImageArray entered: imageDataValid=" + imageDataValid + "\n");
+
                 if (!imageDataValid)
                 {
                     throw new ArgumentException("ImageArray not valid");
@@ -379,6 +381,7 @@ namespace sx
             UInt32 min = 9999999, max = 0;
 
             for(int x=0; x < binnedWidth; x++)
+            {
                 for (int y = 0; y < binnedHeight; y++)
                 {
                     UInt32 pixelValue;
@@ -406,6 +409,8 @@ namespace sx
                         max = pixelValue;
                     imageData[x, y] = pixelValue;
                 }
+            }
+            imageDataValid = true;
             Log.Write("getRecordedPixels(): returns, min=" + min +" max=" + max + "\n");
         }
 
