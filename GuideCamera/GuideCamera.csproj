@@ -125,6 +125,10 @@
     <Content Include="ReadMe.htm" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MainCamera\MainCamera.csproj">
+      <Project>{A98969EA-BFA8-48FE-9968-D434F05E0EF5}</Project>
+      <Name>MainCamera</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SXCamera\SXCamera.csproj">
       <Project>{D2998653-2206-4026-8AB7-03D0189B4E36}</Project>
       <Name>SXCamera</Name>

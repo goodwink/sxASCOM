@@ -58,21 +58,24 @@ namespace ASCOM.SXMainCamera
         private volatile CameraStates state;
         private volatile bool bAbortRequested;
         private volatile bool bStopRequested;
+        private static short cameraId;
 
         #region Camera Constructor
          //
         // Constructor - Must be public for COM registration!
         //
-        public Camera()
+        public Camera(short whichCamera)
         {
             //Thread.Sleep(15000);
             SXCamera.SharedResources.LogWrite("In Main Camera Constructor\n");
 
-            binX = binY = 1;
             oStateLock = new Object();
-            state = CameraStates.cameraIdle;
+            cameraId = whichCamera;                     
+        }
 
-            
+        public Camera() :
+            this(0)
+        {
         }
         #endregion
 
@@ -338,9 +341,11 @@ namespace ASCOM.SXMainCamera
                 {
                     if (sxCamera == null)
                     {
-                        sxCamera = new sx.Camera(SXCamera.SharedResources.controller, 1);
+                        sxCamera = new sx.Camera(SXCamera.SharedResources.controller, cameraId);
                         NumX = sxCamera.ccdWidth;
                         NumY = sxCamera.ccdHeight;
+                        binX = binY = 1;
+                        state = CameraStates.cameraIdle;
                     }
                 }
                 else
@@ -755,15 +760,12 @@ namespace ASCOM.SXMainCamera
                         SXCamera.SharedResources.LogWrite("Before Sleep(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         Thread.Sleep(50);
                     }
-
-
+                    
                     if (bAbortRequested || bStopRequested)
                     {
                         break;
                     }
-                }
-
-                
+                }           
 
                 lock (oStateLock)
                 {
