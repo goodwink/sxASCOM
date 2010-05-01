@@ -274,12 +274,17 @@ namespace sx
             }
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
+            
+            Log.Write("clear about to Write\n");
             controller.Write(cmdBlock, out numBytesWritten);
+            Log.Write("clear about to return\n");
         }
 
         public void clearCcdPixels()
         {
+            Log.Write("clearCcdPixels entered\n");
             clear(0);
+            Log.Write("clearCcdPixels returns\n");
         }
 
         public void clearRecordedPixels()
@@ -296,12 +301,14 @@ namespace sx
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_TIMER, 0, 0, 0);
 
-            lock (controller)
+            //lock (controller)
             {
+                Log.Write("getTimer has locked\n");
                 controller.Write(cmdBlock, out numBytesWritten);
 
                 controller.Read(out bytes, 4, out numBytesRead);
             }
+            Log.Write("getTimer has unlocked\n");
 
             ms = System.BitConverter.ToInt32(bytes, 0);
 
@@ -328,12 +335,15 @@ namespace sx
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (short)Marshal.SizeOf(model));
 
-            lock (controller)
+            
+            //lock (controller)
             {
+                Log.Write("getModel has locked\n");
                 controller.Write(cmdBlock, out numBytesWritten);
 
                 controller.Read(out  bytes, 2, out numBytesRead);
             }
+            Log.Write("getModel has unlocked\n");
             model = System.BitConverter.ToUInt16(bytes, 0);
 
             return model;
@@ -346,13 +356,14 @@ namespace sx
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_GET_CCD_PARMS, 0, idx, 0);
 
-            lock (controller)
+            //lock (controller)
             {
-
+                Log.Write("getParams has locked\n");
                 controller.Write(cmdBlock, out numBytesWritten);
 
                 parms = (SX_CCD_PARAMS)controller.Read(typeof(SX_CCD_PARAMS), out numBytesRead);
             }
+            Log.Write("getParams has unlocked\n");
         }
 
         internal void getRecordedPixels()
@@ -380,9 +391,11 @@ namespace sx
             Int32 byteoffset = 0;
             UInt32 min = 9999999, max = 0;
 
-            for(int x=0; x < binnedWidth; x++)
+            Log.Write("getRecordedPixels() decoding data, bitsPerPixel=" + bitsPerPixel +" binnedWidth = " + binnedWidth + " binnedHeight="+ binnedHeight + "\n");
+            
+            for (int y = 0; y < binnedHeight; y++)
             {
-                for (int y = 0; y < binnedHeight; y++)
+                for (int x = 0; x < binnedWidth; x++)
                 {
                     UInt32 pixelValue;
 
@@ -407,6 +420,10 @@ namespace sx
                         min = pixelValue;
                     if (pixelValue > max)
                         max = pixelValue;
+                    if (y == 0 || y == binnedHeight-1)
+                    {
+                        //Log.Write("p[" + x + "][0] = " + pixelValue + "\n");
+                    }
                     imageData[x, y] = pixelValue;
                 }
             }
@@ -428,12 +445,14 @@ namespace sx
                                          idx, 
                                          (Int16)Marshal.SizeOf(readBlock));
 
-            lock (controller)
+            //lock (controller)
             {
+                Log.Write("recordPixels has locked\n");
                 controller.Write(cmdBlock, readBlock, out numBytesWritten);
                 exposureEnd = DateTime.Now;
                 getRecordedPixels();
             }
+            Log.Write("recordPixels has unlocked\n");
         }
 
         public void recordPixelsDelayed(out DateTime exposureEnd)
@@ -447,8 +466,9 @@ namespace sx
                                          idx,
                                          (Int16)Marshal.SizeOf(readDelayedBlock));
 
-            lock (controller)
+            //lock (controller)
             {
+                Log.Write("recordPixelsDelayed has locked\n"); 
                 // this will be locked for a long time.  It should probably do something
                 // different, like write the command, sleep for most of the time, then lock
                 // and read, but that would also open the potential for other problems.
@@ -456,6 +476,7 @@ namespace sx
                 exposureEnd = DateTime.Now;
                 getRecordedPixels();
             }
+            Log.Write("recordPixelsDelayed has unlocked\n"); 
         }
     }
 }

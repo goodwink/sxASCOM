@@ -66,6 +66,7 @@ namespace sx
                     }
                     else
                     {
+                        Log.Write("Objectsize: invalid type " + elementType.ToString());
                         throw new ArgumentException(String.Format("ObjectSize: invaild type {0}", elementType.ToString()));
                     }
                 }
@@ -117,11 +118,21 @@ namespace sx
                     }
                 }
 
-                FileIO.WriteFile(deviceHandle, unManagedBlockBuffer, numBytesToWrite, out numBytesWritten, IntPtr.Zero);
+                int ret = FileIO.WriteFile(deviceHandle, unManagedBlockBuffer, numBytesToWrite, out numBytesWritten, IntPtr.Zero);
 
-                if (numBytesWritten != numBytesToWrite)
+                if (ret == 0)
                 {
-                    throw new System.IO.IOException(String.Format("Short Write: requested {0} bytes, only got {1}", numBytesToWrite, numBytesWritten));
+                    int error = Marshal.GetLastWin32Error();
+                    System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception();
+                    string errMsg = ex.Message;
+
+                    Log.Write("WriteFile write error=" + error + " (" + errMsg + ") numBytesToWrite=" + numBytesToWrite + " numBytesWritten=" + numBytesWritten + "\n");
+                    throw new System.IO.IOException("WriteFile write error=" + error + " (" + errMsg + ") numBytesToWrite=" + numBytesToWrite + " numBytesWritten=" + numBytesWritten);
+                }
+                else if (numBytesWritten != numBytesToWrite)
+                {
+                    Log.Write("WriteFile: short write numBytesToWrite=" + numBytesToWrite + " numBytesWritten=" + numBytesWritten + "\n");
+                    throw new System.IO.IOException("WriteFile: short write numBytesToWrite=" + numBytesToWrite + " numBytesWritten=" + numBytesWritten);
                 }
             }
             finally
@@ -152,25 +163,40 @@ namespace sx
                     IntPtr buf = new IntPtr(unManagedBuffer.ToInt64() + numBytesRead);
                     Int32 readSize = numBytesToRead - numBytesRead;
 
-                    if (readSize > MAX_READ_SIZE)
-                        readSize = MAX_READ_SIZE;
+                    //if (readSize > MAX_READ_SIZE)
+                    //    readSize = MAX_READ_SIZE;
 
-                    Log.Write("ReadFile - to read=" + numBytesToRead + " read=" + numBytesRead + " read size=" + readSize + "\n");
+                    Log.Write("ReadFile: numBytesRead=" + numBytesToRead + " read=" + numBytesRead + " readSize=" + readSize + "\n");
 
-                    FileIO.ReadFile(deviceHandle, buf, readSize, out thisRead, IntPtr.Zero);
-                    numBytesRead += thisRead;
-                    error = Marshal.GetLastWin32Error();
+                    int ret = FileIO.ReadFile(deviceHandle, buf, readSize, out thisRead, IntPtr.Zero);
+
+                    if (ret == 0)
+                    {
+                        error = Marshal.GetLastWin32Error();
+                    }
+                    else
+                    {
+                        numBytesRead += thisRead;
+                    }
                 }
 
-                Log.Write("ReadFile after loop: error=" + error + " to read=" + numBytesToRead + " read=" + numBytesRead + "\n");
-
-                if (numBytesRead != numBytesToRead)
+                if (error != 0)
                 {
                     System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception();
                     string errMsg = ex.Message;
 
-                    throw new System.IO.IOException(String.Format("Short Read: requested {0} bytes, only got {1}. GetLastWin32Error returns {2}", numBytesToRead, numBytesRead, error));
+                    Log.Write("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead + "\n");
+                    throw new System.IO.IOException("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead);
+
                 }
+
+                if (numBytesRead != numBytesToRead)
+                {
+                    Log.Write("ReadFile: short read numBytesToRead=" + numBytesToRead + " numBytesRead=" + numBytesRead + "\n");
+                    throw new System.IO.IOException("ReadFile: short read numBytesToRead=" + numBytesToRead + " numBytesRead=" + numBytesRead);
+                }
+
+                Log.Write("ReadFile: after loop numBytesRead=" + numBytesRead + "\n");
 
                 if (returnType == typeof(System.String))
                 {
@@ -201,10 +227,6 @@ namespace sx
                 {
                     obj = Marshal.PtrToStructure(unManagedBuffer, returnType);
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Write("iface read caught an exception: " + ex + "\n");
             }
             finally
             {

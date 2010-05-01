@@ -8,20 +8,30 @@ using WinUsbDemo;
 
 namespace sx
 {
-    internal static class Log
+    public class Log
     {
         private const string logPath = @"c:\temp\sx_log.txt";
         private static FileStream logFS;
+        private static DateTime lastWriteTime;
 
         static Log()
         {
-            logFS = File.Create(logPath);
+            logFS = new FileStream(logPath, FileMode.Create, FileAccess.Write, FileShare.Read, 1);
+            lastWriteTime = DateTime.Now;
+            //logFS = File.Create(logPath);
         }
         
-        internal static void Write(string value)
+        public static void Write(string value)
         {
-            byte[] info = new UTF8Encoding(true).GetBytes(value);
-            logFS.Write(info, 0, info.Length);
+            lock (logPath)
+            {
+                DateTime currentTime = DateTime.Now;
+                TimeSpan delta = currentTime - lastWriteTime;
+     
+                byte[] info = new UTF8Encoding(true).GetBytes(String.Format("{0,6:##0.000} {1}", delta.TotalSeconds, value));
+                logFS.Write(info, 0, info.Length);
+                lastWriteTime = currentTime;
+            }
         }
     }
 

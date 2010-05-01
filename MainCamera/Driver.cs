@@ -67,7 +67,7 @@ namespace ASCOM.SXMainCamera
         public Camera(short whichCamera)
         {
             //Thread.Sleep(15000);
-            SXCamera.SharedResources.LogWrite("In Main Camera Constructor\n");
+            sx.Log.Write("In Main Camera Constructor\n");
 
             oStateLock = new Object();
             cameraId = whichCamera;                     
@@ -96,7 +96,7 @@ namespace ASCOM.SXMainCamera
         /// </summary>
         public void AbortExposure()
         {
-            SXCamera.SharedResources.LogWrite("AbortExposure\n");
+            sx.Log.Write("AbortExposure\n");
             lock (oStateLock)
             {
                 switch (state)
@@ -125,12 +125,12 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("BinX get\n");
+                sx.Log.Write("BinX get\n");
                 return sxCamera.xBin;
             }
             set
             {
-                SXCamera.SharedResources.LogWrite("BinX set\n");
+                sx.Log.Write("BinX set\n");
                 sxCamera.xBin = (byte)value;
             }
         }
@@ -146,12 +146,12 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("BinY get\n");
+                sx.Log.Write("BinY get\n");
                 return sxCamera.yBin;
             }
             set
             {
-                SXCamera.SharedResources.LogWrite("BinY set\n");
+                sx.Log.Write("BinY set\n");
                 sxCamera.yBin = (byte)value;
             }
         }
@@ -165,7 +165,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CCDTemperature\n"); 
+                sx.Log.Write("CCDTemperature\n"); 
                 throw new System.Exception("CCDTemperature is not supported");
             }
         }
@@ -203,7 +203,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             { 
-                SXCamera.SharedResources.LogWrite("CameraState()\n"); 
+                sx.Log.Write("CameraState()\n"); 
                 lock (oStateLock)
                 {
                     return state;
@@ -219,7 +219,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CameraXSize()\n");
+                sx.Log.Write("CameraXSize()\n");
                 return sxCamera.ccdWidth;
             }
         }
@@ -232,7 +232,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CameraYSize()\n");
+                sx.Log.Write("CameraYSize()\n");
                 return sxCamera.ccdHeight;
             }
         }
@@ -244,7 +244,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CanAbortExposure()\n");
+                sx.Log.Write("CanAbortExposure()\n");
                 return true;
             }
         }
@@ -260,7 +260,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CanAssymetricBin()\n");
+                sx.Log.Write("CanAssymetricBin()\n");
                 return true;
             }
         }
@@ -272,7 +272,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CanGetCoolerPower()\n"); 
+                sx.Log.Write("CanGetCoolerPower()\n"); 
                 return false;
             }
         }
@@ -286,7 +286,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CanPulseGuide()\n");
+                sx.Log.Write("CanPulseGuide()\n");
                 return false;
             }
         }
@@ -300,7 +300,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CanSetCCDTemperature()\n");
+                sx.Log.Write("CanSetCCDTemperature()\n");
                 return false;
             }
         }
@@ -316,7 +316,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CanStopExposure()\n");
+                sx.Log.Write("CanStopExposure()\n");
                 return true;
             }
         }
@@ -331,12 +331,12 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("Connected  get\n");
+                sx.Log.Write("Connected  get\n");
                 return  sxCamera != null;
             }
             set
             {
-                SXCamera.SharedResources.LogWrite("Connected set to " + value +"\n");
+                sx.Log.Write("Connected set to " + value +"\n");
                 if (value)
                 {
                     if (sxCamera == null)
@@ -368,12 +368,12 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("CoolerOn() get\n");
+                sx.Log.Write("CoolerOn() get\n");
                 throw new System.Exception("CoolerOn is not supported");
             }
             set
             {
-                SXCamera.SharedResources.LogWrite("CoolerOn() set\n");
+                sx.Log.Write("CoolerOn() set\n");
                 throw new System.Exception("CoolerOn is not supported");
             }
         }
@@ -388,7 +388,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("CoolerPower()\n");
+                sx.Log.Write("CoolerPower()\n");
                 return 100;
             }
         }
@@ -403,7 +403,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("Description()\n");
+                sx.Log.Write("Description()\n");
                 return sxCamera.description;
             }
         }
@@ -418,7 +418,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("ElectronsPerADU()\n");
+                sx.Log.Write("ElectronsPerADU()\n");
                 throw new System.Exception("ElectronsPerADU is not supported");
             }
         }
@@ -432,7 +432,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("FullWellCapacity()\n"); 
+                sx.Log.Write("FullWellCapacity()\n"); 
                 throw new System.Exception("FullWellCapacity is not supported");
             }
         }
@@ -446,7 +446,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("HasShutter()\n"); 
+                sx.Log.Write("HasShutter()\n"); 
                 return false;
             }
         }
@@ -460,7 +460,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             { 
-                SXCamera.SharedResources.LogWrite("HeatSinkTemperature()\n");
+                sx.Log.Write("HeatSinkTemperature()\n");
                 throw new System.Exception("HeatSinkTemperature is not valid if CanControlTemperature == false");
             }
         }
@@ -482,7 +482,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("ImageArray()\n"); 
+                sx.Log.Write("ImageArray()\n"); 
                 if (!bImageValid)
                 {
                     throw new System.Exception("The image is not valid.");
@@ -509,7 +509,7 @@ namespace ASCOM.SXMainCamera
         {
             get
             { 
-                SXCamera.SharedResources.LogWrite("ImageArrayVariant()\n"); 
+                sx.Log.Write("ImageArrayVariant()\n"); 
                 throw new System.Exception("The method or operation is not implemented."); 
             }
         }
@@ -537,7 +537,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("IsPulseGuiding()\n"); 
+                sx.Log.Write("IsPulseGuiding()\n"); 
                 throw new System.Exception("The method or operation is not implemented.");
             }
         }
@@ -552,7 +552,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("LastError()\n"); 
+                sx.Log.Write("LastError()\n"); 
                 throw new System.Exception("The method or operation is not implemented.");
             }
         }
@@ -567,7 +567,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("LastExposureDuration()\n"); 
+                sx.Log.Write("LastExposureDuration()\n"); 
                 return actualExposureLength.TotalSeconds;
             }
         }
@@ -581,7 +581,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("LastExposureStartTime()\n"); 
+                sx.Log.Write("LastExposureStartTime()\n"); 
                 return exposureStart.ToString("yyyy-MM-ddTHH:mm:ss.fff");
             }
         }
@@ -594,8 +594,8 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("MaxADU()\n"); 
-                throw new System.Exception("MaxADU is not supported");
+                sx.Log.Write("MaxADU()\n");
+                return ( 1 << sxCamera.bitsPerPixel) - 1;
             }
         }
 
@@ -608,7 +608,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("MaxBinX()\n"); 
+                sx.Log.Write("MaxBinX()\n"); 
                 return sxCamera.xBinMax;
             }
         }
@@ -622,7 +622,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("MaxBinY()\n"); 
+                sx.Log.Write("MaxBinY()\n"); 
                 return sxCamera.yBinMax;
             }
         }
@@ -658,7 +658,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("PixelSizeX()\n"); 
+                sx.Log.Write("PixelSizeX()\n"); 
                 return sxCamera.pixelWidth;
             }
         }
@@ -672,7 +672,7 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                SXCamera.SharedResources.LogWrite("PixelSizeY()\n"); 
+                sx.Log.Write("PixelSizeY()\n"); 
                 return sxCamera.pixelHeight;
             }
         }
@@ -698,7 +698,7 @@ namespace ASCOM.SXMainCamera
         /// <exception cref=" System.Exception">PulseGuide command is unsuccessful</exception>
         public void PulseGuide(GuideDirections Direction, int Duration)
         {
-            SXCamera.SharedResources.LogWrite("PulseGuide()\n");
+            sx.Log.Write("PulseGuide()\n");
             throw new System.Exception("PulseGuide() cannot be called if CanPuluseGuide == false");
         }
 
@@ -714,12 +714,12 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                SXCamera.SharedResources.LogWrite("SetCCDTemperature Get()\n");
+                sx.Log.Write("SetCCDTemperature Get()\n");
                 throw new System.Exception("SetCCDTemperature cannot be use if CanSetCCDTemperature == false");
             }
             set
             {
-                SXCamera.SharedResources.LogWrite("SetCCDTemperature SEt()\n");
+                sx.Log.Write("SetCCDTemperature SEt()\n");
                 throw new System.Exception("SetCCDTemperature cannot be use if CanSetCCDTemperature == false");
             }
         }
@@ -732,16 +732,17 @@ namespace ASCOM.SXMainCamera
         public void SetupDialog()
         {
             SetupDialogForm F = new SetupDialogForm();
-            SXCamera.SharedResources.LogWrite("SetupDialog()\n");
+            sx.Log.Write("SetupDialog()\n");
             F.ShowDialog();
         }
 
         internal void caputure(double Duration, bool Light)
         {
-            SXCamera.SharedResources.LogWrite("capture begins Duration=" + Duration + "\n");
+            sx.Log.Write("capture begins Duration=" + Duration + "\n");
 
             try
             {
+                sx.Log.Write("calling clearCcdPixel\n");
                 sxCamera.clearCcdPixels();
 
                 exposureStart = DateTime.Now;
@@ -750,6 +751,7 @@ namespace ASCOM.SXMainCamera
 
                 // We sleep for most of the exposure, then spin for the last little bit
                 // because this helps us end closer to the right time
+                sx.Log.Write("about to begin loop, exposureEnd=" + exposureEnd + "\n");
                 for(TimeSpan remainingExposureTime = desiredExposureLength;
                     remainingExposureTime.TotalMilliseconds > 0;
                     remainingExposureTime = exposureEnd - DateTime.Now)
@@ -757,7 +759,7 @@ namespace ASCOM.SXMainCamera
                     // sleep in small chunks so that we are responsive to abort and stop requests
                     if (remainingExposureTime.TotalMilliseconds > 75)
                     {
-                        SXCamera.SharedResources.LogWrite("Before Sleep(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        sx.Log.Write("Before Sleep(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         Thread.Sleep(50);
                     }
                     
@@ -765,7 +767,7 @@ namespace ASCOM.SXMainCamera
                     {
                         break;
                     }
-                }           
+                }
 
                 lock (oStateLock)
                 {
@@ -779,7 +781,7 @@ namespace ASCOM.SXMainCamera
                 sxCamera.recordPixels(out exposureEnd);
                 actualExposureLength = exposureEnd - exposureStart;
 
-                SXCamera.SharedResources.LogWrite("capture delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
+                sx.Log.Write("capture delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
                 
                 bImageValid = true;
             }
@@ -800,7 +802,7 @@ namespace ASCOM.SXMainCamera
         /// <exception cref=" System.Exception">the exposure cannot be started for any reason, such as a hardware or communications error</exception>
         public void StartExposure(double Duration, bool Light)
         {
-            SXCamera.SharedResources.LogWrite("StartExposure() duration=" + Duration + "\n");
+            sx.Log.Write("StartExposure() duration=" + Duration + "\n");
 
             lock (oStateLock)
             {
@@ -823,11 +825,11 @@ namespace ASCOM.SXMainCamera
                 
                 CaptureDelegate captureDelegate = new CaptureDelegate(caputure);
                 
-                SXCamera.SharedResources.LogWrite("StartExposure() about to BeginInvode delgate\n");
+                sx.Log.Write("StartExposure() about to BeginInvode delgate\n");
                 
                 captureDelegate.BeginInvoke(Duration, Light, null, null);
 
-                SXCamera.SharedResources.LogWrite("StartExposure() after delegae BeginInvoke\n");
+                sx.Log.Write("StartExposure() after delegate BeginInvoke\n");
             }
             catch (Exception ex)
             {
@@ -870,7 +872,7 @@ namespace ASCOM.SXMainCamera
         /// <exception cref=" System.Exception">Must throw an exception if for any reason no image readout will be available.</exception>
         public void StopExposure()
         {
-            SXCamera.SharedResources.LogWrite("StopExposure()\n");
+            sx.Log.Write("StopExposure()\n");
             lock (oStateLock)
             {
                 switch (state)

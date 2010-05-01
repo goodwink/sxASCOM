@@ -68,10 +68,20 @@ namespace sx
         
         internal void Write(SX_CMD_BLOCK block, Object data, out Int32 numBytesWritten)
         {
-            lock (this)
+            //lock (this)
             {
-                iface.Write(block, data, out numBytesWritten);
+                try
+                {
+                    Log.Write("Write has locked\n");
+                    iface.Write(block, data, out numBytesWritten);
+                }
+                catch
+                {
+                    Log.Write("Retrying write\n");
+                    iface.Write(block, data, out numBytesWritten);
+                }
             }
+            Log.Write("Write has unlocked\n");
         }
            
         internal void Write(SX_CMD_BLOCK block, out Int32 numBytesWritten)
@@ -81,13 +91,14 @@ namespace sx
 
         internal object Read(Type returnType, Int32 numBytesToRead, out Int32 numBytesRead)
         {
-            Log.Write("in controller read\n");
             object oReturn;
 
-            lock (this)
+            //lock (this)
             {
+                Log.Write("Read has locked\n");
                 oReturn = iface.Read(returnType, numBytesToRead, out numBytesRead);
             }
+            Log.Write("Read has unlocked\n"); 
             return oReturn;
         }
 
