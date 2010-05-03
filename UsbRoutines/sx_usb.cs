@@ -118,6 +118,8 @@ namespace sx
                     }
                 }
 
+                Log.Write(String.Format("usbWrite(): unManagedBlockBuffer=0x{0:x16} numBytesToWrite={1}\n", unManagedBlockBuffer.ToInt64(), numBytesToWrite));
+                   
                 int ret = FileIO.WriteFile(deviceHandle, unManagedBlockBuffer, numBytesToWrite, out numBytesWritten, IntPtr.Zero);
 
                 if (ret == 0)
@@ -166,7 +168,7 @@ namespace sx
                     //if (readSize > MAX_READ_SIZE)
                     //    readSize = MAX_READ_SIZE;
 
-                    Log.Write("ReadFile: numBytesRead=" + numBytesToRead + " read=" + numBytesRead + " readSize=" + readSize + "\n");
+                    Log.Write(String.Format("usbRead: buf=0x{0:x16} numBytesToRead={1} numBytesRead={2} readSize={3}\n", buf.ToInt64(), numBytesToRead, numBytesRead, readSize));
 
                     int ret = FileIO.ReadFile(deviceHandle, buf, readSize, out thisRead, IntPtr.Zero);
 

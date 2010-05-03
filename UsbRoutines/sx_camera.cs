@@ -223,20 +223,26 @@ namespace sx
         {
             idx = cameraIdx;
 
-            try
-            {
-                this.controller = controller;
+            this.controller = controller;
 
-                cameraModel = getModel();
-                getParams(ref ccdParms);
-                buildReadDelayedBlock(out readDelayedBlock, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
-                imageDataValid = false;
-            }
-            catch (Exception ex)
+            if (cameraIdx > 0)
             {
-                throw ex;
+                if (cameraIdx != 1)
+                {
+                    throw new ArgumentException("Error: Untested with cameraIdx > 1");
+                }
+
+                if ((controller.extraCapabilities & INTEGRATED_GUIDER_CCD) == 0)
+                {
+                    throw new ArgumentException("Error: cameraIDX == 1 and INTEGRATED_GUIDER_CCD == 0");
+                }
             }
-        }
+
+            cameraModel = getModel();
+            getParams(ref ccdParms);
+            buildReadDelayedBlock(out readDelayedBlock, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
+            imageDataValid = false;
+         }
 
         // we use a READ_DELAYED_BLOCK to store paramters that are accessed as properties.  
         // If the user requests a read without delay, we can just copy all the matching 
@@ -246,10 +252,12 @@ namespace sx
         {
             block.x_offset = inblock.x_offset;
             block.y_offset = inblock.y_offset;
-            block.width = inblock.width;
-            block.height = inblock.height;
+            block.width = (UInt16)(inblock.width*2);
+            block.height = (UInt16)(inblock.height/2);
             block.x_bin = inblock.x_bin;
             block.y_bin = inblock.y_bin;
+
+            Log.Write(String.Format("initReadBlock() x_off={0} y_off={1} width={2} height={3} x_bin={4} y_bin={5}\n", block.x_offset, block.y_offset, block.width, block.height, block.x_bin, block.y_bin));
         }
 
         internal void buildReadDelayedBlock(out SX_READ_DELAYED_BLOCK block, UInt16 x_offset, UInt16 y_offset, UInt16 width, UInt16 height, Byte x_bin, Byte y_bin, UInt32 delay)
@@ -261,6 +269,8 @@ namespace sx
             block.x_bin = x_bin;
             block.y_bin = y_bin;
             block.delay = delay;
+
+            Log.Write(String.Format("initReadBlock() x_off={0} y_off={1} width={2} height={3} x_bin={4} y_bin={5} delay={6}\n", block.x_offset, block.y_offset, block.width, block.height, block.x_bin, block.y_bin, delay));
         }
 
         internal void clear(Byte Flags)
@@ -289,41 +299,9 @@ namespace sx
 
         public void clearRecordedPixels()
         {
+            Log.Write("clearRecordedPixels entered\n");
             clear(SX_CCD_FLAGS_NOWIPE_FRAME);
-        }
-
-        public int getTimer()
-        {
-            SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten, numBytesRead;
-            byte[] bytes;
-            Int32 ms = 0;
-
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_TIMER, 0, 0, 0);
-
-            //lock (controller)
-            {
-                Log.Write("getTimer has locked\n");
-                controller.Write(cmdBlock, out numBytesWritten);
-
-                controller.Read(out bytes, 4, out numBytesRead);
-            }
-            Log.Write("getTimer has unlocked\n");
-
-            ms = System.BitConverter.ToInt32(bytes, 0);
-
-            Log.Write("Timer 0 = " + ms + "\n");
-
-            return ms;
-        }
-
-        public void setTimer(UInt32 ms)
-        {
-            SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten;
-
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_TIMER, 0, idx, (short)Marshal.SizeOf(ms));
-            controller.Write(cmdBlock, ms, out numBytesWritten);
+            Log.Write("clearRecordedPixels entered\n");
         }
 
         public UInt16 getModel()
@@ -336,7 +314,7 @@ namespace sx
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (short)Marshal.SizeOf(model));
 
             
-            //lock (controller)
+            lock (controller)
             {
                 Log.Write("getModel has locked\n");
                 controller.Write(cmdBlock, out numBytesWritten);
@@ -356,7 +334,7 @@ namespace sx
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_GET_CCD_PARMS, 0, idx, 0);
 
-            //lock (controller)
+            lock (controller)
             {
                 Log.Write("getParams has locked\n");
                 controller.Write(cmdBlock, out numBytesWritten);
@@ -366,23 +344,24 @@ namespace sx
             Log.Write("getParams has unlocked\n");
         }
 
-        internal void getRecordedPixels()
+        internal void downloadPixels()
         {
             Int32 numBytesRead;
             Int32 binnedWidth = width/xBin;
             Int32 binnedHeight = height/yBin;
             Int32 imageBytes = binnedWidth * binnedHeight * bitsPerPixel/BITS_PER_BYTE;
 
-            Log.Write("getRecordedPixels() is about to read " + imageBytes + "\n");
+            Log.Write(String.Format("downloadPixels(): requesting {0}bytres ({1} pixels, {2} bytes each\n", imageBytes, binnedWidth*binnedHeight, bitsPerPixel/BITS_PER_BYTE));
 
-            byte [] imageAsBytes = (byte[])controller.Read(typeof(byte[]), imageBytes, out numBytesRead);
-
-            Log.Write("getRecordedPixels() - read completed, numBytesRead=" + numBytesRead + "\n");
+            byte[] imageAsBytes = (byte[])controller.Read(typeof(byte[]), imageBytes, out numBytesRead);
+            
+            Log.Write("downloadPixels(): read completed, numBytesRead=" + numBytesRead + "\n");
 
             if (bitsPerPixel != 16 && bitsPerPixel != 8)
             {
-                throw new ArgumentOutOfRangeException("getRecordedPixels Untested: bitsPerPixel != 16", "bitsPerPixel");
+                throw new ArgumentOutOfRangeException("downloadPixels(): Untested: bitsPerPixel != 16", "bitsPerPixel");
             }
+
             imageData = new UInt32[binnedWidth, binnedHeight];
 
             // Copy the bytes read from the camera into a UInt32 array.
@@ -391,8 +370,9 @@ namespace sx
             Int32 byteoffset = 0;
             UInt32 min = 9999999, max = 0;
 
-            Log.Write("getRecordedPixels() decoding data, bitsPerPixel=" + bitsPerPixel +" binnedWidth = " + binnedWidth + " binnedHeight="+ binnedHeight + "\n");
-            
+            Log.Write("downloadPixels(): decoding data, bitsPerPixel=" + bitsPerPixel +" binnedWidth = " + binnedWidth + " binnedHeight="+ binnedHeight + "\n");
+
+            double sum = 0;
             for (int y = 0; y < binnedHeight; y++)
             {
                 for (int x = 0; x < binnedWidth; x++)
@@ -422,13 +402,14 @@ namespace sx
                         max = pixelValue;
                     if (y == 0 || y == binnedHeight-1)
                     {
-                        //Log.Write("p[" + x + "][0] = " + pixelValue + "\n");
+                        //Log.Write(String.Format("pixelHeight[{0,4}][{1,4}]=0x{2:X}\n", x, y, pixelValue));
                     }
                     imageData[x, y] = pixelValue;
+                    sum += pixelValue;
                 }
             }
             imageDataValid = true;
-            Log.Write("getRecordedPixels(): returns, min=" + min +" max=" + max + "\n");
+            Log.Write(String.Format("downloadPixels(): min={0} max={1} ave={2:f}\n", min, max, sum/(double)(binnedHeight*binnedWidth)));
         }
 
         public void recordPixels(out DateTime exposureEnd)
@@ -437,22 +418,28 @@ namespace sx
             Int32 numBytesWritten;
             SX_READ_BLOCK readBlock;
 
+            Log.Write("recordPixels() entered\n");
+
             initReadBlock(out readBlock, readDelayedBlock);
 
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, 
-                                         SX_CMD_READ_PIXELS, 
-                                         SX_CCD_FLAGS_FIELD_ODD | SX_CCD_FLAGS_FIELD_EVEN,
-                                         idx, 
-                                         (Int16)Marshal.SizeOf(readBlock));
+            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
+                               SX_CMD_READ_PIXELS,
+                               SX_CCD_FLAGS_FIELD_ODD | SX_CCD_FLAGS_FIELD_EVEN,
+                               idx,
+                               (Int16)Marshal.SizeOf(readBlock));
 
-            //lock (controller)
+            lock (controller)
             {
-                Log.Write("recordPixels has locked\n");
+                Log.Write("recordPixels() has locked\n");
+                Log.Write("recordPixels() requesting read\n");
                 controller.Write(cmdBlock, readBlock, out numBytesWritten);
                 exposureEnd = DateTime.Now;
-                getRecordedPixels();
+                Log.Write("recordPixels() beginning downloading\n");
+                downloadPixels();
+                Log.Write("recordPixels() download completed\n");
+                //controller.echo("hello");     
             }
-            Log.Write("recordPixels has unlocked\n");
+            Log.Write("recordPixels() has unlocked\n");
         }
 
         public void recordPixelsDelayed(out DateTime exposureEnd)
@@ -460,22 +447,27 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
 
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, 
+            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, 
                                          SX_CMD_READ_PIXELS_DELAYED, 
                                          SX_CCD_FLAGS_FIELD_ODD | SX_CCD_FLAGS_FIELD_EVEN,
                                          idx,
                                          (Int16)Marshal.SizeOf(readDelayedBlock));
 
-            //lock (controller)
+            // this will be locked for a long time.  It should probably do something
+            // different, like write the command, sleep for most of the time, then lock
+            // and read, but that would also open the potential for other problems.
+
+
+            lock (controller)
             {
-                Log.Write("recordPixelsDelayed has locked\n"); 
-                // this will be locked for a long time.  It should probably do something
-                // different, like write the command, sleep for most of the time, then lock
-                // and read, but that would also open the potential for other problems.
+                Log.Write("recordPixelsDelayed has locked\n");
+                Log.Write("recordPixelsDelayed requesting read\n");
                 controller.Write(cmdBlock, readDelayedBlock, out numBytesWritten);
                 exposureEnd = DateTime.Now;
-                getRecordedPixels();
+                Log.Write("recordPixelsDelayed requesting download\n");
+                downloadPixels();
             }
+
             Log.Write("recordPixelsDelayed has unlocked\n"); 
         }
     }

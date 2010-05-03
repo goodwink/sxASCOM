@@ -63,23 +63,16 @@ namespace sx
             block.cmd_value = cmd_value;
             block.index = index;
             block.cmd_length = cmd_length;
+            Log.Write(String.Format("buildCommandBlock(): type=0x{0:x2} cmd=0x{1:x2} cmd_value=0x{2:x4} index=0x{3:x4} cmd_length=0x{4:x4}\n", cmd_type, cmd, cmd_value, index, cmd_length));
         }
 
         
         internal void Write(SX_CMD_BLOCK block, Object data, out Int32 numBytesWritten)
         {
-            //lock (this)
+            lock (this)
             {
-                try
-                {
-                    Log.Write("Write has locked\n");
-                    iface.Write(block, data, out numBytesWritten);
-                }
-                catch
-                {
-                    Log.Write("Retrying write\n");
-                    iface.Write(block, data, out numBytesWritten);
-                }
+                Log.Write("Write has locked\n");
+                iface.Write(block, data, out numBytesWritten);
             }
             Log.Write("Write has unlocked\n");
         }
@@ -93,7 +86,7 @@ namespace sx
         {
             object oReturn;
 
-            //lock (this)
+            lock (this)
             {
                 Log.Write("Read has locked\n");
                 oReturn = iface.Read(returnType, numBytesToRead, out numBytesRead);
@@ -135,31 +128,7 @@ namespace sx
             }
         }
 
-        internal void clear(Byte Flags)
-        {
-            SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten;
-
-            if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME)) != 0)
-            {
-                throw new ArgumentException("Invalid flags passed to ClearPixels");
-            }
-
-            buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, 0, 0);
-            Write(cmdBlock, out numBytesWritten);
-        }
-
-        public void clearCcdPixels()
-        {
-            clear(0);
-        }
-
-        public void clearRecordedPixels()
-        {
-            clear(SX_CCD_FLAGS_NOWIPE_FRAME);
-        }
-
-        public void reset()
+         public void reset()
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
@@ -199,21 +168,27 @@ namespace sx
             parms = (SX_CCD_PARAMS)Read(typeof(SX_CCD_PARAMS), out numBytesRead);
         }
 
-/*
-        public uint getTimer()
+        public int getTimer()
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten, numBytesRead;
             byte[] bytes;
-            UInt32 ms = 0;
+            Int32 ms = 0;
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_TIMER, 0, 0, 0);
 
-            Write(cmdBlock, out numBytesWritten);
+            lock (this)
+            {
+                Log.Write("getTimer has locked\n");
+                Write(cmdBlock, out numBytesWritten);
 
-            Read(out bytes, 4, out numBytesRead);
+                Read(out bytes, 4, out numBytesRead);
+            }
+            Log.Write("getTimer has unlocked\n");
 
-            ms = System.BitConverter.ToUInt32(bytes, 0);
+            ms = System.BitConverter.ToInt32(bytes, 0);
+
+            Log.Write("Timer 0 = " + ms + "\n");
 
             return ms;
         }
@@ -224,9 +199,7 @@ namespace sx
             Int32 numBytesWritten;
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_TIMER, 0, 0, (short)Marshal.SizeOf(ms));
-
             Write(cmdBlock, ms, out numBytesWritten);
         }
-*/
     }
 }

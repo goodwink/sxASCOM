@@ -49,7 +49,8 @@ namespace ASCOM.SXCamera
             catch (Exception ex)
             {
                 controller = null;
-                sx.Log.Write("caught " + ex + "\n");
+                sx.Log.Write("SharedResources() caught " + ex + "\n");
+                throw ex;
             }
 
             sx.Log.Write("new returned " + controller + "\n");

@@ -46,7 +46,7 @@ namespace ASCOM.SXMainCamera
         ASCOM.SXCamera.ReferenceCountedObjectBase, 
         ICamera
     {
-
+        private bool bConnected;
         private sx.Camera sxCamera;
         private DateTime exposureStart;
         private TimeSpan desiredExposureLength;
@@ -67,7 +67,7 @@ namespace ASCOM.SXMainCamera
         public Camera(short whichCamera)
         {
             //Thread.Sleep(15000);
-            sx.Log.Write("In Main Camera Constructor\n");
+            sx.Log.Write("In Camera Constructor for camera " + whichCamera +" \n");
 
             oStateLock = new Object();
             cameraId = whichCamera;                     
@@ -331,27 +331,31 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                sx.Log.Write("Connected  get\n");
-                return  sxCamera != null;
+                sx.Log.Write("Connected  get - returning " + bConnected +"\n");
+                return  bConnected;
             }
             set
             {
-                sx.Log.Write("Connected set to " + value +"\n");
+                sx.Log.Write("Connected requesting set to " + value +"\n");
                 if (value)
                 {
-                    if (sxCamera == null)
+                    if (bConnected)
                     {
-                        sxCamera = new sx.Camera(SXCamera.SharedResources.controller, cameraId);
-                        NumX = sxCamera.ccdWidth;
-                        NumY = sxCamera.ccdHeight;
-                        binX = binY = 1;
-                        state = CameraStates.cameraIdle;
+                        throw new System.Exception("Attempt to connect when already connected");
                     }
+
+                    sxCamera = new sx.Camera(SXCamera.SharedResources.controller, cameraId);
+                    NumX = sxCamera.ccdWidth;
+                    NumY = sxCamera.ccdHeight;
+                    binX = binY = 1;
+                    state = CameraStates.cameraIdle;
                 }
                 else
                 {
                     sxCamera = null;
                 }
+
+                bConnected = value;
             }
         }
 
@@ -742,27 +746,40 @@ namespace ASCOM.SXMainCamera
 
             try
             {
-                sx.Log.Write("calling clearCcdPixel\n");
-                sxCamera.clearCcdPixels();
-
+                sx.Log.Write("capture(): calling clearRecordedPixel\n");
+                sxCamera.clearRecordedPixels();
+                sx.Log.Write("capture(): calling clearCcdPixel\n");
+                sxCamera.clearCcdPixels(); // This clears both the CCD and the recorded pixels.  For
+                                           // long exposures (> 2 seconds) we will cleare the recorded pixels again just before
+                                           // the exposure ends to clear any accumulated noise.
+                bool bRecordedCleared = false;
+                
                 exposureStart = DateTime.Now;
                 desiredExposureLength = TimeSpan.FromSeconds(Duration);
                 DateTime exposureEnd = exposureStart + desiredExposureLength;
 
                 // We sleep for most of the exposure, then spin for the last little bit
                 // because this helps us end closer to the right time
-                sx.Log.Write("about to begin loop, exposureEnd=" + exposureEnd + "\n");
-                for(TimeSpan remainingExposureTime = desiredExposureLength;
+
+                sx.Log.Write("capture(): about to begin loop, exposureEnd=" + exposureEnd + "\n");
+                for (TimeSpan remainingExposureTime = desiredExposureLength;
                     remainingExposureTime.TotalMilliseconds > 0;
                     remainingExposureTime = exposureEnd - DateTime.Now)
                 {
-                    // sleep in small chunks so that we are responsive to abort and stop requests
-                    if (remainingExposureTime.TotalMilliseconds > 75)
+                    
+                    if (remainingExposureTime.TotalSeconds < 2.0 && !bRecordedCleared)
                     {
-                        sx.Log.Write("Before Sleep(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        sx.Log.Write("capture(): before clearRecordedPixels(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        sxCamera.clearRecordedPixels();
+                        bRecordedCleared = true;
+                    }
+                    else if (remainingExposureTime.TotalMilliseconds > 75)
+                    {
+                        // sleep in small chunks so that we are responsive to abort and stop requests
+                        //sx.Log.Write("Before sleep, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         Thread.Sleep(50);
                     }
-                    
+
                     if (bAbortRequested || bStopRequested)
                     {
                         break;
@@ -777,11 +794,12 @@ namespace ASCOM.SXMainCamera
                     }
                     state = CameraStates.cameraDownload;
                 }
-                
+
                 sxCamera.recordPixels(out exposureEnd);
+
                 actualExposureLength = exposureEnd - exposureStart;
 
-                sx.Log.Write("capture delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
+                sx.Log.Write("capture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
                 
                 bImageValid = true;
             }
@@ -825,11 +843,11 @@ namespace ASCOM.SXMainCamera
                 
                 CaptureDelegate captureDelegate = new CaptureDelegate(caputure);
                 
-                sx.Log.Write("StartExposure() about to BeginInvode delgate\n");
+                sx.Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
                 
                 captureDelegate.BeginInvoke(Duration, Light, null, null);
 
-                sx.Log.Write("StartExposure() after delegate BeginInvoke\n");
+                sx.Log.Write("StartExposure() after captureDelegate.BeginInvode()\n");
             }
             catch (Exception ex)
             {

@@ -11,26 +11,36 @@ namespace sx
     public class Log
     {
         private const string logPath = @"c:\temp\sx_log.txt";
-        private static FileStream logFS;
+        private static FileStream logFS=null;
         private static DateTime lastWriteTime;
 
         static Log()
         {
-            logFS = new FileStream(logPath, FileMode.Create, FileAccess.Write, FileShare.Read, 1);
-            lastWriteTime = DateTime.Now;
+            try
+            {
+                logFS = new FileStream(logPath, FileMode.Create, FileAccess.Write, FileShare.Read, 1);
+                lastWriteTime = DateTime.Now;
+            }
+            catch
+            {
+            }
+
             //logFS = File.Create(logPath);
         }
         
         public static void Write(string value)
         {
-            lock (logPath)
+            if (logFS != null)
             {
-                DateTime currentTime = DateTime.Now;
-                TimeSpan delta = currentTime - lastWriteTime;
-     
-                byte[] info = new UTF8Encoding(true).GetBytes(String.Format("{0,6:##0.000} {1}", delta.TotalSeconds, value));
-                logFS.Write(info, 0, info.Length);
-                lastWriteTime = currentTime;
+                lock (logPath)
+                {
+                    DateTime currentTime = DateTime.Now;
+                    TimeSpan delta = currentTime - lastWriteTime;
+
+                    byte[] info = new UTF8Encoding(true).GetBytes(String.Format("{0,6:##0.000} {1}", delta.TotalSeconds, value));
+                    logFS.Write(info, 0, info.Length);
+                    lastWriteTime = currentTime;
+                }
             }
         }
     }
@@ -113,10 +123,10 @@ namespace sx
             internal Byte extra_capabilities;
         }
 
-        const Byte STAR2000_PORT = 0x1;
-        const Byte DEPRICATED_COMPRESSED_PIXEL_FORMAT = 0x2;
-        const Byte EEPROM = 0x4;
-        const Byte INTEGRATED_GUIDER_CCD = 0x8;
+        internal const Byte STAR2000_PORT = 0x1;
+        internal const Byte DEPRICATED_COMPRESSED_PIXEL_FORMAT = 0x2;
+        internal const Byte EEPROM = 0x4;
+        internal const Byte INTEGRATED_GUIDER_CCD = 0x8;
 
         const UInt16 COLOR_MATRIX_PACKED_RGB         = 0x8000;
         const UInt16 COLOR_MATRIX_PACKED_BGR         = 0x4000;
