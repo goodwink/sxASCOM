@@ -61,9 +61,11 @@ namespace ASCOM.SXMainCamera
             // 
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(123, 31);
+            this.label1.Size = new System.Drawing.Size(123, 94);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Construct your driver\'s setup dialog here.";
+            this.label1.Text = "ASCOM Driver for SX/SXV/SXVF/SXVR Cameras\r\n\r\nCopyright (C) 2010 Dad Dog Developme" +
+                "nt Ltd.\r\nAll Rights Reserved";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // picASCOM
             // 

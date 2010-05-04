@@ -42,5 +42,10 @@ namespace ASCOM.SXMainCamera
                 MessageBox.Show(other.Message);
             }
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

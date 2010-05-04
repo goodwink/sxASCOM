@@ -64,7 +64,7 @@ namespace ASCOM.SXMainCamera
          //
         // Constructor - Must be public for COM registration!
         //
-        public Camera(short whichCamera)
+        protected Camera(short whichCamera)
         {
             //Thread.Sleep(15000);
             sx.Log.Write("In Camera Constructor for camera " + whichCamera +" \n");
@@ -331,12 +331,12 @@ namespace ASCOM.SXMainCamera
         {
             get
             {
-                sx.Log.Write("Connected  get - returning " + bConnected +"\n");
+                sx.Log.Write("Connected:  get - returning " + bConnected +"\n");
                 return  bConnected;
             }
             set
             {
-                sx.Log.Write("Connected requesting set to " + value +"\n");
+                sx.Log.Write("Connected: set to " + value + " requested. Current value is " + bConnected +"\n");
                 if (value)
                 {
                     if (bConnected)
@@ -373,7 +373,7 @@ namespace ASCOM.SXMainCamera
             get
             {
                 sx.Log.Write("CoolerOn() get\n");
-                throw new System.Exception("CoolerOn is not supported");
+                return true;
             }
             set
             {
@@ -408,7 +408,12 @@ namespace ASCOM.SXMainCamera
             get 
             {
                 sx.Log.Write("Description()\n");
-                return sxCamera.description;
+                String sRet = sxCamera.description;
+                if (cameraId == 1)
+                {
+                    sRet += " Guider";
+                }
+                return sRet;
             }
         }
 
@@ -423,7 +428,7 @@ namespace ASCOM.SXMainCamera
             get 
             {
                 sx.Log.Write("ElectronsPerADU()\n");
-                throw new System.Exception("ElectronsPerADU is not supported");
+                return sxCamera.electronsPerADU;
             }
         }
 
@@ -436,8 +441,8 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                sx.Log.Write("FullWellCapacity()\n"); 
-                throw new System.Exception("FullWellCapacity is not supported");
+                sx.Log.Write("FullWellCapacity()\n");
+                return MaxADU * ElectronsPerADU /(BinX * BinY);
             }
         }
 
@@ -740,15 +745,50 @@ namespace ASCOM.SXMainCamera
             F.ShowDialog();
         }
 
-        internal void caputure(double Duration, bool Light)
+        internal void hardwareCapture(double Duration, bool Light)
         {
-            sx.Log.Write("capture begins Duration=" + Duration + "\n");
+            sx.Log.Write("hardwareCapture() begins Duration=" + Duration + "\n");
 
             try
             {
-                sx.Log.Write("capture(): calling clearRecordedPixel\n");
+                exposureStart = DateTime.Now;
+                
+                lock (oStateLock)
+                {
+                    if (bAbortRequested)
+                    {
+                        return;
+                    }
+                    state = CameraStates.cameraDownload;
+                }
+
+                sxCamera.delayMs = (uint)(1000 * Duration);
+                sxCamera.recordPixelsDelayed();
+
+                actualExposureLength = new TimeSpan(0, 0, 0, 0, (int)(1000*Duration));
+
+                sx.Log.Write("hardwareCapture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
+
+                bImageValid = true;
+            }
+            finally
+            {
+                lock (oStateLock)
+                {
+                    state = CameraStates.cameraIdle;
+                }
+            }
+        }
+
+        internal void softwareCapture(double Duration, bool Light)
+        {
+            sx.Log.Write("softwareCapture() begins Duration=" + Duration + "\n");
+
+            try
+            {
+                sx.Log.Write("softwareCapture(): calling clearRecordedPixel\n");
                 sxCamera.clearRecordedPixels();
-                sx.Log.Write("capture(): calling clearCcdPixel\n");
+                sx.Log.Write("softwareCapture(): calling clearCcdPixel\n");
                 sxCamera.clearCcdPixels(); // This clears both the CCD and the recorded pixels.  For
                                            // long exposures (> 2 seconds) we will cleare the recorded pixels again just before
                                            // the exposure ends to clear any accumulated noise.
@@ -761,7 +801,7 @@ namespace ASCOM.SXMainCamera
                 // We sleep for most of the exposure, then spin for the last little bit
                 // because this helps us end closer to the right time
 
-                sx.Log.Write("capture(): about to begin loop, exposureEnd=" + exposureEnd + "\n");
+                sx.Log.Write("softwareCapture(): about to begin loop, exposureEnd=" + exposureEnd + "\n");
                 for (TimeSpan remainingExposureTime = desiredExposureLength;
                     remainingExposureTime.TotalMilliseconds > 0;
                     remainingExposureTime = exposureEnd - DateTime.Now)
@@ -769,7 +809,7 @@ namespace ASCOM.SXMainCamera
                     
                     if (remainingExposureTime.TotalSeconds < 2.0 && !bRecordedCleared)
                     {
-                        sx.Log.Write("capture(): before clearRecordedPixels(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        sx.Log.Write("softwareCapture(): before clearRecordedPixels(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         sxCamera.clearRecordedPixels();
                         bRecordedCleared = true;
                     }
@@ -799,7 +839,7 @@ namespace ASCOM.SXMainCamera
 
                 actualExposureLength = exposureEnd - exposureStart;
 
-                sx.Log.Write("capture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
+                sx.Log.Write("softwareCapture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
                 
                 bImageValid = true;
             }
@@ -836,15 +876,24 @@ namespace ASCOM.SXMainCamera
 
             try
             {
-                sxCamera.width = (ushort)(binX*NumX);
-                sxCamera.height = (ushort)(binY*NumY);
-                sxCamera.xOffset = (ushort)(binX*StartX);
-                sxCamera.yOffset = (ushort)(binY*StartY);
-                
-                CaptureDelegate captureDelegate = new CaptureDelegate(caputure);
-                
+                sxCamera.width = (ushort)(binX * NumX);
+                sxCamera.height = (ushort)(binY * NumY);
+                sxCamera.xOffset = (ushort)(binX * StartX);
+                sxCamera.yOffset = (ushort)(binY * StartY);
+
+                CaptureDelegate captureDelegate;
+
+                if (cameraId == 1 && Duration <= 5.0)
+                {
+                    captureDelegate = new CaptureDelegate(hardwareCapture);
+                }
+                else
+                {
+                    captureDelegate = new CaptureDelegate(softwareCapture);
+                }
+
                 sx.Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
-                
+
                 captureDelegate.BeginInvoke(Duration, Light, null, null);
 
                 sx.Log.Write("StartExposure() after captureDelegate.BeginInvode()\n");
@@ -900,6 +949,8 @@ namespace ASCOM.SXMainCamera
                         bStopRequested = true;
                         break;
                     default:
+                        if (bStopRequested)
+                            break; // they asked when it was legal and are just asking again.
                         throw new System.Exception("Stop not possible.");
                 }
             }

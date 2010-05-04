@@ -14,6 +14,7 @@ namespace sx
         private Controller controller;
         private SX_CCD_PARAMS ccdParms;
         private SX_READ_DELAYED_BLOCK readDelayedBlock;
+        byte[] imageAsBytes;
         private UInt32[,] imageData;
         private bool imageDataValid;
         private Int16 idx;
@@ -59,6 +60,25 @@ namespace sx
         {
             get;
             private set;
+        }
+
+        public double electronsPerADU
+        {
+            get
+            {
+                double dReturn;
+
+                switch (cameraModel)
+                {
+                    case 0x59:
+                        dReturn = 0.40;
+                        break;
+                    default:
+                        throw new System.Exception("ElectronsPerADU unknown for this camera model");
+                }
+
+                return dReturn;
+            }
         }
 
         public Byte hFrontPorch
@@ -215,12 +235,19 @@ namespace sx
                     throw new ArgumentException("ImageArray not valid");
                 }
 
+                if (imageData == null)
+                {
+                    convertCameraDataToImageData();
+                }
+
                 return imageData; 
             }
         }
 
         public Camera(Controller controller, Int16 cameraIdx)
         {
+            Log.Write(String.Format("sx.Camera() constructor: controller={0} cameraIdx={1}\n", controller, cameraIdx));
+
             idx = cameraIdx;
 
             this.controller = controller;
@@ -234,6 +261,7 @@ namespace sx
 
                 if ((controller.extraCapabilities & INTEGRATED_GUIDER_CCD) == 0)
                 {
+                    Log.Write(String.Format("sx.Camera() constructor: Guide Camera is not connected\n"));
                     throw new ArgumentException("Error: cameraIDX == 1 and INTEGRATED_GUIDER_CCD == 0");
                 }
             }
@@ -242,6 +270,7 @@ namespace sx
             getParams(ref ccdParms);
             buildReadDelayedBlock(out readDelayedBlock, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
             imageDataValid = false;
+            Log.Write(String.Format("sx.Camera() constructor returns\n"));
          }
 
         // we use a READ_DELAYED_BLOCK to store paramters that are accessed as properties.  
@@ -344,18 +373,10 @@ namespace sx
             Log.Write("getParams has unlocked\n");
         }
 
-        internal void downloadPixels()
+        internal void convertCameraDataToImageData()
         {
-            Int32 numBytesRead;
-            Int32 binnedWidth = width/xBin;
-            Int32 binnedHeight = height/yBin;
-            Int32 imageBytes = binnedWidth * binnedHeight * bitsPerPixel/BITS_PER_BYTE;
-
-            Log.Write(String.Format("downloadPixels(): requesting {0}bytres ({1} pixels, {2} bytes each\n", imageBytes, binnedWidth*binnedHeight, bitsPerPixel/BITS_PER_BYTE));
-
-            byte[] imageAsBytes = (byte[])controller.Read(typeof(byte[]), imageBytes, out numBytesRead);
-            
-            Log.Write("downloadPixels(): read completed, numBytesRead=" + numBytesRead + "\n");
+            Int32 binnedWidth = width / xBin;
+            Int32 binnedHeight = height / yBin;
 
             if (bitsPerPixel != 16 && bitsPerPixel != 8)
             {
@@ -370,7 +391,7 @@ namespace sx
             Int32 byteoffset = 0;
             UInt32 min = 9999999, max = 0;
 
-            Log.Write("downloadPixels(): decoding data, bitsPerPixel=" + bitsPerPixel +" binnedWidth = " + binnedWidth + " binnedHeight="+ binnedHeight + "\n");
+            Log.Write("convertCameraDataToImageData(): decoding data, bitsPerPixel=" + bitsPerPixel + " binnedWidth = " + binnedWidth + " binnedHeight=" + binnedHeight + "\n");
 
             double sum = 0;
             for (int y = 0; y < binnedHeight; y++)
@@ -408,8 +429,24 @@ namespace sx
                     sum += pixelValue;
                 }
             }
+
+            Log.Write(String.Format("convertCameraDataToImageData(): min={0} max={1} ave={2:f}\n", min, max, sum / (double)(binnedHeight * binnedWidth)));
+        }
+
+        internal void downloadPixels()
+        {
+            Int32 numBytesRead;
+            Int32 binnedWidth = width / xBin;
+            Int32 binnedHeight = height / yBin;
+            Int32 imageBytes = binnedWidth * binnedHeight * bitsPerPixel / BITS_PER_BYTE;
+
+            Log.Write(String.Format("downloadPixels(): requesting {0}bytres ({1} pixels, {2} bytes each\n", imageBytes, binnedWidth * binnedHeight, bitsPerPixel / BITS_PER_BYTE));
+
+            imageAsBytes = (byte[])controller.Read(typeof(byte[]), imageBytes, out numBytesRead);
+            imageData = null;
             imageDataValid = true;
-            Log.Write(String.Format("downloadPixels(): min={0} max={1} ave={2:f}\n", min, max, sum/(double)(binnedHeight*binnedWidth)));
+
+            Log.Write("downloadPixels(): read completed, numBytesRead=" + numBytesRead + "\n");
         }
 
         public void recordPixels(out DateTime exposureEnd)
@@ -431,6 +468,7 @@ namespace sx
             lock (controller)
             {
                 Log.Write("recordPixels() has locked\n");
+                imageDataValid = false;
                 Log.Write("recordPixels() requesting read\n");
                 controller.Write(cmdBlock, readBlock, out numBytesWritten);
                 exposureEnd = DateTime.Now;
@@ -442,7 +480,7 @@ namespace sx
             Log.Write("recordPixels() has unlocked\n");
         }
 
-        public void recordPixelsDelayed(out DateTime exposureEnd)
+        public void recordPixelsDelayed()
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
@@ -461,9 +499,9 @@ namespace sx
             lock (controller)
             {
                 Log.Write("recordPixelsDelayed has locked\n");
+                imageDataValid = false;
                 Log.Write("recordPixelsDelayed requesting read\n");
                 controller.Write(cmdBlock, readDelayedBlock, out numBytesWritten);
-                exposureEnd = DateTime.Now;
                 Log.Write("recordPixelsDelayed requesting download\n");
                 downloadPixels();
             }
