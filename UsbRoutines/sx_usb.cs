@@ -11,9 +11,9 @@ namespace sx
     {
         internal Byte cmd_type;
         internal Byte cmd;
-        internal Int16 cmd_value;
-        internal Int16 index;
-        internal Int16 cmd_length;
+        internal UInt16 cmd_value;
+        internal UInt16 index;
+        internal UInt16 cmd_length;
     }
 
     internal class USBInterface

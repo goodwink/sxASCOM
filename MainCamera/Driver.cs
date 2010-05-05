@@ -52,24 +52,27 @@ namespace ASCOM.SXMainCamera
         private TimeSpan desiredExposureLength;
         private TimeSpan actualExposureLength;
         private delegate void CaptureDelegate(double Duration, bool Light);
+        private delegate void GuideDelegate(GuideDirections Direction, int Duration);
         private bool bImageValid;
         private short binX, binY;
-        private volatile Object oStateLock;
+        private volatile Object oCameraStateLock;
         private volatile CameraStates state;
         private volatile bool bAbortRequested;
         private volatile bool bStopRequested;
-        private static short cameraId;
+        private volatile Object oGuideStateLock;
+        private volatile bool bGuiding;
+        private static UInt16 cameraId;
 
         #region Camera Constructor
          //
         // Constructor - Must be public for COM registration!
         //
-        protected Camera(short whichCamera)
+        protected Camera(UInt16 whichCamera)
         {
             //Thread.Sleep(15000);
             sx.Log.Write("In Camera Constructor for camera " + whichCamera +" \n");
 
-            oStateLock = new Object();
+            oCameraStateLock = new Object();
             cameraId = whichCamera;                     
         }
 
@@ -97,7 +100,7 @@ namespace ASCOM.SXMainCamera
         public void AbortExposure()
         {
             sx.Log.Write("AbortExposure\n");
-            lock (oStateLock)
+            lock (oCameraStateLock)
             {
                 switch (state)
                 {
@@ -204,7 +207,7 @@ namespace ASCOM.SXMainCamera
             get 
             { 
                 sx.Log.Write("CameraState()\n"); 
-                lock (oStateLock)
+                lock (oCameraStateLock)
                 {
                     return state;
                 }
@@ -287,7 +290,7 @@ namespace ASCOM.SXMainCamera
             get
             {
                 sx.Log.Write("CanPulseGuide()\n");
-                return false;
+                return sxCamera.hasGuidePort;
             }
         }
 
@@ -349,10 +352,19 @@ namespace ASCOM.SXMainCamera
                     NumY = sxCamera.ccdHeight;
                     binX = binY = 1;
                     state = CameraStates.cameraIdle;
+                    bImageValid = false;
+                    bAbortRequested = false;
+                    bStopRequested = false;
+                    bGuiding = false;
                 }
                 else
                 {
+                    if (sxCamera.hasGuidePort)
+                    {
+                        sxCamera.guideStop();
+                    }
                     sxCamera = null;
+                    
                 }
 
                 bConnected = value;
@@ -546,8 +558,11 @@ namespace ASCOM.SXMainCamera
         {
             get 
             {
-                sx.Log.Write("IsPulseGuiding()\n"); 
-                throw new System.Exception("The method or operation is not implemented.");
+                sx.Log.Write("IsPulseGuiding()\n");
+                lock (oGuideStateLock)
+                {
+                    return bGuiding;
+                }
             }
         }
 
@@ -686,6 +701,61 @@ namespace ASCOM.SXMainCamera
             }
         }
 
+        private void guide(GuideDirections Direction, int Duration)
+        {
+            sx.Log.Write("guide() begins Duration=" + Duration + "\n");
+            DateTime guideStart = DateTime.Now;
+
+            try
+            {
+                TimeSpan desiredGuideDuration = TimeSpan.FromMilliseconds(Duration);
+                DateTime guideEnd = guideStart + desiredGuideDuration;
+
+                switch (Direction)
+                {
+                    case GuideDirections.guideNorth:
+                        sxCamera.guideNorth();
+                        break;
+                    case GuideDirections.guideSouth:
+                        sxCamera.guideSouth();
+                        break;
+                    case GuideDirections.guideEast:
+                        sxCamera.guideEast();
+                        break;
+                    case GuideDirections.guideWest:
+                        sxCamera.guideWest();
+                        break;
+                }
+
+                // We sleep for most of the guide time, then spin for the last little bit
+                // because this helps us end closer to the right time
+
+                sx.Log.Write("guide(): about to begin loop\n");
+                
+                for (TimeSpan remainingGuideTime = desiredExposureLength;
+                    remainingGuideTime.TotalMilliseconds > 0;
+                    remainingGuideTime = guideEnd - DateTime.Now)
+                {
+                    if (remainingGuideTime.TotalMilliseconds > 75)
+                    {
+                        // sleep in small chunks so that we are responsive to abort and stop requests
+                        //sx.Log.Write("Before sleep, remaining exposure=" + remainingGuideTime.TotalSeconds + "\n");
+                        Thread.Sleep(50);
+                    }
+                }
+            }
+            finally
+            {
+                sxCamera.guideStop();
+
+                lock (oGuideStateLock)
+                {
+                    bGuiding = false;
+                }
+                sx.Log.Write(String.Format("guide(): delay ends, actualExposureLength={0:F4}\n", (DateTime.Now - guideStart).TotalMilliseconds));
+            }
+        }
+
         /// <summary>
         /// This method returns only after the move has completed.
         ///
@@ -708,7 +778,20 @@ namespace ASCOM.SXMainCamera
         public void PulseGuide(GuideDirections Direction, int Duration)
         {
             sx.Log.Write("PulseGuide()\n");
-            throw new System.Exception("PulseGuide() cannot be called if CanPuluseGuide == false");
+
+            if (!CanPulseGuide)
+            {
+                throw new System.Exception("PulseGuide() cannot be called if CanPuluseGuide == false");
+            }
+
+            GuideDelegate guideDelegate = new GuideDelegate(guide);
+
+            lock (oGuideStateLock)
+            {
+                bGuiding = true;
+            }
+
+            guideDelegate.BeginInvoke(Direction, Duration, null, null);
         }
 
         /// <summary>
@@ -753,7 +836,7 @@ namespace ASCOM.SXMainCamera
             {
                 exposureStart = DateTime.Now;
                 
-                lock (oStateLock)
+                lock (oCameraStateLock)
                 {
                     if (bAbortRequested)
                     {
@@ -773,7 +856,7 @@ namespace ASCOM.SXMainCamera
             }
             finally
             {
-                lock (oStateLock)
+                lock (oCameraStateLock)
                 {
                     state = CameraStates.cameraIdle;
                 }
@@ -826,7 +909,7 @@ namespace ASCOM.SXMainCamera
                     }
                 }
 
-                lock (oStateLock)
+                lock (oCameraStateLock)
                 {
                     if (bAbortRequested)
                     {
@@ -845,7 +928,7 @@ namespace ASCOM.SXMainCamera
             }
             finally
             {
-                lock (oStateLock)
+                lock (oCameraStateLock)
                 {
                     state = CameraStates.cameraIdle;
                 }
@@ -862,7 +945,7 @@ namespace ASCOM.SXMainCamera
         {
             sx.Log.Write("StartExposure() duration=" + Duration + "\n");
 
-            lock (oStateLock)
+            lock (oCameraStateLock)
             {
                 if (state != CameraStates.cameraIdle)
                 {
@@ -900,7 +983,7 @@ namespace ASCOM.SXMainCamera
             }
             catch (Exception ex)
             {
-                lock (oStateLock)
+                lock (oCameraStateLock)
                 {
                     state = CameraStates.cameraIdle;
                 }
@@ -940,7 +1023,7 @@ namespace ASCOM.SXMainCamera
         public void StopExposure()
         {
             sx.Log.Write("StopExposure()\n");
-            lock (oStateLock)
+            lock (oCameraStateLock)
             {
                 switch (state)
                 {

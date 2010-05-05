@@ -6,12 +6,22 @@ using WinUsbDemo;
 
 namespace sx
 {
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+
+
+    // Locking:
+    //    While doing I/O, iface is locked. This prevents the possibility of 
+    //    interleaved I/O.
+    // Calls that return data must lock the controller to prevent intersperced returns such
+    //    as might happen of we called get timer while an image was being transferred. 
     public class Controller
         : sxBase
     {
         // Variables
         private USBInterface iface;
         private SX_CCD_PARAMS ccdParms;
+        private object DataReturned;
 
         // Properties
 
@@ -30,11 +40,6 @@ namespace sx
         public Byte numSerialPorts
         {
             get {return ccdParms.num_serial_ports;}
-        }
-
-        public Byte extraCapabilities
-        {
-            get {return ccdParms.extra_capabilities;}
         }
 
         public Controller()
@@ -56,7 +61,7 @@ namespace sx
             }
         }
 
-        internal void buildCommandBlock(out SX_CMD_BLOCK block, Byte cmd_type, Byte cmd, Int16 cmd_value, Int16 index, Int16 cmd_length)
+        internal void buildCommandBlock(out SX_CMD_BLOCK block, Byte cmd_type, Byte cmd, UInt16 cmd_value, UInt16 index, UInt16 cmd_length)
         {
             block.cmd_type = cmd_type;
             block.cmd = cmd;
@@ -69,7 +74,7 @@ namespace sx
         
         internal void Write(SX_CMD_BLOCK block, Object data, out Int32 numBytesWritten)
         {
-            lock (this)
+            lock (iface)
             {
                 Log.Write("Write has locked\n");
                 iface.Write(block, data, out numBytesWritten);
@@ -86,7 +91,7 @@ namespace sx
         {
             object oReturn;
 
-            lock (this)
+            lock (iface)
             {
                 Log.Write("Read has locked\n");
                 oReturn = iface.Read(returnType, numBytesToRead, out numBytesRead);
@@ -116,7 +121,7 @@ namespace sx
             Int32 numBytesWritten, numBytesRead;
             string s2;
 
-            buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_ECHO, 0, 0, (Int16)s.Length);
+            buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_ECHO, 0, 0, (UInt16)s.Length);
 
             Write(cmdBlock, s, out numBytesWritten);
 
@@ -198,8 +203,17 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
 
-            buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_TIMER, 0, 0, (short)Marshal.SizeOf(ms));
+            buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_TIMER, 0, 0, (UInt16)Marshal.SizeOf(ms));
             Write(cmdBlock, ms, out numBytesWritten);
+        }
+
+        public void guide(UInt16 direction)
+        {
+            SX_CMD_BLOCK cmdBlock;
+            Int32 numBytesWritten;
+
+            buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_STAR2K, direction, 0, 0);
+            Write(cmdBlock, out numBytesWritten);
         }
     }
 }

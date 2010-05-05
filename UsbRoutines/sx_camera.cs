@@ -6,10 +6,33 @@ using WinUsbDemo;
 
 namespace sx
 {
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    internal struct SX_READ_BLOCK
+    {
+        internal UInt16 x_offset;
+        internal UInt16 y_offset;
+        internal UInt16 width;
+        internal UInt16 height;
+        internal Byte x_bin;
+        internal Byte y_bin;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    internal struct SX_READ_DELAYED_BLOCK
+    {
+        internal UInt16 x_offset;
+        internal UInt16 y_offset;
+        internal UInt16 width;
+        internal UInt16 height;
+        internal Byte x_bin;
+        internal Byte y_bin;
+        internal UInt32 delay;
+    }
+
+
     public class Camera
         :sxBase
     {
-
         // Variables
         private Controller controller;
         private SX_CCD_PARAMS ccdParms;
@@ -17,7 +40,8 @@ namespace sx
         byte[] imageAsBytes;
         private UInt32[,] imageData;
         private bool imageDataValid;
-        private Int16 idx;
+        private object oImageDataLock;
+        private UInt16 idx;
 
         // Properties
 
@@ -126,7 +150,17 @@ namespace sx
             get {return ccdParms.bits_per_pixel;}
         }
 
-        public Byte extraCapabilities
+        public Boolean hasGuideCamera
+        {
+            get { return (extraCapabilities & INTEGRATED_GUIDER_CCD) == INTEGRATED_GUIDER_CCD; }
+        }
+
+        public Boolean hasGuidePort
+        {
+            get { return (extraCapabilities & STAR2000_PORT) == STAR2000_PORT; }
+        }
+
+        private Byte extraCapabilities
         {
             get {return ccdParms.extra_capabilities;}
         }
@@ -228,23 +262,26 @@ namespace sx
         {
             get
             {
-                Log.Write("ImageArray entered: imageDataValid=" + imageDataValid + "\n");
-
-                if (!imageDataValid)
+                lock (oImageDataLock)
                 {
-                    throw new ArgumentException("ImageArray not valid");
-                }
+                    Log.Write("ImageArray entered: imageDataValid=" + imageDataValid + "\n");
 
-                if (imageData == null)
-                {
-                    convertCameraDataToImageData();
-                }
+                    if (!imageDataValid)
+                    {
+                        throw new ArgumentException("ImageArray not valid");
+                    }
 
-                return imageData; 
+                    if (imageData == null)
+                    {
+                        convertImageAsBytesToImageData();
+                    }
+
+                    return imageData;
+                }
             }
         }
 
-        public Camera(Controller controller, Int16 cameraIdx)
+        public Camera(Controller controller, UInt16 cameraIdx)
         {
             Log.Write(String.Format("sx.Camera() constructor: controller={0} cameraIdx={1}\n", controller, cameraIdx));
 
@@ -259,7 +296,7 @@ namespace sx
                     throw new ArgumentException("Error: Untested with cameraIdx > 1");
                 }
 
-                if ((controller.extraCapabilities & INTEGRATED_GUIDER_CCD) == 0)
+                if (!hasGuideCamera)
                 {
                     Log.Write(String.Format("sx.Camera() constructor: Guide Camera is not connected\n"));
                     throw new ArgumentException("Error: cameraIDX == 1 and INTEGRATED_GUIDER_CCD == 0");
@@ -270,6 +307,7 @@ namespace sx
             getParams(ref ccdParms);
             buildReadDelayedBlock(out readDelayedBlock, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
             imageDataValid = false;
+            oImageDataLock = new object();
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
          }
 
@@ -340,9 +378,8 @@ namespace sx
             byte[] bytes = new byte[2];
             UInt16 model=0;
 
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (short)Marshal.SizeOf(model));
+            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (UInt16)Marshal.SizeOf(model));
 
-            
             lock (controller)
             {
                 Log.Write("getModel has locked\n");
@@ -373,7 +410,7 @@ namespace sx
             Log.Write("getParams has unlocked\n");
         }
 
-        internal void convertCameraDataToImageData()
+        internal void convertImageAsBytesToImageData()
         {
             Int32 binnedWidth = width / xBin;
             Int32 binnedHeight = height / yBin;
@@ -443,10 +480,59 @@ namespace sx
             Log.Write(String.Format("downloadPixels(): requesting {0}bytres ({1} pixels, {2} bytes each\n", imageBytes, binnedWidth * binnedHeight, bitsPerPixel / BITS_PER_BYTE));
 
             imageAsBytes = (byte[])controller.Read(typeof(byte[]), imageBytes, out numBytesRead);
-            imageData = null;
-            imageDataValid = true;
+
+            lock (oImageDataLock)
+            {
+                imageDataValid = true;
+                imageData = null;
+            }
 
             Log.Write("downloadPixels(): read completed, numBytesRead=" + numBytesRead + "\n");
+        }
+
+        public void guideNorth()
+        {
+            if (!hasGuidePort)
+            {
+                controller.guide(SX_STAR2K_NORTH);
+            }
+        }
+
+        public void guideSouth()
+        {
+            if (!hasGuidePort)
+            {
+                throw new System.Exception("Exposure already in progress");
+            }
+            controller.guide(SX_STAR2K_SOUTH);
+        }
+
+        public void guideEast()
+        {
+            if (!hasGuidePort)
+            {
+                throw new System.Exception("Exposure already in progress");
+            }
+            controller.guide(SX_STAR2K_EAST);
+        }
+
+        public void guideWest()
+        {
+            if (!hasGuidePort)
+            {
+                throw new System.Exception("Exposure already in progress");
+            }
+            controller.guide(SX_STAR2K_WEST);
+
+        }
+
+        public void guideStop()
+        {
+            if (!hasGuidePort)
+            {
+                throw new System.Exception("Exposure already in progress");
+            }
+            controller.guide(SX_STAR2K_STOP);
         }
 
         public void recordPixels(out DateTime exposureEnd)
@@ -463,12 +549,15 @@ namespace sx
                                SX_CMD_READ_PIXELS,
                                SX_CCD_FLAGS_FIELD_ODD | SX_CCD_FLAGS_FIELD_EVEN,
                                idx,
-                               (Int16)Marshal.SizeOf(readBlock));
+                               (UInt16)Marshal.SizeOf(readBlock));
 
             lock (controller)
             {
                 Log.Write("recordPixels() has locked\n");
-                imageDataValid = false;
+                lock (oImageDataLock)
+                {
+                    imageDataValid = false;
+                }
                 Log.Write("recordPixels() requesting read\n");
                 controller.Write(cmdBlock, readBlock, out numBytesWritten);
                 exposureEnd = DateTime.Now;
@@ -489,7 +578,7 @@ namespace sx
                                          SX_CMD_READ_PIXELS_DELAYED, 
                                          SX_CCD_FLAGS_FIELD_ODD | SX_CCD_FLAGS_FIELD_EVEN,
                                          idx,
-                                         (Int16)Marshal.SizeOf(readDelayedBlock));
+                                         (UInt16)Marshal.SizeOf(readDelayedBlock));
 
             // this will be locked for a long time.  It should probably do something
             // different, like write the command, sleep for most of the time, then lock
@@ -499,7 +588,10 @@ namespace sx
             lock (controller)
             {
                 Log.Write("recordPixelsDelayed has locked\n");
-                imageDataValid = false;
+                lock (oImageDataLock)
+                {
+                    imageDataValid = false;
+                }
                 Log.Write("recordPixelsDelayed requesting read\n");
                 controller.Write(cmdBlock, readDelayedBlock, out numBytesWritten);
                 Log.Write("recordPixelsDelayed requesting download\n");

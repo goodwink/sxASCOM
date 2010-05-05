@@ -78,50 +78,19 @@ namespace sx
         internal const Byte SX_CCD_FLAGS_TDI = 32;	           // Implement TDI (drift scan) operation
         internal const Byte SX_CCD_FLAGS_NOCLEAR_FRAME = 64;  // Don't clear frame, even when asked
 
+        // STAR2K values
+        internal const UInt16 SX_STAR2K_STOP  = 0;
+        internal const UInt16 SX_STAR2K_WEST  = 1;
+        internal const UInt16 SX_STAR2K_SOUTH = 2; 
+        internal const UInt16 SX_STAR2K_NORTH = 4;
+        internal const UInt16 SX_STAR2K_EAST  = 8;
+        
         // constants
         internal const Byte BITS_PER_BYTE=8; 
+
         // limits
         internal Byte MAX_BIN=4; // I made this up
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
-        internal struct SX_READ_BLOCK
-        {
-            internal UInt16 x_offset;
-            internal UInt16 y_offset;
-            internal UInt16 width;
-            internal UInt16 height;
-            internal Byte x_bin;
-            internal Byte y_bin;
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
-        internal struct SX_READ_DELAYED_BLOCK
-        {
-            internal UInt16 x_offset;
-            internal UInt16 y_offset;
-            internal UInt16 width;
-            internal UInt16 height;
-            internal Byte x_bin;
-            internal Byte y_bin;
-            internal UInt32 delay;
-        }
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
-        internal struct SX_CCD_PARAMS
-        {
-            internal Byte hfront_porch;
-            internal Byte hback_porch;
-            internal UInt16 width;
-            internal Byte vfront_porch;
-            internal Byte vback_porch;
-            internal UInt16 height;
-            internal UInt16 pixel_uwidth;
-            internal UInt16 pixel_uheight;
-            internal UInt16 color_matrix;
-            internal Byte bits_per_pixel;
-            internal Byte num_serial_ports;
-            internal Byte extra_capabilities;
-        }
 
         internal const Byte STAR2000_PORT = 0x1;
         internal const Byte DEPRICATED_COMPRESSED_PIXEL_FORMAT = 0x2;
@@ -140,5 +109,21 @@ namespace sx
         const UInt16 COLOR_MATRIX_MATRIX_GREEN_MASK  = 0x00F0;
         const UInt16 COLOR_MATRIX_MATRIX_BLUE_MASK   = 0x000F;
         const UInt16 COLOR_MATRIX_MONOCHROME         = 0x0FFF;
+
+        internal struct SX_CCD_PARAMS
+        {
+            internal Byte hfront_porch;
+            internal Byte hback_porch;
+            internal UInt16 width;
+            internal Byte vfront_porch;
+            internal Byte vback_porch;
+            internal UInt16 height;
+            internal UInt16 pixel_uwidth;
+            internal UInt16 pixel_uheight;
+            internal UInt16 color_matrix;
+            internal Byte bits_per_pixel;
+            internal Byte num_serial_ports;
+            internal Byte extra_capabilities;
+        }
     }
 }
