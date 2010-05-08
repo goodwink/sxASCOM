@@ -40,13 +40,24 @@ namespace ASCOM.SXMain
     // The ClassInterface/None addribute prevents an empty interface called
     // _Camera from being created and used as the [default] interface
     //
-    [Guid("c150cbaa-429d-4bad-84ff-27077b4156aa")]
+    [Guid("cfa2c985-9251-4b62-9146-99a52bf47701")]
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {
         public Camera() :
-            base(1)
+            base(0)
         {
+        }
+
+        /// <summary>
+        /// Launches a configuration dialog box for the driver.  The call will not return
+        /// until the user clicks OK or cancel manually.
+        /// </summary>
+        /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
+        public override void SetupDialog()
+        {
+            SetupDialogForm F = new SetupDialogForm();
+            F.ShowDialog();
         }
     }
 }

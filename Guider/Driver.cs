@@ -42,11 +42,17 @@ namespace ASCOM.SXGuider
     //
     [Guid("c150cbaa-429d-4bad-84ff-27077b4156aa")]
     [ClassInterface(ClassInterfaceType.None)]
-    public class Camera : ASCOM.SXMainCamera.Camera
+    public class Camera : ASCOM.SXGeneric.Camera
     {
         public Camera() :
             base(1)
         {
         }
+        public override void SetupDialog()
+        {
+            SetupDialogForm F = new SetupDialogForm();
+            F.ShowDialog();
+        }
+
     }
 }

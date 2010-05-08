@@ -6,22 +6,18 @@ using WinUsbDemo;
 
 namespace sx
 {
-
-    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
-
-
     // Locking:
     //    While doing I/O, iface is locked. This prevents the possibility of 
     //    interleaved I/O.
     // Calls that return data must lock the controller to prevent intersperced returns such
     //    as might happen of we called get timer while an image was being transferred. 
+
     public class Controller
         : sxBase
     {
         // Variables
         private USBInterface iface;
         private SX_CCD_PARAMS ccdParms;
-        private object DataReturned;
 
         // Properties
 

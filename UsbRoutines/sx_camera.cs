@@ -29,6 +29,22 @@ namespace sx
         internal UInt32 delay;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    internal struct SX_CCD_PARAMS
+    {
+        internal Byte hfront_porch;
+        internal Byte hback_porch;
+        internal UInt16 width;
+        internal Byte vfront_porch;
+        internal Byte vback_porch;
+        internal UInt16 height;
+        internal UInt16 pixel_uwidth;
+        internal UInt16 pixel_uheight;
+        internal UInt16 color_matrix;
+        internal Byte bits_per_pixel;
+        internal Byte num_serial_ports;
+        internal Byte extra_capabilities;
+    }
 
     public class Camera
         :sxBase

@@ -40,9 +40,8 @@ namespace ASCOM.SXGeneric
     // The ClassInterface/None addribute prevents an empty interface called
     // _Camera from being created and used as the [default] interface
     //
-    [Guid("cfa2c985-9251-4b62-9146-99a52bf47701")]
     [ClassInterface(ClassInterfaceType.None)]
-    public class Camera :
+    abstract public class Camera :
         ASCOM.SXCamera.ReferenceCountedObjectBase, 
         ICamera
     {
@@ -73,12 +72,8 @@ namespace ASCOM.SXGeneric
             sx.Log.Write("In Camera Constructor for camera " + whichCamera +" \n");
 
             oCameraStateLock = new Object();
+            oGuideStateLock = new Object();
             cameraId = whichCamera;                     
-        }
-
-        public Camera() :
-            this(0)
-        {
         }
         #endregion
 
@@ -816,18 +811,8 @@ namespace ASCOM.SXGeneric
             }
         }
 
-        /// <summary>
-        /// Launches a configuration dialog box for the driver.  The call will not return
-        /// until the user clicks OK or cancel manually.
-        /// </summary>
-        /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
-        public void SetupDialog()
-        {
-            SetupDialogForm F = new SetupDialogForm();
-            sx.Log.Write("SetupDialog()\n");
-            F.ShowDialog();
-        }
-
+        abstract public void SetupDialog();
+ 
         internal void hardwareCapture(double Duration, bool Light)
         {
             sx.Log.Write("hardwareCapture() begins Duration=" + Duration + "\n");

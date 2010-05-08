@@ -226,29 +226,28 @@ namespace ASCOM.SXCamera
             DirectoryInfo d = new DirectoryInfo(assyPath);
             foreach (FileInfo fi in d.GetFiles("*.dll"))
             {
-                string aPath = fi.FullName;
-                string fqClassName = fi.Name.Replace(fi.Extension, "");						// COM class FQN
-                //char[] charSeparators = new char[] { '_' };
-                //string[] componentsClassName = rawClassName.Split(charSeparators, 2, StringSplitOptions.RemoveEmptyEntries);
-                //string fqClassName = rawClassName.Split(charSeparators, 2, StringSplitOptions.RemoveEmptyEntries)[0];
-     
-                //
-                // First try to load the assembly and get the types for
-                // the class and the class facctory. If this doesn't work ????
-                //
-                try
+                if (!fi.Name.ToLower().Contains("generic"))
                 {
-                    Assembly so = Assembly.LoadFrom(aPath);
-                    m_ComObjectTypes.Add(so.GetType(fqClassName, true));
-                    m_ComObjectAssys.Add(so);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show("Failed to load served COM class assembly " + fi.Name + " - " + e.Message,
-                        "SXCamera", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                    return false;
-                }
+                    string aPath = fi.FullName;
+                    string fqClassName = fi.Name.Replace(fi.Extension, "");						// COM class FQN
 
+                    //
+                    // First try to load the assembly and get the types for
+                    // the class and the class facctory. If this doesn't work ????
+                    //
+                    try
+                    {
+                        Assembly so = Assembly.LoadFrom(aPath);
+                        m_ComObjectTypes.Add(so.GetType(fqClassName, true));
+                        m_ComObjectAssys.Add(so);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("Failed to load served COM class assembly " + fi.Name + " - " + e.Message,
+                            "SXCamera", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                        return false;
+                    }
+                }
             }
             return true;
         }
