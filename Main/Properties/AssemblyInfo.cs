@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 //
 // TODO - Add your authorship information here
-[assembly: AssemblyTitle("SX Guide Camera Driver")]
-[assembly: AssemblyDescription("ASCOM Camera Driver for SX Guide Camera")]
+[assembly: AssemblyTitle("SX Main Camera Driver")]
+[assembly: AssemblyDescription("ASCOM Camera Driver for SX Main Camera")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ASCOM Initiative")]
-[assembly: AssemblyProduct("SX Guide Camera")]
+[assembly: AssemblyProduct("SX Main Camera")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
