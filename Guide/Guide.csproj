@@ -7,8 +7,8 @@
     <ProjectGuid>{3846096F-535B-4C0F-91E4-16AC50CF11AE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ASCOM.SXGuider</RootNamespace>
-    <AssemblyName>ASCOM.SXGuider.Camera</AssemblyName>
+    <RootNamespace>ASCOM.SXGuide</RootNamespace>
+    <AssemblyName>ASCOM.SXGuide.Camera</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>

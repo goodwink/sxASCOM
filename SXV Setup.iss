@@ -34,14 +34,15 @@ Name: "{cf}\ASCOM\Uninstall\Camera\SXV"
 ; TODO: Add subfolders below {app} as needed (e.g. Name: "{app}\MyFolder")
 
 [Files]
-Source: "D:\Astronomy\src\sxASCOM\GuideCamera\bin\Debug\ASCOM.SXCamera.exe"; DestDir: "{app}"
+Source: "D:\Astronomy\src\sxASCOM\SXCamera\bin\Debug\ASCOM.SXCamera.exe"; DestDir: "{app}"
 ; TODO: Add driver assemblies into the ServedClasses folder
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
 Source: "D:\Astronomy\src\sxASCOM\ASCOM.SXCamera.Readme.txt"; DestDir: "{app}"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
-Source: "D:\Astronomy\src\sxASCOM\GuideCamera\bin\Debug\ASCOM.SXCamera.UsbRoutines.dll"; DestDir: "{app}"
-Source: "D:\Astronomy\src\sxASCOM\GuideCamera\bin\Debug\ASCOM.SXMainCamera.Camera.dll"; DestDir: "{app}"
-Source: "D:\Astronomy\src\sxASCOM\GuideCamera\bin\Debug\ASCOM.SXGuideCamera.Camera.dll"; DestDir: "{app}"
+Source: "D:\Astronomy\src\sxASCOM\SXCamera\bin\Debug\ASCOM.SXCamera.UsbRoutines.dll"; DestDir: "{app}"
+Source: "D:\Astronomy\src\sxASCOM\Generic\bin\Debug\ASCOM.SXGeneric.Camera.dll"; DestDir: "{app}"
+Source: "D:\Astronomy\src\sxASCOM\Main\bin\Debug\ASCOM.SXMain.Camera.dll"; DestDir: "{app}"
+Source: "D:\Astronomy\src\sxASCOM\Guide\bin\Debug\ASCOM.SXGuide.Camera.dll"; DestDir: "{app}"
 
 ; Only if driver is .NET
 [Run]

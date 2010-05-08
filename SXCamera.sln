@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generic", "Generic\Generic.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{0D4A2103-3948-43E7-BAF9-961FA8DE9CA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guider", "Guider\Guider.csproj", "{3846096F-535B-4C0F-91E4-16AC50CF11AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Guide", "Guide\Guide.csproj", "{3846096F-535B-4C0F-91E4-16AC50CF11AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
