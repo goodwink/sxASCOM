@@ -31,7 +31,7 @@ using ASCOM.Helper;
 using ASCOM.Helper2;
 using ASCOM.Interface;
 
-namespace ASCOM.SXMainCamera
+namespace ASCOM.SXGeneric
 {
     //
     // Your driver's ID is ASCOM.SXCamera.Camera
