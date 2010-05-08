@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0D4A2103-3948-43E7-BAF9-961FA8DE9CA5}</ProjectGuid>
+    <ProjectGuid>{A98969EA-BFA8-48FE-9968-D434F05E0EF5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ASCOM.SXGuider</RootNamespace>
-    <AssemblyName>ASCOM.SXGuider.Camera</AssemblyName>
+    <RootNamespace>ASCOM.SXMainCamera</RootNamespace>
+    <AssemblyName>ASCOM.SXMainCamera.Camera</AssemblyName>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>2.0</OldToolsVersion>
@@ -125,13 +125,13 @@
     <Content Include="ReadMe.htm" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MainCamera\SXGeneric.csproj">
-      <Project>{A98969EA-BFA8-48FE-9968-D434F05E0EF5}</Project>
-      <Name>SXGeneric</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SXCamera\SXCamera.csproj">
       <Project>{D2998653-2206-4026-8AB7-03D0189B4E36}</Project>
       <Name>SXCamera</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UsbRoutines\UsbRoutines.csproj">
+      <Project>{71435F1C-132A-4130-A01B-7B3C15B51079}</Project>
+      <Name>UsbRoutines</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

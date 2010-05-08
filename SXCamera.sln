@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SXCamera", "SXCamera\SXCamera.csproj", "{D2998653-2206-4026-8AB7-03D0189B4E36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SXGeneric", "Generic\Generic.csproj", "{A98969EA-BFA8-48FE-9968-D434F05E0EF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainCamera", "MainCamera\MainCamera.csproj", "{A98969EA-BFA8-48FE-9968-D434F05E0EF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuideCamera", "Guideer\Guider.csproj", "{0D4A2103-3948-43E7-BAF9-961FA8DE9CA5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuideCamera", "GuideCamera\GuideCamera.csproj", "{0D4A2103-3948-43E7-BAF9-961FA8DE9CA5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsbRoutines", "UsbRoutines\UsbRoutines.csproj", "{71435F1C-132A-4130-A01B-7B3C15B51079}"
 EndProject
