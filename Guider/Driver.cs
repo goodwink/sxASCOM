@@ -31,7 +31,7 @@ using ASCOM.Helper2;
 using ASCOM.Interface;
 using ASCOM.SXCamera;
 
-namespace ASCOM.SXGuideCamera
+namespace ASCOM.SXGuider
 {
     //
     // Your driver's ID is ASCOM.SXCamera.Camera
@@ -42,7 +42,7 @@ namespace ASCOM.SXGuideCamera
     //
     [Guid("c150cbaa-429d-4bad-84ff-27077b4156aa")]
     [ClassInterface(ClassInterfaceType.None)]
-    public class Camera : ASCOM.SXMainCamera.Camera
+    public class Camera : ASCOM.SXGeneric.Camera
     {
         public Camera() :
             base(1)

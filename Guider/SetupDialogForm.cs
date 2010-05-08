@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace ASCOM.SXGuideCamera
+namespace ASCOM.SXGuider
 {
     [ComVisible(false)]					// Form not registered for COM!
     public partial class SetupDialogForm : Form
