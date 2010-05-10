@@ -59,5 +59,6 @@ namespace ASCOM.SXMain
             SetupDialogForm F = new SetupDialogForm();
             F.ShowDialog();
         }
+
     }
 }

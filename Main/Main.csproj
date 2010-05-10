@@ -123,7 +123,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Generic\Generic.csproj">
       <Project>{A98969EA-BFA8-48FE-9968-D434F05E0EF5}</Project>
-      <Name>MainCamera</Name>
+      <Name>Generic</Name>
     </ProjectReference>
     <ProjectReference Include="..\SXCamera\SXCamera.csproj">
       <Project>{D2998653-2206-4026-8AB7-03D0189B4E36}</Project>

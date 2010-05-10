@@ -53,6 +53,31 @@ namespace ASCOM.SXGuide
             SetupDialogForm F = new SetupDialogForm();
             F.ShowDialog();
         }
+        /// <summary>
+        /// Returns a description of the camera model, such as manufacturer and model
+        /// number. Any ASCII characters may be used. The string shall not exceed 68
+        /// characters (for compatibility with FITS headers).
+        /// </summary>
+        /// <exception cref=" System.Exception">Must throw exception if description unavailable</exception>
+        public virtual new string Description
+        {
+            get
+            {
+                return base.Description + " Guider";
+            }
+        }
+
+        public override void StartExposure(double Duration, bool Light)
+        {
+            bool useHardwareTimer = false;
+
+            if (Duration <= 5.0)
+            {
+                useHardwareTimer = true;
+            }
+
+            base.StartExposure(Duration, Light, useHardwareTimer);
+        }
 
     }
 }

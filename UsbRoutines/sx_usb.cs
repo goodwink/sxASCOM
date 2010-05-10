@@ -22,7 +22,7 @@ namespace sx
         // Hardware info
 
         internal const String GUID_STRING = "{606377C1-2270-11d4-BFD8-00207812F5D5}";
-        internal const int MAX_READ_SIZE = 64 * 1024;
+        internal const int MAX_READ_SIZE = 256 * 1024;
 
         // Variables
         internal SafeFileHandle deviceHandle;
@@ -165,10 +165,10 @@ namespace sx
                     IntPtr buf = new IntPtr(unManagedBuffer.ToInt64() + numBytesRead);
                     Int32 readSize = numBytesToRead - numBytesRead;
 
-                    //if (readSize > MAX_READ_SIZE)
-                    //    readSize = MAX_READ_SIZE;
+                    if (readSize > MAX_READ_SIZE)
+                        readSize = MAX_READ_SIZE;
 
-                    Log.Write(String.Format("usbRead: buf=0x{0:x16} numBytesToRead={1} numBytesRead={2} readSize={3}\n", buf.ToInt64(), numBytesToRead, numBytesRead, readSize));
+                    Log.Write(String.Format("usbRead: buf=0x{0:x16} numBytesToRead={1,8} numBytesRead={2,8} readSize={3,8}\n", buf.ToInt64(), numBytesToRead, numBytesRead, readSize));
 
                     int ret = FileIO.ReadFile(deviceHandle, buf, readSize, out thisRead, IntPtr.Zero);
 
@@ -237,22 +237,5 @@ namespace sx
 
             return obj;
         }
-
-/*
-        internal void Read(out byte[] bytes, Int32 numBytes, out Int32 numBytesRead)
-        {
-            bytes = (byte[])Read(typeof(System.Byte[]), numBytes, out numBytesRead);
-        }
-
-        internal void Read(out string s, Int32 numBytesToRead, out Int32 numBytesRead)
-        {
-            s = (string)Read(typeof(System.String), numBytesToRead, out numBytesRead);
-        }
-
-        internal object Read(Type returnType, out Int32 numBytesRead)
-        {
-            return Read(returnType, Marshal.SizeOf(returnType), out numBytesRead);
-        }
-*/
     }
 }

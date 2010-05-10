@@ -52,6 +52,7 @@ namespace ASCOM.SXGeneric
         private TimeSpan actualExposureLength;
         private delegate void CaptureDelegate(double Duration, bool Light);
         private delegate void GuideDelegate(GuideDirections Direction, int Duration);
+        private delegate void FooDelegate();
         private bool bImageValid;
         private short binX, binY;
         private volatile Object oCameraStateLock;
@@ -410,17 +411,13 @@ namespace ASCOM.SXGeneric
         /// characters (for compatibility with FITS headers).
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if description unavailable</exception>
-        public string Description
+        public virtual string Description
         {
             get 
             {
                 sx.Log.Write("Description()\n");
-                String sRet = sxCamera.description;
-                if (cameraId == 1)
-                {
-                    sRet += " Guider";
-                }
-                return sRet;
+
+                return sxCamera.description;
             }
         }
 
@@ -847,6 +844,23 @@ namespace ASCOM.SXGeneric
                 }
             }
         }
+                
+        internal void foo()
+        {
+            for (int i = 0; i < 16; i++)
+            {
+                sxCamera.guideEast();
+                Thread.Sleep(50);
+                sxCamera.guideWest();
+                Thread.Sleep(50);
+                sxCamera.guideNorth();
+                Thread.Sleep(50);
+                sxCamera.guideSouth();
+                Thread.Sleep(50);
+                sxCamera.guideStop();
+                Thread.Sleep(50);
+            }
+        }
 
         internal void softwareCapture(double Duration, bool Light)
         {
@@ -903,6 +917,11 @@ namespace ASCOM.SXGeneric
                     state = CameraStates.cameraDownload;
                 }
 
+                FooDelegate fooDelegate = new FooDelegate(foo);
+                fooDelegate.BeginInvoke(null, null);
+
+                Thread.Sleep(100);
+
                 sxCamera.recordPixels(out exposureEnd);
 
                 actualExposureLength = exposureEnd - exposureStart;
@@ -926,7 +945,12 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">NumX, NumY, XBin, YBin, StartX, StartY, or Duration parameters are invalid.</exception>
         /// <exception cref=" System.Exception">CanAsymmetricBin is False and BinX != BinY</exception>
         /// <exception cref=" System.Exception">the exposure cannot be started for any reason, such as a hardware or communications error</exception>
-        public void StartExposure(double Duration, bool Light)
+        virtual public void StartExposure(double Duration, bool Light)
+        {
+            StartExposure(Duration, Light, false);
+        }
+
+        protected void StartExposure(double Duration, bool Light, bool useHardwareTimer)
         {
             sx.Log.Write("StartExposure() duration=" + Duration + "\n");
 
@@ -951,7 +975,7 @@ namespace ASCOM.SXGeneric
 
                 CaptureDelegate captureDelegate;
 
-                if (cameraId == 1 && Duration <= 5.0)
+                if (useHardwareTimer)
                 {
                     captureDelegate = new CaptureDelegate(hardwareCapture);
                 }
