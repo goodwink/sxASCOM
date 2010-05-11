@@ -66,7 +66,7 @@ namespace sx
         {
             get
             {
-                string ret = "unknown" + cameraModel;
+                string ret = "unknown " + cameraModel;
 
                 switch (cameraModel)
                 {

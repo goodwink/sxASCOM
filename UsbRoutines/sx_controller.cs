@@ -27,7 +27,7 @@ namespace sx
     /// - It is not possible to perform full duplex operations - you cannot write to the device if a read is in progress. I
     ///   assume the converse is also true, but writes are so fast that I never hit it and it wasn't worth the effort to
     ///   verify it.
-    /// - If you attempt to do simultanious reads and writes, one operatons (generally the write) will timeout after 10 seconds.  
+    /// - If you attempt to do simultanious reads and writes, one operation (generally the write) will timeout after 10 seconds.  
     ///   The operation that times our returns an I/O error.
     /// - These factors together caused the guide routine to be rewritten to be synchronous. It would be possible to make it 
     ///   async, but it would have to hold the lock the entire time, so there is no real benefit to doing so.  
@@ -39,7 +39,7 @@ namespace sx
     /// - Use of the hardware camera requires keeping the controller locked for the entire exposure.
     ///   My preferred usage is to use the hardware timer for the guide camera when present.  The exposures are usually short, so 
     ///   having the controller locked for the entire time isn't too bad. Also, the autoguiding programs I have looked at tend to take
-    ///   an exposure, then guide, then take an exposure.  This usage pattern prevents the "lock during exposure" and the "lock while guiding"
+    ///   an exposure, then guide, then take an exposure.  This usage pattern prevents the "lock during HW exposure" and the "lock while guiding"
     ///   from actually colliding.
     /// </summary>
 
@@ -73,19 +73,12 @@ namespace sx
         {
             Connected = false;
 
-            try
-            {
-                iface = new USBInterface();
+            iface = new USBInterface();
 
-                reset();
-                firmwareVersion = getVersion();
-                getParams(ref ccdParms);
-                Connected = true;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            reset();
+            firmwareVersion = getVersion();
+            getParams(ref ccdParms);
+            Connected = true;
         }
 
         internal void buildCommandBlock(out SX_CMD_BLOCK block, Byte cmd_type, Byte cmd, UInt16 cmd_value, UInt16 index, UInt16 cmd_length)
@@ -232,7 +225,7 @@ namespace sx
 
             ms = System.BitConverter.ToInt32(bytes, 0);
 
-            Log.Write("Timer 0 = " + ms + "\n");
+            Log.Write("Timer = " + ms + "\n");
 
             return ms;
         }
