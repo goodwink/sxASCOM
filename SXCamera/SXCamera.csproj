@@ -114,7 +114,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\log\Logging.csproj">
+    <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{1C61F66B-383E-493C-AF71-216F3F61A64A}</Project>
       <Name>Logging</Name>
     </ProjectReference>
