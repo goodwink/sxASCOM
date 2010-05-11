@@ -29,7 +29,6 @@ using ASCOM;
 using ASCOM.Helper;
 using ASCOM.Helper2;
 using ASCOM.Interface;
-using ASCOM.SXCamera;
 
 namespace ASCOM.SXGuide
 {
@@ -67,6 +66,14 @@ namespace ASCOM.SXGuide
             }
         }
 
+        public override bool CanPulseGuide
+        {
+            get
+            {
+                return sxCamera.hasGuidePort;
+            }
+        }
+
         public override void StartExposure(double Duration, bool Light)
         {
             bool useHardwareTimer = false;
@@ -78,6 +85,5 @@ namespace ASCOM.SXGuide
 
             base.StartExposure(Duration, Light, useHardwareTimer);
         }
-
     }
 }

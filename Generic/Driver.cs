@@ -46,13 +46,11 @@ namespace ASCOM.SXGeneric
         ICamera
     {
         private bool bConnected;
-        private sx.Camera sxCamera;
+        protected sx.Camera sxCamera;
         private DateTime exposureStart;
         private TimeSpan desiredExposureLength;
         private TimeSpan actualExposureLength;
         private delegate void CaptureDelegate(double Duration, bool Light);
-        private delegate void GuideDelegate(GuideDirections Direction, int Duration);
-        private delegate void FooDelegate();
         private bool bImageValid;
         private short binX, binY;
         private volatile Object oCameraStateLock;
@@ -277,18 +275,16 @@ namespace ASCOM.SXGeneric
         }
 
         /// <summary>
-        /// Returns True if the camera can send autoguider pulses to the telescope mount;
+        /// Returns True if the camera can send autoguider pulses to the telescope mount;        abstract public bool CanPulseGuide
+        public abstract bool CanPulseGuide
+        {
+            get;
+        }
+
         /// False if not.  (Note: this does not provide any indication of whether the
         /// autoguider cable is actually connected.)
         /// </summary>
-        public bool CanPulseGuide
-        {
-            get
-            {
-                sx.Log.Write("CanPulseGuide()\n");
-                return sxCamera.hasGuidePort;
-            }
-        }
+
 
         /// <summary>
         /// If True, the camera's cooler setpoint can be adjusted. If False, the camera
@@ -355,10 +351,6 @@ namespace ASCOM.SXGeneric
                 }
                 else
                 {
-                    if (sxCamera.hasGuidePort)
-                    {
-                        sxCamera.guideStop();
-                    }
                     sxCamera = null;
                     
                 }
@@ -693,61 +685,6 @@ namespace ASCOM.SXGeneric
             }
         }
 
-        private void guide(GuideDirections Direction, int Duration)
-        {
-            sx.Log.Write("guide() begins Duration=" + Duration + "\n");
-            DateTime guideStart = DateTime.Now;
-
-            try
-            {
-                TimeSpan desiredGuideDuration = TimeSpan.FromMilliseconds(Duration);
-                DateTime guideEnd = guideStart + desiredGuideDuration;
-
-                switch (Direction)
-                {
-                    case GuideDirections.guideNorth:
-                        sxCamera.guideNorth();
-                        break;
-                    case GuideDirections.guideSouth:
-                        sxCamera.guideSouth();
-                        break;
-                    case GuideDirections.guideEast:
-                        sxCamera.guideEast();
-                        break;
-                    case GuideDirections.guideWest:
-                        sxCamera.guideWest();
-                        break;
-                }
-
-                // We sleep for most of the guide time, then spin for the last little bit
-                // because this helps us end closer to the right time
-
-                sx.Log.Write("guide(): about to begin loop\n");
-                
-                for (TimeSpan remainingGuideTime = desiredExposureLength;
-                    remainingGuideTime.TotalMilliseconds > 0;
-                    remainingGuideTime = guideEnd - DateTime.Now)
-                {
-                    if (remainingGuideTime.TotalMilliseconds > 75)
-                    {
-                        // sleep in small chunks so that we are responsive to abort and stop requests
-                        //sx.Log.Write("Before sleep, remaining exposure=" + remainingGuideTime.TotalSeconds + "\n");
-                        Thread.Sleep(50);
-                    }
-                }
-            }
-            finally
-            {
-                sxCamera.guideStop();
-
-                lock (oGuideStateLock)
-                {
-                    bGuiding = false;
-                }
-                sx.Log.Write(String.Format("guide(): delay ends, actualExposureLength={0:F4}\n", (DateTime.Now - guideStart).TotalMilliseconds));
-            }
-        }
-
         /// <summary>
         /// This method returns only after the move has completed.
         ///
@@ -776,14 +713,36 @@ namespace ASCOM.SXGeneric
                 throw new System.Exception("PulseGuide() cannot be called if CanPuluseGuide == false");
             }
 
-            GuideDelegate guideDelegate = new GuideDelegate(guide);
-
-            lock (oGuideStateLock)
+            try
             {
-                bGuiding = true;
-            }
+                lock (oGuideStateLock)
+                {
+                    bGuiding = true;
+                }
 
-            guideDelegate.BeginInvoke(Direction, Duration, null, null);
+                switch (Direction)
+                {
+                    case GuideDirections.guideNorth:
+                        sxCamera.guideNorth(Duration);
+                        break;
+                    case GuideDirections.guideSouth:
+                        sxCamera.guideSouth(Duration);
+                        break;
+                    case GuideDirections.guideEast:
+                        sxCamera.guideEast(Duration);
+                        break;
+                    case GuideDirections.guideWest:
+                        sxCamera.guideWest(Duration);
+                        break;
+                }
+            }
+            finally
+            {
+                lock (oGuideStateLock)
+                {
+                    bGuiding = false;
+                }
+            }
         }
 
         /// <summary>
@@ -844,23 +803,6 @@ namespace ASCOM.SXGeneric
                 }
             }
         }
-                
-        internal void foo()
-        {
-            for (int i = 0; i < 16; i++)
-            {
-                sxCamera.guideEast();
-                Thread.Sleep(50);
-                sxCamera.guideWest();
-                Thread.Sleep(50);
-                sxCamera.guideNorth();
-                Thread.Sleep(50);
-                sxCamera.guideSouth();
-                Thread.Sleep(50);
-                sxCamera.guideStop();
-                Thread.Sleep(50);
-            }
-        }
 
         internal void softwareCapture(double Duration, bool Light)
         {
@@ -916,11 +858,6 @@ namespace ASCOM.SXGeneric
                     }
                     state = CameraStates.cameraDownload;
                 }
-
-                FooDelegate fooDelegate = new FooDelegate(foo);
-                fooDelegate.BeginInvoke(null, null);
-
-                Thread.Sleep(100);
 
                 sxCamera.recordPixels(out exposureEnd);
 

@@ -29,7 +29,6 @@ using ASCOM;
 using ASCOM.Helper;
 using ASCOM.Helper2;
 using ASCOM.Interface;
-using ASCOM.SXCamera;
 
 namespace ASCOM.SXMain
 {
@@ -60,5 +59,21 @@ namespace ASCOM.SXMain
             F.ShowDialog();
         }
 
+        public override bool CanPulseGuide
+        {
+            get
+            {
+                if (sxCamera.hasGuideCamera)
+                {
+                    return false;
+                }
+                else
+                {
+                    return sxCamera.hasGuidePort;
+                }
+            }
+        }
+
     }
 }
+

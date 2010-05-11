@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
 
 namespace sx
 {
+    // This class defines the the functions to access the resources which exist on the 
+    // USB controller board.  If there are two cameras conneted (a main camera and a guide
+    // camera), there is still only one of these devices present.
+    //
     // Locking:
-    //    While doing I/O, iface is locked. This prevents the possibility of 
-    //    interleaved I/O.
-    // Calls that return data must lock the controller to prevent intersperced returns such
-    //    as might happen of we called get timer while an image was being transferred. 
+    //    The controller object is used as the lock.  It is necessary to lock the interface when
+    // a transaction is occuring.  There are three types of transactions:
+    // - simple command writes that return no data
+    // - operations that require a write to begin, and which return data that is collected with read
+    // - operations that require a write to begin and another write to end (STAR2K guiding is the only one)
 
     public class Controller
         : sxBase
@@ -70,7 +76,7 @@ namespace sx
         
         internal void Write(SX_CMD_BLOCK block, Object data, out Int32 numBytesWritten)
         {
-            lock (iface)
+            lock (this)
             {
                 Log.Write("Write has locked\n");
                 iface.Write(block, data, out numBytesWritten);
@@ -87,7 +93,7 @@ namespace sx
         {
             object oReturn;
 
-            lock (iface)
+            lock (this)
             {
                 Log.Write("Read has locked\n");
                 oReturn = iface.Read(returnType, numBytesToRead, out numBytesRead);
@@ -119,9 +125,13 @@ namespace sx
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_ECHO, 0, 0, (UInt16)s.Length);
 
-            Write(cmdBlock, s, out numBytesWritten);
+            lock (this)
+            {
 
-            Read(out s2, s.Length, out numBytesRead);
+                Write(cmdBlock, s, out numBytesWritten);
+
+                Read(out s2, s.Length, out numBytesRead);
+            }
 
             if (s2 != s)
             {
@@ -148,9 +158,14 @@ namespace sx
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_FIRMWARE_VERSION, 0, 0, 0);
 
-            Write(cmdBlock, out numBytesWritten);
+            lock (this)
+            {
+                Log.Write("getVersion has locked\n");
+                Write(cmdBlock, out numBytesWritten);
 
-            Read(out bytes, 4, out numBytesRead);
+                Read(out bytes, 4, out numBytesRead);
+            }
+            Log.Write("getVersion has unlocked\n");
 
             ver = System.BitConverter.ToUInt32(bytes, 0);
 
@@ -203,13 +218,65 @@ namespace sx
             Write(cmdBlock, ms, out numBytesWritten);
         }
 
-        public void guide(UInt16 direction)
+        public Boolean hasGuideCamera
+        {
+            get { return (ccdParms.extra_capabilities & INTEGRATED_GUIDER_CCD) == INTEGRATED_GUIDER_CCD; }
+        }
+
+        public Boolean hasGuidePort
+        {
+            get { return (ccdParms.extra_capabilities & STAR2000_PORT) == STAR2000_PORT; }
+        }
+
+        public void guide(UInt16 direction, int durationMS)
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
+            DateTime guideStart = DateTime.Now;
+
+            if (!hasGuidePort)
+            {
+                throw new System.Exception("Guide request but no guide port");
+            }
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_STAR2K, direction, 0, 0);
-            Write(cmdBlock, out numBytesWritten);
+
+            sx.Log.Write(String.Format("guide({0}, {1}) begins\n", direction, durationMS));
+
+            lock (this)
+            {
+                try
+                {
+                    TimeSpan desiredGuideDuration = TimeSpan.FromMilliseconds(durationMS);
+                    DateTime guideEnd = guideStart + desiredGuideDuration;
+
+                    Write(cmdBlock, out numBytesWritten);
+
+                    // We sleep for most of the guide time, then spin for the last little bit
+                    // because this helps us end closer to the right time
+
+                    sx.Log.Write("guide(): about to begin loop\n");
+
+                    for (TimeSpan remainingGuideTime = desiredGuideDuration;
+                        remainingGuideTime.TotalMilliseconds > 0;
+                        remainingGuideTime = guideEnd - DateTime.Now)
+                    {
+                        if (remainingGuideTime.TotalMilliseconds > 75)
+                        {
+                            // sleep in small chunks so that we are responsive to abort and stop requests
+                            //sx.Log.Write("Before sleep, remaining exposure=" + remainingGuideTime.TotalSeconds + "\n");
+                            Thread.Sleep(50);
+                        }
+                    }
+                }
+                finally
+                {
+                    buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_STAR2K, SX_STAR2K_STOP, 0, 0);
+                    Write(cmdBlock, out numBytesWritten);
+                }
+            }
+
+            sx.Log.Write(String.Format("guide(): delay ends, actualExposureLength={0:F4}\n", (DateTime.Now - guideStart).TotalMilliseconds));
         }
     }
 }

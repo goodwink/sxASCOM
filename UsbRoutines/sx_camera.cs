@@ -168,12 +168,12 @@ namespace sx
 
         public Boolean hasGuideCamera
         {
-            get { return (extraCapabilities & INTEGRATED_GUIDER_CCD) == INTEGRATED_GUIDER_CCD; }
+            get { return controller.hasGuideCamera; }
         }
 
         public Boolean hasGuidePort
         {
-            get { return (extraCapabilities & STAR2000_PORT) == STAR2000_PORT; }
+            get { return controller.hasGuidePort; }
         }
 
         private Byte extraCapabilities
@@ -506,52 +506,27 @@ namespace sx
             Log.Write("downloadPixels(): read completed, numBytesRead=" + numBytesRead + "\n");
         }
 
-        public void guideNorth()
+        public void guideNorth(int durationMS)
         {
-            if (!hasGuidePort)
-            {
-                controller.guide(SX_STAR2K_NORTH);
-            }
+            controller.guide(SX_STAR2K_NORTH, durationMS);
         }
 
-        public void guideSouth()
+        public void guideSouth(int durationMS)
         {
-            if (!hasGuidePort)
-            {
-                throw new System.Exception("Exposure already in progress");
-            }
-            controller.guide(SX_STAR2K_SOUTH);
+            controller.guide(SX_STAR2K_SOUTH, durationMS);
         }
 
-        public void guideEast()
+        public void guideEast(int durationMS)
         {
-            if (!hasGuidePort)
-            {
-                throw new System.Exception("Exposure already in progress");
-            }
-            controller.guide(SX_STAR2K_EAST);
+            controller.guide(SX_STAR2K_EAST, durationMS);
         }
 
-        public void guideWest()
+        public void guideWest(int durationMS)
         {
-            if (!hasGuidePort)
-            {
-                throw new System.Exception("Exposure already in progress");
-            }
-            controller.guide(SX_STAR2K_WEST);
-
+            controller.guide(SX_STAR2K_WEST, durationMS);
         }
 
-        public void guideStop()
-        {
-            if (!hasGuidePort)
-            {
-                throw new System.Exception("Exposure already in progress");
-            }
-            controller.guide(SX_STAR2K_STOP);
-        }
-
-        public void recordPixels(out DateTime exposureEnd)
+         public void recordPixels(out DateTime exposureEnd)
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
