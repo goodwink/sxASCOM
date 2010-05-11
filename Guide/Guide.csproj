@@ -125,6 +125,10 @@
       <Project>{A98969EA-BFA8-48FE-9968-D434F05E0EF5}</Project>
       <Name>Generic</Name>
     </ProjectReference>
+    <ProjectReference Include="..\log\Logging.csproj">
+      <Project>{1C61F66B-383E-493C-AF71-216F3F61A64A}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SXCamera\SXCamera.csproj">
       <Project>{D2998653-2206-4026-8AB7-03D0189B4E36}</Project>
       <Name>SXCamera</Name>

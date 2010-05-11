@@ -31,6 +31,8 @@ using ASCOM.Helper;
 using ASCOM.Helper2;
 using ASCOM.Interface;
 
+using Logging;
+
 namespace ASCOM.SXGeneric
 {
     //
@@ -68,7 +70,7 @@ namespace ASCOM.SXGeneric
         protected Camera(UInt16 whichCamera)
         {
             //Thread.Sleep(15000);
-            sx.Log.Write("In Camera Constructor for camera " + whichCamera +" \n");
+            Log.Write("In Camera Constructor for camera " + whichCamera +" \n");
 
             oCameraStateLock = new Object();
             oGuideStateLock = new Object();
@@ -93,7 +95,7 @@ namespace ASCOM.SXGeneric
         /// </summary>
         public void AbortExposure()
         {
-            sx.Log.Write("AbortExposure\n");
+            Log.Write("AbortExposure\n");
             lock (oCameraStateLock)
             {
                 switch (state)
@@ -122,12 +124,12 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("BinX get\n");
+                Log.Write("BinX get\n");
                 return sxCamera.xBin;
             }
             set
             {
-                sx.Log.Write("BinX set\n");
+                Log.Write("BinX set\n");
                 sxCamera.xBin = (byte)value;
             }
         }
@@ -143,12 +145,12 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("BinY get\n");
+                Log.Write("BinY get\n");
                 return sxCamera.yBin;
             }
             set
             {
-                sx.Log.Write("BinY set\n");
+                Log.Write("BinY set\n");
                 sxCamera.yBin = (byte)value;
             }
         }
@@ -162,7 +164,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("CCDTemperature\n"); 
+                Log.Write("CCDTemperature\n"); 
                 throw new System.Exception("CCDTemperature is not supported");
             }
         }
@@ -200,7 +202,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             { 
-                sx.Log.Write("CameraState()\n"); 
+                Log.Write("CameraState()\n"); 
                 lock (oCameraStateLock)
                 {
                     return state;
@@ -216,7 +218,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("CameraXSize()\n");
+                Log.Write("CameraXSize()\n");
                 return sxCamera.ccdWidth;
             }
         }
@@ -229,7 +231,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("CameraYSize()\n");
+                Log.Write("CameraYSize()\n");
                 return sxCamera.ccdHeight;
             }
         }
@@ -241,7 +243,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("CanAbortExposure()\n");
+                Log.Write("CanAbortExposure()\n");
                 return true;
             }
         }
@@ -257,7 +259,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("CanAssymetricBin()\n");
+                Log.Write("CanAssymetricBin()\n");
                 return true;
             }
         }
@@ -269,13 +271,13 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("CanGetCoolerPower()\n"); 
+                Log.Write("CanGetCoolerPower()\n"); 
                 return false;
             }
         }
 
         /// <summary>
-        /// Returns True if the camera can send autoguider pulses to the telescope mount;        abstract public bool CanPulseGuide
+        /// Returns True if the camera can send autoguider pulses to the telescope mount; 
         public abstract bool CanPulseGuide
         {
             get;
@@ -295,7 +297,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("CanSetCCDTemperature()\n");
+                Log.Write("CanSetCCDTemperature()\n");
                 return false;
             }
         }
@@ -311,7 +313,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("CanStopExposure()\n");
+                Log.Write("CanStopExposure()\n");
                 return true;
             }
         }
@@ -326,12 +328,12 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("Connected:  get - returning " + bConnected +"\n");
+                Log.Write("Connected:  get - returning " + bConnected +"\n");
                 return  bConnected;
             }
             set
             {
-                sx.Log.Write("Connected: set to " + value + " requested. Current value is " + bConnected +"\n");
+                Log.Write("Connected: set to " + value + " requested. Current value is " + bConnected +"\n");
                 if (value)
                 {
                     if (bConnected)
@@ -372,12 +374,12 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("CoolerOn() get\n");
+                Log.Write("CoolerOn() get\n");
                 return true;
             }
             set
             {
-                sx.Log.Write("CoolerOn() set\n");
+                Log.Write("CoolerOn() set\n");
                 throw new System.Exception("CoolerOn is not supported");
             }
         }
@@ -392,7 +394,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("CoolerPower()\n");
+                Log.Write("CoolerPower()\n");
                 return 100;
             }
         }
@@ -407,7 +409,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("Description()\n");
+                Log.Write("Description()\n");
 
                 return sxCamera.description;
             }
@@ -423,7 +425,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("ElectronsPerADU()\n");
+                Log.Write("ElectronsPerADU()\n");
                 return sxCamera.electronsPerADU;
             }
         }
@@ -437,7 +439,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("FullWellCapacity()\n");
+                Log.Write("FullWellCapacity()\n");
                 return MaxADU * ElectronsPerADU /(BinX * BinY);
             }
         }
@@ -451,7 +453,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("HasShutter()\n"); 
+                Log.Write("HasShutter()\n"); 
                 return false;
             }
         }
@@ -465,7 +467,7 @@ namespace ASCOM.SXGeneric
         {
             get
             { 
-                sx.Log.Write("HeatSinkTemperature()\n");
+                Log.Write("HeatSinkTemperature()\n");
                 throw new System.Exception("HeatSinkTemperature is not valid if CanControlTemperature == false");
             }
         }
@@ -487,7 +489,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("ImageArray()\n"); 
+                Log.Write("ImageArray()\n"); 
                 if (!bImageValid)
                 {
                     throw new System.Exception("The image is not valid.");
@@ -514,7 +516,7 @@ namespace ASCOM.SXGeneric
         {
             get
             { 
-                sx.Log.Write("ImageArrayVariant()\n"); 
+                Log.Write("ImageArrayVariant()\n"); 
                 throw new System.Exception("The method or operation is not implemented."); 
             }
         }
@@ -542,7 +544,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("IsPulseGuiding()\n");
+                Log.Write("IsPulseGuiding()\n");
                 lock (oGuideStateLock)
                 {
                     return bGuiding;
@@ -560,7 +562,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("LastError()\n"); 
+                Log.Write("LastError()\n"); 
                 throw new System.Exception("The method or operation is not implemented.");
             }
         }
@@ -575,7 +577,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("LastExposureDuration()\n"); 
+                Log.Write("LastExposureDuration()\n"); 
                 return actualExposureLength.TotalSeconds;
             }
         }
@@ -589,7 +591,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("LastExposureStartTime()\n"); 
+                Log.Write("LastExposureStartTime()\n"); 
                 return exposureStart.ToString("yyyy-MM-ddTHH:mm:ss.fff");
             }
         }
@@ -602,7 +604,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("MaxADU()\n");
+                Log.Write("MaxADU()\n");
                 return ( 1 << sxCamera.bitsPerPixel) - 1;
             }
         }
@@ -616,7 +618,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("MaxBinX()\n"); 
+                Log.Write("MaxBinX()\n"); 
                 return sxCamera.xBinMax;
             }
         }
@@ -630,7 +632,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("MaxBinY()\n"); 
+                Log.Write("MaxBinY()\n"); 
                 return sxCamera.yBinMax;
             }
         }
@@ -666,7 +668,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("PixelSizeX()\n"); 
+                Log.Write("PixelSizeX()\n"); 
                 return sxCamera.pixelWidth;
             }
         }
@@ -680,7 +682,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                sx.Log.Write("PixelSizeY()\n"); 
+                Log.Write("PixelSizeY()\n"); 
                 return sxCamera.pixelHeight;
             }
         }
@@ -706,7 +708,7 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">PulseGuide command is unsuccessful</exception>
         public void PulseGuide(GuideDirections Direction, int Duration)
         {
-            sx.Log.Write("PulseGuide()\n");
+            Log.Write("PulseGuide()\n");
 
             if (!CanPulseGuide)
             {
@@ -757,12 +759,12 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                sx.Log.Write("SetCCDTemperature Get()\n");
+                Log.Write("SetCCDTemperature Get()\n");
                 throw new System.Exception("SetCCDTemperature cannot be use if CanSetCCDTemperature == false");
             }
             set
             {
-                sx.Log.Write("SetCCDTemperature SEt()\n");
+                Log.Write("SetCCDTemperature SEt()\n");
                 throw new System.Exception("SetCCDTemperature cannot be use if CanSetCCDTemperature == false");
             }
         }
@@ -771,7 +773,7 @@ namespace ASCOM.SXGeneric
  
         internal void hardwareCapture(double Duration, bool Light)
         {
-            sx.Log.Write("hardwareCapture() begins Duration=" + Duration + "\n");
+            Log.Write("hardwareCapture() begins Duration=" + Duration + "\n");
 
             try
             {
@@ -791,7 +793,7 @@ namespace ASCOM.SXGeneric
 
                 actualExposureLength = new TimeSpan(0, 0, 0, 0, (int)(1000*Duration));
 
-                sx.Log.Write("hardwareCapture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
+                Log.Write("hardwareCapture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
 
                 bImageValid = true;
             }
@@ -806,13 +808,13 @@ namespace ASCOM.SXGeneric
 
         internal void softwareCapture(double Duration, bool Light)
         {
-            sx.Log.Write("softwareCapture() begins Duration=" + Duration + "\n");
+            Log.Write("softwareCapture() begins Duration=" + Duration + "\n");
 
             try
             {
-                sx.Log.Write("softwareCapture(): calling clearRecordedPixel\n");
+                Log.Write("softwareCapture(): calling clearRecordedPixel\n");
                 sxCamera.clearRecordedPixels();
-                sx.Log.Write("softwareCapture(): calling clearCcdPixel\n");
+                Log.Write("softwareCapture(): calling clearCcdPixel\n");
                 sxCamera.clearCcdPixels(); // This clears both the CCD and the recorded pixels.  For
                                            // long exposures (> 2 seconds) we will cleare the recorded pixels again just before
                                            // the exposure ends to clear any accumulated noise.
@@ -825,7 +827,7 @@ namespace ASCOM.SXGeneric
                 // We sleep for most of the exposure, then spin for the last little bit
                 // because this helps us end closer to the right time
 
-                sx.Log.Write("softwareCapture(): about to begin loop, exposureEnd=" + exposureEnd + "\n");
+                Log.Write("softwareCapture(): about to begin loop, exposureEnd=" + exposureEnd + "\n");
                 for (TimeSpan remainingExposureTime = desiredExposureLength;
                     remainingExposureTime.TotalMilliseconds > 0;
                     remainingExposureTime = exposureEnd - DateTime.Now)
@@ -833,14 +835,14 @@ namespace ASCOM.SXGeneric
                     
                     if (remainingExposureTime.TotalSeconds < 2.0 && !bRecordedCleared)
                     {
-                        sx.Log.Write("softwareCapture(): before clearRecordedPixels(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        Log.Write("softwareCapture(): before clearRecordedPixels(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         sxCamera.clearRecordedPixels();
                         bRecordedCleared = true;
                     }
                     else if (remainingExposureTime.TotalMilliseconds > 75)
                     {
                         // sleep in small chunks so that we are responsive to abort and stop requests
-                        //sx.Log.Write("Before sleep, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        //Log.Write("Before sleep, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         Thread.Sleep(50);
                     }
 
@@ -863,7 +865,7 @@ namespace ASCOM.SXGeneric
 
                 actualExposureLength = exposureEnd - exposureStart;
 
-                sx.Log.Write("softwareCapture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
+                Log.Write("softwareCapture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
                 
                 bImageValid = true;
             }
@@ -889,7 +891,7 @@ namespace ASCOM.SXGeneric
 
         protected void StartExposure(double Duration, bool Light, bool useHardwareTimer)
         {
-            sx.Log.Write("StartExposure() duration=" + Duration + "\n");
+            Log.Write("StartExposure() duration=" + Duration + "\n");
 
             lock (oCameraStateLock)
             {
@@ -921,11 +923,11 @@ namespace ASCOM.SXGeneric
                     captureDelegate = new CaptureDelegate(softwareCapture);
                 }
 
-                sx.Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
+                Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
 
                 captureDelegate.BeginInvoke(Duration, Light, null, null);
 
-                sx.Log.Write("StartExposure() after captureDelegate.BeginInvode()\n");
+                Log.Write("StartExposure() after captureDelegate.BeginInvode()\n");
             }
             catch (Exception ex)
             {
@@ -968,7 +970,7 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">Must throw an exception if for any reason no image readout will be available.</exception>
         public void StopExposure()
         {
-            sx.Log.Write("StopExposure()\n");
+            Log.Write("StopExposure()\n");
             lock (oCameraStateLock)
             {
                 switch (state)

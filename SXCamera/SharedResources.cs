@@ -17,7 +17,7 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System.Threading;
-
+using Logging;
 using sx;
 
 namespace ASCOM.SXCamera
@@ -40,7 +40,7 @@ namespace ASCOM.SXCamera
 
             //Thread.Sleep(15000);
 
-            sx.Log .Write("hello world\n");
+            Log.Write("hello world\n");
 
             try
             {
@@ -49,11 +49,11 @@ namespace ASCOM.SXCamera
             catch (Exception ex)
             {
                 controller = null;
-                sx.Log.Write("SharedResources() caught " + ex + "\n");
+                Log.Write("SharedResources() caught " + ex + "\n");
                 throw ex;
             }
 
-            sx.Log.Write("new returned " + controller + "\n");
+            Log.Write("new returned " + controller + "\n");
         }
 
         //

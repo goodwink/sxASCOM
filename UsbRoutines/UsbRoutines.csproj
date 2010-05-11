@@ -56,6 +56,12 @@
     <Compile Include="sx_controller.cs" />
     <Compile Include="sx_usb.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\log\Logging.csproj">
+      <Project>{1C61F66B-383E-493C-AF71-216F3F61A64A}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

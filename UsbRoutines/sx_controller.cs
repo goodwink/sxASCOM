@@ -4,19 +4,44 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
+using Logging;
 
 namespace sx
 {
-    // This class defines the the functions to access the resources which exist on the 
-    // USB controller board.  If there are two cameras conneted (a main camera and a guide
-    // camera), there is still only one of these devices present.
-    //
-    // Locking:
-    //    The controller object is used as the lock.  It is necessary to lock the interface when
-    // a transaction is occuring.  There are three types of transactions:
-    // - simple command writes that return no data
-    // - operations that require a write to begin, and which return data that is collected with read
-    // - operations that require a write to begin and another write to end (STAR2K guiding is the only one)
+
+
+    /// <summary>
+    /// This class defines the the functions to access the resources which exist on the 
+    /// USB controller board.  If there are two cameras conneted (a main camera and a guide
+    /// camera), there is still only one of these devices present.
+    ///
+    /// Locking:
+    ///    The controller object is used as the lock.  It is necessary to lock the interface when
+    /// a transaction is occuring.  There are three types of transactions:
+    /// - simple command writes that return no data
+    /// - operations that require a write to begin, and which return data that is collected with read
+    /// - operations that require a write to begin and another write to end (STAR2K guiding is the only one)
+    /// 
+    /// Much of the functionality is defined by the hardware.  The controller on the SX cameras is fairly simple,
+    /// and the following limitations were observed:
+    /// - It is not possible to perform full duplex operations - you cannot write to the device if a read is in progress. I
+    ///   assume the converse is also true, but writes are so fast that I never hit it and it wasn't worth the effort to
+    ///   verify it.
+    /// - If you attempt to do simultanious reads and writes, one operatons (generally the write) will timeout after 10 seconds.  
+    ///   The operation that times our returns an I/O error.
+    /// - These factors together caused the guide routine to be rewritten to be synchronous. It would be possible to make it 
+    ///   async, but it would have to hold the lock the entire time, so there is no real benefit to doing so.  
+    ///   If it did not hold the lock, it would be possible for a read to occur between the write which
+    ///   starts guiding and the write which stops it, making a guide operation that was requrest for a few MS take (at best) several seconds or
+    ///   (at worst ) never stop because the write operation failed
+    /// - Despite there being two cameras, there is only one hardware timer, which can be used to control either camera but
+    ///   not both.  
+    /// - Use of the hardware camera requires keeping the controller locked for the entire exposure.
+    ///   My preferred usage is to use the hardware timer for the guide camera when present.  The exposures are usually short, so 
+    ///   having the controller locked for the entire time isn't too bad. Also, the autoguiding programs I have looked at tend to take
+    ///   an exposure, then guide, then take an exposure.  This usage pattern prevents the "lock during exposure" and the "lock while guiding"
+    ///   from actually colliding.
+    /// </summary>
 
     public class Controller
         : sxBase
@@ -76,6 +101,8 @@ namespace sx
         
         internal void Write(SX_CMD_BLOCK block, Object data, out Int32 numBytesWritten)
         {
+            // I lock here to prevent the data from two writes from getting interleaved. I doubt windows would actually do that, but 
+            // it is easy to prevent it here and then I know I don't have to worry about it.
             lock (this)
             {
                 Log.Write("Write has locked\n");
@@ -93,6 +120,7 @@ namespace sx
         {
             object oReturn;
 
+            // See the comment above the lock in Write() for more information on this lock. 
             lock (this)
             {
                 Log.Write("Read has locked\n");
@@ -241,7 +269,7 @@ namespace sx
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_STAR2K, direction, 0, 0);
 
-            sx.Log.Write(String.Format("guide({0}, {1}) begins\n", direction, durationMS));
+            Log.Write(String.Format("guide({0}, {1}) begins\n", direction, durationMS));
 
             lock (this)
             {
@@ -255,7 +283,7 @@ namespace sx
                     // We sleep for most of the guide time, then spin for the last little bit
                     // because this helps us end closer to the right time
 
-                    sx.Log.Write("guide(): about to begin loop\n");
+                    Log.Write("guide(): about to begin loop\n");
 
                     for (TimeSpan remainingGuideTime = desiredGuideDuration;
                         remainingGuideTime.TotalMilliseconds > 0;
@@ -264,7 +292,7 @@ namespace sx
                         if (remainingGuideTime.TotalMilliseconds > 75)
                         {
                             // sleep in small chunks so that we are responsive to abort and stop requests
-                            //sx.Log.Write("Before sleep, remaining exposure=" + remainingGuideTime.TotalSeconds + "\n");
+                            //Log.Write("Before sleep, remaining exposure=" + remainingGuideTime.TotalSeconds + "\n");
                             Thread.Sleep(50);
                         }
                     }
@@ -276,7 +304,7 @@ namespace sx
                 }
             }
 
-            sx.Log.Write(String.Format("guide(): delay ends, actualExposureLength={0:F4}\n", (DateTime.Now - guideStart).TotalMilliseconds));
+            Log.Write(String.Format("guide(): delay ends, actualExposureLength={0:F4}\n", (DateTime.Now - guideStart).TotalMilliseconds));
         }
     }
 }

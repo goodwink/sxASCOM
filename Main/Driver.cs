@@ -30,6 +30,8 @@ using ASCOM.Helper;
 using ASCOM.Helper2;
 using ASCOM.Interface;
 
+using Logging;
+
 namespace ASCOM.SXMain
 {
     //
@@ -55,6 +57,7 @@ namespace ASCOM.SXMain
         /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
         public override void SetupDialog()
         {
+            Log.Write("Main Camera: SetupDialog()\n");
             SetupDialogForm F = new SetupDialogForm();
             F.ShowDialog();
         }
@@ -63,14 +66,11 @@ namespace ASCOM.SXMain
         {
             get
             {
-                if (sxCamera.hasGuideCamera)
-                {
-                    return false;
-                }
-                else
-                {
-                    return sxCamera.hasGuidePort;
-                }
+                bool bReturn = false;
+                if (!sxCamera.hasGuideCamera)
+                    bReturn = sxCamera.hasGuidePort;
+                Log.Write("Main Camera: CanPulseGuide returns " + bReturn + "\n");
+                return bReturn;
             }
         }
 

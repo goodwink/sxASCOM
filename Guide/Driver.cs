@@ -30,6 +30,8 @@ using ASCOM.Helper;
 using ASCOM.Helper2;
 using ASCOM.Interface;
 
+using Logging;
+
 namespace ASCOM.SXGuide
 {
     //
@@ -49,6 +51,7 @@ namespace ASCOM.SXGuide
         }
         public override void SetupDialog()
         {
+            Log.Write("Guide Camera SetupDialog()\n");
             SetupDialogForm F = new SetupDialogForm();
             F.ShowDialog();
         }
@@ -62,7 +65,9 @@ namespace ASCOM.SXGuide
         {
             get
             {
-                return base.Description + " Guider";
+                string sReturn = "Guider (" + base.Description + ")";
+                Log.Write("Guide Camera Description" + sReturn + "\n");
+                return sReturn;
             }
         }
 
@@ -70,7 +75,9 @@ namespace ASCOM.SXGuide
         {
             get
             {
-                return sxCamera.hasGuidePort;
+                bool bReturn = sxCamera.hasGuidePort;
+                Log.Write("Guide Camera CanPulseGuide returns " + bReturn+ "\n");
+                return bReturn;
             }
         }
 
@@ -82,7 +89,7 @@ namespace ASCOM.SXGuide
             {
                 useHardwareTimer = true;
             }
-
+            Log.Write(String.Format("Guide Camera StartExposure({0}, {1}) useHardwareTimer = {2}\n", Duration, Light, useHardwareTimer));
             base.StartExposure(Duration, Light, useHardwareTimer);
         }
     }

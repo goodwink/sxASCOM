@@ -1,50 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.IO;
-using System.Text;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
 
 namespace sx
 {
-    public class Log
-    {
-        private const string logPath = @"c:\temp\sx_log.txt";
-        private static FileStream logFS=null;
-        private static DateTime lastWriteTime;
-
-        static Log()
-        {
-            try
-            {
-                logFS = new FileStream(logPath, FileMode.Create, FileAccess.Write, FileShare.Read, 1);
-                lastWriteTime = DateTime.Now;
-            }
-            catch
-            {
-            }
-
-            //logFS = File.Create(logPath);
-        }
-        
-        public static void Write(string value)
-        {
-            if (logFS != null)
-            {
-                lock (logPath)
-                {
-                    DateTime currentTime = DateTime.Now;
-                    TimeSpan delta = currentTime - lastWriteTime;
-
-                    byte[] info = new UTF8Encoding(true).GetBytes(String.Format("{0,6:##0.000} {1}", delta.TotalSeconds, value));
-                    logFS.Write(info, 0, info.Length);
-                    lastWriteTime = currentTime;
-                }
-            }
-        }
-    }
-
     public class sxBase
     {
         // cmd_type
