@@ -409,7 +409,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("Description()\n");
+                Log.Write("Generic Description()\n");
 
                 return sxCamera.description;
             }
@@ -773,7 +773,7 @@ namespace ASCOM.SXGeneric
  
         internal void hardwareCapture(double Duration, bool Light)
         {
-            Log.Write("hardwareCapture() begins Duration=" + Duration + "\n");
+            Log.Write(String.Format("hardwareCapture({0}, {1}): begins\n", Duration, Light));
 
             try
             {
@@ -793,7 +793,7 @@ namespace ASCOM.SXGeneric
 
                 actualExposureLength = new TimeSpan(0, 0, 0, 0, (int)(1000*Duration));
 
-                Log.Write("hardwareCapture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
+                Log.Write("hardwareCapture(): dends\n");
 
                 bImageValid = true;
             }
@@ -808,13 +808,11 @@ namespace ASCOM.SXGeneric
 
         internal void softwareCapture(double Duration, bool Light)
         {
-            Log.Write("softwareCapture() begins Duration=" + Duration + "\n");
+            Log.Write(String.Format("softwareCapture({0}, {1}): begins\n", Duration, Light));
 
             try
             {
-                Log.Write("softwareCapture(): calling clearRecordedPixel\n");
                 sxCamera.clearRecordedPixels();
-                Log.Write("softwareCapture(): calling clearCcdPixel\n");
                 sxCamera.clearCcdPixels(); // This clears both the CCD and the recorded pixels.  For
                                            // long exposures (> 2 seconds) we will cleare the recorded pixels again just before
                                            // the exposure ends to clear any accumulated noise.
@@ -865,7 +863,7 @@ namespace ASCOM.SXGeneric
 
                 actualExposureLength = exposureEnd - exposureStart;
 
-                Log.Write("softwareCapture(): delay ends, actualExposureLength=" + actualExposureLength.TotalSeconds + "\n");
+                Log.Write(String.Format("softwareCapture(): delay ends, actualExposureLength={0}, requested={1}\n", actualExposureLength.TotalSeconds, Duration));
                 
                 bImageValid = true;
             }
@@ -891,7 +889,7 @@ namespace ASCOM.SXGeneric
 
         protected void StartExposure(double Duration, bool Light, bool useHardwareTimer)
         {
-            Log.Write("StartExposure() duration=" + Duration + "\n");
+            Log.Write(String.Format("StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
 
             lock (oCameraStateLock)
             {

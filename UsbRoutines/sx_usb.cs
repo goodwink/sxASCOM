@@ -23,7 +23,6 @@ namespace sx
         // Hardware info
 
         internal const String GUID_STRING = "{606377C1-2270-11d4-BFD8-00207812F5D5}";
-        internal const int MAX_READ_SIZE = 256 * 1024;
 
         // Variables
         internal SafeFileHandle deviceHandle;
@@ -165,9 +164,6 @@ namespace sx
                     Int32 thisRead = 0;
                     IntPtr buf = new IntPtr(unManagedBuffer.ToInt64() + numBytesRead);
                     Int32 readSize = numBytesToRead - numBytesRead;
-
-                    if (readSize > MAX_READ_SIZE)
-                        readSize = MAX_READ_SIZE;
 
                     Log.Write(String.Format("usbRead: buf=0x{0:x16} numBytesToRead={1,8} numBytesRead={2,8} readSize={3,8}\n", buf.ToInt64(), numBytesToRead, numBytesRead, readSize));
 

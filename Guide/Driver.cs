@@ -61,11 +61,11 @@ namespace ASCOM.SXGuide
         /// characters (for compatibility with FITS headers).
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if description unavailable</exception>
-        public virtual new string Description
+        public override string Description
         {
             get
             {
-                string sReturn = "Guider (" + base.Description + ")";
+                string sReturn = "SX-Guider (" + base.Description + ")";
                 Log.Write("Guide Camera Description" + sReturn + "\n");
                 return sReturn;
             }

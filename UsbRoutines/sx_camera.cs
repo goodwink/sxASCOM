@@ -494,7 +494,7 @@ namespace sx
             Int32 binnedHeight = height / yBin;
             Int32 imageBytes = binnedWidth * binnedHeight * bitsPerPixel / BITS_PER_BYTE;
 
-            Log.Write(String.Format("downloadPixels(): requesting {0}bytres ({1} pixels, {2} bytes each\n", imageBytes, binnedWidth * binnedHeight, bitsPerPixel / BITS_PER_BYTE));
+            Log.Write(String.Format("downloadPixels(): requesting {0}bytres ({1} pixels, {2} bytes each)\n", imageBytes, binnedWidth * binnedHeight, bitsPerPixel / BITS_PER_BYTE));
 
             imageAsBytes = (byte[])controller.Read(typeof(byte[]), imageBytes, out numBytesRead);
 
