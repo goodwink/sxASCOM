@@ -210,12 +210,19 @@ namespace sx
                         Marshal.Copy(unManagedBuffer, bytes, 0, numPixels);
                         obj = bytes;
                     }
-                    else if (returnType == typeof(Int16[]))
+                    else if (returnType == typeof(Int16[]) || returnType == typeof(UInt16[]))
                     {
-                        Int32 numPixels = numBytesRead / 2;
+                        Int32 numPixels = numBytesRead / Marshal.SizeOf(typeof(Int16));
                         Int16[] shorts = new Int16[numPixels];
                         Marshal.Copy(unManagedBuffer, shorts, 0, numPixels);
                         obj = shorts;
+                    }
+                    else if (returnType == typeof(Int32[]) || returnType == typeof(UInt32[]))
+                    {
+                        Int32 numPixels = numBytesRead / Marshal.SizeOf(typeof(Int32));
+                        Int32[] ints = new Int32[numPixels];
+                        Marshal.Copy(unManagedBuffer, ints, 0, numPixels);
+                        obj = ints;
                     }
                     else
                     {

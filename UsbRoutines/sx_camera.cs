@@ -54,11 +54,17 @@ namespace sx
         private Controller controller;
         private SX_CCD_PARAMS ccdParms;
         private SX_READ_DELAYED_BLOCK readDelayedBlock;
-        byte[] imageAsBytes;
+        private SX_READ_DELAYED_BLOCK lastExposureReadDelayedBlock;
+        //byte[] imageAsBytes;
+        Array imageRawData;
+        Type pixelType;
         private UInt32[,] imageData;
         private bool imageDataValid;
         private object oImageDataLock;
         private UInt16 idx;
+
+        byte [] imageAsBytes;
+        private UInt32[,] imageDataFromBytes;
 
         // Properties
 
@@ -290,7 +296,7 @@ namespace sx
 
                     if (imageData == null)
                     {
-                        convertImageAsBytesToImageData();
+                        convertCameraDataToImageData();
                     }
 
                     return imageData;
@@ -322,6 +328,7 @@ namespace sx
 
             cameraModel = getModel();
             getParams(ref ccdParms);
+            setPixelType();
             buildReadDelayedBlock(out readDelayedBlock, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
             imageDataValid = false;
             oImageDataLock = new object();
@@ -336,8 +343,16 @@ namespace sx
         {
             block.x_offset = inblock.x_offset;
             block.y_offset = inblock.y_offset;
-            block.width = (UInt16)(inblock.width*2);
-            block.height = (UInt16)(inblock.height/2);
+            block.width = (UInt16)inblock.width;
+            block.height = (UInt16)inblock.height;
+            // I have no idea why the next bit is required, but it is.  If it isn't there, 
+            // the read of the image data fails with a semaphore timeout. I found this in the
+            // sample application from SX.
+            if (idx == 0 && cameraModel == 0x59)
+            {
+                block.width *= 2;
+                block.height /= 2;
+            }
             block.x_bin = inblock.x_bin;
             block.y_bin = inblock.y_bin;
 
@@ -402,7 +417,7 @@ namespace sx
                 Log.Write("getModel has locked\n");
                 controller.Write(cmdBlock, out numBytesWritten);
 
-                controller.Read(out  bytes, 2, out numBytesRead);
+                bytes = controller.ReadBytes(Marshal.SizeOf(model), out numBytesRead);
             }
             Log.Write("getModel has unlocked\n");
             model = System.BitConverter.ToUInt16(bytes, 0);
@@ -422,15 +437,15 @@ namespace sx
                 Log.Write("getParams has locked\n");
                 controller.Write(cmdBlock, out numBytesWritten);
 
-                parms = (SX_CCD_PARAMS)controller.Read(typeof(SX_CCD_PARAMS), out numBytesRead);
+                parms = (SX_CCD_PARAMS)controller.ReadObject(typeof(SX_CCD_PARAMS), out numBytesRead);
             }
             Log.Write("getParams has unlocked\n");
         }
 
-        internal void convertImageAsBytesToImageData()
+        internal void convertCameraDataToImageData()
         {
-            Int32 binnedWidth = width / xBin;
-            Int32 binnedHeight = height / yBin;
+            Int32 binnedWidth = lastExposureReadDelayedBlock.width;
+            Int32 binnedHeight = lastExposureReadDelayedBlock.height;
 
             if (bitsPerPixel != 16 && bitsPerPixel != 8)
             {
@@ -442,62 +457,96 @@ namespace sx
             // Copy the bytes read from the camera into a UInt32 array.
             // There must be a better way to do this, but I don't know what it is. 
 
-            Int32 byteoffset = 0;
-            UInt32 min = 9999999, max = 0;
-
             Log.Write("convertCameraDataToImageData(): decoding data, bitsPerPixel=" + bitsPerPixel + " binnedWidth = " + binnedWidth + " binnedHeight=" + binnedHeight + "\n");
 
-            double sum = 0;
-            for (int y = 0; y < binnedHeight; y++)
+            if (idx == 0 && cameraModel == 0x59)
             {
-                for (int x = 0; x < binnedWidth; x++)
-                {
-                    UInt32 pixelValue;
 
-                    switch(bitsPerPixel)
+                Log.Write("convertCameraDataToImageData(): decoding M25C data\n");
+
+                // to go along with the odd requirement that we must double the width and halve the height 
+                // to read the data from MX25C, we have to unscramble the data here
+
+                int srcIdx = 0;
+                int x, y;
+
+                try
+                {
+                    for (y = 0; y < binnedHeight; y += 2)
                     {
-                        case 8:
-                            pixelValue = imageAsBytes[byteoffset];
-                            byteoffset += 1;
-                            break;
-                        case 16:
-                            pixelValue = System.BitConverter.ToUInt16(imageAsBytes, byteoffset);
-                            byteoffset += 2;
-                            break;
-                        case 32:
-                            pixelValue = System.BitConverter.ToUInt32(imageAsBytes, byteoffset);
-                            byteoffset += 4;
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(String.Format("Unexpected bitsPerPixel {0}", bitsPerPixel), "bitsPerPixel");
+                        for (x = 0; x < binnedWidth; x += 2)
+                        {
+                            imageData[x, y] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x, y + 1] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x + 1, y + 1] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x, y + 1] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                        }
                     }
-                    if (pixelValue < min)
-                        min = pixelValue;
-                    if (pixelValue > max)
-                        max = pixelValue;
-                    if (y == 0 || y == binnedHeight-1)
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing M25C data - {0}\n", ex.ToString()));
+                    throw ex;
+                }
+            }
+            else
+            {
+                int srcIdx = 0;
+                int x, y;
+                
+                try
+                {
+                    for (y = 0; y < binnedHeight; y++)
                     {
-                        //Log.Write(String.Format("pixelHeight[{0,4}][{1,4}]=0x{2:X}\n", x, y, pixelValue));
+                        for (x = 0; x < binnedWidth; x++)
+                        {
+                            imageData[x,y ] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            if (imageData[x, y] != imageDataFromBytes[x, y])
+                            {
+                                Log.Write(String.Format("difference for {0},{1}: {2} != {3}\n", y, x, imageData[x, y], imageDataFromBytes[x, y]));
+                            }
+                        }
                     }
-                    imageData[x, y] = pixelValue;
-                    sum += pixelValue;
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing non-M25C data - {0}\n", ex.ToString()));
+                    throw ex;
                 }
             }
 
-            Log.Write(String.Format("convertCameraDataToImageData(): min={0} max={1} ave={2:f}\n", min, max, sum / (double)(binnedHeight * binnedWidth)));
+            Log.Write("convertCameraDataToImageData(): ends\n");
+        }
+
+        internal void setPixelType()
+        {
+            switch (bitsPerPixel)
+            {
+                case 8:
+                    pixelType = typeof(System.Byte);
+                    break;
+                case 16:
+                    pixelType = typeof(System.UInt16);
+                    break;
+                case 32:
+                    pixelType = typeof(System.UInt32);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(String.Format("Unexpected bitsPerPixel {0}", bitsPerPixel), "bitsPerPixel");
+            }
         }
 
         internal void downloadPixels()
         {
             Int32 numBytesRead;
-            Int32 binnedWidth = width / xBin;
-            Int32 binnedHeight = height / yBin;
-            Int32 imageBytes = binnedWidth * binnedHeight * bitsPerPixel / BITS_PER_BYTE;
+            Int32 binnedWidth = lastExposureReadDelayedBlock.width;
+            Int32 binnedHeight = lastExposureReadDelayedBlock.height;
+            Int32 imagePixels = binnedWidth * binnedHeight;
 
-            Log.Write(String.Format("downloadPixels(): requesting {0}bytres ({1} pixels, {2} bytes each)\n", imageBytes, binnedWidth * binnedHeight, bitsPerPixel / BITS_PER_BYTE));
+            Log.Write(String.Format("downloadPixels(): requesting {0} pixels, {1} bytes each ({2} bytes)\n", imagePixels, Marshal.SizeOf(pixelType), imagePixels * Marshal.SizeOf(pixelType)));
 
-            imageAsBytes = (byte[])controller.Read(typeof(byte[]), imageBytes, out numBytesRead);
-
+            imageRawData = (Array)controller.ReadArray(pixelType, imagePixels, out numBytesRead);
+           
             lock (oImageDataLock)
             {
                 imageDataValid = true;
@@ -535,6 +584,8 @@ namespace sx
 
             Log.Write("recordPixels() entered\n");
 
+            lastExposureReadDelayedBlock = readDelayedBlock;
+
             initReadBlock(out readBlock, readDelayedBlock);
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
@@ -565,6 +616,8 @@ namespace sx
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
+
+            lastExposureReadDelayedBlock = readDelayedBlock;
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, 
                                          SX_CMD_READ_PIXELS_DELAYED, 

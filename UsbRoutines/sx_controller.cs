@@ -91,7 +91,6 @@ namespace sx
             Log.Write(String.Format("buildCommandBlock(): type=0x{0:x2} cmd=0x{1:x2} cmd_value=0x{2:x4} index=0x{3:x4} cmd_length=0x{4:x4}\n", cmd_type, cmd, cmd_value, index, cmd_length));
         }
 
-        
         internal void Write(SX_CMD_BLOCK block, Object data, out Int32 numBytesWritten)
         {
             // I lock here to prevent the data from two writes from getting interleaved. I doubt windows would actually do that, but 
@@ -123,17 +122,22 @@ namespace sx
             return oReturn;
         }
 
-        internal void Read(out byte[] bytes, Int32 numBytes, out Int32 numBytesRead)
+        internal Array ReadArray(Type elementType, Int32 numElements, out Int32 numBytesRead)
         {
-            bytes = (byte[])Read(typeof(System.Byte[]), numBytes, out numBytesRead);
+            return (Array)Read(System.Array.CreateInstance(elementType, 0).GetType(), numElements * Marshal.SizeOf(elementType), out numBytesRead);
         }
 
-        internal void Read(out string s, Int32 numBytesToRead, out Int32 numBytesRead)
+        internal byte[] ReadBytes(Int32 numBytes, out Int32 numBytesRead)
         {
-            s = (string)Read(typeof(System.String), numBytesToRead, out numBytesRead);
+            return (byte[])Read(typeof(byte[]), numBytes, out numBytesRead);
         }
 
-        internal object Read(Type returnType, out Int32 numBytesRead)
+        internal string ReadString(Int32 numCharsToRead, out Int32 numBytesRead)
+        {
+            return (string)Read(typeof(System.String), numCharsToRead, out numBytesRead);
+        }
+
+        internal object ReadObject(Type returnType, out Int32 numBytesRead)
         {
             return Read(returnType, Marshal.SizeOf(returnType), out numBytesRead);
         }
@@ -151,7 +155,7 @@ namespace sx
 
                 Write(cmdBlock, s, out numBytesWritten);
 
-                Read(out s2, s.Length, out numBytesRead);
+                s2 = ReadString(s.Length, out numBytesRead);
             }
 
             if (s2 != s)
@@ -184,7 +188,7 @@ namespace sx
                 Log.Write("getVersion has locked\n");
                 Write(cmdBlock, out numBytesWritten);
 
-                Read(out bytes, 4, out numBytesRead);
+                bytes = ReadBytes(Marshal.SizeOf(ver), out numBytesRead);
             }
             Log.Write("getVersion has unlocked\n");
 
@@ -202,7 +206,7 @@ namespace sx
 
             Write(cmdBlock, out numBytesWritten);
 
-            parms = (SX_CCD_PARAMS)Read(typeof(SX_CCD_PARAMS), out numBytesRead);
+            parms = (SX_CCD_PARAMS)ReadObject(typeof(SX_CCD_PARAMS), out numBytesRead);
         }
 
         public int getTimer()
@@ -219,7 +223,7 @@ namespace sx
                 Log.Write("getTimer has locked\n");
                 Write(cmdBlock, out numBytesWritten);
 
-                Read(out bytes, 4, out numBytesRead);
+                bytes = ReadBytes(Marshal.SizeOf(ms), out numBytesRead);
             }
             Log.Write("getTimer has unlocked\n");
 
