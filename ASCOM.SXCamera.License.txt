@@ -1,0 +1,27 @@
+Copyright (C) 2010 by Dad Dog Development Ltd.
+
+This is an alpha quality software preview.  
+
+Please do not not redistribute it or use it in any purpose other than 
+functional testing. 
+
+Be aware that this software may contain code to prevent it from functioning
+after a period of time.
+
+THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Your license to use the software is dependant upon your acceptance of
+these terms.  If you live in a jursidiction which disallows exclusion of 
+waranties, liabilities or consequential damages, then you are not granted 
+a license to use this software.
+
+For addtional information see the README file (ASCOM.SXCamera.Readme.txt)
