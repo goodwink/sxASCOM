@@ -63,9 +63,6 @@ namespace sx
         private object oImageDataLock;
         private UInt16 idx;
 
-        byte [] imageAsBytes;
-        private UInt32[,] imageDataFromBytes;
-
         // Properties
 
         public string description
@@ -501,10 +498,6 @@ namespace sx
                         for (x = 0; x < binnedWidth; x++)
                         {
                             imageData[x,y ] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            if (imageData[x, y] != imageDataFromBytes[x, y])
-                            {
-                                Log.Write(String.Format("difference for {0},{1}: {2} != {3}\n", y, x, imageData[x, y], imageDataFromBytes[x, y]));
-                            }
                         }
                     }
                 }
