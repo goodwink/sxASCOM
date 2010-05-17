@@ -255,7 +255,7 @@ namespace sx
 
         public Byte xBinMax
         {
-            get { return MAX_BIN;}
+            get { return MAX_X_BIN;}
         }
 
         public Byte yBin
@@ -272,7 +272,7 @@ namespace sx
         
         public Byte yBinMax
         {
-            get { return MAX_BIN;}
+            get { return MAX_Y_BIN;}
         }
 
         public UInt32 delayMs 
