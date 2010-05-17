@@ -8,7 +8,7 @@ namespace Logging
 {
     public class Log
     {
-        private const string logPath = @"c:\temp\sx_log.txt";
+        private const string logPath = @"c:\temp\sx-ascom\sx_log.txt";
         private static FileStream logFS = null;
         private static DateTime lastWriteTime;
 

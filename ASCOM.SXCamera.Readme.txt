@@ -1,1 +1,75 @@
-Readme
+Copyright (C) 2010 by Dad Dog Development Ltd.
+
+This is the README for the ASCOM driver for Starlight Express cameras.
+
+     This driver was not written by, authorized by, sanctioned by, or any
+     other ... by Starlight Express.  It was independently developed 
+     from the developer documentation available from the SX website. I had
+     a couple of email exchanges with Terry Pratt, but that is the extent
+     of SX involvement.  Please do not make them regret providing 
+     developer documentation by asking questions or complaining about 
+     problems to SX.
+
+I am moving from DSLR imaging to CCD imaging, and am a professional software 
+developer. I discovered that my two favorite imaging apps (PHD and
+Images Plus) would not work with my new SX camera.  I also had some truely
+lousy weather, and since it was a "simple matter of programming" to make them
+work with my camera, so I wrote this driver.
+
+This is an ALPHA release.  That means it isn't ready for prime time.  I'm 
+releasing it in the hopes of learning more about how it works with various
+SX cameras and guiders. Please test it during daylight hours.  
+
+PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS DRIVER. 
+
+I have am SXVF-M25C and the older style 8 bit guide camera.  It seems to work 
+with both of them. If you are willing to participate by loading the driver, and 
+seeing if it works with your camera and guider (if you have one), I'd 
+like to know the results. If it doesn't work, it can create a log file 
+which might help me fix it.
+
+Expected To Work:
+- SXVF-MX25C
+- SX 8-bit Guide Camera
+- Simultanious use of both cameras by seperate software products
+- Autoguider port - if a guide camera is attached, the guide port shows up
+  as attached to it.  If not, it is attached to the main camera.
+
+Will probably work:
+- other SX cameras
+- SX 16 bit guide camera
+
+Known Limitations/things that don't work:
+
+- Binning does not yet work
+- There is no support for SXVR cooler features since I don't have a camera
+  which provides these features, and because there is no documentation for 
+  those features on the SX website
+- serial ports - I don't have the serial box, and if I did it would require 
+  writing virtual serial drivers for my telescope to take advantage of them
+
+Disclaimer:
+
+At present I have no business model, and I'm not sure what I'm going to do with
+the driver.  This Alpha release is in no way a commitment that there will ever
+be another release, and if you submit a defect report, there is not guarantee
+that I will ever fix it.  
+
+If I get the driver working well enough that I can use it for my imaging
+needs, any other work I do on it will be taking time away from some other part
+of my life.  I'm a hobbiest, and I'd rather be imaging than writing 
+software. Supporting cameras that I don't own and can't test on will be a 
+non-trivial undertaking (for example, putting together the installer took 
+more than an hour).  I'm likely (but not promising to) release the 
+driver for free, and to request donations to fund support.  
+
+If you have an SX camera then you have invested in a premium setup, and this 
+driver will provide you with additional software options. If you don't think 
+that is worth anything, then don't donate - just don't have any 
+expectation that problems you report will be fixed.
+
+Clear Skies, 
+
+Bret McKee
+Dad Dog Development, Ltd
+bretm@daddog.com

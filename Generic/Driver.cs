@@ -334,8 +334,14 @@ namespace ASCOM.SXGeneric
             set
             {
                 Log.Write("Connected: set to " + value + " requested. Current value is " + bConnected +"\n");
+                
                 if (value)
                 {
+                    if (DateTime.Now.CompareTo(DateTime.Parse("07/31/2010")) > 0)
+                    {
+                        throw new System.Exception("Alpha release expired");
+                    }
+
                     if (bConnected)
                     {
                         throw new System.Exception("Attempt to connect when already connected");
