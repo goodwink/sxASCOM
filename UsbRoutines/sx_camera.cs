@@ -58,7 +58,7 @@ namespace sx
         //byte[] imageAsBytes;
         Array imageRawData;
         Type pixelType;
-        private UInt32[,] imageData;
+        private Int32 [,] imageData;
         private bool imageDataValid;
         private object oImageDataLock;
         private UInt16 idx;
@@ -242,7 +242,7 @@ namespace sx
         {
             get {return readDelayedBlock.x_bin;}
             set {
-                    if (value > MAX_BIN)
+                    if (value <=0 || value > MAX_BIN)
                     {
                         throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 0<=height<={1}", value, MAX_BIN), "xBin");
                     }
@@ -259,7 +259,7 @@ namespace sx
         {
             get {return readDelayedBlock.y_bin;}
             set {
-                    if (value > MAX_BIN)
+                    if (value <=0 || value > MAX_BIN)
                     {
                         throw new ArgumentOutOfRangeException(String.Format("Invalid lBin {0} 0<=height<={1}", value, MAX_BIN), "xBin");
                     }
@@ -449,7 +449,7 @@ namespace sx
                 throw new ArgumentOutOfRangeException("downloadPixels(): Untested: bitsPerPixel != 16", "bitsPerPixel");
             }
 
-            imageData = new UInt32[binnedWidth, binnedHeight];
+            imageData = new Int32[binnedWidth, binnedHeight];
 
             // Copy the bytes read from the camera into a UInt32 array.
             // There must be a better way to do this, but I don't know what it is. 
@@ -473,10 +473,10 @@ namespace sx
                     {
                         for (x = 0; x < binnedWidth; x += 2)
                         {
-                            imageData[x, y] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            imageData[x, y + 1] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            imageData[x + 1, y + 1] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            imageData[x, y + 1] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x + 1, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
                         }
                     }
                 }
@@ -497,7 +497,7 @@ namespace sx
                     {
                         for (x = 0; x < binnedWidth; x++)
                         {
-                            imageData[x,y ] = (UInt32)(UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x,y ] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
                         }
                     }
                 }
@@ -569,7 +569,7 @@ namespace sx
             controller.guide(SX_STAR2K_WEST, durationMS);
         }
 
-         public void recordPixels(out DateTime exposureEnd)
+         public void recordPixels(out DateTimeOffset exposureEnd)
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
@@ -596,7 +596,7 @@ namespace sx
                 }
                 Log.Write("recordPixels() requesting read\n");
                 controller.Write(cmdBlock, readBlock, out numBytesWritten);
-                exposureEnd = DateTime.Now;
+                exposureEnd = DateTimeOffset.Now;
                 Log.Write("recordPixels() beginning downloading\n");
                 downloadPixels();
                 Log.Write("recordPixels() download completed\n");

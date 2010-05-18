@@ -49,7 +49,7 @@ namespace ASCOM.SXGeneric
     {
         private bool bConnected;
         protected sx.Camera sxCamera;
-        private DateTime exposureStart;
+        private DateTimeOffset exposureStart;
         private TimeSpan desiredExposureLength;
         private TimeSpan actualExposureLength;
         private delegate void CaptureDelegate(double Duration, bool Light);
@@ -62,6 +62,8 @@ namespace ASCOM.SXGeneric
         private volatile Object oGuideStateLock;
         private volatile bool bGuiding;
         private static UInt16 cameraId;
+        protected bool bLastErrorValid;
+        protected string lastErrorMessage;
 
         #region Camera Constructor
          //
@@ -96,6 +98,7 @@ namespace ASCOM.SXGeneric
         public void AbortExposure()
         {
             Log.Write("AbortExposure\n");
+            bLastErrorValid = false;
             lock (oCameraStateLock)
             {
                 switch (state)
@@ -164,8 +167,8 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CCDTemperature\n"); 
-                throw new System.Exception("CCDTemperature is not supported");
+                Log.Write("CCDTemperature\n");
+                throw new System.Exception("CCDTemperature must throw exception if data unavailable");
             }
         }
 
@@ -356,6 +359,8 @@ namespace ASCOM.SXGeneric
                     bAbortRequested = false;
                     bStopRequested = false;
                     bGuiding = false;
+                    bLastErrorValid = false;
+                    lastErrorMessage = "Last Error";
                 }
                 else
                 {
@@ -474,7 +479,7 @@ namespace ASCOM.SXGeneric
             get
             { 
                 Log.Write("HeatSinkTemperature()\n");
-                throw new System.Exception("HeatSinkTemperature is not valid if CanControlTemperature == false");
+                throw new System.Exception("HeatSinkTemperature must throw exception if data unavailable");
             }
         }
 
@@ -500,6 +505,7 @@ namespace ASCOM.SXGeneric
                 {
                     throw new System.Exception("The image is not valid.");
                 }
+
                 return sxCamera.ImageArray;
             }
         }
@@ -522,8 +528,27 @@ namespace ASCOM.SXGeneric
         {
             get
             { 
-                Log.Write("ImageArrayVariant()\n"); 
-                throw new System.Exception("The method or operation is not implemented."); 
+                Log.Write("ImageArrayVariant()\n");
+                if (!bImageValid)
+                {
+                    throw new System.Exception("The image is not valid.");
+                }
+
+                
+                Int32 [,] data = (Int32 [,])ImageArray;
+                Int32 width = data.GetLength(0);
+                Int32 height = data.GetLength(1);
+                object [,] oReturn = new object[width, height];
+
+                for (int x = 0; x < width; x++)
+                {
+                    for(int y=0;y<height;y++)
+                    {
+                        oReturn[x, y] = data[x, y];
+                    }
+                }
+
+                return oReturn;
             }
         }
 
@@ -568,8 +593,12 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("LastError()\n"); 
-                throw new System.Exception("The method or operation is not implemented.");
+                Log.Write("LastError()\n");
+                if (!bLastErrorValid)
+                {
+                    throw new System.Exception("LastError called when there was no last error");
+                }
+                return lastErrorMessage;
             }
         }
 
@@ -583,6 +612,10 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
+                if (!bImageValid)
+                {
+                    throw new System.Exception("LastExposureDuration cannot be called if no image is ready");
+                }
                 Log.Write("LastExposureDuration()\n"); 
                 return actualExposureLength.TotalSeconds;
             }
@@ -597,8 +630,12 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
+                if (!bImageValid)
+                {
+                    throw new System.Exception("LastExposureStartTime cannot be called if no image is ready");
+                }
                 Log.Write("LastExposureStartTime()\n"); 
-                return exposureStart.ToString("yyyy-MM-ddTHH:mm:ss.fff");
+                return exposureStart.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff");
             }
         }
 
@@ -715,6 +752,7 @@ namespace ASCOM.SXGeneric
         public void PulseGuide(GuideDirections Direction, int Duration)
         {
             Log.Write("PulseGuide()\n");
+            bLastErrorValid = false;
 
             if (!CanPulseGuide)
             {
@@ -766,12 +804,12 @@ namespace ASCOM.SXGeneric
             get
             {
                 Log.Write("SetCCDTemperature Get()\n");
-                throw new System.Exception("SetCCDTemperature cannot be use if CanSetCCDTemperature == false");
+                throw new System.Exception("SetCCDTemperature must throw exception if CanSetCCDTemperature is False.");
             }
             set
             {
                 Log.Write("SetCCDTemperature SEt()\n");
-                throw new System.Exception("SetCCDTemperature cannot be use if CanSetCCDTemperature == false");
+                throw new System.Exception("SetCCDTemperature must throw exception if CanSetCCDTemperature is False.");
             }
         }
 
@@ -826,7 +864,7 @@ namespace ASCOM.SXGeneric
                 
                 exposureStart = DateTime.Now;
                 desiredExposureLength = TimeSpan.FromSeconds(Duration);
-                DateTime exposureEnd = exposureStart + desiredExposureLength;
+                DateTimeOffset exposureEnd = exposureStart + desiredExposureLength;
 
                 // We sleep for most of the exposure, then spin for the last little bit
                 // because this helps us end closer to the right time
@@ -890,12 +928,27 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">the exposure cannot be started for any reason, such as a hardware or communications error</exception>
         virtual public void StartExposure(double Duration, bool Light)
         {
-            StartExposure(Duration, Light, false);
+            try
+            {
+                bLastErrorValid = false;
+                if (Duration < 0)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("StartExposure({0}, {1}): Invalid Duration 0<=Duration", Duration, Light), "Duration");
+                }
+                StartExposure(Duration, Light, false);
+            }
+            catch (System.Exception ex)
+            {
+                bLastErrorValid = true;
+                lastErrorMessage = ex.ToString();
+                throw ex;
+            }
         }
 
         protected void StartExposure(double Duration, bool Light, bool useHardwareTimer)
         {
             Log.Write(String.Format("StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
+            bLastErrorValid = false;
 
             lock (oCameraStateLock)
             {
@@ -975,6 +1028,7 @@ namespace ASCOM.SXGeneric
         public void StopExposure()
         {
             Log.Write("StopExposure()\n");
+            bLastErrorValid = false;
             lock (oCameraStateLock)
             {
                 switch (state)

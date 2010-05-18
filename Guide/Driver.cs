@@ -83,14 +83,23 @@ namespace ASCOM.SXGuide
 
         public override void StartExposure(double Duration, bool Light)
         {
-            bool useHardwareTimer = false;
-
-            if (Duration <= 5.0)
+            try
             {
-                useHardwareTimer = true;
+                bool useHardwareTimer = false;
+
+                if (Duration <= 5.0)
+                {
+                    useHardwareTimer = true;
+                }
+                Log.Write(String.Format("Guide Camera StartExposure({0}, {1}) useHardwareTimer = {2}\n", Duration, Light, useHardwareTimer));
+                base.StartExposure(Duration, Light, useHardwareTimer);
             }
-            Log.Write(String.Format("Guide Camera StartExposure({0}, {1}) useHardwareTimer = {2}\n", Duration, Light, useHardwareTimer));
-            base.StartExposure(Duration, Light, useHardwareTimer);
+            catch (System.Exception ex)
+            {
+                bLastErrorValid = true;
+                lastErrorMessage = ex.ToString();
+                throw ex;
+            }
         }
     }
 }
