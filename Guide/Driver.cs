@@ -75,31 +75,31 @@ namespace ASCOM.SXGuide
         {
             get
             {
-                bool bReturn = sxCamera.hasGuidePort;
+                bool bReturn = bHasGuideCamera;
+
                 Log.Write("Guide Camera CanPulseGuide returns " + bReturn+ "\n");
+
+                if (!Connected)
+                {
+                    throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
+                }
+
                 return bReturn;
             }
         }
 
         public override void StartExposure(double Duration, bool Light)
         {
-            try
-            {
-                bool useHardwareTimer = false;
+            bool useHardwareTimer = false;
 
-                if (Duration <= 5.0)
-                {
-                    useHardwareTimer = true;
-                }
-                Log.Write(String.Format("Guide Camera StartExposure({0}, {1}) useHardwareTimer = {2}\n", Duration, Light, useHardwareTimer));
-                base.StartExposure(Duration, Light, useHardwareTimer);
-            }
-            catch (System.Exception ex)
+            if (Duration <= 5.0)
             {
-                bLastErrorValid = true;
-                lastErrorMessage = ex.ToString();
-                throw ex;
+                useHardwareTimer = true;
             }
+
+            Log.Write(String.Format("Guide Camera StartExposure({0}, {1}) useHardwareTimer = {2}\n", Duration, Light, useHardwareTimer));
+
+            base.StartExposure(Duration, Light, useHardwareTimer);
         }
     }
 }

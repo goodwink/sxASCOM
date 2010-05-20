@@ -67,9 +67,17 @@ namespace ASCOM.SXMain
             get
             {
                 bool bReturn = false;
-                if (!sxCamera.hasGuideCamera)
+
+                if (!Connected)
+                {
+                    throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
+                }
+
+                if (!bHasGuideCamera)
                     bReturn = sxCamera.hasGuidePort;
+
                 Log.Write("Main Camera: CanPulseGuide returns " + bReturn + "\n");
+
                 return bReturn;
             }
         }
