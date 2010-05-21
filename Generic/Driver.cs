@@ -83,7 +83,7 @@ namespace ASCOM.SXGeneric
         protected Camera(UInt16 whichCamera)
         {
             //Thread.Sleep(15000);
-            Log.Write("In Camera Constructor for camera " + whichCamera +" \n");
+            Log.Write("Camera(" + whichCamera +")\n");
 
             cameraId = whichCamera;                     
 
@@ -104,6 +104,7 @@ namespace ASCOM.SXGeneric
             bLastErrorValid = true;
             lastErrorMessage = errorMessage;
 
+            Log.Write("SetError(" + errorMessage + ")\n");
             return errorMessage;
         }
 
@@ -117,7 +118,7 @@ namespace ASCOM.SXGeneric
         /// </summary>
         public void AbortExposure()
         {
-            Log.Write("AbortExposure\n");
+            Log.Write("AbortExposure()\n");
 
             bLastErrorValid = false;
 
@@ -154,7 +155,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("BinX get\n");
+                Log.Write("BinX get: m_Binx =" + m_BinX + "\n");
 
                 if (!Connected)
                 {
@@ -165,7 +166,7 @@ namespace ASCOM.SXGeneric
             }
             set
             {
-                Log.Write("BinX set\n");
+                Log.Write("BinX set to " + value + "\n");
 
                 if (!Connected)
                 {
@@ -179,8 +180,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
-                    bLastErrorValid = true;
-                    lastErrorMessage = ex.ToString();
+                    SetError(ex.ToString());
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + m_MaxBinX.ToString(), ex);
                 }
                 catch (System.Exception ex)
@@ -201,7 +201,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("BinY get\n");
+                Log.Write("BinY get: m_BinY =" + m_BinY +"\n");
 
                 if (!Connected)
                 {
@@ -212,7 +212,7 @@ namespace ASCOM.SXGeneric
             }
             set
             {
-                Log.Write("BinY set\n");
+                Log.Write("BinY set to " + value +" \n");
 
                 if (!Connected)
                 {
@@ -226,8 +226,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
-                    bLastErrorValid = true;
-                    lastErrorMessage = ex.ToString();
+                    SetError(ex.ToString());
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinY.ToString(), ex);
                 }
                 catch (System.Exception ex)
@@ -246,13 +245,13 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CCDTemperature\n");
+                Log.Write("CCDTemperature: will throw excpetion\n");
 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
-                throw new ASCOM.InvalidOperationException("CCDTemperature: must throw exception if data unavailable");
+                throw new ASCOM.PropertyNotImplementedException(SetError("CCDTemperature: must throw exception if data unavailable"), false);
             }
         }
 
@@ -289,7 +288,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             { 
-                Log.Write("CameraState()\n");
+                Log.Write("CameraState() called from state " + state +"\n");
 
                 if (!Connected)
                 {
@@ -311,7 +310,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CameraXSize()\n");
+                Log.Write("CameraXSize get: m_CameraXSize = " + m_CameraXSize + "\n");
 
                 if (!Connected)
                 {
@@ -334,7 +333,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CameraYSize()\n");
+                Log.Write("CameraYSize get: m_CameraYSize = " + m_CameraYSize +"\n");
 
                 if (!Connected)
                 {
@@ -357,7 +356,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanAbortExposure()\n");
+                Log.Write("CanAbortExposure get\n");
 
                 if (!Connected)
                 {
@@ -379,7 +378,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanAssymetricBin()\n");
+                Log.Write("CanAssymetricBin get\n");
 
                 if (!Connected)
                 {
@@ -397,7 +396,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanGetCoolerPower()\n");
+                Log.Write("CanGetCoolerPower get\n");
 
                 if (!Connected)
                 {
@@ -429,7 +428,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanSetCCDTemperature()\n");
+                Log.Write("CanSetCCDTemperature get\n");
 
                 if (!Connected)
                 {
@@ -451,7 +450,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanStopExposure()\n");
+                Log.Write("CanStopExposure get\n");
 
                 if (!Connected)
                 {
@@ -472,13 +471,13 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("Connected:  get - returning " + m_Connected +"\n");
+                Log.Write("Connected get: returning " + m_Connected +"\n");
 
                 return  m_Connected;
             }
             set
             {
-                Log.Write("Connected: set to " + value + " requested. Current value is " + Connected +"\n");
+                Log.Write("Connected set to " + value + " requested. Current value is " + Connected +"\n");
                 
                 if (value)
                 {
@@ -513,6 +512,7 @@ namespace ASCOM.SXGeneric
                         StartX = 0;
                         StartY = 0;
                         bHasGuideCamera = sxCamera.hasGuideCamera;
+                        ElectronsPerADU = sxCamera.electronsPerADU;
                     }
                     catch (System.Exception ex)
                     {
@@ -527,7 +527,7 @@ namespace ASCOM.SXGeneric
                     bStopRequested = false;
                     bGuiding = false;
                     bLastErrorValid = false;
-                    lastErrorMessage = "Last Error";
+                    lastErrorMessage = "Uninitialized Last Error";
                 }
                 else
                 {
@@ -550,7 +550,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CoolerOn() get\n");
+                Log.Write("CoolerOn get\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -560,7 +560,7 @@ namespace ASCOM.SXGeneric
             }
             set
             {
-                Log.Write("CoolerOn() set\n");
+                Log.Write("CoolerOn set to " + value + "\n");
 
                 if (!Connected)
                 {
@@ -581,7 +581,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("CoolerPower()\n");
+                Log.Write("CoolerPower get returns hard coded 100\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -600,7 +600,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("Generic Description()\n");
+                Log.Write("Generic Description get: " + m_Description + "\n");
 
                 if (!Connected)
                 {
@@ -612,6 +612,7 @@ namespace ASCOM.SXGeneric
             }
             protected set
             {
+                Log.Write("Generic Description set: " + value + "\n");
                 m_Description = value;
             }
         }
@@ -626,7 +627,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("ElectronsPerADU()\n");
+                Log.Write("ElectronsPerADU get returns " + m_ElectronsPerADU + "\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -636,6 +637,7 @@ namespace ASCOM.SXGeneric
             }
             private set
             {
+                Log.Write("ElectronsPerADU set to " + value + "\n");
                 m_ElectronsPerADU = value;
             }
         }
@@ -649,7 +651,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("FullWellCapacity()\n");
+                Log.Write("FullWellCapacity get returns " + MaxADU * ElectronsPerADU / (BinX * BinY) + "\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -668,7 +670,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("HasShutter()\n");
+                Log.Write("HasShutter get returns hard coded false\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -686,7 +688,7 @@ namespace ASCOM.SXGeneric
         {
             get
             { 
-                Log.Write("HeatSinkTemperature()\n");
+                Log.Write("HeatSinkTemperature get will throw an exception\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -712,7 +714,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("ImageArray()\n");
+                Log.Write("ImageArray get\n");
 
                 if (!Connected)
                 {
@@ -730,8 +732,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    bLastErrorValid = true;
-                    lastErrorMessage = ex.ToString();
+                    SetError(ex.ToString());
                     throw new ASCOM.ValueNotSetException(MethodBase.GetCurrentMethod().Name, ex);
                 }
             }
@@ -755,7 +756,7 @@ namespace ASCOM.SXGeneric
         {
             get
             { 
-                Log.Write("ImageArrayVariant()\n");
+                Log.Write("ImageArrayVariant get\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -786,8 +787,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    bLastErrorValid = true;
-                    lastErrorMessage = ex.ToString();
+                    SetError(ex.ToString());
                     throw new ASCOM.ValueNotSetException(MethodBase.GetCurrentMethod().Name, ex);
                 }
             }
@@ -803,6 +803,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
+                Log.Write("ImageReady get: bImageValid = " + bImageValid + "\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -821,7 +822,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("IsPulseGuiding()\n");
+                Log.Write("IsPulseGuiding get: bGuiding = " + bGuiding + "\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -988,25 +989,25 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("NumX get\n");
+                Log.Write("NumX get: " + m_NumX + "\n");
 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
 
-                return CameraXSize / BinX;
+                return m_NumX;
             }
 
             set
             {
-                Log.Write("NumX set\n");
+                Log.Write("NumX set: " + value + "\n");
 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
-                m_NumX = value;
+                m_NumX = value/BinX;
             }
         }
 
@@ -1019,18 +1020,18 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("NumY get\n");
+                Log.Write("NumY get: " + m_NumY + "\n");
 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
 
-                return CameraYSize / BinX;
+                return m_NumY;
             }
             set
             {
-                Log.Write("NumY set\n");
+                Log.Write("NumY set: " + value + "\n");
 
                 if (!Connected)
                 {
@@ -1049,7 +1050,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("PixelSizeX()\n"); 
+                Log.Write("PixelSizeX get: m_PixleSizeX = " + m_PixelSizeX + "\n"); 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -1059,6 +1060,7 @@ namespace ASCOM.SXGeneric
             }
             private set
             {
+                Log.Write("PixelSizeX set: " + value + "\n"); 
                 m_PixelSizeX = value;
             }
         }
@@ -1072,7 +1074,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("PixelSizeY()\n"); 
+                Log.Write("PixelSizeX get: m_PixleSizeY = " + m_PixelSizeY + "\n"); 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -1083,6 +1085,7 @@ namespace ASCOM.SXGeneric
 
             private set
             {
+                Log.Write("PixelSizeY set: " + value + "\n"); 
                 m_PixelSizeY = value;
             }
         }
@@ -1108,7 +1111,7 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">PulseGuide command is unsuccessful</exception>
         public void PulseGuide(GuideDirections Direction, int Duration)
         {
-            Log.Write("PulseGuide()\n");
+            Log.Write("PulseGuide(" + Direction + "," + Duration + ")\n");
             bLastErrorValid = false;
             
             if (!Connected)
@@ -1146,8 +1149,7 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
-                bLastErrorValid = true;
-                lastErrorMessage = ex.ToString();
+                SetError(ex.ToString());
                 throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
             }
             finally
@@ -1171,21 +1173,21 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("SetCCDTemperature get\n");
+                Log.Write("SetCCDTemperature get: will throw an exception\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
-                throw new ASCOM.InvalidOperationException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."));
+                throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), false);
             }
             set
             {
-                Log.Write("SetCCDTemperature set\n");
+                Log.Write("SetCCDTemperature set: will throw an exception\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
-                throw new ASCOM.InvalidOperationException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."));
+                throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), true);
             }
         }
 
@@ -1213,14 +1215,12 @@ namespace ASCOM.SXGeneric
 
                 actualExposureLength = new TimeSpan(0, 0, 0, 0, (int)(1000*Duration));
 
-                Log.Write("hardwareCapture(): dends\n");
+                Log.Write("hardwareCapture(): ends successfully\n");
 
                 bImageValid = true;
             }
             catch (System.Exception ex)
             {
-                bLastErrorValid = true;
-                lastErrorMessage = ex.ToString();
                 throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
             }
             finally
@@ -1295,8 +1295,6 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
-                bLastErrorValid = true;
-                lastErrorMessage = ex.ToString();
                 throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
             }
             finally
@@ -1316,6 +1314,7 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">the exposure cannot be started for any reason, such as a hardware or communications error</exception>
         virtual public void StartExposure(double Duration, bool Light)
         {
+            Log.Write(String.Format("StartExposure({0}, {1}) begins\n", Duration, Light));
             StartExposure(Duration, Light, false);
         }
 
@@ -1329,6 +1328,12 @@ namespace ASCOM.SXGeneric
                 throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
             }
 
+            if (Duration < 0)
+            {
+                SetError("Exposure duration < 0");
+                throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, Duration.ToString(), ">= 0");
+            }
+            
             lock (oCameraStateLock)
             {
                 if (state != CameraStates.cameraIdle)
@@ -1349,8 +1354,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
-                    bLastErrorValid = true;
-                    lastErrorMessage = ex.ToString();
+                    SetError(ex.ToString());
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumX.ToString(), "1-" + (CameraXSize/BinX).ToString(), ex);
                 }
 
@@ -1360,8 +1364,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
-                    bLastErrorValid = true;
-                    lastErrorMessage = ex.ToString();
+                    SetError(ex.ToString());
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
                 }
                 
@@ -1371,8 +1374,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
-                    bLastErrorValid = true;
-                    lastErrorMessage = ex.ToString();
+                    SetError(ex.ToString());
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartX.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
                 }
 
@@ -1383,8 +1385,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
-                    bLastErrorValid = true;
-                    lastErrorMessage = ex.ToString();
+                    SetError(ex.ToString());
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
                 }
 
@@ -1424,6 +1425,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
+                Log.Write("StartX get: m_StartX = " + m_StartX + "\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -1433,26 +1435,13 @@ namespace ASCOM.SXGeneric
 
             set
             {
+                Log.Write("StartX set: " + value + "\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
 
-                try
-                {
-                    m_StartX = value;
-                    sxCamera.xOffset = (UInt16)(value * BinX);
-                }
-                catch (ArgumentOutOfRangeException ex)
-                {
-                    bLastErrorValid = true;
-                    lastErrorMessage = ex.ToString();
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + (CameraXSize/BinX).ToString(), ex);
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
+                m_StartX = value;
             }
         }
 
@@ -1464,6 +1453,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
+                Log.Write("StartY get: m_StartY = " + m_StartY + "\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -1473,6 +1463,7 @@ namespace ASCOM.SXGeneric
 
             set
             {
+                Log.Write("StartY set: " + value + "\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -1492,7 +1483,7 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">Must throw an exception if for any reason no image readout will be available.</exception>
         public void StopExposure()
         {
-            Log.Write("StopExposure()\n");
+            Log.Write("StopExposure() requested when in state " + state + "\n");
             bLastErrorValid = false;
 
             if (!Connected)
@@ -1509,6 +1500,7 @@ namespace ASCOM.SXGeneric
                         bStopRequested = true;
                         break;
                     default:
+                        break;
                         if (bStopRequested)
                             break; // they asked when it was legal and are just asking again.
                         throw new ASCOM.InvalidOperationException(String.Format("Stop not possible when camera is in state {0}", state));

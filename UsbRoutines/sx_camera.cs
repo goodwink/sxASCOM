@@ -218,9 +218,9 @@ namespace sx
         {
             get {return readDelayedBlock.width;}
             set {
-                    if (value > ccdParms.width)
+                    if (value == 0 || value > ccdParms.width)
                     {
-                        throw new ArgumentOutOfRangeException(String.Format("Invalid width {0} 0<=width<={1}", value, ccdParms.width), "width");
+                        throw new ArgumentOutOfRangeException(String.Format("Invalid width {0} 1<=width<={1}", value, ccdParms.width), "width");
                     }
                     readDelayedBlock.width = value;
                 }
@@ -230,9 +230,9 @@ namespace sx
         {
             get {return readDelayedBlock.height;}
             set {
-                    if (value > ccdParms.height)
+                    if (value == 0 || value > ccdParms.height)
                     {
-                        throw new ArgumentOutOfRangeException(String.Format("Invalid height {0} 0<=height<={1}", value, ccdParms.height), "height");
+                        throw new ArgumentOutOfRangeException(String.Format("Invalid height {0} 1<=height<={1}", value, ccdParms.height), "height");
                     }
                     readDelayedBlock.height = value;
                 }
@@ -244,7 +244,7 @@ namespace sx
             set {
                     if (value <=0 || value > MAX_BIN)
                     {
-                        throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 0<=height<={1}", value, MAX_BIN), "xBin");
+                        throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 1<=height<={1}", value, MAX_BIN), "xBin");
                     }
                     readDelayedBlock.x_bin = value;
                 }
@@ -261,7 +261,7 @@ namespace sx
             set {
                     if (value <=0 || value > MAX_BIN)
                     {
-                        throw new ArgumentOutOfRangeException(String.Format("Invalid lBin {0} 0<=height<={1}", value, MAX_BIN), "xBin");
+                        throw new ArgumentOutOfRangeException(String.Format("Invalid yBin {0} 1<=height<={1}", value, MAX_BIN), "yBin");
                     }
                     readDelayedBlock.y_bin = value;
                 }
