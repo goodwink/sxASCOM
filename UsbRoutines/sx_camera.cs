@@ -53,7 +53,7 @@ namespace sx
         // Variables
         private Controller controller;
         private SX_CCD_PARAMS ccdParms;
-        private SX_READ_DELAYED_BLOCK readDelayedBlock;
+        private SX_READ_DELAYED_BLOCK nextExposureReadDelayedBlock;
         private SX_READ_DELAYED_BLOCK lastExposureReadDelayedBlock;
         //byte[] imageAsBytes;
         Array imageRawData;
@@ -192,62 +192,77 @@ namespace sx
 
         public UInt16 xOffset
         {
-            get {return readDelayedBlock.x_offset;}
-            set {
-                    if (value >= ccdParms.width)
-                    {
-                        throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0} 0<=xOffset<={1}", value, ccdParms.width), "xOffset");
-                    }
-                    readDelayedBlock.x_offset = value;
+            get {return nextExposureReadDelayedBlock.x_offset;}
+            set 
+            {
+                if (value > ccdWidth)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0} 0<=xOffset<={1}", value, ccdParms.width), "xOffset");
                 }
+
+                if (value + width > ccdWidth)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", value, width, ccdWidth), "xOffset");
+                }
+
+                nextExposureReadDelayedBlock.x_offset = value;
+            }
         }
 
         public UInt16 yOffset
         {
-            get {return readDelayedBlock.y_offset;}
-            set {
-                    if (value >= ccdParms.height)
-                    {
-                        throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset {0} 0<=yOffset<={1}", value, ccdParms.height), "yOffset");
-                    }
-                    readDelayedBlock.x_offset = value;
+            get {return nextExposureReadDelayedBlock.y_offset;}
+            set 
+            {
+                if (value >= ccdHeight)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset {0} 0<=yOffset<={1}", value, ccdParms.height), "yOffset");
                 }
+                if (value + height > ccdHeight)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", value, height, ccdHeight), "yOffset");
+                }
+                nextExposureReadDelayedBlock.y_offset = value;
+            }
         }
 
         public UInt16 width
         {
-            get {return readDelayedBlock.width;}
-            set {
-                    if (value == 0 || value > ccdParms.width)
-                    {
-                        throw new ArgumentOutOfRangeException(String.Format("Invalid width {0} 1<=width<={1}", value, ccdParms.width), "width");
-                    }
-                    readDelayedBlock.width = value;
+            get {return nextExposureReadDelayedBlock.width;}
+            set
+            {
+                if (value == 0 || value > ccdParms.width)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid width {0} 1<=width<={1}", value, ccdParms.width), "width");
                 }
+                nextExposureReadDelayedBlock.width = value;
+            }
         }
 
         public UInt16 height
         {
-            get {return readDelayedBlock.height;}
-            set {
-                    if (value == 0 || value > ccdParms.height)
-                    {
-                        throw new ArgumentOutOfRangeException(String.Format("Invalid height {0} 1<=height<={1}", value, ccdParms.height), "height");
-                    }
-                    readDelayedBlock.height = value;
+            get {return nextExposureReadDelayedBlock.height;}
+            set 
+            {
+                if (value == 0 || value > ccdParms.height)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid height {0} 1<=height<={1}", value, ccdParms.height), "height");
                 }
+                nextExposureReadDelayedBlock.height = value;
+            }
         }
 
         public Byte xBin
         {
-            get {return readDelayedBlock.x_bin;}
-            set {
-                    if (value <=0 || value > MAX_BIN)
-                    {
-                        throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 1<=height<={1}", value, MAX_BIN), "xBin");
-                    }
-                    readDelayedBlock.x_bin = value;
+            get {return nextExposureReadDelayedBlock.x_bin;}
+            set 
+            {
+                if (value <=0 || value > MAX_X_BIN)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 1<=height<={1}", value, MAX_BIN), "xBin");
                 }
+                nextExposureReadDelayedBlock.x_bin = value;
+            }
         }
 
         public Byte xBinMax
@@ -257,13 +272,13 @@ namespace sx
 
         public Byte yBin
         {
-            get {return readDelayedBlock.y_bin;}
+            get {return nextExposureReadDelayedBlock.y_bin;}
             set {
-                    if (value <=0 || value > MAX_BIN)
+                    if (value <=0 || value > MAX_Y_BIN)
                     {
                         throw new ArgumentOutOfRangeException(String.Format("Invalid yBin {0} 1<=height<={1}", value, MAX_BIN), "yBin");
                     }
-                    readDelayedBlock.y_bin = value;
+                    nextExposureReadDelayedBlock.y_bin = value;
                 }
         }
         
@@ -274,8 +289,8 @@ namespace sx
 
         public UInt32 delayMs 
         {
-            get { return readDelayedBlock.delay; }
-            set { readDelayedBlock.delay = value; }
+            get { return nextExposureReadDelayedBlock.delay; }
+            set { nextExposureReadDelayedBlock.delay = value; }
         }
 
         public object ImageArray
@@ -326,11 +341,39 @@ namespace sx
             cameraModel = getModel();
             getParams(ref ccdParms);
             setPixelType();
-            buildReadDelayedBlock(out readDelayedBlock, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
+            buildReadDelayedBlock(out nextExposureReadDelayedBlock, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
             imageDataValid = false;
             oImageDataLock = new object();
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
          }
+
+        internal void checkParms(UInt16 width, UInt16 height, UInt16 xOffset, UInt16 yOffset, Byte xBin, Byte yBin)
+        {
+            if (width > ccdWidth)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("Invalid width {0}: 0<=width<={1}", width, ccdWidth), "width");
+            }
+            if (height > ccdHeight)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", height, ccdHeight), "height");
+            }
+            if (xOffset > ccdWidth)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0}: 0<=width<={1}", xOffset, ccdWidth), "xOffset");
+            }
+            if (yOffset > ccdHeight)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", yOffset, ccdHeight), "yOffset");
+            }
+            if (xOffset + width > ccdWidth)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", xOffset, width, ccdWidth), "width+xOffset");
+            }
+            if (yOffset + height > ccdHeight)
+            {
+                throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", yOffset, height, ccdHeight), "height+yOffset");
+            }
+        }
 
         // we use a READ_DELAYED_BLOCK to store paramters that are accessed as properties.  
         // If the user requests a read without delay, we can just copy all the matching 
@@ -338,11 +381,25 @@ namespace sx
 
         internal void initReadBlock(out SX_READ_BLOCK block, SX_READ_DELAYED_BLOCK inblock)
         {
-            block.x_offset = inblock.x_offset;
-            block.y_offset = inblock.y_offset;
             block.width = (UInt16)inblock.width;
             block.height = (UInt16)inblock.height;
-            // I have no idea why the next bit is required, but it is.  If it isn't there, 
+
+            block.x_offset = inblock.x_offset;
+            block.y_offset = inblock.y_offset;
+
+            block.x_bin = inblock.x_bin;
+            block.y_bin = inblock.y_bin;
+
+            Log.Write(String.Format("initReadBlock() x_off={0} y_off={1} width={2} height={3} x_bin={4} y_bin={5}\n", block.x_offset, block.y_offset, block.width, block.height, block.x_bin, block.y_bin));
+        }
+
+        internal void initReadDelayedBlock(out SX_READ_DELAYED_BLOCK block, SX_READ_DELAYED_BLOCK inblock)
+        {
+            block = inblock;
+
+            checkParms(block.width, block.height, block.x_offset, block.y_offset, block.x_bin, block.y_bin);
+            
+            // I have no idea why the next bit is required, but it is.  If it isn't there,
             // the read of the image data fails with a semaphore timeout. I found this in the
             // sample application from SX.
             if (idx == 0 && cameraModel == 0x59)
@@ -350,23 +407,22 @@ namespace sx
                 block.width *= 2;
                 block.height /= 2;
             }
-            block.x_bin = inblock.x_bin;
-            block.y_bin = inblock.y_bin;
-
-            Log.Write(String.Format("initReadBlock() x_off={0} y_off={1} width={2} height={3} x_bin={4} y_bin={5}\n", block.x_offset, block.y_offset, block.width, block.height, block.x_bin, block.y_bin));
         }
 
         internal void buildReadDelayedBlock(out SX_READ_DELAYED_BLOCK block, UInt16 x_offset, UInt16 y_offset, UInt16 width, UInt16 height, Byte x_bin, Byte y_bin, UInt32 delay)
         {
-            block.x_offset = x_offset;
-            block.y_offset = y_offset;
             block.width = width;
             block.height = height;
+
+            block.x_offset = x_offset;
+            block.y_offset = y_offset;
+
             block.x_bin = x_bin;
             block.y_bin = y_bin;
+
             block.delay = delay;
 
-            Log.Write(String.Format("initReadBlock() x_off={0} y_off={1} width={2} height={3} x_bin={4} y_bin={5} delay={6}\n", block.x_offset, block.y_offset, block.width, block.height, block.x_bin, block.y_bin, delay));
+            Log.Write(String.Format("buildReadDelayedBlock() x_off={0} y_off={1} width={2} height={3} x_bin={4} y_bin={5} delay={6}\n", block.x_offset, block.y_offset, block.width, block.height, block.x_bin, block.y_bin, delay));
         }
 
         internal void clear(Byte Flags)
@@ -441,12 +497,19 @@ namespace sx
 
         internal void convertCameraDataToImageData()
         {
-            Int32 binnedWidth = lastExposureReadDelayedBlock.width;
-            Int32 binnedHeight = lastExposureReadDelayedBlock.height;
+            Int32 binnedWidth = lastExposureReadDelayedBlock.width/lastExposureReadDelayedBlock.x_bin;
+            Int32 binnedHeight = lastExposureReadDelayedBlock.height/lastExposureReadDelayedBlock.y_bin;
 
             if (bitsPerPixel != 16 && bitsPerPixel != 8)
             {
                 throw new ArgumentOutOfRangeException("downloadPixels(): Untested: bitsPerPixel != 16", "bitsPerPixel");
+            }
+
+            // undo the mysterious dance done in initReadDelayedBlock
+            if (idx == 0 && cameraModel == 0x59)
+            {
+                binnedWidth /= 2;
+                binnedHeight *= 2;
             }
 
             imageData = new Int32[binnedWidth, binnedHeight];
@@ -474,9 +537,21 @@ namespace sx
                         for (x = 0; x < binnedWidth; x += 2)
                         {
                             imageData[x, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            imageData[x, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            imageData[x + 1, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            imageData[x, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            
+                            if (y + 1 < binnedHeight)
+                            {
+                                imageData[x, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            }
+
+                            if (x + 1 < binnedWidth && y + 1 < binnedHeight)
+                            {
+                                imageData[x + 1, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            }
+  
+                            if (y + 1 < binnedHeight)
+                            {
+                                imageData[x, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            }
                         }
                     }
                 }
@@ -532,8 +607,8 @@ namespace sx
         internal void downloadPixels()
         {
             Int32 numBytesRead;
-            Int32 binnedWidth = lastExposureReadDelayedBlock.width;
-            Int32 binnedHeight = lastExposureReadDelayedBlock.height;
+            Int32 binnedWidth = lastExposureReadDelayedBlock.width / lastExposureReadDelayedBlock.x_bin;
+            Int32 binnedHeight = lastExposureReadDelayedBlock.height / lastExposureReadDelayedBlock.y_bin;
             Int32 imagePixels = binnedWidth * binnedHeight;
 
             Log.Write(String.Format("downloadPixels(): requesting {0} pixels, {1} bytes each ({2} bytes)\n", imagePixels, Marshal.SizeOf(pixelType), imagePixels * Marshal.SizeOf(pixelType)));
@@ -569,7 +644,7 @@ namespace sx
             controller.guide(SX_STAR2K_WEST, durationMS);
         }
 
-         public void recordPixels(out DateTimeOffset exposureEnd)
+        public void recordPixels(out DateTimeOffset exposureEnd)
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
@@ -577,9 +652,9 @@ namespace sx
 
             Log.Write("recordPixels() entered\n");
 
-            lastExposureReadDelayedBlock = readDelayedBlock;
 
-            initReadBlock(out readBlock, readDelayedBlock);
+            initReadDelayedBlock(out lastExposureReadDelayedBlock, nextExposureReadDelayedBlock);
+            initReadBlock(out readBlock, lastExposureReadDelayedBlock);
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
                                SX_CMD_READ_PIXELS,
@@ -610,13 +685,13 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
 
-            lastExposureReadDelayedBlock = readDelayedBlock;
+            initReadDelayedBlock(out lastExposureReadDelayedBlock, nextExposureReadDelayedBlock);
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, 
                                          SX_CMD_READ_PIXELS_DELAYED, 
                                          SX_CCD_FLAGS_FIELD_ODD | SX_CCD_FLAGS_FIELD_EVEN,
                                          idx,
-                                         (UInt16)Marshal.SizeOf(readDelayedBlock));
+                                         (UInt16)Marshal.SizeOf(nextExposureReadDelayedBlock));
 
             // this will be locked for a long time.  It should probably do something
             // different, like write the command, sleep for most of the time, then lock
@@ -631,7 +706,7 @@ namespace sx
                     imageDataValid = false;
                 }
                 Log.Write("recordPixelsDelayed requesting read\n");
-                controller.Write(cmdBlock, readDelayedBlock, out numBytesWritten);
+                controller.Write(cmdBlock, nextExposureReadDelayedBlock, out numBytesWritten);
                 Log.Write("recordPixelsDelayed requesting download\n");
                 downloadPixels();
             }

@@ -47,7 +47,7 @@ namespace sx
         internal const UInt16 SX_STAR2K_EAST  = 8;
         
         // limits
-        internal const Byte MAX_BIN=1; // I made this up
+        internal const Byte MAX_BIN=4; // I made this up 
         internal const Byte MAX_X_BIN = MAX_BIN;
         internal const Byte MAX_Y_BIN = MAX_BIN;
 

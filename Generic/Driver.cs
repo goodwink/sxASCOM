@@ -1007,7 +1007,7 @@ namespace ASCOM.SXGeneric
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
-                m_NumX = value/BinX;
+                m_NumX = value;
             }
         }
 
@@ -1377,7 +1377,6 @@ namespace ASCOM.SXGeneric
                     SetError(ex.ToString());
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartX.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
                 }
-
 
                 try
                 {
