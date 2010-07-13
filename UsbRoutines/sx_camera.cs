@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
@@ -310,7 +311,26 @@ namespace sx
                     {
                         convertCameraDataToImageData();
                     }
+                    if (false)
+                    {
+                        using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.cooked", FileMode.Create)))
+                        {
+                            Int32 binnedWidth = lastExposureReadDelayedBlock.width / lastExposureReadDelayedBlock.x_bin;
+                            Int32 binnedHeight = lastExposureReadDelayedBlock.height / lastExposureReadDelayedBlock.y_bin;
 
+                            if (idx == 0 && cameraModel == 0x59)
+                            {
+                                binnedWidth /= 2;
+                                binnedHeight *= 2;
+                            }
+
+                            for (int xx = 0; xx < binnedWidth; xx++)
+                                for (int yy = 0; yy < binnedHeight; yy++)
+                                {
+                                    binWriter.Write(imageData[xx, yy]);
+                                }
+                        }
+                    }
                     return imageData;
                 }
             }
@@ -492,6 +512,7 @@ namespace sx
 
                 parms = (SX_CCD_PARAMS)controller.ReadObject(typeof(SX_CCD_PARAMS), out numBytesRead);
             }
+            Log.Write(String.Format("parms.color_matrix=0x{0:x}, parms.extra_capabilitites=0x{1:x}\n", parms.color_matrix, parms.extra_capabilities));
             Log.Write("getParams has unlocked\n");
         }
 
@@ -550,7 +571,7 @@ namespace sx
   
                             if (y + 1 < binnedHeight)
                             {
-                                imageData[x, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                                imageData[x + 1, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
                             }
                         }
                     }
@@ -614,7 +635,7 @@ namespace sx
             Log.Write(String.Format("downloadPixels(): requesting {0} pixels, {1} bytes each ({2} bytes)\n", imagePixels, Marshal.SizeOf(pixelType), imagePixels * Marshal.SizeOf(pixelType)));
 
             imageRawData = (Array)controller.ReadArray(pixelType, imagePixels, out numBytesRead);
-           
+
             lock (oImageDataLock)
             {
                 imageDataValid = true;
@@ -622,6 +643,22 @@ namespace sx
             }
 
             Log.Write("downloadPixels(): read completed, numBytesRead=" + numBytesRead + "\n");
+
+            if (false)
+            {
+                using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.raw", FileMode.Create)))
+                {
+                    int srcIdx = 0;
+                    for (int xx = 0; xx < binnedWidth; xx++)
+                    {
+                        for (int yy = 0; yy < binnedHeight; yy++)
+                        {
+                            binWriter.Write((UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++)));
+                        }
+                    }
+                }
+            }
+
         }
 
         public void guideNorth(int durationMS)

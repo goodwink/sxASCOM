@@ -1,6 +1,6 @@
 Copyright (C) 2010 by Dad Dog Development Ltd.
 
-This is an alpha quality software preview.  
+This is a beta quality software preview.  
 
 Please do not not redistribute it or use it in any purpose other than 
 functional testing. 
