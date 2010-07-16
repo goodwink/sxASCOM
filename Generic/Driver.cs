@@ -1213,6 +1213,8 @@ namespace ASCOM.SXGeneric
                 sxCamera.delayMs = (uint)(1000 * Duration);
                 sxCamera.recordPixelsDelayed();
 
+                actualExposureLength = DateTime.Now - exposureStart;
+                Log.Write(String.Format("hardwareCapture(): exposure + download took {0}, requested {1}", actualExposureLength.TotalSeconds, Duration));
                 actualExposureLength = new TimeSpan(0, 0, 0, 0, (int)(1000*Duration));
 
                 Log.Write("hardwareCapture(): ends successfully\n");
@@ -1322,6 +1324,8 @@ namespace ASCOM.SXGeneric
         {
             Log.Write(String.Format("StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
             bLastErrorValid = false;
+       useHardwareTimer = true;
+       Duration /= 1000;
 
             if (!Connected)
             {
