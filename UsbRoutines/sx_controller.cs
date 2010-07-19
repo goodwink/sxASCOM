@@ -301,7 +301,7 @@ namespace sx
                 }
             }
 
-            Log.Write(String.Format("guide(): delay ends, actualExposureLength={0:F4}\n", (DateTime.Now - guideStart).TotalMilliseconds));
+            Log.Write(String.Format("guide(): delay ends, actualGuideLength={0:F4}\n", (DateTime.Now - guideStart).TotalMilliseconds));
         }
     }
 }

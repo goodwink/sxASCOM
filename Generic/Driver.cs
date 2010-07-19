@@ -378,14 +378,17 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanAssymetricBin get\n");
+                Log.Write("CanAsymetricBin get: false\n");
 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
 
-                return true;
+                // The SX cameras can actualy do asymmetric binning, but with bayer color cameras it makes things weird, 
+                // and I don't need it, so I'm disallowing it.
+
+                return false;
             }
         }
 
@@ -396,7 +399,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanGetCoolerPower get\n");
+                Log.Write("CanGetCoolerPower get: false\n");
 
                 if (!Connected)
                 {
@@ -428,7 +431,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanSetCCDTemperature get\n");
+                Log.Write("CanSetCCDTemperature get: false\n");
 
                 if (!Connected)
                 {
@@ -450,7 +453,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanStopExposure get\n");
+                Log.Write("CanStopExposure get: true\n");
 
                 if (!Connected)
                 {
@@ -550,7 +553,7 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CoolerOn get\n");
+                Log.Write("CoolerOn get: true\n");
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -865,7 +868,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("LastExposureDuration get\n");
+                Log.Write("LastExposureDuration get: " + actualExposureLength.TotalSeconds + "\n");
 
                 if (!Connected)
                 {
@@ -890,7 +893,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("LastExposureStartTime get\n");
+                Log.Write("LastExposureStartTime get" + exposureStart.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff") + "\n");
 
                 if (!Connected)
                 {
@@ -914,7 +917,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("MaxADU get\n");
+                Log.Write("MaxADU get" + m_MaxADU + "\n");
 
                 if (!Connected)
                 {
@@ -939,7 +942,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("MaxBinX get\n");
+                Log.Write("MaxBinX get" + m_MaxBinX + "\n");
 
                 if (!Connected)
                 {
@@ -964,14 +967,14 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("MaxBinY get\n");
+                Log.Write("MaxBinY get" + m_MaxBinY + "\n");
 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
 
-                return m_MaxBinX;
+                return m_MaxBinY;
             }
 
             private set
@@ -1050,7 +1053,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("PixelSizeX get: m_PixleSizeX = " + m_PixelSizeX + "\n"); 
+                Log.Write("PixelSizeX get: m_PixelSizeX = " + m_PixelSizeX + "\n"); 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -1074,7 +1077,7 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("PixelSizeX get: m_PixleSizeY = " + m_PixelSizeY + "\n"); 
+                Log.Write("PixelSizeX get: m_PixelSizeY = " + m_PixelSizeY + "\n"); 
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
@@ -1214,7 +1217,7 @@ namespace ASCOM.SXGeneric
                 sxCamera.recordPixelsDelayed();
 
                 actualExposureLength = DateTime.Now - exposureStart;
-                Log.Write(String.Format("hardwareCapture(): exposure + download took {0}, requested {1}", actualExposureLength.TotalSeconds, Duration));
+                Log.Write(String.Format("hardwareCapture(): exposure + download took {0}, requested {1}\n", actualExposureLength.TotalSeconds, Duration));
                 actualExposureLength = new TimeSpan(0, 0, 0, 0, (int)(1000*Duration));
 
                 Log.Write("hardwareCapture(): ends successfully\n");
@@ -1324,8 +1327,8 @@ namespace ASCOM.SXGeneric
         {
             Log.Write(String.Format("StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
             bLastErrorValid = false;
-       useHardwareTimer = true;
-       Duration /= 1000;
+       //useHardwareTimer = true;
+       //Duration /= 1000;
 
             if (!Connected)
             {

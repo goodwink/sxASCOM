@@ -10,7 +10,7 @@ namespace sx
     {
         // cmd_type
         internal const Byte SX_CMD_TYPE_PARMS = 0x40;
-        internal const Byte SX_CMD_TYPE_READ = 0xc0;
+        internal const Byte SX_CMD_TYPE_READ  = 0xc0;
 
         // commands
         internal const Byte SX_CMD_GET_FIRMWARE_VERSION = 255;
@@ -47,7 +47,7 @@ namespace sx
         internal const UInt16 SX_STAR2K_EAST  = 8;
         
         // limits
-        internal const Byte MAX_BIN=4; // I made this up 
+        internal const Byte MAX_BIN=8; // I made this up 
         internal const Byte MAX_X_BIN = MAX_BIN;
         internal const Byte MAX_Y_BIN = MAX_BIN;
 

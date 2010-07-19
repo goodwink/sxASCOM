@@ -179,6 +179,29 @@ namespace sx
                     }
                 }
 
+                if (error == 0 && numBytesToRead > 1024 * 1024 * 10)
+                {
+                    Log.Write(String.Format("about to try an extra read after a {0} read", numBytesToRead));
+
+                    IntPtr dummyUnManagedBuffer = Marshal.AllocHGlobal(1);
+
+                    int thisRead;
+                    int dummyRet;
+
+                    do
+                    {
+                        dummyRet = FileIO.ReadFile(deviceHandle, dummyUnManagedBuffer, 1, out thisRead, IntPtr.Zero);
+                        if (dummyRet == 0)
+                        {
+                            Log.Write(String.Format("extra read returns 0\n"));
+                        }
+                        else
+                        {
+                            Log.Write(String.Format("extra read returns {0} data was {1}\n", dummyRet, Marshal.ReadByte(dummyUnManagedBuffer)));
+                        }
+                    } while (dummyRet > 0);
+                }
+
                 if (error != 0)
                 {
                     System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception();

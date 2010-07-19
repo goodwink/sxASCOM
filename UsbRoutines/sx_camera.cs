@@ -48,15 +48,20 @@ namespace sx
         internal Byte extra_capabilities;
     }
 
+    internal struct EXPOSURE_INFO
+    {
+        internal SX_READ_DELAYED_BLOCK userRequested;
+        internal SX_READ_DELAYED_BLOCK toCamera;
+    }
+
     public class Camera
         :sxBase
     {
         // Variables
         private Controller controller;
         private SX_CCD_PARAMS ccdParms;
-        private SX_READ_DELAYED_BLOCK nextExposureReadDelayedBlock;
-        private SX_READ_DELAYED_BLOCK lastExposureReadDelayedBlock;
-        //byte[] imageAsBytes;
+        private SX_READ_DELAYED_BLOCK nextExposure;
+        private EXPOSURE_INFO currentExposure;
         Array imageRawData;
         Type pixelType;
         private Int32 [,] imageData;
@@ -193,7 +198,7 @@ namespace sx
 
         public UInt16 xOffset
         {
-            get {return nextExposureReadDelayedBlock.x_offset;}
+            get {return nextExposure.x_offset;}
             set 
             {
                 if (value > ccdWidth)
@@ -206,13 +211,13 @@ namespace sx
                     throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", value, width, ccdWidth), "xOffset");
                 }
 
-                nextExposureReadDelayedBlock.x_offset = value;
+                nextExposure.x_offset = value;
             }
         }
 
         public UInt16 yOffset
         {
-            get {return nextExposureReadDelayedBlock.y_offset;}
+            get {return nextExposure.y_offset;}
             set 
             {
                 if (value >= ccdHeight)
@@ -223,46 +228,54 @@ namespace sx
                 {
                     throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", value, height, ccdHeight), "yOffset");
                 }
-                nextExposureReadDelayedBlock.y_offset = value;
+                nextExposure.y_offset = value;
             }
         }
 
         public UInt16 width
         {
-            get {return nextExposureReadDelayedBlock.width;}
+            get {return nextExposure.width;}
             set
             {
                 if (value == 0 || value > ccdParms.width)
                 {
                     throw new ArgumentOutOfRangeException(String.Format("Invalid width {0} 1<=width<={1}", value, ccdParms.width), "width");
                 }
-                nextExposureReadDelayedBlock.width = value;
+                nextExposure.width = value;
             }
         }
 
         public UInt16 height
         {
-            get {return nextExposureReadDelayedBlock.height;}
+            get {return nextExposure.height;}
             set 
             {
                 if (value == 0 || value > ccdParms.height)
                 {
                     throw new ArgumentOutOfRangeException(String.Format("Invalid height {0} 1<=height<={1}", value, ccdParms.height), "height");
                 }
-                nextExposureReadDelayedBlock.height = value;
+                nextExposure.height = value;
             }
         }
 
         public Byte xBin
         {
-            get {return nextExposureReadDelayedBlock.x_bin;}
+            get {return nextExposure.x_bin;}
             set 
             {
                 if (value <=0 || value > MAX_X_BIN)
                 {
                     throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 1<=height<={1}", value, MAX_BIN), "xBin");
                 }
-                nextExposureReadDelayedBlock.x_bin = value;
+
+                // note that this disallows non power of 2 binning values.  The camera hardware can deal with them, but 
+                // there are interactions with bayer matrices that I don't want to deal with now
+                if ((value & (value - 1)) != 0)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
+                }
+
+                nextExposure.x_bin = value;
             }
         }
 
@@ -273,13 +286,21 @@ namespace sx
 
         public Byte yBin
         {
-            get {return nextExposureReadDelayedBlock.y_bin;}
+            get {return nextExposure.y_bin;}
             set {
                     if (value <=0 || value > MAX_Y_BIN)
                     {
                         throw new ArgumentOutOfRangeException(String.Format("Invalid yBin {0} 1<=height<={1}", value, MAX_BIN), "yBin");
                     }
-                    nextExposureReadDelayedBlock.y_bin = value;
+
+                    // note that this disallows non power of 2 binning values.  The camera hardware can deal with them, but 
+                    // there are interactions with bayer matrices that I don't want to deal with now
+                    if ((value & (value - 1)) != 0)
+                    {
+                        throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
+                    }
+
+                    nextExposure.y_bin = value;
                 }
         }
         
@@ -290,8 +311,8 @@ namespace sx
 
         public UInt32 delayMs 
         {
-            get { return nextExposureReadDelayedBlock.delay; }
-            set { nextExposureReadDelayedBlock.delay = value; }
+            get { return nextExposure.delay; }
+            set { nextExposure.delay = value; }
         }
 
         public object ImageArray
@@ -315,8 +336,8 @@ namespace sx
                     {
                         using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.cooked", FileMode.Create)))
                         {
-                            Int32 binnedWidth = lastExposureReadDelayedBlock.width / lastExposureReadDelayedBlock.x_bin;
-                            Int32 binnedHeight = lastExposureReadDelayedBlock.height / lastExposureReadDelayedBlock.y_bin;
+                            Int32 binnedWidth = currentExposure.userRequested.width / currentExposure.userRequested.x_bin;
+                            Int32 binnedHeight = currentExposure.userRequested.height / currentExposure.userRequested.y_bin;
 
                             if (idx == 0 && cameraModel == 0x59)
                             {
@@ -361,7 +382,7 @@ namespace sx
             cameraModel = getModel();
             getParams(ref ccdParms);
             setPixelType();
-            buildReadDelayedBlock(out nextExposureReadDelayedBlock, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
+            buildReadDelayedBlock(out nextExposure, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
             imageDataValid = false;
             oImageDataLock = new object();
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
@@ -393,40 +414,119 @@ namespace sx
             {
                 throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", yOffset, height, ccdHeight), "height+yOffset");
             }
+            // The following if disallows asymmetric binning. The SX cameras will do it, but it there are difficulties that arise from
+            // asymmetric binning and bayer matrices that I don't want to deal with at this point...
+            if (xBin != yBin)
+            {
+                throw new ArgumentOutOfRangeException("xBin != yBin");
+            }
         }
 
         // we use a READ_DELAYED_BLOCK to store paramters that are accessed as properties.  
         // If the user requests a read without delay, we can just copy all the matching 
         // parameters out of the one we are keeping
 
-        internal void initReadBlock(out SX_READ_BLOCK block, SX_READ_DELAYED_BLOCK inblock)
+        internal void initReadBlock(SX_READ_DELAYED_BLOCK inBlock, out SX_READ_BLOCK outBlock)
         {
-            block.width = (UInt16)inblock.width;
-            block.height = (UInt16)inblock.height;
+            outBlock.width = (UInt16)inBlock.width;
+            outBlock.height = (UInt16)inBlock.height;
 
-            block.x_offset = inblock.x_offset;
-            block.y_offset = inblock.y_offset;
+            outBlock.x_offset = inBlock.x_offset;
+            outBlock.y_offset = inBlock.y_offset;
 
-            block.x_bin = inblock.x_bin;
-            block.y_bin = inblock.y_bin;
+            outBlock.x_bin = inBlock.x_bin;
+            outBlock.y_bin = inBlock.y_bin;
 
-            Log.Write(String.Format("initReadBlock() x_off={0} y_off={1} width={2} height={3} x_bin={4} y_bin={5}\n", block.x_offset, block.y_offset, block.width, block.height, block.x_bin, block.y_bin));
+            Log.Write(String.Format("initReadBlock() x_off={0} y_off={1} width={2} height={3} x_bin={4} y_bin={5}\n", outBlock.x_offset, outBlock.y_offset, outBlock.width, outBlock.height, outBlock.x_bin, outBlock.y_bin));
         }
 
-        internal void initReadDelayedBlock(out SX_READ_DELAYED_BLOCK block, SX_READ_DELAYED_BLOCK inblock)
+        internal void adjustReadDelayedBlock(SX_READ_DELAYED_BLOCK inBlock, ref EXPOSURE_INFO exposure)
         {
-            block = inblock;
+            exposure.userRequested = inBlock;
 
-            checkParms(block.width, block.height, block.x_offset, block.y_offset, block.x_bin, block.y_bin);
-            
+            checkParms(exposure.userRequested.width, exposure.userRequested.height, exposure.userRequested.x_offset, exposure.userRequested.y_offset, exposure.userRequested.x_bin, exposure.userRequested.y_bin);
+
+            exposure.toCamera = exposure.userRequested;
+
+            dumpReadDelayedBlock(exposure.toCamera, "before adjust");
+
+            // Adjust the widths to refelct the binning factors. Some of the code was easier to write if:
+            // - The width and height are multiples of 2 and the binning factor.
+
+            Int32 xBinFactor = exposure.toCamera.x_bin * 2;
+            Int32 yBinFactor = exposure.toCamera.y_bin * 2;
+
+            Log.Write(String.Format("xBinFactor={0} yBinFactor={1}\n", xBinFactor, yBinFactor));
+
+            exposure.toCamera.width  = (UInt16)(((exposure.toCamera.width  + xBinFactor - 1) / xBinFactor) * xBinFactor);
+            exposure.toCamera.height = (UInt16)(((exposure.toCamera.height + yBinFactor - 1) / yBinFactor) * yBinFactor);
+
+            Log.Write(String.Format("after addDivMul, width={0} height={1}\n", exposure.toCamera.width, exposure.toCamera.height));
+
+            // cameras with a Bayer matrix need the offsets to be even so that the block returned 
+            // has the same color representation as a full frame.  Since this only adds a pixel to
+            // each dimesion, we just do it for all cameras
+            // 
+            // If it isn't divisible by 2, we move it one back.  This is won't cause the value to
+            // underflow because if it was zero, the if will not be successful and we won't 
+            // decrement it.
+
+            if (exposure.toCamera.x_bin != 1 && (exposure.toCamera.x_offset % 2) != 0)
+            {
+                exposure.toCamera.x_offset--;
+                Log.Write(String.Format("after x bincheck x_offset = {0}\n", exposure.toCamera.x_offset));
+            }
+
+            if (exposure.toCamera.y_bin != 1 && (exposure.toCamera.y_offset % 2) != 0)
+            {
+                exposure.toCamera.y_offset--;
+                Log.Write(String.Format("after y bincheck y_offset = {0}\n", exposure.toCamera.y_offset));
+            }
+
+            Debug.Assert(exposure.toCamera.x_bin == 1 || exposure.toCamera.x_offset % 2 == 0);
+            Debug.Assert(exposure.toCamera.y_bin == 1 || exposure.toCamera.y_offset % 2 == 0);
+            Debug.Assert(exposure.toCamera.width % 2 == 0);
+            Debug.Assert(exposure.toCamera.height % 2 == 0);
+            Debug.Assert(exposure.toCamera.width % exposure.toCamera.x_bin == 0);
+            Debug.Assert(exposure.toCamera.height % exposure.toCamera.y_bin == 0);
+
             // I have no idea why the next bit is required, but it is.  If it isn't there,
             // the read of the image data fails with a semaphore timeout. I found this in the
             // sample application from SX.
+
+            dumpReadDelayedBlock(exposure.toCamera, "after adjust, before M25C adjustment");
+
             if (idx == 0 && cameraModel == 0x59)
             {
-                block.width *= 2;
-                block.height /= 2;
+                exposure.toCamera.width *= 2;
+                exposure.toCamera.height /= 2;
             }
+
+            dumpReadDelayedBlock(exposure.toCamera, "after adjust and M25C adjustment");
+        }
+
+        internal void dumpReadBlock(SX_READ_BLOCK block)
+        {
+            Log.Write(String.Format("\tx_offset={0:d}, y_offset={1:d}\n", block.x_offset, block.y_offset));
+            Log.Write(String.Format("\twidth={0:d}, height={1:d}\n", block.width, block.height));
+            Log.Write(String.Format("\tx_bin={0:d}, y_bin={1:d}\n", block.x_bin, block.y_bin));
+        }
+
+        internal void dumpReadBlock(SX_READ_BLOCK block, string title)
+        {
+            Log.Write("Read Block:" + title + "\n");
+            dumpReadBlock(block);
+        }
+
+        internal void dumpReadDelayedBlock(SX_READ_DELAYED_BLOCK block, string title)
+        {
+            SX_READ_BLOCK readBlock;
+
+            initReadBlock(block, out readBlock);
+
+            Log.Write("Read Delayed Block:" + title + "\n");
+            dumpReadBlock(readBlock);
+            Log.Write(String.Format("\tdelay={0:d}\n", block.delay));
         }
 
         internal void buildReadDelayedBlock(out SX_READ_DELAYED_BLOCK block, UInt16 x_offset, UInt16 y_offset, UInt16 width, UInt16 height, Byte x_bin, Byte y_bin, UInt32 delay)
@@ -442,7 +542,7 @@ namespace sx
 
             block.delay = delay;
 
-            Log.Write(String.Format("buildReadDelayedBlock() x_off={0} y_off={1} width={2} height={3} x_bin={4} y_bin={5} delay={6}\n", block.x_offset, block.y_offset, block.width, block.height, block.x_bin, block.y_bin, delay));
+            dumpReadDelayedBlock(block, "buildReadDelayedBlock");
         }
 
         internal void clear(Byte Flags)
@@ -498,6 +598,17 @@ namespace sx
             return model;
         }
 
+        void dumpParams(SX_CCD_PARAMS parms)
+        {
+            Log.Write(String.Format("params:"));
+            Log.Write(String.Format("\thfront_porch={0:d}, hback_porch={1:d}\n", parms.hfront_porch, parms.hback_porch));
+            Log.Write(String.Format("\tvfront_porch={0:d}, vback_porch={1:d}\n", parms.vfront_porch, parms.vback_porch));
+            Log.Write(String.Format("\twidth={0:d}, height={1:d}\n", parms.width, parms.height));
+            Log.Write(String.Format("\tpixel_uwidth={0:d}, pixel_uheight={1:d}\n", parms.pixel_uwidth, parms.pixel_uheight));
+            Log.Write(String.Format("\tbits_per_pixel={0:d}, num_serial_ports={1:d}\n", parms.bits_per_pixel, parms.num_serial_ports));
+            Log.Write(String.Format("\tcolor_matrix=0x{0:x}, extra_capabilitites=0x{1:x}\n", parms.color_matrix, parms.extra_capabilities));
+        }
+
         void getParams(ref SX_CCD_PARAMS parms)
         {
             SX_CMD_BLOCK cmdBlock;
@@ -512,14 +623,16 @@ namespace sx
 
                 parms = (SX_CCD_PARAMS)controller.ReadObject(typeof(SX_CCD_PARAMS), out numBytesRead);
             }
-            Log.Write(String.Format("parms.color_matrix=0x{0:x}, parms.extra_capabilitites=0x{1:x}\n", parms.color_matrix, parms.extra_capabilities));
+
             Log.Write("getParams has unlocked\n");
+
+            dumpParams(parms);
         }
 
         internal void convertCameraDataToImageData()
         {
-            Int32 binnedWidth = lastExposureReadDelayedBlock.width/lastExposureReadDelayedBlock.x_bin;
-            Int32 binnedHeight = lastExposureReadDelayedBlock.height/lastExposureReadDelayedBlock.y_bin;
+            Int32 binnedWidth = currentExposure.toCamera.width / currentExposure.toCamera.x_bin;
+            Int32 binnedHeight = currentExposure.toCamera.height / currentExposure.toCamera.y_bin;
 
             if (bitsPerPixel != 16 && bitsPerPixel != 8)
             {
@@ -628,8 +741,8 @@ namespace sx
         internal void downloadPixels()
         {
             Int32 numBytesRead;
-            Int32 binnedWidth = lastExposureReadDelayedBlock.width / lastExposureReadDelayedBlock.x_bin;
-            Int32 binnedHeight = lastExposureReadDelayedBlock.height / lastExposureReadDelayedBlock.y_bin;
+            Int32 binnedWidth = currentExposure.toCamera.width / currentExposure.toCamera.x_bin;
+            Int32 binnedHeight = currentExposure.toCamera.height / currentExposure.toCamera.y_bin;
             Int32 imagePixels = binnedWidth * binnedHeight;
 
             Log.Write(String.Format("downloadPixels(): requesting {0} pixels, {1} bytes each ({2} bytes)\n", imagePixels, Marshal.SizeOf(pixelType), imagePixels * Marshal.SizeOf(pixelType)));
@@ -689,9 +802,8 @@ namespace sx
 
             Log.Write("recordPixels() entered\n");
 
-
-            initReadDelayedBlock(out lastExposureReadDelayedBlock, nextExposureReadDelayedBlock);
-            initReadBlock(out readBlock, lastExposureReadDelayedBlock);
+            adjustReadDelayedBlock(nextExposure, ref currentExposure);
+            initReadBlock(currentExposure.userRequested, out readBlock);
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
                                SX_CMD_READ_PIXELS,
@@ -722,13 +834,13 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
 
-            initReadDelayedBlock(out lastExposureReadDelayedBlock, nextExposureReadDelayedBlock);
+            adjustReadDelayedBlock(nextExposure, ref currentExposure);
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, 
                                          SX_CMD_READ_PIXELS_DELAYED, 
                                          SX_CCD_FLAGS_FIELD_ODD | SX_CCD_FLAGS_FIELD_EVEN,
                                          idx,
-                                         (UInt16)Marshal.SizeOf(nextExposureReadDelayedBlock));
+                                         (UInt16)Marshal.SizeOf(currentExposure.toCamera));
 
             // this will be locked for a long time.  It should probably do something
             // different, like write the command, sleep for most of the time, then lock
@@ -743,7 +855,7 @@ namespace sx
                     imageDataValid = false;
                 }
                 Log.Write("recordPixelsDelayed requesting read\n");
-                controller.Write(cmdBlock, nextExposureReadDelayedBlock, out numBytesWritten);
+                controller.Write(cmdBlock, currentExposure.toCamera, out numBytesWritten);
                 Log.Write("recordPixelsDelayed requesting download\n");
                 downloadPixels();
             }
