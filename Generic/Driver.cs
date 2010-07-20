@@ -1327,7 +1327,7 @@ namespace ASCOM.SXGeneric
         {
             Log.Write(String.Format("StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
             bLastErrorValid = false;
-       //useHardwareTimer = true;
+       useHardwareTimer = true;
        //Duration /= 1000;
 
             if (!Connected)

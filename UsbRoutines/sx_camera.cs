@@ -453,13 +453,21 @@ namespace sx
             // Adjust the widths to refelct the binning factors. Some of the code was easier to write if:
             // - The width and height are multiples of 2 and the binning factor.
 
-            Int32 xBinFactor = exposure.toCamera.x_bin * 2;
-            Int32 yBinFactor = exposure.toCamera.y_bin * 2;
+            UInt16 xBinFactor = (UInt16)(exposure.toCamera.x_bin * 2);
+            UInt16 yBinFactor = (UInt16)(exposure.toCamera.y_bin * 2);
 
             Log.Write(String.Format("xBinFactor={0} yBinFactor={1}\n", xBinFactor, yBinFactor));
 
             exposure.toCamera.width  = (UInt16)(((exposure.toCamera.width  + xBinFactor - 1) / xBinFactor) * xBinFactor);
+            if (exposure.toCamera.width > ccdWidth)
+            {
+                exposure.toCamera.width -= xBinFactor;
+            }
             exposure.toCamera.height = (UInt16)(((exposure.toCamera.height + yBinFactor - 1) / yBinFactor) * yBinFactor);
+            if (exposure.toCamera.height > ccdHeight)
+            {
+                exposure.toCamera.height -= yBinFactor;
+            }
 
             Log.Write(String.Format("after addDivMul, width={0} height={1}\n", exposure.toCamera.width, exposure.toCamera.height));
 
@@ -803,7 +811,7 @@ namespace sx
             Log.Write("recordPixels() entered\n");
 
             adjustReadDelayedBlock(nextExposure, ref currentExposure);
-            initReadBlock(currentExposure.userRequested, out readBlock);
+            initReadBlock(currentExposure.toCamera, out readBlock);
 
             controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
                                SX_CMD_READ_PIXELS,

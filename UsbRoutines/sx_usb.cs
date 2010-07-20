@@ -103,7 +103,7 @@ namespace sx
 
                     if (t.IsArray)
                     {
-                        byte [] dataAsArray = (byte [])data;
+                        byte[] dataAsArray = (byte[])data;
                         Marshal.Copy(dataAsArray, 0, unManagedDataPointer, dataAsArray.Length);
                     }
                     else if (t == typeof(System.String))
@@ -119,7 +119,28 @@ namespace sx
                 }
 
                 Log.Write(String.Format("usbWrite(): unManagedBlockBuffer=0x{0:x16} numBytesToWrite={1}\n", unManagedBlockBuffer.ToInt64(), numBytesToWrite));
-                   
+                
+                if (true)
+                {
+                    string hexData = "";
+                    for (int i = 0; i < Marshal.SizeOf(block); i++)
+                    {
+                        hexData += String.Format("{0:x2} ", Marshal.ReadByte(unManagedBlockBuffer, i));
+                    }
+
+                    Log.Write(String.Format("Header: {0}\n", hexData));
+
+                    if (data != null)
+                    {
+                        hexData = "";
+                        for (int i = 0; i < Marshal.SizeOf(data); i++)
+                        {
+                            hexData += String.Format("{0:x2} ", Marshal.ReadByte(unManagedBlockBuffer, i + Marshal.SizeOf(block)));
+                        }
+                        Log.Write(String.Format("Data: {0}\n", hexData));
+                    }
+                }
+
                 int ret = FileIO.WriteFile(deviceHandle, unManagedBlockBuffer, numBytesToWrite, out numBytesWritten, IntPtr.Zero);
 
                 if (ret == 0)
@@ -179,7 +200,7 @@ namespace sx
                     }
                 }
 
-                if (error == 0 && numBytesToRead > 1024 * 1024 * 10)
+                if (false && error == 0 && numBytesToRead > 1024 * 1024 * 10)
                 {
                     Log.Write(String.Format("about to try an extra read after a {0} read", numBytesToRead));
 
