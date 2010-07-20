@@ -270,10 +270,10 @@ namespace sx
 
                 // note that this disallows non power of 2 binning values.  The camera hardware can deal with them, but 
                 // there are interactions with bayer matrices that I don't want to deal with now
-                if ((value & (value - 1)) != 0)
-                {
-                    throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
-                }
+                //if ((value & (value - 1)) != 0)
+                //{
+                //    throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
+                //}
 
                 nextExposure.x_bin = value;
             }
@@ -295,10 +295,10 @@ namespace sx
 
                     // note that this disallows non power of 2 binning values.  The camera hardware can deal with them, but 
                     // there are interactions with bayer matrices that I don't want to deal with now
-                    if ((value & (value - 1)) != 0)
-                    {
-                        throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
-                    }
+                    //if ((value & (value - 1)) != 0)
+                    //{
+                    //    throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
+                    //}
 
                     nextExposure.y_bin = value;
                 }
@@ -420,6 +420,17 @@ namespace sx
             {
                 throw new ArgumentOutOfRangeException("xBin != yBin");
             }
+
+            if (width % xBin != 0)
+            {
+                throw new ArgumentOutOfRangeException("width % xBin != 0");
+            }
+
+            if (height % yBin != 0)
+            {
+                throw new ArgumentOutOfRangeException("height % yBin != 0");
+            }
+
         }
 
         // we use a READ_DELAYED_BLOCK to store paramters that are accessed as properties.  
@@ -450,59 +461,44 @@ namespace sx
 
             dumpReadDelayedBlock(exposure.toCamera, "before adjust");
 
-            // Adjust the widths to refelct the binning factors. Some of the code was easier to write if:
-            // - The width and height are multiples of 2 and the binning factor.
-
-            UInt16 xBinFactor = (UInt16)(exposure.toCamera.x_bin * 2);
-            UInt16 yBinFactor = (UInt16)(exposure.toCamera.y_bin * 2);
-
-            Log.Write(String.Format("xBinFactor={0} yBinFactor={1}\n", xBinFactor, yBinFactor));
-
-            exposure.toCamera.width  = (UInt16)(((exposure.toCamera.width  + xBinFactor - 1) / xBinFactor) * xBinFactor);
-            if (exposure.toCamera.width > ccdWidth)
-            {
-                exposure.toCamera.width -= xBinFactor;
-            }
-            exposure.toCamera.height = (UInt16)(((exposure.toCamera.height + yBinFactor - 1) / yBinFactor) * yBinFactor);
-            if (exposure.toCamera.height > ccdHeight)
-            {
-                exposure.toCamera.height -= yBinFactor;
-            }
-
-            Log.Write(String.Format("after addDivMul, width={0} height={1}\n", exposure.toCamera.width, exposure.toCamera.height));
-
-            // cameras with a Bayer matrix need the offsets to be even so that the block returned 
-            // has the same color representation as a full frame.  Since this only adds a pixel to
-            // each dimesion, we just do it for all cameras
+            // cameras with a Bayer matrix need the offsets to be even so that the subframe returned 
+            // has the same color representation as a full frame.  Since this (at most) offsets 
+            // the image by 1 pixel on each axis, just do it for all cameras
             // 
-            // If it isn't divisible by 2, we move it one back.  This is won't cause the value to
-            // underflow because if it was zero, the if will not be successful and we won't 
-            // decrement it.
+            // If it isn't divisible by 2, we move it one back.  
 
-            if (exposure.toCamera.x_bin != 1 && (exposure.toCamera.x_offset % 2) != 0)
+            if (exposure.toCamera.x_bin == 1 && (exposure.toCamera.x_offset % 2) != 0)
             {
                 exposure.toCamera.x_offset--;
                 Log.Write(String.Format("after x bincheck x_offset = {0}\n", exposure.toCamera.x_offset));
             }
 
-            if (exposure.toCamera.y_bin != 1 && (exposure.toCamera.y_offset % 2) != 0)
+            if (exposure.toCamera.y_bin == 1 && (exposure.toCamera.y_offset % 2) != 0)
             {
                 exposure.toCamera.y_offset--;
                 Log.Write(String.Format("after y bincheck y_offset = {0}\n", exposure.toCamera.y_offset));
             }
 
-            Debug.Assert(exposure.toCamera.x_bin == 1 || exposure.toCamera.x_offset % 2 == 0);
-            Debug.Assert(exposure.toCamera.y_bin == 1 || exposure.toCamera.y_offset % 2 == 0);
-            Debug.Assert(exposure.toCamera.width % 2 == 0);
-            Debug.Assert(exposure.toCamera.height % 2 == 0);
+            Debug.Assert(exposure.toCamera.x_bin != 1 || exposure.toCamera.x_offset % 2 == 0);
+            Debug.Assert(exposure.toCamera.y_bin != 1 || exposure.toCamera.y_offset % 2 == 0);
             Debug.Assert(exposure.toCamera.width % exposure.toCamera.x_bin == 0);
             Debug.Assert(exposure.toCamera.height % exposure.toCamera.y_bin == 0);
 
-            // I have no idea why the next bit is required, but it is.  If it isn't there,
-            // the read of the image data fails with a semaphore timeout. I found this in the
-            // sample application from SX.
-
             dumpReadDelayedBlock(exposure.toCamera, "after adjust, before M25C adjustment");
+
+            // See if our modified parameters are still legal
+            try
+            {
+                checkParms(exposure.toCamera.width, exposure.toCamera.height, exposure.toCamera.x_offset, exposure.toCamera.y_offset, exposure.toCamera.x_bin, exposure.toCamera.y_bin);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(String.Format("checkParms for toCamera generated exception {0}\n", ex));
+                throw;
+            }
+
+            // I have no idea why the next bit is required, but it is.  If it isn't there,
+            // the read of the image data fails. I found this in the sample basic application from SX.
 
             if (idx == 0 && cameraModel == 0x59)
             {
@@ -639,19 +635,12 @@ namespace sx
 
         internal void convertCameraDataToImageData()
         {
-            Int32 binnedWidth = currentExposure.toCamera.width / currentExposure.toCamera.x_bin;
-            Int32 binnedHeight = currentExposure.toCamera.height / currentExposure.toCamera.y_bin;
+            Int32 binnedWidth = currentExposure.userRequested.width / currentExposure.userRequested.x_bin;
+            Int32 binnedHeight = currentExposure.userRequested.height / currentExposure.userRequested.y_bin;
 
             if (bitsPerPixel != 16 && bitsPerPixel != 8)
             {
-                throw new ArgumentOutOfRangeException("downloadPixels(): Untested: bitsPerPixel != 16", "bitsPerPixel");
-            }
-
-            // undo the mysterious dance done in initReadDelayedBlock
-            if (idx == 0 && cameraModel == 0x59)
-            {
-                binnedWidth /= 2;
-                binnedHeight *= 2;
+                throw new ArgumentOutOfRangeException("downloadPixels(): Untested: bitsPerPixel != 16 && bitPerPixel !=8", "bitsPerPixel");
             }
 
             imageData = new Int32[binnedWidth, binnedHeight];
@@ -659,7 +648,7 @@ namespace sx
             // Copy the bytes read from the camera into a UInt32 array.
             // There must be a better way to do this, but I don't know what it is. 
 
-            Log.Write("convertCameraDataToImageData(): decoding data, bitsPerPixel=" + bitsPerPixel + " binnedWidth = " + binnedWidth + " binnedHeight=" + binnedHeight + "\n");
+            Log.Write(String.Format("convertCameraDataToImageDate(): x_bin = {0} binnedWidth={1} binnedWidth={2}\n", currentExposure.toCamera.x_bin, binnedWidth, binnedWidth));
 
             if (idx == 0 && cameraModel == 0x59)
             {
@@ -668,32 +657,49 @@ namespace sx
 
                 // to go along with the odd requirement that we must double the width and halve the height 
                 // to read the data from MX25C, we have to unscramble the data here
+                //
+                // Before we took the picture, we adjusted the parameters we sent to the camera so that:
+                // - The subimage starts on an even pixel if it is unbinned
+                // - The width and height are even multiples of the respective binning factors
+                // 
+                // A single row of the returned data is unpacked into 2 image rows like this:
+                //
+                // Input row:   ABCDEFGHIJKL...
+                // Output Row1: ADEHIL...
+                // Output Row2: BCFGJK...
+                //
 
+                Int32 cameraBinnedWidth = currentExposure.toCamera.width / currentExposure.toCamera.x_bin;
+                Int32 cameraBinnedHeight = currentExposure.toCamera.height / currentExposure.toCamera.y_bin;
                 int srcIdx = 0;
                 int x, y;
 
+                // get the binned height and width from the camera. We may not have quite enough data
+                // from the camera to fill the output array, so there could be zeros on the right or on the
+                // bottom
+                // Consider
+                //    sensor: 16x16, binning: 5
+                //    height x width = 3x3 (9 pixels), but the swizzle will get us 6x1 (6 pixels)
+                // The adjustment below would then get us 3x2, and we would put those 6 pixels into the
+                // "upper left" of the output array, leaving zeros in the "lower right"
+
+                cameraBinnedWidth  /= 2;
+                cameraBinnedHeight *= 2;
+
                 try
                 {
-                    for (y = 0; y < binnedHeight; y += 2)
+                    for (y = 0; y < cameraBinnedHeight; y += 2)
                     {
-                        for (x = 0; x < binnedWidth; x += 2)
+                        for (x = 0; x < cameraBinnedWidth; x += 2)
                         {
-                            imageData[x, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            // This inner loop handles 4 pixels.  
+                            // The way the /2 and *2 work out, we need all of them - if there is a size mismatch,
+                            // the output array will be bigger than the data array.
                             
-                            if (y + 1 < binnedHeight)
-                            {
-                                imageData[x, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            }
-
-                            if (x + 1 < binnedWidth && y + 1 < binnedHeight)
-                            {
-                                imageData[x + 1, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            }
-  
-                            if (y + 1 < binnedHeight)
-                            {
-                                imageData[x + 1, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            }
+                            imageData[x, y]         = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x, y + 1]     = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x + 1, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            imageData[x + 1, y]     = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
                         }
                     }
                 }

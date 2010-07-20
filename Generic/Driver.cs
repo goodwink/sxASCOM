@@ -1210,7 +1210,7 @@ namespace ASCOM.SXGeneric
                     {
                         return;
                     }
-                    state = CameraStates.cameraDownload;
+                    state = CameraStates.cameraExposing;
                 }
 
                 sxCamera.delayMs = (uint)(1000 * Duration);
