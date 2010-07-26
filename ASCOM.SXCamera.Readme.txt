@@ -5,7 +5,7 @@ This is the README for the ASCOM driver for Starlight Express cameras.
      This driver was not written by, authorized by, sanctioned by, or any
      other ... by Starlight Express.  It was independently developed 
      from the developer documentation available from the SX website. I had
-     a couple of email exchanges with Terry Pratt, but that is the extent
+     a couple of email exchanges with Terry Platt, but that is the extent
      of SX involvement.  Please do not make them regret providing 
      developer documentation by asking questions or complaining about 
      problems to SX.
