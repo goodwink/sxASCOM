@@ -502,7 +502,24 @@ namespace sx
 
             if (idx == 0 && cameraModel == 0x59)
             {
+
                 exposure.toCamera.width *= 2;
+
+                // in order for this to work, the height must be even
+
+                if (exposure.toCamera.height % 2 == 1)
+                {
+                    if (exposure.toCamera.height + exposure.toCamera.y_bin <= ccdHeight)
+                    {
+                        exposure.toCamera.height += exposure.toCamera.y_bin;
+                    }
+                    else
+                    {
+                        exposure.toCamera.height -= exposure.toCamera.y_bin;
+                    }
+                }
+
+                Debug.Assert(exposure.toCamera.height % 2 == 0);
                 exposure.toCamera.height /= 2;
             }
 
@@ -648,7 +665,7 @@ namespace sx
             // Copy the bytes read from the camera into a UInt32 array.
             // There must be a better way to do this, but I don't know what it is. 
 
-            Log.Write(String.Format("convertCameraDataToImageDate(): x_bin = {0} binnedWidth={1} binnedWidth={2}\n", currentExposure.toCamera.x_bin, binnedWidth, binnedWidth));
+            Log.Write(String.Format("convertCameraDataToImageData(): x_bin = {0} binnedWidth={1} binnedHeight={2}\n", currentExposure.toCamera.x_bin, binnedWidth, binnedHeight));
 
             if (idx == 0 && cameraModel == 0x59)
             {
@@ -672,7 +689,7 @@ namespace sx
                 Int32 cameraBinnedWidth = currentExposure.toCamera.width / currentExposure.toCamera.x_bin;
                 Int32 cameraBinnedHeight = currentExposure.toCamera.height / currentExposure.toCamera.y_bin;
                 int srcIdx = 0;
-                int x, y;
+                int x=-1, y=-1;
 
                 // get the binned height and width from the camera. We may not have quite enough data
                 // from the camera to fill the output array, so there could be zeros on the right or on the
@@ -682,30 +699,82 @@ namespace sx
                 //    height x width = 3x3 (9 pixels), but the swizzle will get us 6x1 (6 pixels)
                 // The adjustment below would then get us 3x2, and we would put those 6 pixels into the
                 // "upper left" of the output array, leaving zeros in the "lower right"
+                //
+                // In the adustment code, we try to bump the number height if we can, so the only time this 
+                // will actually happen is if we are full height and binning in a way that gets us an odd
+                // number of rows (2016 binned 5, gives 403 rows. The swizzle will leave us with 403/2 
+                // 201 rows that becomes 402 rows when we unswizzle it here, so the last row will be 0
 
                 cameraBinnedWidth  /= 2;
                 cameraBinnedHeight *= 2;
+
+                Log.Write(String.Format("convertCameraDataToImageData(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
+                Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixes={1}, len={2}\n", binnedWidth*binnedHeight, cameraBinnedWidth * cameraBinnedHeight, imageRawData.Length));
+
+                int saveCase=-2;
 
                 try
                 {
                     for (y = 0; y < cameraBinnedHeight; y += 2)
                     {
+
+                        // This loop is based on cameraBinnedWidth, not binnedWidth because we have to 
+                        // get all the pixels accoss each row every time, even if we don't want them all.
+                        // Otherwise we will give the wrong data to next ro
                         for (x = 0; x < cameraBinnedWidth; x += 2)
                         {
+                            UInt16 pixel;
+
                             // This inner loop handles 4 pixels.  
-                            // The way the /2 and *2 work out, we need all of them - if there is a size mismatch,
-                            // the output array will be bigger than the data array.
+                            //
+                            // It is possible that we requested more pixels from the camera than the user
+                            // requested from us, so we have to check to make sure before we assign them
+                            //
                             
-                            imageData[x, y]         = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            imageData[x, y + 1]     = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            imageData[x + 1, y + 1] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            imageData[x + 1, y]     = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            saveCase=0;
+                            pixel = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            if (x < binnedWidth && y < binnedHeight)
+                            {
+                                imageData[x, y] = pixel;
+                            }
+
+                            saveCase++;
+                            pixel = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            if (x < binnedWidth && y + 1 < binnedHeight)
+                            {
+                                imageData[x, y + 1]     = pixel;
+                            }
+
+                            
+                            if (x + 1 < cameraBinnedWidth)
+                            {
+                                saveCase++;
+                                pixel = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                                if (x + 1 < binnedWidth && y + 1 < binnedHeight)
+                                {
+                                    imageData[x + 1, y + 1] = pixel;
+                                }
+
+                                saveCase++;
+                                pixel = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                                if (x + 1 < binnedWidth && y < binnedHeight)
+                                {
+                                    imageData[x + 1, y] = pixel;
+                                }
+                            }
                         }
+                    }
+
+                    if (srcIdx != imageRawData.Length)
+                    {
+                        Log.Write(String.Format("surprise: srcIdx ({0}) != imageData.Length ({1})\n", srcIdx, imageRawData.Length));
                     }
                 }
                 catch (System.Exception ex)
                 {
-                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing M25C data - {0}\n", ex.ToString()));
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing M25C data\n"));
+                    Log.Write(String.Format("x = {0} y={1} srcIdx={2} case={3}\n", x, y, srcIdx, saveCase));
+                    Log.Write("Exception data was: \n" +  ex.ToString() + "\n");
                     throw ex;
                 }
             }
