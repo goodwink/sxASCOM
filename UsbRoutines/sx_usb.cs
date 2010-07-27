@@ -133,7 +133,7 @@ namespace sx
                     if (data != null)
                     {
                         hexData = "";
-                        for (int i = 0; i < Marshal.SizeOf(data); i++)
+                        for (int i = 0; i < ObjectSize(data); i++)
                         {
                             hexData += String.Format("{0:x2} ", Marshal.ReadByte(unManagedBlockBuffer, i + Marshal.SizeOf(block)));
                         }

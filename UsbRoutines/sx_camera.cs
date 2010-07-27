@@ -106,6 +106,7 @@ namespace sx
                 return ret;
             }
         }
+
         public UInt16 cameraModel
         {
             get;
@@ -583,6 +584,11 @@ namespace sx
             Log.Write("clear about to return\n");
         }
 
+        public void echo(string s)
+        {
+            controller.echo(s);
+        }
+
         public void clearCcdPixels()
         {
             Log.Write("clearCcdPixels entered\n");
@@ -594,7 +600,7 @@ namespace sx
         {
             Log.Write("clearRecordedPixels entered\n");
             clear(SX_CCD_FLAGS_NOWIPE_FRAME);
-            Log.Write("clearRecordedPixels entered\n");
+            Log.Write("clearRecordedPixels returns\n");
         }
 
         public UInt16 getModel()

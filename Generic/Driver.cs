@@ -34,6 +34,7 @@ using ASCOM.Interface;
 
 using Logging;
 
+
 namespace ASCOM.SXGeneric
 {
     //
@@ -48,6 +49,10 @@ namespace ASCOM.SXGeneric
         ASCOM.SXCamera.ReferenceCountedObjectBase, 
         ICamera
     {
+        // Constants
+        private const double ImageCommandTime = 0.001; // this is about how long it takes to send the "Download Image" command
+
+        // members
         protected sx.Camera sxCamera;
         private DateTimeOffset exposureStart;
         private TimeSpan desiredExposureLength;
@@ -1243,28 +1248,43 @@ namespace ASCOM.SXGeneric
 
             try
             {
-                sxCamera.clearRecordedPixels();
                 sxCamera.clearCcdPixels(); // This clears both the CCD and the recorded pixels.  For
-                                           // long exposures (> 2 seconds) we will cleare the recorded pixels again just before
+                                           // exposures > 1 second we will clear the recorded pixels again just before
                                            // the exposure ends to clear any accumulated noise.
                 bool bRecordedCleared = false;
+
+                if (Duration > ImageCommandTime)
+                {
+                    Duration -= ImageCommandTime;
+                }
+                else
+                {
+                    Duration = 0;
+                }
+                desiredExposureLength = TimeSpan.FromSeconds(Duration);
+
+                if (desiredExposureLength.TotalSeconds < 1.0)
+                {
+                    bRecordedCleared = true; // we don't do the clear again inside the loop for short exposures
+                    sxCamera.echo("done"); // the clear takes a long time - send something to the camera so we know it is done
+                }
                 
                 exposureStart = DateTime.Now;
-                desiredExposureLength = TimeSpan.FromSeconds(Duration);
                 DateTimeOffset exposureEnd = exposureStart + desiredExposureLength;
 
                 // We sleep for most of the exposure, then spin for the last little bit
                 // because this helps us end closer to the right time
 
                 Log.Write("softwareCapture(): about to begin loop, exposureEnd=" + exposureEnd + "\n");
+
                 for (TimeSpan remainingExposureTime = desiredExposureLength;
                     remainingExposureTime.TotalMilliseconds > 0;
                     remainingExposureTime = exposureEnd - DateTime.Now)
                 {
                     
-                    if (remainingExposureTime.TotalSeconds < 2.0 && !bRecordedCleared)
+                    if (remainingExposureTime.TotalSeconds < 1.0 && !bRecordedCleared)
                     {
-                        Log.Write("softwareCapture(): before clearRecordedPixels(), remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        Log.Write("softwareCapture(): doing clearRecordedPixels() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         sxCamera.clearRecordedPixels();
                         bRecordedCleared = true;
                     }
@@ -1300,7 +1320,7 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
             finally
             {
@@ -1320,15 +1340,22 @@ namespace ASCOM.SXGeneric
         virtual public void StartExposure(double Duration, bool Light)
         {
             Log.Write(String.Format("StartExposure({0}, {1}) begins\n", Duration, Light));
-            StartExposure(Duration, Light, false);
+
+            // because of timing accuracy, we do all short exposures with the HW timer
+            if (Duration <= 1.0)
+            {
+                StartExposure(Duration, Light, true);
+            }
+            else
+            {
+                StartExposure(Duration, Light, false);
+            }
         }
 
         protected void StartExposure(double Duration, bool Light, bool useHardwareTimer)
         {
             Log.Write(String.Format("StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
             bLastErrorValid = false;
-       useHardwareTimer = true;
-       //Duration /= 1000;
 
             if (!Connected)
             {
