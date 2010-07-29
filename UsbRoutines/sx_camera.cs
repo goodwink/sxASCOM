@@ -332,6 +332,18 @@ namespace sx
                     if (imageData == null)
                     {
                         convertCameraDataToImageData();
+
+                        if (false)
+                        {
+                            for (int ii = 0; ii < 20; ii++)
+                            {
+                                for (int jj = 0; jj < 20; jj++)
+                                {
+                                    double d = Math.Sqrt((jj - 10) * (jj - 10) + (ii - 10) * (ii - 10));
+                                    imageData[ii + 200, jj + 200] = (Int32)(UInt32)(60000-4000*d);
+                                }
+                            }
+                        }
                     }
                     if (false)
                     {

@@ -18,9 +18,9 @@ work with my camera, so I wrote this driver.
 
 This is an ALPHA release.  That means it isn't ready for prime time.  I'm 
 releasing it in the hopes of learning more about how it works with various
-SX cameras and guiders. Please test it during daylight hours.  
+SX cameras and guiders. Please test it during daylight hours.
 
-PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS DRIVER. 
+PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER. 
 
 I have am SXVF-M25C and the older style 8 bit guide camera.  It seems to work 
 with both of them. If you are willing to participate by loading the driver, and 
@@ -41,7 +41,6 @@ Will probably work:
 
 Known Limitations/things that don't work:
 
-- Binning does not yet work
 - There is no support for SXVR cooler features since I don't have a camera
   which provides these features, and because there is no documentation for 
   those features on the SX website
@@ -50,23 +49,28 @@ Known Limitations/things that don't work:
 
 Disclaimer:
 
-At present I have no business model, and I'm not sure what I'm going to do with
-the driver.  This Alpha release is in no way a commitment that there will ever
-be another release, and if you submit a defect report, there is not guarantee
-that I will ever fix it.  
+In the interest of full disclosure, I want to make something perfectly
+clear.  I'm a hobbiest, and I'd rather be imaging than writing software. 
 
-If I get the driver working well enough that I can use it for my imaging
+Assuming I get the driver working well enough that I can use it for my imaging
 needs, any other work I do on it will be taking time away from some other part
-of my life.  I'm a hobbiest, and I'd rather be imaging than writing 
-software. Supporting cameras that I don't own and can't test on will be a 
-non-trivial undertaking (for example, putting together the installer took 
-more than an hour).  I'm likely (but not promising to) release the 
-driver for free, and to request donations to fund support.  
+of my life.  
 
-If you have an SX camera then you have invested in a premium setup, and this 
-driver will provide you with additional software options. If you don't think 
-that is worth anything, then don't donate - just don't have any 
-expectation that problems you report will be fixed.
+I hope to get the driver working for a broad range of cameras,
+but supporting cameras that I don't own and can't test on will be a non-trivial 
+undertaking.  If doing so turns out to take a huge amount of time, I might 
+abandon the driver or request donations. If that would offend you, please don't use 
+this software.
+
+The release of this Alpha version of the driver is in no way a commitment 
+that there will ever be another release, and if you submit a defect report, 
+there is not guarantee that it will ever get fixed.
+
+The driver is licensed under the Creative Commons Attribution-No Derivative 
+Works 3.0 License.  A copy can be found in the file CreativeCommons.html, or it 
+an be viewed at http://creativecommons.org/licenses/by-nd/3.0/ or send a letter 
+to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 
+94105, USA.
 
 Clear Skies, 
 

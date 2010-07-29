@@ -4,7 +4,7 @@
 ;
 [Setup]
 AppName=ASCOM SX Camera Driver
-AppVerName=ASCOM SX Camera Driver 1.01
+AppVerName=ASCOM SX Camera Driver 0.90
 AppVersion=0.10
 AppPublisher=Bret McKee <bretm@daddog.com>
 AppPublisherURL=mailto:bretm@daddog.com
@@ -22,7 +22,7 @@ SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
 WizardImageFile="C:\Program Files (x86)\ASCOM\InstallGen\Resources\WizardImage.bmp"
 ;LicenseFile="C:\Program Files (x86)\ASCOM\InstallGen\Resources\CreativeCommons.txt"
-LicenseFile="C:\Users\bretm\Astronomy\src\sxASCOM\ASCOM.SXCamera.License.txt"
+LicenseFile="C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.License.txt"
 
 ; {cf}\ASCOM\Uninstall\Camera folder created by Platform, always
 UninstallFilesDir="{cf}\ASCOM\Uninstall\Camera\SX"
@@ -32,23 +32,27 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
 Name: "{cf}\ASCOM\Uninstall\Camera\SX"
-; TODO: Add ServedClasses folder for driver assemblies
 Name: "{app}\SXCameraServedClasses"
-; TODO: Add subfolders below {app} as needed (e.g. Name: "{app}\MyFolder")
+Name: "{app}\SXCamera"
 
 [Files]
 Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera\bin\Debug\ASCOM.SXCamera.exe"; DestDir: "{app}"
 ; TODO: Add driver assemblies into the ServedClasses folder
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera\bin\Debug\ASCOM.SXCamera.exe.config"; DestDir: "{app}"
 Source: "C:\Users\bretm\Astronomy\src\sxASCOM\Main\bin\Debug\ASCOM.SXMain.Camera.dll"; DestDir: "{app}\SXCameraServedClasses"
 Source: "C:\Users\bretm\Astronomy\src\sxASCOM\Guide\bin\Debug\ASCOM.SXGuide.Camera.dll"; DestDir: "{app}\SXCameraServedClasses"
-Source: "C:\Users\bretm\Astronomy\src\sxASCOM\ASCOM.SXCamera.License.txt"; DestDir: "{app}\SXCameraServedClasses"
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.License.txt"; DestDir: "{app}"
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.License.txt"; DestDir: "{app}\SXCamera"
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.License.txt"; DestDir: "{app}\SXCameraServedClasses"
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
-Source: "C:\Users\bretm\Astronomy\src\sxASCOM\ASCOM.SXCamera.Readme.txt"; DestDir: "{app}"; Flags: isreadme
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.Readme.txt"; DestDir: "{app}"; Flags: isreadme
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.Readme.txt"; DestDir: "{app}\SXCamera"; Flags: isreadme
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.Readme.txt"; DestDir: "{app}\SXCameraServedClasses"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
-Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera\bin\Debug\ASCOM.SXCamera.UsbRoutines.dll"; DestDir: "{app}"
-Source: "C:\Users\bretm\Astronomy\src\sxASCOM\Generic\bin\Debug\ASCOM.SXGeneric.Camera.dll"; DestDir: "{app}"
-Source: "C:\Users\bretm\Astronomy\src\sxASCOM\Logging\bin\Debug\ASCOM.SXLogging.dll"; DestDir: "{app}"
-Source: "C:\Users\bretm\Astronomy\src\sxASCOM\ASCOM.SXCamera.License.txt"; DestDir: "{app}"
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera\bin\Debug\ASCOM.SXCamera.UsbRoutines.dll"; DestDir: "{app}\SXCamera"
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\Generic\bin\Debug\ASCOM.SXGeneric.Camera.dll"; DestDir: "{app}\SXCamera"
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\Logging\bin\Debug\ASCOM.SXLogging.dll"; DestDir: "{app}\SXCamera"
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.License.txt"; DestDir: "{app}"
 
 
 ; Only if driver is .NET

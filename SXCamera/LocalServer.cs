@@ -221,7 +221,7 @@ namespace ASCOM.SXCamera
             string assyPath = Assembly.GetEntryAssembly().Location;
             int i = assyPath.LastIndexOf(@"\SXCamera\bin\");						// Look for us running in IDE
             if (i == -1) i = assyPath.LastIndexOf('\\');
-            assyPath = assyPath.Remove(i, assyPath.Length - i) + "\\SXCameraServedClasses";
+            assyPath = assyPath.Remove(i, assyPath.Length - i) + "\\SXCamera\\SXCameraServedClasses";
 
             DirectoryInfo d = new DirectoryInfo(assyPath);
             foreach (FileInfo fi in d.GetFiles("*.dll"))

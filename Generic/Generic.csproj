@@ -160,6 +160,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy "$(TargetPath)" "..\..\..\SXCameraServedClasses\$(TargetName).dll"</PostBuildEvent>
+    <PostBuildEvent>copy "$(TargetPath)" "..\..\..\SXCamera\SXCameraServedClasses\$(TargetName).dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>
