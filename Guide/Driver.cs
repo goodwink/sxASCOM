@@ -46,7 +46,7 @@ namespace ASCOM.SXGuide
     public class Camera : ASCOM.SXGeneric.Camera
     {
         public Camera() :
-            base(1)
+            base(1, "Guide")
         {
         }
         public override void SetupDialog()

@@ -32,13 +32,15 @@ namespace ASCOM.SXMain
             this.cmdCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.picASCOM = new System.Windows.Forms.PictureBox();
+            this.EnableLoggingCheckBox = new System.Windows.Forms.CheckBox();
+            this.EnableUntestedCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
             // 
             this.cmdOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.cmdOK.Location = new System.Drawing.Point(134, 92);
+            this.cmdOK.Location = new System.Drawing.Point(293, 88);
             this.cmdOK.Name = "cmdOK";
             this.cmdOK.Size = new System.Drawing.Size(59, 24);
             this.cmdOK.TabIndex = 0;
@@ -49,7 +51,7 @@ namespace ASCOM.SXMain
             // cmdCancel
             // 
             this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cmdCancel.Location = new System.Drawing.Point(134, 122);
+            this.cmdCancel.Location = new System.Drawing.Point(293, 123);
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(59, 25);
             this.cmdCancel.TabIndex = 1;
@@ -61,7 +63,7 @@ namespace ASCOM.SXMain
             // 
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(123, 94);
+            this.label1.Size = new System.Drawing.Size(361, 76);
             this.label1.TabIndex = 2;
             this.label1.Text = "ASCOM Driver for SX/SXV/SXVF/SXVR Cameras\r\n\r\nCopyright (C) 2010 Dad Dog Developme" +
                 "nt Ltd.\r\nAll Rights Reserved";
@@ -71,7 +73,7 @@ namespace ASCOM.SXMain
             // 
             this.picASCOM.Cursor = System.Windows.Forms.Cursors.Hand;
             this.picASCOM.Image = global::ASCOM.SXMain.Properties.Resources.ASCOM;
-            this.picASCOM.Location = new System.Drawing.Point(145, 9);
+            this.picASCOM.Location = new System.Drawing.Point(304, 12);
             this.picASCOM.Name = "picASCOM";
             this.picASCOM.Size = new System.Drawing.Size(48, 56);
             this.picASCOM.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -80,11 +82,35 @@ namespace ASCOM.SXMain
             this.picASCOM.DoubleClick += new System.EventHandler(this.BrowseToAscom);
             this.picASCOM.Click += new System.EventHandler(this.BrowseToAscom);
             // 
+            // EnableLoggingCheckBox
+            // 
+            this.EnableLoggingCheckBox.AutoSize = true;
+            this.EnableLoggingCheckBox.Location = new System.Drawing.Point(15, 123);
+            this.EnableLoggingCheckBox.Name = "EnableLoggingCheckBox";
+            this.EnableLoggingCheckBox.Size = new System.Drawing.Size(100, 17);
+            this.EnableLoggingCheckBox.TabIndex = 4;
+            this.EnableLoggingCheckBox.Text = "Enable Logging";
+            this.EnableLoggingCheckBox.UseVisualStyleBackColor = true;
+            this.EnableLoggingCheckBox.CheckedChanged += new System.EventHandler(this.EnableLoggingCheckBox_CheckedChanged);
+            // 
+            // EnableUntestedCheckBox
+            // 
+            this.EnableUntestedCheckBox.AutoSize = true;
+            this.EnableUntestedCheckBox.Location = new System.Drawing.Point(15, 88);
+            this.EnableUntestedCheckBox.Name = "EnableUntestedCheckBox";
+            this.EnableUntestedCheckBox.Size = new System.Drawing.Size(149, 17);
+            this.EnableUntestedCheckBox.TabIndex = 5;
+            this.EnableUntestedCheckBox.Text = "Enable Untested Cameras";
+            this.EnableUntestedCheckBox.UseVisualStyleBackColor = true;
+            this.EnableUntestedCheckBox.CheckedChanged += new System.EventHandler(this.EnableUntestedCheckBox_CheckedChanged);
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(203, 155);
+            this.ClientSize = new System.Drawing.Size(376, 196);
+            this.Controls.Add(this.EnableUntestedCheckBox);
+            this.Controls.Add(this.EnableLoggingCheckBox);
             this.Controls.Add(this.picASCOM);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmdCancel);
@@ -108,5 +134,7 @@ namespace ASCOM.SXMain
         private System.Windows.Forms.Button cmdCancel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox picASCOM;
+        public System.Windows.Forms.CheckBox EnableLoggingCheckBox;
+        public System.Windows.Forms.CheckBox EnableUntestedCheckBox;
     }
 }

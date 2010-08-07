@@ -24,6 +24,7 @@ using System;
 using System.Collections;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 using ASCOM;
 using ASCOM.Helper;
@@ -46,7 +47,7 @@ namespace ASCOM.SXMain
     public class Camera : ASCOM.SXGeneric.Camera
     {
         public Camera() :
-            base(0)
+            base(0, "Main")
         {
         }
 
@@ -59,7 +60,47 @@ namespace ASCOM.SXMain
         {
             Log.Write("Main Camera: SetupDialog()\n");
             SetupDialogForm F = new SetupDialogForm();
-            F.ShowDialog();
+
+            F.EnableLoggingCheckBox.Checked = config.enableLogging;
+            F.EnableUntestedCheckBox.Checked = config.enableUntested;
+
+            if (F.ShowDialog() == DialogResult.OK)
+            {
+                if (config.enableLogging != F.EnableLoggingCheckBox.Checked)
+                {
+                    config.enableLogging = F.EnableLoggingCheckBox.Checked;
+
+                    if (false && F.EnableLoggingCheckBox.Checked)
+                    {
+                        SaveFileDialog DebugOutputFileName = new SaveFileDialog();
+
+                        DebugOutputFileName.Title = "Log File Name";
+                        DebugOutputFileName.AddExtension = true;
+                        DebugOutputFileName.FileName = config.logFileName;
+                        DebugOutputFileName.InitialDirectory = ".";
+                        DebugOutputFileName.RestoreDirectory = true;
+                        DebugOutputFileName.CheckFileExists = false;
+                        DebugOutputFileName.DefaultExt = "log";
+                        DebugOutputFileName.Filter = "Log Files|*.log|All Files|*.*";
+
+                        if (DebugOutputFileName.ShowDialog() == DialogResult.OK)
+                        {
+                            config.logFileName = DebugOutputFileName.FileName;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Logging disabled since no file was selected", "Logging Disabled");
+                            config.enableLogging = false;
+                        }
+                        DebugOutputFileName.Dispose();
+                    }
+                }
+
+                if (config.enableUntested != F.EnableUntestedCheckBox.Checked)
+                {
+                    config.enableUntested = F.EnableUntestedCheckBox.Checked;
+                }
+            }
         }
 
         public override bool CanPulseGuide

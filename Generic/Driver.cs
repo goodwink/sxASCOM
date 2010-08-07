@@ -26,6 +26,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Reflection;
+using System.Windows.Forms;
 
 using ASCOM;
 using ASCOM.Helper;
@@ -69,13 +70,13 @@ namespace ASCOM.SXGeneric
         protected bool bLastErrorValid;
         protected string lastErrorMessage;
         protected bool bHasGuideCamera;
+        protected ASCOM.SXCamera.Configuration config;
         // values that back properties: property foo is in m_foo
         private bool m_Connected;
         private short m_BinX, m_BinY;
         private short m_MaxBinX, m_MaxBinY;
         private int m_CameraXSize, m_CameraYSize;
         protected string m_Description;
-        private double m_ElectronsPerADU;
         private int m_MaxADU;
         private int m_NumX, m_NumY;
         private double m_PixelSizeX, m_PixelSizeY;
@@ -85,7 +86,7 @@ namespace ASCOM.SXGeneric
          //
         // Constructor - Must be public for COM registration!
         //
-        protected Camera(UInt16 whichCamera)
+        protected Camera(UInt16 whichCamera, string cameraType)
         {
             //Thread.Sleep(15000);
             Log.Write("Camera(" + whichCamera +")\n");
@@ -94,6 +95,8 @@ namespace ASCOM.SXGeneric
 
             oCameraStateLock = new Object();
             oGuideStateLock = new Object();
+            config = new ASCOM.SXCamera.Configuration(cameraType);
+
         }
         #endregion
 
@@ -489,9 +492,10 @@ namespace ASCOM.SXGeneric
                 
                 if (value)
                 {
-                    if (DateTime.Now.CompareTo(DateTime.Parse("07/31/2010")) > 0)
+                    if (DateTime.Now.CompareTo(DateTime.Parse("10/1/2010")) > 0)
                     {
-                        throw new ASCOM.PropertyNotImplementedException(SetError("connected: Alpha release expired"), true);
+                        MessageBox.Show("This Beta Release has expired.  Please update your bits", "Expired");
+                        throw new ASCOM.PropertyNotImplementedException(SetError("connected: Beta release expired"), true);
                     }
 
                     if (m_Connected)
@@ -520,13 +524,12 @@ namespace ASCOM.SXGeneric
                         StartX = 0;
                         StartY = 0;
                         bHasGuideCamera = sxCamera.hasGuideCamera;
-                        ElectronsPerADU = sxCamera.electronsPerADU;
                     }
                     catch (System.Exception ex)
                     {
                         sxCamera = null;
                         m_Connected = true;
-                        throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                        throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request: " + ex.ToString()), ex);
                     }
                     // setup state variables
                     state = CameraStates.cameraIdle;
@@ -635,18 +638,24 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("ElectronsPerADU get returns " + m_ElectronsPerADU + "\n");
+                double dRet;
+
                 if (!Connected)
                 {
                     throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
                 }
 
-                return m_ElectronsPerADU;
-            }
-            private set
-            {
-                Log.Write("ElectronsPerADU set to " + value + "\n");
-                m_ElectronsPerADU = value;
+                try
+                {
+                    dRet = sxCamera.electronsPerADU;
+                    Log.Write("ElectronsPerADU get returns " + dRet + "\n");
+                }
+                catch (Exception ex)
+                {
+                    Log.Write("ElectronsPerADU: value not known\n");
+                    throw ex;
+                }
+                return dRet;
             }
         }
 

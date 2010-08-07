@@ -10,7 +10,7 @@ namespace ASCOM.SXGuide
 {
     [ComVisible(false)]					// Form not registered for COM!
     public partial class SetupDialogForm : Form
-    {
+    {   
         public SetupDialogForm()
         {
             InitializeComponent();
@@ -46,6 +46,11 @@ namespace ASCOM.SXGuide
         private void label1_Click(object sender, EventArgs e)
         {
 
+        }
+
+        public void cmdLogging_click()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

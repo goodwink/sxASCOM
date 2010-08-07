@@ -38,10 +38,6 @@ namespace ASCOM.SXCamera
         {
             //m_SharedSerial = new ASCOM.Helper.Serial();
 
-            //Thread.Sleep(15000);
-
-            Log.Write("hello world\n");
-
             try
             {
                 controller = new sx.Controller();
@@ -52,8 +48,6 @@ namespace ASCOM.SXCamera
                 Log.Write("SharedResources() caught " + ex + "\n");
                 throw ex;
             }
-
-            Log.Write("new returned " + controller + "\n");
         }
 
         //

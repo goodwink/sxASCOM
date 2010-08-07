@@ -4,11 +4,12 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 
+
 namespace Logging
 {
     public class Log
     {
-        private const string logPath = @"c:\temp\sx-ascom\sx_log.txt";
+        private static string logPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + "ascom-sx-camera.log";
         private static FileStream logFS = null;
         private static DateTime lastWriteTime;
 
