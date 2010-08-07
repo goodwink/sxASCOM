@@ -75,27 +75,30 @@ namespace sx
         {
             get
             {
-                string ret = "unknown " + cameraModel;
+                string ret = "unknown (and untested) " + cameraModel;
 
                 switch (cameraModel)
                 {
-                    case 0x09:
-                        ret = "HX9";
-                        break;
-                    case 0x45:
-                        ret = "MX5";
-                        break;
-                    case 0xc5:
-                        ret = "MX5C";
-                        break;
-                    case 0x47:
-                        ret = "MX7";
-                        break;
-                    case 0xc7:
-                        ret = "MX7C";
-                        break;
-                    case 0x49:
-                        ret = "MX9";
+                    //case 0x09:
+                    //    ret = "HX9";
+                    //    break;
+                    //case 0x45:
+                    //    ret = "MX5";
+                    //    break;
+                    //case 0xc5:
+                    //    ret = "MX5C";
+                    //    break;
+                    //case 0x47:
+                    //    ret = "MX7";
+                    //    break;
+                    //case 0xc7:
+                    //    ret = "MX7C";
+                    //    break;
+                    //case 0x49:
+                    //    ret = "MX9";
+                    //    break;
+                    case 137:
+                        ret = "H9C";
                         break;
                     case 0x59:
                         ret = "MX25C";

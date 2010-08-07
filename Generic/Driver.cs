@@ -653,7 +653,7 @@ namespace ASCOM.SXGeneric
                 catch (Exception ex)
                 {
                     Log.Write("ElectronsPerADU: value not known\n");
-                    throw ex;
+                    throw new ASCOM.PropertyNotImplementedException(String.Format("ElectronsPerADU Must throw exception if data unavailable."), false);
                 }
                 return dRet;
             }

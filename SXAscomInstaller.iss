@@ -41,8 +41,8 @@ Source: "C:\Users\bretm\Astronomy\src\sxASCOM\ASCOM.SXCamera.exe.config"; DestDi
 Source: "C:\Users\bretm\Astronomy\src\sxASCOM\Main\bin\Debug\ASCOM.SXMain.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
 Source: "C:\Users\bretm\Astronomy\src\sxASCOM\Guide\bin\Debug\ASCOM.SXGuide.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
 Source: "C:\Users\bretm\Astronomy\src\sxASCOM\Generic\bin\Debug\ASCOM.SXGeneric.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
-Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.License.html"; DestDir: "{app}\SXCamera" ; Flags: isreadme
-Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.License.html"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\CreativeCommons.html"; DestDir: "{app}\SXCamera" ; Flags: isreadme
+Source: "C:\Users\bretm\Astronomy\src\sxASCOM\CreativeCommons.html"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
 Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.Readme.txt"; DestDir: "{app}\SXCamera"; Flags: isreadme
 Source: "C:\Users\bretm\Astronomy\src\sxASCOM\SXCamera.Readme.txt"; DestDir: "{app}\SXCamera\SXCameraServedClasses"

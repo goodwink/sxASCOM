@@ -30,6 +30,7 @@ which might help me fix it.
 
 Expected To Work:
 - SXVF-MX25C
+- SXF-H9C
 - SX 8-bit Guide Camera
 - Simultanious use of both cameras by seperate software products
 - Autoguider port - if a guide camera is attached, the guide port shows up
@@ -47,6 +48,17 @@ Known Limitations/things that don't work:
 - serial ports - I don't have the serial box, and if I did it would require 
   writing virtual serial drivers for my telescope to take advantage of them
 
+How can you help?
+
+What is really needed is testing on a broad range of SX cameras.  Please try the driver with your camera.  If it 
+seems to work, please send me a email letting me know what model camera you have. If you really want to help, please
+download the ASCOM confomance tester from http://ascom-standards.org/Downloads/DevTools.htm, run it with your 
+camera connected, and send me the output.
+
+If your camera doesn't seem to work correctly, please check the "Enable Logging" option on the properties page.  
+This will create a file named ascom-sx-camera.log on your desktop.  Email me this file along with your 
+camera model.
+
 Disclaimer:
 
 In the interest of full disclosure, I want to make something perfectly
@@ -59,12 +71,8 @@ of my life.
 I hope to get the driver working for a broad range of cameras,
 but supporting cameras that I don't own and can't test on will be a non-trivial 
 undertaking.  If doing so turns out to take a huge amount of time, I might 
-abandon the driver or request donations. If that would offend you, please don't use 
+abandon the effort or request donations. If that would offend you, please don't use 
 this software.
-
-The release of this Alpha version of the driver is in no way a commitment 
-that there will ever be another release, and if you submit a defect report, 
-there is not guarantee that it will ever get fixed.
 
 The driver is licensed under the Creative Commons Attribution-No Derivative 
 Works 3.0 License.  A copy can be found in the file CreativeCommons.html, or it 
