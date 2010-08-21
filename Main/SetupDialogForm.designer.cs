@@ -26,7 +26,7 @@ namespace ASCOM.SXMain
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
+        private void InitializeComponent(string version)
         {
             this.cmdOK = new System.Windows.Forms.Button();
             this.cmdCancel = new System.Windows.Forms.Button();
@@ -34,6 +34,7 @@ namespace ASCOM.SXMain
             this.picASCOM = new System.Windows.Forms.PictureBox();
             this.EnableLoggingCheckBox = new System.Windows.Forms.CheckBox();
             this.EnableUntestedCheckBox = new System.Windows.Forms.CheckBox();
+            this.Version = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.SuspendLayout();
             // 
@@ -62,8 +63,8 @@ namespace ASCOM.SXMain
             // label1
             // 
             this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(361, 76);
+            this.label1.Name = "Version:" + version;
+            this.label1.Size = new System.Drawing.Size(361, 59);
             this.label1.TabIndex = 2;
             this.label1.Text = "ASCOM Driver for SX/SXV/SXVF/SXVR Cameras\r\n\r\nCopyright (C) 2010 Dad Dog Developme" +
                 "nt Ltd.\r\nAll Rights Reserved";
@@ -85,7 +86,7 @@ namespace ASCOM.SXMain
             // EnableLoggingCheckBox
             // 
             this.EnableLoggingCheckBox.AutoSize = true;
-            this.EnableLoggingCheckBox.Location = new System.Drawing.Point(15, 123);
+            this.EnableLoggingCheckBox.Location = new System.Drawing.Point(15, 153);
             this.EnableLoggingCheckBox.Name = "EnableLoggingCheckBox";
             this.EnableLoggingCheckBox.Size = new System.Drawing.Size(100, 17);
             this.EnableLoggingCheckBox.TabIndex = 4;
@@ -96,7 +97,7 @@ namespace ASCOM.SXMain
             // EnableUntestedCheckBox
             // 
             this.EnableUntestedCheckBox.AutoSize = true;
-            this.EnableUntestedCheckBox.Location = new System.Drawing.Point(15, 88);
+            this.EnableUntestedCheckBox.Location = new System.Drawing.Point(15, 123);
             this.EnableUntestedCheckBox.Name = "EnableUntestedCheckBox";
             this.EnableUntestedCheckBox.Size = new System.Drawing.Size(149, 17);
             this.EnableUntestedCheckBox.TabIndex = 5;
@@ -104,11 +105,22 @@ namespace ASCOM.SXMain
             this.EnableUntestedCheckBox.UseVisualStyleBackColor = true;
             this.EnableUntestedCheckBox.CheckedChanged += new System.EventHandler(this.EnableUntestedCheckBox_CheckedChanged);
             // 
+            // Version
+            // 
+            this.Version.AutoSize = true;
+            this.Version.Location = new System.Drawing.Point(15, 88);
+            this.Version.Name = "Version";
+            this.Version.Size = new System.Drawing.Size(45, 13);
+            this.Version.TabIndex = 6;
+            this.Version.Text = "Version " + version;
+            this.Version.Click += new System.EventHandler(this.label2_Click_1);
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(376, 196);
+            this.ClientSize = new System.Drawing.Size(380, 221);
+            this.Controls.Add(this.Version);
             this.Controls.Add(this.EnableUntestedCheckBox);
             this.Controls.Add(this.EnableLoggingCheckBox);
             this.Controls.Add(this.picASCOM);
@@ -136,5 +148,6 @@ namespace ASCOM.SXMain
         private System.Windows.Forms.PictureBox picASCOM;
         public System.Windows.Forms.CheckBox EnableLoggingCheckBox;
         public System.Windows.Forms.CheckBox EnableUntestedCheckBox;
+        private System.Windows.Forms.Label Version;
     }
 }

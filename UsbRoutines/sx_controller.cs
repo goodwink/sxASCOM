@@ -71,6 +71,7 @@ namespace sx
 
         public Controller()
         {
+            Log.Write("Controller(): entered\n");
             Connected = false;
 
             iface = new USBInterface();
@@ -79,6 +80,8 @@ namespace sx
             firmwareVersion = getVersion();
             getParams(ref ccdParms);
             Connected = true;
+
+            Log.Write("Controller(): returns\n");
         }
 
         internal void buildCommandBlock(out SX_CMD_BLOCK block, Byte cmd_type, Byte cmd, UInt16 cmd_value, UInt16 index, UInt16 cmd_length)

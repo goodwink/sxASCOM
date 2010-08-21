@@ -59,7 +59,8 @@ namespace ASCOM.SXMain
         public override void SetupDialog()
         {
             Log.Write("Main Camera: SetupDialog()\n");
-            SetupDialogForm F = new SetupDialogForm();
+            SetupDialogForm F = new SetupDialogForm(String.Format("{0}.{1}.{2}", SXCamera.SharedResources.versionMajor,
+                SXCamera.SharedResources.versionMinor, SXCamera.SharedResources.versionMaintenance));
 
             F.EnableLoggingCheckBox.Checked = config.enableLogging;
             F.EnableUntestedCheckBox.Checked = config.enableUntested;

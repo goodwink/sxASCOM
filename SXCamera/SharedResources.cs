@@ -19,39 +19,65 @@ using System.Collections.Generic;
 using System.Threading;
 using Logging;
 using sx;
+using ASCOM;
 
 namespace ASCOM.SXCamera
 {
 
     public class SharedResources
     {
-
-        public static sx.Controller controller
-        {
-            get;
-            private set;
-        }
-
+        private static bool m_bConnected;
+        private static sx.Controller m_controller;
         private SharedResources() { }							// Prevent creation of instances
 
         static SharedResources()								// Static initialization
         {
-            //m_SharedSerial = new ASCOM.Helper.Serial();
-
-            try
-            {
-                controller = new sx.Controller();
-            }
-            catch (Exception ex)
-            {
-                controller = null;
-                Log.Write("SharedResources() caught " + ex + "\n");
-                throw ex;
-            }
+            Log.Write("SharedResources()\n");
         }
 
         //
         // Public access to shared resources
         //
+
+
+        public static sx.Controller controller
+        {
+            get
+            {
+                if (!m_bConnected)
+                {
+                    Log.Write("SharedResources():controller creating object\n");
+                    try
+                    {
+                        m_controller = new sx.Controller();
+                    }
+                    catch (Exception ex)
+                    {
+                        m_controller = null;
+                        string msg = String.Format("SharedResources()::controller get caught an exception {0}\n", ex.ToString());
+                        Log.Write(msg);
+                        throw new ASCOM.DriverException(msg, ex);
+                    }
+                    m_bConnected = true;
+                    Log.Write("SharedResources():controller object create succeeded\n");
+                }
+
+                return m_controller;
+            }
+        }
+
+        public static uint versionMajor
+        {
+            get { return 0; }
+        }
+        public static uint versionMinor
+        {
+            get { return 8; }
+        }
+
+        public static uint versionMaintenance
+        {
+            get { return 3; }
+        }
     }
 }
