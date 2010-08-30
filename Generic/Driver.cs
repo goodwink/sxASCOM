@@ -100,6 +100,10 @@ namespace ASCOM.SXGeneric
 
                 config = new ASCOM.SXCamera.Configuration(cameraType);
             }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
+            }
             catch (Exception ex)
             {
                 String msg = String.Format("Camera constructor caught exception {0}\n", ex.ToString());
