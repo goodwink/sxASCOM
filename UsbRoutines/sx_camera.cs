@@ -475,8 +475,8 @@ namespace sx
 
             exposure.toCamera = exposure.userRequested;
 
-            dumpReadDelayedBlock(exposure.toCamera, "before adjust");
-
+            dumpReadDelayedBlock(exposure.toCamera, "as requested - before adjustments");
+#if false
             // cameras with a Bayer matrix need the offsets to be even so that the subframe returned 
             // has the same color representation as a full frame.  Since this (at most) offsets 
             // the image by 1 pixel on each axis, just do it for all cameras
@@ -500,7 +500,7 @@ namespace sx
             Debug.Assert(exposure.toCamera.width % exposure.toCamera.x_bin == 0);
             Debug.Assert(exposure.toCamera.height % exposure.toCamera.y_bin == 0);
 
-            dumpReadDelayedBlock(exposure.toCamera, "after adjust, before M25C adjustment");
+            dumpReadDelayedBlock(exposure.toCamera, "after bayer adjust, before M25C adjustment");
 
             // See if our modified parameters are still legal
             try
@@ -512,6 +512,7 @@ namespace sx
                 Log.Write(String.Format("checkParms for toCamera generated exception {0}\n", ex));
                 throw;
             }
+#endif
 
             // I have no idea why the next bit is required, but it is.  If it isn't there,
             // the read of the image data fails. I found this in the sample basic application from SX.
