@@ -14,16 +14,23 @@ I am moving from DSLR imaging to CCD imaging, and am a professional software
 developer. I discovered that my two favorite imaging apps (PHD and
 Images Plus) would not work with my new SX camera.  I also had some truely
 lousy weather, and since it was a "simple matter of programming" to make them
-work with my camera, so I wrote this driver.
+work with my camera, I wrote this driver.
 
-This is an ALPHA release.  That means it isn't ready for prime time.  I'm 
+This is an BETA release.  That means it isn't quite ready for prime time.  I'm 
 releasing it in the hopes of learning more about how it works with various
-SX cameras and guiders. Please test it during daylight hours.
+SX cameras and guiders. 
 
-PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER. 
+I have acquired several night's worth of images with it, with PHD taking
+a guider exposure every 2 seconds and the main camera taking 4 minutes 
+exposures.  I've not seen any crash issues for some time. 
 
-I have am SXVF-M25C and the older style 8 bit guide camera.  It seems to work 
-with both of them. If you are willing to participate by loading the driver, and 
+PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER until you have
+tried it during the daylight first. 
+
+I have am SXVF-M25C and the older style 8 bit guide camera, and I managed to 
+borrow a friend's SXF-H9c.  It seems to work with all of them. 
+
+If you are willing to help by loading the driver, and 
 seeing if it works with your camera and guider (if you have one), I'd 
 like to know the results. If it doesn't work, it can create a log file 
 which might help me fix it.
