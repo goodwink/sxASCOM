@@ -115,7 +115,7 @@ namespace ASCOM.SXCamera
 
         public bool enableLogging
         {
-            get { return GetBool(ENABLE_LOGGING, false); }
+            get { return GetBool(ENABLE_LOGGING, true); }
             set { SetString(ENABLE_LOGGING, value.ToString()); }
         }
 
