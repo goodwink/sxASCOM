@@ -476,7 +476,7 @@ namespace sx
             exposure.toCamera = exposure.userRequested;
 
             dumpReadDelayedBlock(exposure.toCamera, "as requested - before adjustments");
-#if false
+
             // cameras with a Bayer matrix need the offsets to be even so that the subframe returned 
             // has the same color representation as a full frame.  Since this (at most) offsets 
             // the image by 1 pixel on each axis, just do it for all cameras
@@ -512,14 +512,12 @@ namespace sx
                 Log.Write(String.Format("checkParms for toCamera generated exception {0}\n", ex));
                 throw;
             }
-#endif
 
             // I have no idea why the next bit is required, but it is.  If it isn't there,
             // the read of the image data fails. I found this in the sample basic application from SX.
 
             if (idx == 0 && cameraModel == 0x59)
             {
-
                 exposure.toCamera.width *= 2;
 
                 // in order for this to work, the height must be even
@@ -538,6 +536,20 @@ namespace sx
 
                 Debug.Assert(exposure.toCamera.height % 2 == 0);
                 exposure.toCamera.height /= 2;
+
+                exposure.toCamera.x_offset *= 2;
+
+                // The y_offset must also be even.
+
+                if (exposure.toCamera.y_offset % 2 == 1)
+                {
+                    Debug.Assert(exposure.toCamera.y_offset >= exposure.toCamera.y_bin);
+                    exposure.toCamera.y_offset -= exposure.toCamera.y_bin;
+                    Debug.Assert(exposure.toCamera.y_offset % 2 == 0);
+                }
+
+                exposure.toCamera.y_offset /= 2;  
+
             }
 
             dumpReadDelayedBlock(exposure.toCamera, "after adjust and M25C adjustment");

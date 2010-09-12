@@ -1286,6 +1286,10 @@ namespace ASCOM.SXGeneric
         {
             Log.Write(String.Format("StartExposure({0}, {1}) begins\n", Duration, Light));
 
+#if False
+            Duration /= 1000;
+#endif
+
             // because of timing accuracy, we do all short exposures with the HW timer
             if (Duration <= 1.0)
             {
