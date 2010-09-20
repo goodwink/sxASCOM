@@ -63,6 +63,7 @@ namespace ASCOM.SXMain
 
             F.EnableLoggingCheckBox.Checked = config.enableLogging;
             F.EnableUntestedCheckBox.Checked = config.enableUntested;
+            F.secondsAreMiliseconds.Checked = config.secondsAreMilliseconds;
             F.Version.Text = String.Format("Version: {0}.{1}.{2}", SXCamera.SharedResources.versionMajor,
                 SXCamera.SharedResources.versionMinor, SXCamera.SharedResources.versionMaintenance);
 
@@ -101,6 +102,10 @@ namespace ASCOM.SXMain
                 if (config.enableUntested != F.EnableUntestedCheckBox.Checked)
                 {
                     config.enableUntested = F.EnableUntestedCheckBox.Checked;
+                }
+                if (config.secondsAreMilliseconds != F.secondsAreMiliseconds.Checked)
+                {
+                    config.secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
                 }
             }
         }

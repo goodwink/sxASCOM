@@ -35,6 +35,7 @@ namespace ASCOM.SXMain
             this.EnableLoggingCheckBox = new System.Windows.Forms.CheckBox();
             this.EnableUntestedCheckBox = new System.Windows.Forms.CheckBox();
             this.Version = new System.Windows.Forms.Label();
+            this.secondsAreMiliseconds = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.SuspendLayout();
             // 
@@ -110,16 +111,28 @@ namespace ASCOM.SXMain
             this.Version.AutoSize = true;
             this.Version.Location = new System.Drawing.Point(15, 88);
             this.Version.Name = "Version";
-            this.Version.Size = new System.Drawing.Size(45, 13);
+            this.Version.Size = new System.Drawing.Size(72, 13);
             this.Version.TabIndex = 6;
             this.Version.Text = "Version: a.b.c";
             this.Version.Click += new System.EventHandler(this.label2_Click_1);
+            // 
+            // secondsAreMiliseconds
+            // 
+            this.secondsAreMiliseconds.AutoSize = true;
+            this.secondsAreMiliseconds.Location = new System.Drawing.Point(15, 187);
+            this.secondsAreMiliseconds.Name = "secondsAreMiliseconds";
+            this.secondsAreMiliseconds.Size = new System.Drawing.Size(147, 17);
+            this.secondsAreMiliseconds.TabIndex = 7;
+            this.secondsAreMiliseconds.Text = "Seconds Are Milliseconds";
+            this.secondsAreMiliseconds.UseVisualStyleBackColor = true;
+            this.secondsAreMiliseconds.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(380, 221);
+            this.ClientSize = new System.Drawing.Size(380, 229);
+            this.Controls.Add(this.secondsAreMiliseconds);
             this.Controls.Add(this.Version);
             this.Controls.Add(this.EnableUntestedCheckBox);
             this.Controls.Add(this.EnableLoggingCheckBox);
@@ -149,5 +162,6 @@ namespace ASCOM.SXMain
         public System.Windows.Forms.CheckBox EnableLoggingCheckBox;
         public System.Windows.Forms.CheckBox EnableUntestedCheckBox;
         public System.Windows.Forms.Label Version;
+        public System.Windows.Forms.CheckBox secondsAreMiliseconds;
     }
 }

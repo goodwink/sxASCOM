@@ -12,9 +12,16 @@ namespace ASCOM.SXCamera
         private const string CONFIGURATION_SUBKEY = "Configuration";
 
         private const String ENABLE_UNTESTED = "EnableUntested";
+        private const bool   DEFAULT_ENABLE_UNTESTED = false;
+
         private const String ENABLE_LOGGING = "EnableLogging";
+        private const bool   DEFAULT_ENABLE_LOGGING = true;
+
         private const string LOG_FILE_NAME = "LogFileName";
         private string DEFAULT_LOG_FILE_NAME = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + "ascom-sx-camera.log";
+
+        private const string SECONDS_ARE_MILLISECONDS = "SecondsAreMilliseconds";
+        private const bool DEFAULT_SECONDS_ARE_MILLISECONDS = false;
 
         private string driverID;
         ProfileClass profile;
@@ -109,13 +116,19 @@ namespace ASCOM.SXCamera
         public bool enableUntested
         {
             
-            get { return GetBool(ENABLE_UNTESTED, false);}
+            get { return GetBool(ENABLE_UNTESTED, DEFAULT_ENABLE_UNTESTED);}
             set { SetString(ENABLE_UNTESTED, value.ToString());}
         }
 
         public bool enableLogging
         {
-            get { return GetBool(ENABLE_LOGGING, true); }
+            get { return GetBool(ENABLE_LOGGING, DEFAULT_ENABLE_LOGGING); }
+            set { SetString(ENABLE_LOGGING, value.ToString()); }
+        }
+
+        public bool secondsAreMilliseconds
+        {
+            get { return GetBool(SECONDS_ARE_MILLISECONDS, DEFAULT_SECONDS_ARE_MILLISECONDS); }
             set { SetString(ENABLE_LOGGING, value.ToString()); }
         }
 

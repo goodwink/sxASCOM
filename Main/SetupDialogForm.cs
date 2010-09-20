@@ -71,5 +71,10 @@ namespace ASCOM.SXMain
         {
 
         }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
