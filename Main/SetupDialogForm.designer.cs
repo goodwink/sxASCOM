@@ -26,7 +26,7 @@ namespace ASCOM.SXMain
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent(string version)
+        private void InitializeComponent()
         {
             this.cmdOK = new System.Windows.Forms.Button();
             this.cmdCancel = new System.Windows.Forms.Button();
@@ -63,7 +63,7 @@ namespace ASCOM.SXMain
             // label1
             // 
             this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "Version:" + version;
+            this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(361, 59);
             this.label1.TabIndex = 2;
             this.label1.Text = "ASCOM Driver for SX/SXV/SXVF/SXVR Cameras\r\n\r\nCopyright (C) 2010 Dad Dog Developme" +
@@ -112,7 +112,7 @@ namespace ASCOM.SXMain
             this.Version.Name = "Version";
             this.Version.Size = new System.Drawing.Size(45, 13);
             this.Version.TabIndex = 6;
-            this.Version.Text = "Version " + version;
+            this.Version.Text = "Version: a.b.c";
             this.Version.Click += new System.EventHandler(this.label2_Click_1);
             // 
             // SetupDialogForm
@@ -148,6 +148,6 @@ namespace ASCOM.SXMain
         private System.Windows.Forms.PictureBox picASCOM;
         public System.Windows.Forms.CheckBox EnableLoggingCheckBox;
         public System.Windows.Forms.CheckBox EnableUntestedCheckBox;
-        private System.Windows.Forms.Label Version;
+        public System.Windows.Forms.Label Version;
     }
 }

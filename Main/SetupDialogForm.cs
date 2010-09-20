@@ -11,9 +11,9 @@ namespace ASCOM.SXMain
     [ComVisible(false)]					// Form not registered for COM!
     public partial class SetupDialogForm : Form
     {
-        public SetupDialogForm(string version)
+        public SetupDialogForm()
         {
-            InitializeComponent(version);
+            InitializeComponent();
         }
 
         private void cmdOK_Click(object sender, EventArgs e)
