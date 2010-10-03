@@ -99,6 +99,8 @@ namespace ASCOM.SXGeneric
                 oGuideStateLock = new Object();
 
                 config = new ASCOM.SXCamera.Configuration(cameraType);
+
+                Log.Write("Camera() constructor ends\n");
             }
             catch (ASCOM.DriverException ex)
             {
@@ -111,9 +113,6 @@ namespace ASCOM.SXGeneric
                 Log.Write(msg);
                 throw new ASCOM.DriverException(msg, ex);
             }
-
-            Log.Write("Camera() constructor returns\n");
-
         }
         #endregion
 
@@ -151,25 +150,36 @@ namespace ASCOM.SXGeneric
         /// </summary>
         public void AbortExposure()
         {
-            Log.Write("AbortExposure()\n");
-
-            bLastErrorValid = false;
-
-            verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-            lock (oCameraStateLock)
+            try
             {
-                switch (state)
+                Log.Write("AbortExposure()\n");
+
+                bLastErrorValid = false;
+
+                verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                lock (oCameraStateLock)
                 {
-                    case CameraStates.cameraIdle:
-                        // nothing to do
-                        break;
-                    case CameraStates.cameraExposing:
-                        bAbortRequested = true;
-                        break;
-                    default:
-                        throw new ASCOM.InvalidOperationException(SetError(String.Format("Abort not possible when camera is in state {0}", state)));
+                    switch (state)
+                    {
+                        case CameraStates.cameraIdle:
+                            // nothing to do
+                            break;
+                        case CameraStates.cameraExposing:
+                            bAbortRequested = true;
+                            break;
+                        default:
+                            throw new ASCOM.InvalidOperationException(SetError(String.Format("Abort not possible when camera is in state {0}", state)));
+                    }
                 }
+            }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
+            }
+            catch (System.Exception ex)
+            {
+                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
             }
         }
 
@@ -185,20 +195,31 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("BinX get: m_Binx =" + m_BinX + "\n");
+                try
+                {
+                    Log.Write("BinX get: m_Binx =" + m_BinX + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_BinX;
+                    return m_BinX;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
             set
             {
-                Log.Write("BinX set to " + value + "\n");
-
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-
                 try
                 {
+                    Log.Write("BinX set to " + value + "\n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
                     m_BinX = value;
                     sxCamera.xBin = (byte)value;
                 }
@@ -206,6 +227,10 @@ namespace ASCOM.SXGeneric
                 {
                     SetError(ex.ToString());
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + m_MaxBinX.ToString(), ex);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
                 }
                 catch (System.Exception ex)
                 {
@@ -225,20 +250,31 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("BinY get: m_BinY =" + m_BinY +"\n");
+                try
+                {
+                    Log.Write("BinY get: m_BinY =" + m_BinY +"\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_BinY;
+                    return m_BinY;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
             set
             {
-                Log.Write("BinY set to " + value +" \n");
-
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-
                 try
                 {
+                    Log.Write("BinY set to " + value +" \n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
                     m_BinY = value;
                     sxCamera.yBin = (byte)value;
                 }
@@ -246,6 +282,10 @@ namespace ASCOM.SXGeneric
                 {
                     SetError(ex.ToString());
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinY.ToString(), ex);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
                 }
                 catch (System.Exception ex)
                 {
@@ -263,10 +303,21 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CCDTemperature: will throw excpetion\n");
+                try
+                {
+                    Log.Write("CCDTemperature: will throw excpetion\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-                throw new ASCOM.PropertyNotImplementedException(SetError("CCDTemperature: must throw exception if data unavailable"), false);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    throw new ASCOM.PropertyNotImplementedException(SetError("CCDTemperature: must throw exception if data unavailable"), false);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -303,13 +354,24 @@ namespace ASCOM.SXGeneric
         {
             get 
             { 
-                Log.Write("CameraState() called from state " + state +"\n");
-
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                lock (oCameraStateLock)
+                try
                 {
-                    return state;
+                    Log.Write("CameraState() called from state " + state +"\n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    lock (oCameraStateLock)
+                    {
+                        return state;
+                    }
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
                 }
             }
         }
@@ -322,15 +384,37 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CameraXSize get: m_CameraXSize = " + m_CameraXSize + "\n");
+                try
+                {
+                    Log.Write("CameraXSize get: m_CameraXSize = " + m_CameraXSize + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_CameraXSize;
+                    return m_CameraXSize;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
             private set
             {
-                m_CameraXSize = value;
+                try
+                {
+                    m_CameraXSize = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -342,16 +426,38 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CameraYSize get: m_CameraYSize = " + m_CameraYSize +"\n");
+                try
+                {
+                    Log.Write("CameraYSize get: m_CameraYSize = " + m_CameraYSize +"\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_CameraYSize;
+                    return m_CameraYSize;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
 
             private set
             {
-                m_CameraYSize = value;
+                try
+                {
+                    m_CameraYSize = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -362,11 +468,22 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanAbortExposure get\n");
+                try
+                {
+                    Log.Write("CanAbortExposure get\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return true;
+                    return true;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -381,14 +498,25 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanAsymetricBin get: false\n");
+                try
+                {
+                    Log.Write("CanAsymetricBin get: false\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                // The SX cameras can actualy do asymmetric binning, but with bayer color cameras it makes things weird, 
-                // and I don't need it, so I'm disallowing it.
+                    // The SX cameras can actualy do asymmetric binning, but with bayer color cameras it makes things weird, 
+                    // and I don't need it, so I'm disallowing it.
 
-                return false;
+                    return false;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -399,11 +527,22 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanGetCoolerPower get: false\n");
+                try
+                {
+                    Log.Write("CanGetCoolerPower get: false\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return false;
+                    return false;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -428,11 +567,22 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanSetCCDTemperature get: false\n");
+                try
+                {
+                    Log.Write("CanSetCCDTemperature get: false\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return false;
+                    return false;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -447,11 +597,22 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CanStopExposure get: true\n");
+                try
+                {
+                    Log.Write("CanStopExposure get: true\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return true;
+                    return true;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -465,9 +626,20 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("Connected get: returning " + m_Connected +"\n");
+                try
+                {
+                    Log.Write("Connected get: returning " + m_Connected +"\n");
 
-                return  m_Connected;
+                    return  m_Connected;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
             set
             {
@@ -477,7 +649,7 @@ namespace ASCOM.SXGeneric
                 {
                     if (value)
                     {
-                        if (DateTime.Now.CompareTo(DateTime.Parse("10/1/2010")) > 0)
+                        if (DateTime.Now.CompareTo(DateTime.Parse("11/15/2010")) > 0)
                         {
                             MessageBox.Show("This Beta Release has expired.  Please update your bits", "Expired");
                             throw new ASCOM.PropertyNotImplementedException(SetError("connected: Beta release expired"), true);
@@ -530,6 +702,8 @@ namespace ASCOM.SXGeneric
                         sxCamera = null;
                         m_Connected = false;
                     }
+
+                    Log.Write("Camera::conneted set ends\n");
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -540,7 +714,6 @@ namespace ASCOM.SXGeneric
                     throw new ASCOM.DriverException("Camera::connected set caught an exception: " + ex.ToString(), ex);
                 }
 
-                Log.Write("Camera::conneted set ends\n");
             }
         }
 
@@ -557,19 +730,41 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("CoolerOn get: true\n");
+                try
+                {
+                    Log.Write("CoolerOn get: true\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return true;
+                    return true;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
             set
             {
-                Log.Write("CoolerOn set to " + value + "\n");
+                try
+                {
+                    Log.Write("CoolerOn set to " + value + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                throw new ASCOM.PropertyNotImplementedException(SetError("CoolerOn is not supported"), true);
+                    throw new ASCOM.PropertyNotImplementedException(SetError("CoolerOn is not supported"), true);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -583,11 +778,22 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("CoolerPower get returns hard coded 100\n");
+                try
+                {
+                    Log.Write("CoolerPower get returns hard coded 100\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return 100;
+                    return 100;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -601,17 +807,39 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("Generic Description get: " + m_Description + "\n");
+                try
+                {
+                    Log.Write("Generic Description get: " + m_Description + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_Description;
+                    return m_Description;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
 
             }
             protected set
             {
-                Log.Write("Generic Description set: " + value + "\n");
-                m_Description = value;
+                try
+                {
+                    Log.Write("Generic Description set: " + value + "\n");
+                    m_Description = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -625,21 +853,26 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                double dRet;
-
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-
                 try
                 {
+                    double dRet;
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
                     dRet = sxCamera.electronsPerADU;
+
                     Log.Write("ElectronsPerADU get returns " + dRet + "\n");
+
+                    return dRet;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
                 }
                 catch (Exception ex)
                 {
                     Log.Write("ElectronsPerADU: value not known\n");
-                    throw new ASCOM.PropertyNotImplementedException(String.Format("ElectronsPerADU Must throw exception if data unavailable."), false);
+                    throw new ASCOM.PropertyNotImplementedException(String.Format("ElectronsPerADU Must throw exception if data unavailable."), false, ex);
                 }
-                return dRet;
             }
         }
 
@@ -652,11 +885,22 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("FullWellCapacity get returns " + MaxADU * ElectronsPerADU / (BinX * BinY) + "\n");
+                try
+                {
+                    Log.Write("FullWellCapacity get returns " + MaxADU * ElectronsPerADU / (BinX * BinY) + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return MaxADU * ElectronsPerADU / (BinX * BinY);
+                    return MaxADU * ElectronsPerADU / (BinX * BinY);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -669,11 +913,22 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("HasShutter get returns hard coded false\n");
+                try
+                {
+                    Log.Write("HasShutter get returns hard coded false\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return false;
+                    return false;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -686,11 +941,22 @@ namespace ASCOM.SXGeneric
         {
             get
             { 
-                Log.Write("HeatSinkTemperature get will throw an exception\n");
+                try
+                {
+                    Log.Write("HeatSinkTemperature get will throw an exception\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                throw new ASCOM.PropertyNotImplementedException(SetError("HeatSinkTemperature must throw exception if data unavailable"), true);
+                    throw new ASCOM.PropertyNotImplementedException(SetError("HeatSinkTemperature must throw exception if data unavailable"), true);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -711,23 +977,34 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("ImageArray get\n");
-
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                if (!bImageValid)
-                {
-                    throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
-                }
-
                 try
                 {
-                    return sxCamera.ImageArray;
+                    Log.Write("ImageArray get\n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (!bImageValid)
+                    {
+                        throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
+                    }
+
+                    try
+                    {
+                        return sxCamera.ImageArray;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        SetError(ex.ToString());
+                        throw new ASCOM.ValueNotSetException(MethodBase.GetCurrentMethod().Name, ex);
+                    }
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
                 }
                 catch (System.Exception ex)
                 {
-                    SetError(ex.ToString());
-                    throw new ASCOM.ValueNotSetException(MethodBase.GetCurrentMethod().Name, ex);
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
                 }
             }
         }
@@ -750,17 +1027,16 @@ namespace ASCOM.SXGeneric
         {
             get
             { 
-                Log.Write("ImageArrayVariant get\n");
-
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                if (!bImageValid)
-                {
-                    throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
-                }
-
                 try
                 {
+                    Log.Write("ImageArrayVariant get\n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (!bImageValid)
+                    {
+                        throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
+                    }
 
                     Int32[,] data = (Int32[,])ImageArray;
                     Int32 width = data.GetLength(0);
@@ -776,6 +1052,10 @@ namespace ASCOM.SXGeneric
                     }
 
                     return oReturn;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
                 }
                 catch (System.Exception ex)
                 {
@@ -795,11 +1075,22 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("ImageReady get: bImageValid = " + bImageValid + "\n");
+                try
+                {
+                    Log.Write("ImageReady get: bImageValid = " + bImageValid + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return bImageValid;
+                    return bImageValid;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -812,13 +1103,24 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("IsPulseGuiding get: bGuiding = " + bGuiding + "\n");
-
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                lock (oGuideStateLock)
+                try
                 {
-                    return bGuiding;
+                    Log.Write("IsPulseGuiding get: bGuiding = " + bGuiding + "\n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    lock (oGuideStateLock)
+                    {
+                        return bGuiding;
+                    }
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
                 }
             }
         }
@@ -833,13 +1135,24 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("LastError()\n");
-
-                if (!bLastErrorValid)
+                try
                 {
-                    throw new ASCOM.InvalidOperationException(SetError("LastError called when there was no last error"));
+                    Log.Write("LastError()\n");
+
+                    if (!bLastErrorValid)
+                    {
+                        throw new ASCOM.InvalidOperationException(SetError("LastError called when there was no last error"));
+                    }
+                    return lastErrorMessage;
                 }
-                return lastErrorMessage;
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -853,16 +1166,27 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("LastExposureDuration get: " + actualExposureLength.TotalSeconds + "\n");
-
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                if (!bImageValid)
+                try
                 {
-                    throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
-                }
+                    Log.Write("LastExposureDuration get: " + actualExposureLength.TotalSeconds + "\n");
 
-                return actualExposureLength.TotalSeconds;
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (!bImageValid)
+                    {
+                        throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
+                    }
+
+                    return actualExposureLength.TotalSeconds;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -875,16 +1199,27 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("LastExposureStartTime get" + exposureStart.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff") + "\n");
-
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                if (!bImageValid)
+                try
                 {
-                    throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
+                    Log.Write("LastExposureStartTime get" + exposureStart.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff") + "\n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (!bImageValid)
+                    {
+                        throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
+                    }
+     
+                    return exposureStart.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff");
                 }
- 
-                return exposureStart.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff");
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -896,16 +1231,38 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("MaxADU get" + m_MaxADU + "\n");
+                try
+                {
+                    Log.Write("MaxADU get" + m_MaxADU + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_MaxADU;
+                    return m_MaxADU;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
 
             protected set
             {
-                m_MaxADU = value;
+                try
+                {
+                    m_MaxADU = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -918,16 +1275,38 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("MaxBinX get" + m_MaxBinX + "\n");
+                try
+                {
+                    Log.Write("MaxBinX get" + m_MaxBinX + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_MaxBinX;
+                    return m_MaxBinX;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
 
             private set
             {
-                m_MaxBinX = value;
+                try
+                {
+                    m_MaxBinX = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -940,16 +1319,38 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("MaxBinY get" + m_MaxBinY + "\n");
+                try
+                {
+                    Log.Write("MaxBinY get" + m_MaxBinY + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_MaxBinY;
+                    return m_MaxBinY;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
 
             private set
             {
-                m_MaxBinY = value;
+                try
+                {
+                    m_MaxBinY = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -962,20 +1363,42 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("NumX get: " + m_NumX + "\n");
+                try
+                {
+                    Log.Write("NumX get: " + m_NumX + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_NumX;
+                    return m_NumX;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
 
             set
             {
-                Log.Write("NumX set: " + value + "\n");
+                try
+                {
+                    Log.Write("NumX set: " + value + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                m_NumX = value;
+                    m_NumX = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -988,19 +1411,41 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("NumY get: " + m_NumY + "\n");
+                try
+                {
+                    Log.Write("NumY get: " + m_NumY + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_NumY;
+                    return m_NumY;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
             set
             {
-                Log.Write("NumY set: " + value + "\n");
+                try
+                {
+                    Log.Write("NumY set: " + value + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                m_NumY = value;
+                    m_NumY = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -1013,16 +1458,38 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("PixelSizeX get: m_PixelSizeX = " + m_PixelSizeX + "\n"); 
+                try
+                {
+                    Log.Write("PixelSizeX get: m_PixelSizeX = " + m_PixelSizeX + "\n"); 
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_PixelSizeX;
+                    return m_PixelSizeX;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
             private set
             {
-                Log.Write("PixelSizeX set: " + value + "\n"); 
-                m_PixelSizeX = value;
+                try
+                {
+                    Log.Write("PixelSizeX set: " + value + "\n"); 
+                    m_PixelSizeX = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -1035,16 +1502,38 @@ namespace ASCOM.SXGeneric
         {
             get 
             {
-                Log.Write("PixelSizeX get: m_PixelSizeY = " + m_PixelSizeY + "\n"); 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                try
+                {
+                    Log.Write("PixelSizeX get: m_PixelSizeY = " + m_PixelSizeY + "\n"); 
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_PixelSizeY;
+                    return m_PixelSizeY;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
 
             private set
             {
-                Log.Write("PixelSizeY set: " + value + "\n"); 
-                m_PixelSizeY = value;
+                try
+                {
+                    Log.Write("PixelSizeY set: " + value + "\n"); 
+                    m_PixelSizeY = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -1069,18 +1558,18 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">PulseGuide command is unsuccessful</exception>
         public void PulseGuide(GuideDirections Direction, int Duration)
         {
-            Log.Write("PulseGuide(" + Direction + "," + Duration + ")\n");
-            bLastErrorValid = false;
-            
-            verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-            if (!CanPulseGuide)
-            {
-                throw new ASCOM.InvalidOperationException(SetError(String.Format("PulseGuide() cannot be called if CanPuluseGuide == false")));
-            }
-
             try
             {
+                Log.Write("PulseGuide(" + Direction + "," + Duration + ")\n");
+                bLastErrorValid = false;
+                
+                verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                if (!CanPulseGuide)
+                {
+                    throw new ASCOM.InvalidOperationException(SetError(String.Format("PulseGuide() cannot be called if CanPuluseGuide == false")));
+                }
+
                 lock (oGuideStateLock)
                 {
                     bGuiding = true;
@@ -1101,6 +1590,10 @@ namespace ASCOM.SXGeneric
                         sxCamera.guideWest(Duration);
                         break;
                 }
+            }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
             }
             catch (System.Exception ex)
             {
@@ -1128,19 +1621,41 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("SetCCDTemperature get: will throw an exception\n");
+                try
+                {
+                    Log.Write("SetCCDTemperature get: will throw an exception\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), false);
+                    throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), false);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
             set
             {
-                Log.Write("SetCCDTemperature set: will throw an exception\n");
+                try
+                {
+                    Log.Write("SetCCDTemperature set: will throw an exception\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), true);
+                    throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), true);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -1148,10 +1663,9 @@ namespace ASCOM.SXGeneric
  
         internal void hardwareCapture(double Duration, bool Light)
         {
-            Log.Write(String.Format("hardwareCapture({0}, {1}): begins\n", Duration, Light));
-
             try
             {
+                Log.Write(String.Format("hardwareCapture({0}, {1}): begins\n", Duration, Light));
                 exposureStart = DateTime.Now;
                 
                 lock (oCameraStateLock)
@@ -1174,6 +1688,10 @@ namespace ASCOM.SXGeneric
 
                 bImageValid = true;
             }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
+            }
             catch (System.Exception ex)
             {
                 throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
@@ -1189,10 +1707,10 @@ namespace ASCOM.SXGeneric
 
         internal void softwareCapture(double Duration, bool Light)
         {
-            Log.Write(String.Format("softwareCapture({0}, {1}): begins\n", Duration, Light));
-
             try
             {
+                Log.Write(String.Format("softwareCapture({0}, {1}): begins\n", Duration, Light));
+
                 sxCamera.clearCcdPixels(); // This clears both the CCD and the recorded pixels.  For
                                            // exposures > 1 second we will clear the recorded pixels again just before
                                            // the exposure ends to clear any accumulated noise.
@@ -1263,6 +1781,10 @@ namespace ASCOM.SXGeneric
                 
                 bImageValid = true;
             }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
+            }
             catch (System.Exception ex)
             {
                 throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
@@ -1284,117 +1806,138 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">the exposure cannot be started for any reason, such as a hardware or communications error</exception>
         virtual public void StartExposure(double Duration, bool Light)
         {
-            Log.Write(String.Format("StartExposure({0}, {1}) begins\n", Duration, Light));
-
-            if (config.secondsAreMilliseconds)
+            try
             {
-                Duration /= 1000;
-                Log.Write(String.Format("StartExposure(): after secondsAreMilliseconds adjustment, duration={0}\n", Duration));
+                Log.Write(String.Format("StartExposure({0}, {1}) begins\n", Duration, Light));
+
+                if (config.secondsAreMilliseconds)
+                {
+                    Duration /= 1000;
+                    Log.Write(String.Format("StartExposure(): after secondsAreMilliseconds adjustment, duration={0}\n", Duration));
+                }
+
+
+                // because of timing accuracy, we do all short exposures with the HW timer
+                if (Duration <= 1.0)
+                {
+                    StartExposure(Duration, Light, true);
+                }
+                else
+                {
+                    StartExposure(Duration, Light, false);
+                }
             }
-
-
-            // because of timing accuracy, we do all short exposures with the HW timer
-            if (Duration <= 1.0)
+            catch (ASCOM.DriverException ex)
             {
-                StartExposure(Duration, Light, true);
+                throw ex;
             }
-            else
+            catch (System.Exception ex)
             {
-                StartExposure(Duration, Light, false);
+                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
             }
         }
 
         protected void StartExposure(double Duration, bool Light, bool useHardwareTimer)
         {
-            Log.Write(String.Format("StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
-            bLastErrorValid = false;
-
-            verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-            if (Duration < 0)
-            {
-                SetError("Exposure duration < 0");
-                throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, Duration.ToString(), ">= 0");
-            }
-            
-            lock (oCameraStateLock)
-            {
-                if (state != CameraStates.cameraIdle)
-                {
-                    throw new ASCOM.InvalidOperationException(SetError(String.Format("StartExposure called while in state {0}", state)));
-                }
-                state = CameraStates.cameraExposing;
-                bAbortRequested = false;
-                bStopRequested = false;
-                bImageValid = false;
-            }
-
             try
             {
-                try
+                Log.Write(String.Format("StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
+                bLastErrorValid = false;
+
+                verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                if (Duration < 0)
                 {
-                    sxCamera.width = (UInt16)(NumX * BinX);
+                    SetError("Exposure duration < 0");
+                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, Duration.ToString(), ">= 0");
                 }
-                catch (ArgumentOutOfRangeException ex)
+
+                lock (oCameraStateLock)
                 {
-                    SetError(ex.ToString());
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumX.ToString(), "1-" + (CameraXSize/BinX).ToString(), ex);
+                    if (state != CameraStates.cameraIdle)
+                    {
+                        throw new ASCOM.InvalidOperationException(SetError(String.Format("StartExposure called while in state {0}", state)));
+                    }
+                    state = CameraStates.cameraExposing;
                 }
 
                 try
                 {
-                    sxCamera.height = (UInt16)(NumY * BinY);
-                }
-                catch (ArgumentOutOfRangeException ex)
-                {
-                    SetError(ex.ToString());
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
-                }
-                
-                try
-                {
-                    sxCamera.xOffset = (UInt16)(StartX * BinX);
-                }
-                catch (ArgumentOutOfRangeException ex)
-                {
-                    SetError(ex.ToString());
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartX.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
-                }
+                    bAbortRequested = false;
+                    bStopRequested = false;
+                    bImageValid = false;
 
-                try
-                {
-                    sxCamera.yOffset = (UInt16)(StartY * BinY);
+                    try
+                    {
+                        sxCamera.width = (UInt16)(NumX * BinX);
+                    }
+                    catch (ArgumentOutOfRangeException ex)
+                    {
+                        SetError(ex.ToString());
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumX.ToString(), "1-" + (CameraXSize/BinX).ToString(), ex);
+                    }
+
+                    try
+                    {
+                        sxCamera.height = (UInt16)(NumY * BinY);
+                    }
+                    catch (ArgumentOutOfRangeException ex)
+                    {
+                        SetError(ex.ToString());
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
+                    }
+                    
+                    try
+                    {
+                        sxCamera.xOffset = (UInt16)(StartX * BinX);
+                    }
+                    catch (ArgumentOutOfRangeException ex)
+                    {
+                        SetError(ex.ToString());
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartX.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
+                    }
+
+                    try
+                    {
+                        sxCamera.yOffset = (UInt16)(StartY * BinY);
+                    }
+                    catch (ArgumentOutOfRangeException ex)
+                    {
+                        SetError(ex.ToString());
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
+                    }
+
+                    CaptureDelegate captureDelegate;
+
+                    if (useHardwareTimer)
+                    {
+                        captureDelegate = new CaptureDelegate(hardwareCapture);
+                    }
+                    else
+                    {
+                        captureDelegate = new CaptureDelegate(softwareCapture);
+                    }
+
+                    Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
+
+                    captureDelegate.BeginInvoke(Duration, Light, null, null);
+
+                    Log.Write("StartExposure() after captureDelegate.BeginInvode()\n");
                 }
-                catch (ArgumentOutOfRangeException ex)
+                finally
                 {
-                    SetError(ex.ToString());
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
+                    lock (oCameraStateLock)
+                    {
+                        state = CameraStates.cameraIdle;
+                    }
                 }
-
-                CaptureDelegate captureDelegate;
-
-                if (useHardwareTimer)
-                {
-                    captureDelegate = new CaptureDelegate(hardwareCapture);
-                }
-                else
-                {
-                    captureDelegate = new CaptureDelegate(softwareCapture);
-                }
-
-                Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
-
-                captureDelegate.BeginInvoke(Duration, Light, null, null);
-
-                Log.Write("StartExposure() after captureDelegate.BeginInvode()\n");
+            }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
             }
             catch (System.Exception ex)
             {
-                lock (oCameraStateLock)
-                {
-                    state = CameraStates.cameraIdle;
-                }
-
                 throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
             }
         }
@@ -1407,20 +1950,42 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("StartX get: m_StartX = " + m_StartX + "\n");
+                try
+                {
+                    Log.Write("StartX get: m_StartX = " + m_StartX + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_StartX;
+                    return m_StartX;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
 
             set
             {
-                Log.Write("StartX set: " + value + "\n");
+                try
+                {
+                    Log.Write("StartX set: " + value + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                m_StartX = value;
+                    m_StartX = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -1432,20 +1997,42 @@ namespace ASCOM.SXGeneric
         {
             get
             {
-                Log.Write("StartY get: m_StartY = " + m_StartY + "\n");
+                try
+                {
+                    Log.Write("StartY get: m_StartY = " + m_StartY + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                return m_StartY;
+                    return m_StartY;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
 
             set
             {
-                Log.Write("StartY set: " + value + "\n");
+                try
+                {
+                    Log.Write("StartY set: " + value + "\n");
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                m_StartY = value;
+                    m_StartY = value;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -1459,28 +2046,40 @@ namespace ASCOM.SXGeneric
         /// <exception cref=" System.Exception">Must throw an exception if for any reason no image readout will be available.</exception>
         public void StopExposure()
         {
-            Log.Write("StopExposure() requested when in state " + state + "\n");
-            bLastErrorValid = false;
-
-            verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-            lock (oCameraStateLock)
+            try
             {
-                switch (state)
+                Log.Write("StopExposure() requested when in state " + state + "\n");
+                bLastErrorValid = false;
+
+                verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                lock (oCameraStateLock)
                 {
-                    case CameraStates.cameraExposing:
-                    case CameraStates.cameraDownload:
-                        bStopRequested = true;
-                        break;
-                    default:
-                        break;
-                        if (bStopRequested)
-                            break; // they asked when it was legal and are just asking again.
-                        throw new ASCOM.InvalidOperationException(String.Format("Stop not possible when camera is in state {0}", state));
+                    switch (state)
+                    {
+                        case CameraStates.cameraExposing:
+                        case CameraStates.cameraDownload:
+                            bStopRequested = true;
+                            break;
+                        default:
+#if false
+                            if (bStopRequested)
+                                break; // they asked when it was legal and are just asking again.
+                            throw new ASCOM.InvalidOperationException(String.Format("Stop not possible when camera is in state {0}", state));
+#endif
+                            break;
+                    }
                 }
             }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
+            }
+            catch (System.Exception ex)
+            {
+                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+            }
         }
-
         #endregion
     }
 }

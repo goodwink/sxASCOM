@@ -70,7 +70,7 @@ namespace WinUsbDemo
             internal Int32 Flags;
             internal IntPtr Reserved;
         }
-
+#if false
         internal struct SP_DEVICE_INTERFACE_DETAIL_DATA
         {
             internal Int32 cbSize;
@@ -84,7 +84,7 @@ namespace WinUsbDemo
             internal Int32 DevInst;
             internal Int32 Reserved;
         }
-
+#endif
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         internal static extern IntPtr RegisterDeviceNotification(IntPtr hRecipient, IntPtr NotificationFilter, Int32 Flags);
 

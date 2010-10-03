@@ -25,6 +25,7 @@ using System.Collections;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Reflection;
 
 using ASCOM;
 using ASCOM.Helper;
@@ -58,55 +59,67 @@ namespace ASCOM.SXMain
         /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
         public override void SetupDialog()
         {
-            Log.Write("Main Camera: SetupDialog()\n");
-            SetupDialogForm F = new SetupDialogForm();
-
-            F.EnableLoggingCheckBox.Checked = config.enableLogging;
-            F.EnableUntestedCheckBox.Checked = config.enableUntested;
-            F.secondsAreMiliseconds.Checked = config.secondsAreMilliseconds;
-            F.Version.Text = String.Format("Version: {0}.{1}.{2}", SXCamera.SharedResources.versionMajor,
-                SXCamera.SharedResources.versionMinor, SXCamera.SharedResources.versionMaintenance);
-
-            if (F.ShowDialog() == DialogResult.OK)
+            try
             {
-                if (config.enableLogging != F.EnableLoggingCheckBox.Checked)
+                Log.Write("Main Camera: SetupDialog()\n");
+                SetupDialogForm F = new SetupDialogForm();
+
+                F.EnableLoggingCheckBox.Checked = config.enableLogging;
+                F.EnableUntestedCheckBox.Checked = config.enableUntested;
+                F.secondsAreMiliseconds.Checked = config.secondsAreMilliseconds;
+                F.Version.Text = String.Format("Version: {0}.{1}.{2}", SXCamera.SharedResources.versionMajor,
+                    SXCamera.SharedResources.versionMinor, SXCamera.SharedResources.versionMaintenance);
+
+                if (F.ShowDialog() == DialogResult.OK)
                 {
-                    config.enableLogging = F.EnableLoggingCheckBox.Checked;
-
-                    if (false && F.EnableLoggingCheckBox.Checked)
+                    if (config.enableLogging != F.EnableLoggingCheckBox.Checked)
                     {
-                        SaveFileDialog DebugOutputFileName = new SaveFileDialog();
-
-                        DebugOutputFileName.Title = "Log File Name";
-                        DebugOutputFileName.AddExtension = true;
-                        DebugOutputFileName.FileName = config.logFileName;
-                        DebugOutputFileName.InitialDirectory = ".";
-                        DebugOutputFileName.RestoreDirectory = true;
-                        DebugOutputFileName.CheckFileExists = false;
-                        DebugOutputFileName.DefaultExt = "log";
-                        DebugOutputFileName.Filter = "Log Files|*.log|All Files|*.*";
-
-                        if (DebugOutputFileName.ShowDialog() == DialogResult.OK)
+                        config.enableLogging = F.EnableLoggingCheckBox.Checked;
+#if false
+                        if (F.EnableLoggingCheckBox.Checked)
                         {
-                            config.logFileName = DebugOutputFileName.FileName;
+                            SaveFileDialog DebugOutputFileName = new SaveFileDialog();
+
+                            DebugOutputFileName.Title = "Log File Name";
+                            DebugOutputFileName.AddExtension = true;
+                            DebugOutputFileName.FileName = config.logFileName;
+                            DebugOutputFileName.InitialDirectory = ".";
+                            DebugOutputFileName.RestoreDirectory = true;
+                            DebugOutputFileName.CheckFileExists = false;
+                            DebugOutputFileName.DefaultExt = "log";
+                            DebugOutputFileName.Filter = "Log Files|*.log|All Files|*.*";
+
+                            if (DebugOutputFileName.ShowDialog() == DialogResult.OK)
+                            {
+                                config.logFileName = DebugOutputFileName.FileName;
+                            }
+                            else
+                            {
+                                MessageBox.Show("Logging disabled since no file was selected", "Logging Disabled");
+                                config.enableLogging = false;
+                            }
+                            DebugOutputFileName.Dispose();
                         }
-                        else
-                        {
-                            MessageBox.Show("Logging disabled since no file was selected", "Logging Disabled");
-                            config.enableLogging = false;
-                        }
-                        DebugOutputFileName.Dispose();
+#endif
+                    }
+
+                    if (config.enableUntested != F.EnableUntestedCheckBox.Checked)
+                    {
+                        config.enableUntested = F.EnableUntestedCheckBox.Checked;
+                    }
+                    if (config.secondsAreMilliseconds != F.secondsAreMiliseconds.Checked)
+                    {
+                        config.secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
                     }
                 }
-
-                if (config.enableUntested != F.EnableUntestedCheckBox.Checked)
-                {
-                    config.enableUntested = F.EnableUntestedCheckBox.Checked;
-                }
-                if (config.secondsAreMilliseconds != F.secondsAreMiliseconds.Checked)
-                {
-                    config.secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
-                }
+            }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
+            }
+            catch (System.Exception ex)
+            {
+                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
             }
         }
 
@@ -114,19 +127,30 @@ namespace ASCOM.SXMain
         {
             get
             {
-                bool bReturn = false;
-
-                if (!Connected)
+                try
                 {
-                    throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
+                    bool bReturn = false;
+
+                    if (!Connected)
+                    {
+                        throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
+                    }
+
+                    if (!bHasGuideCamera)
+                        bReturn = sxCamera.hasGuidePort;
+
+                    Log.Write("Main Camera: CanPulseGuide returns " + bReturn + "\n");
+
+                    return bReturn;
                 }
-
-                if (!bHasGuideCamera)
-                    bReturn = sxCamera.hasGuidePort;
-
-                Log.Write("Main Camera: CanPulseGuide returns " + bReturn + "\n");
-
-                return bReturn;
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 

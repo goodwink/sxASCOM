@@ -335,39 +335,26 @@ namespace sx
                     if (imageData == null)
                     {
                         convertCameraDataToImageData();
-
-                        if (false)
-                        {
-                            for (int ii = 0; ii < 20; ii++)
-                            {
-                                for (int jj = 0; jj < 20; jj++)
-                                {
-                                    double d = Math.Sqrt((jj - 10) * (jj - 10) + (ii - 10) * (ii - 10));
-                                    imageData[ii + 200, jj + 200] = (Int32)(UInt32)(60000-4000*d);
-                                }
-                            }
-                        }
                     }
-                    if (false)
+#if false
+                    using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.cooked", FileMode.Create)))
                     {
-                        using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.cooked", FileMode.Create)))
+                        Int32 binnedWidth = currentExposure.userRequested.width / currentExposure.userRequested.x_bin;
+                        Int32 binnedHeight = currentExposure.userRequested.height / currentExposure.userRequested.y_bin;
+
+                        if (idx == 0 && cameraModel == 0x59)
                         {
-                            Int32 binnedWidth = currentExposure.userRequested.width / currentExposure.userRequested.x_bin;
-                            Int32 binnedHeight = currentExposure.userRequested.height / currentExposure.userRequested.y_bin;
-
-                            if (idx == 0 && cameraModel == 0x59)
-                            {
-                                binnedWidth /= 2;
-                                binnedHeight *= 2;
-                            }
-
-                            for (int xx = 0; xx < binnedWidth; xx++)
-                                for (int yy = 0; yy < binnedHeight; yy++)
-                                {
-                                    binWriter.Write(imageData[xx, yy]);
-                                }
+                            binnedWidth /= 2;
+                            binnedHeight *= 2;
                         }
+
+                        for (int xx = 0; xx < binnedWidth; xx++)
+                            for (int yy = 0; yy < binnedHeight; yy++)
+                            {
+                                binWriter.Write(imageData[xx, yy]);
+                            }
                     }
+#endif
                     return imageData;
                 }
             }
@@ -874,21 +861,19 @@ namespace sx
 
             Log.Write("downloadPixels(): read completed, numBytesRead=" + numBytesRead + "\n");
 
-            if (false)
+#if false
+            using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.raw", FileMode.Create)))
             {
-                using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.raw", FileMode.Create)))
+                int srcIdx = 0;
+                for (int xx = 0; xx < binnedWidth; xx++)
                 {
-                    int srcIdx = 0;
-                    for (int xx = 0; xx < binnedWidth; xx++)
+                    for (int yy = 0; yy < binnedHeight; yy++)
                     {
-                        for (int yy = 0; yy < binnedHeight; yy++)
-                        {
-                            binWriter.Write((UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++)));
-                        }
+                        binWriter.Write((UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++)));
                     }
                 }
             }
-
+#endif
         }
 
         public void guideNorth(int durationMS)

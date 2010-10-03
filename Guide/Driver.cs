@@ -24,6 +24,7 @@ using System;
 using System.Collections;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Reflection;
 
 using ASCOM;
 using ASCOM.Helper;
@@ -49,11 +50,23 @@ namespace ASCOM.SXGuide
             base(1, "Guide")
         {
         }
+
         public override void SetupDialog()
         {
-            Log.Write("Guide Camera SetupDialog()\n");
-            SetupDialogForm F = new SetupDialogForm();
-            F.ShowDialog();
+            try
+            {
+                Log.Write("Guide Camera SetupDialog()\n");
+                SetupDialogForm F = new SetupDialogForm();
+                F.ShowDialog();
+            }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
+            }
+            catch (System.Exception ex)
+            {
+                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+            }
         }
         /// <summary>
         /// Returns a description of the camera model, such as manufacturer and model
@@ -65,9 +78,20 @@ namespace ASCOM.SXGuide
         {
             get
             {
-                string sReturn = "SX-Guider (" + base.Description + ")";
-                Log.Write("Guide Camera Description" + sReturn + "\n");
-                return sReturn;
+                try
+                {
+                    string sReturn = "SX-Guider (" + base.Description + ")";
+                    Log.Write("Guide Camera Description" + sReturn + "\n");
+                    return sReturn;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
@@ -75,31 +99,53 @@ namespace ASCOM.SXGuide
         {
             get
             {
-                bool bReturn = bHasGuideCamera;
-
-                Log.Write("Guide Camera CanPulseGuide returns " + bReturn+ "\n");
-
-                if (!Connected)
+                try
                 {
-                    throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
-                }
+                    bool bReturn = bHasGuideCamera;
 
-                return bReturn;
+                    Log.Write("Guide Camera CanPulseGuide returns " + bReturn+ "\n");
+
+                    if (!Connected)
+                    {
+                        throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
+                    }
+
+                    return bReturn;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
             }
         }
 
         public override void StartExposure(double Duration, bool Light)
         {
-            bool useHardwareTimer = false;
-
-            if (Duration <= 5.0)
+            try
             {
-                useHardwareTimer = true;
+                bool useHardwareTimer = false;
+
+                if (Duration <= 5.0)
+                {
+                    useHardwareTimer = true;
+                }
+
+                Log.Write(String.Format("Guide Camera StartExposure({0}, {1}) useHardwareTimer = {2}\n", Duration, Light, useHardwareTimer));
+
+                base.StartExposure(Duration, Light, useHardwareTimer);
             }
-
-            Log.Write(String.Format("Guide Camera StartExposure({0}, {1}) useHardwareTimer = {2}\n", Duration, Light, useHardwareTimer));
-
-            base.StartExposure(Duration, Light, useHardwareTimer);
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
+            }
+            catch (System.Exception ex)
+            {
+                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+            }
         }
     }
 }
