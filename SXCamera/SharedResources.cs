@@ -77,7 +77,7 @@ namespace ASCOM.SXCamera
 
         public static uint versionMaintenance
         {
-            get { return 1; }
+            get { return 2; }
         }
     }
 }
