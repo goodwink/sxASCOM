@@ -477,7 +477,7 @@ namespace ASCOM.SXGeneric
                 {
                     if (value)
                     {
-                        if (DateTime.Now.CompareTo(DateTime.Parse("10/1/2010")) > 0)
+                        if (DateTime.Now.CompareTo(DateTime.Parse("12/1/2010")) > 0)
                         {
                             MessageBox.Show("This Beta Release has expired.  Please update your bits", "Expired");
                             throw new ASCOM.PropertyNotImplementedException(SetError("connected: Beta release expired"), true);
