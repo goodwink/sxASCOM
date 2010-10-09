@@ -1924,12 +1924,13 @@ namespace ASCOM.SXGeneric
 
                     Log.Write("StartExposure() after captureDelegate.BeginInvode()\n");
                 }
-                finally
+                catch (System.Exception ex)
                 {
                     lock (oCameraStateLock)
                     {
                         state = CameraStates.cameraIdle;
                     }
+                    throw ex;
                 }
             }
             catch (ASCOM.DriverException ex)
