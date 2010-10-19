@@ -2,3 +2,5 @@ SXCameraServedClasses
 bin
 obj
 *.exe
+*.suo
+*~
