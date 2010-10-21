@@ -72,7 +72,7 @@ namespace ASCOM.SXCamera
         }
         public static uint versionMinor
         {
-            get { return 2; }
+            get { return 3; }
         }
 
         public static uint versionMaintenance
