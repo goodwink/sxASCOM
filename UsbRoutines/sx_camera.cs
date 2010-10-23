@@ -54,6 +54,40 @@ namespace sx
         internal SX_READ_DELAYED_BLOCK toCamera;
     }
 
+    internal enum CameraModels
+    {
+        // from http://tech.groups.yahoo.com/group/starlightxpress/message/85249
+        // ------------------ H5 --------------------
+        MODEL_H5=0x05,
+        MODEL_H5C=0x85,
+        // ------------------ H9 --------------------
+        MODEL_H9=0x09,
+        MODEL_H9C=0x89,
+        // ------------------ H16 --------------------
+        MODEL_H16=0x10,
+        MODEL_H16C=0x90,
+        // ------------------ H35 --------------------
+        MODEL_H35=0x23,
+        MODEL_H35C=0xB5,
+        // ------------------ H36 --------------------
+        MODEL_H36=0x24,
+        MODEL_H36C=0xB6,
+        // ------------------ MX5 --------------------
+        MODEL_MX5=0x45,
+        MODEL_MX5C=0x84,
+        // ------------------ MX7 --------------------
+        MODEL_MX7=0x47,
+        MODEL_MX7C=0xC7,
+        // ------------------ MX8 --------------------
+        MODEL_MX8C=0xC8,
+        // ------------------ MX9 --------------------
+        MODEL_MX9=0x49,
+        // ------------------ M25 --------------------
+        MODEL_M25C=0x59,
+        // ------------------ Lodestar --------------------
+        MODEL_LX1=0x46,
+    }
+
     public class Camera
         :sxBase
     {
@@ -75,33 +109,21 @@ namespace sx
         {
             get
             {
-                string ret = "unknown (and untested) " + cameraModel;
+                string ret;
 
-                switch (cameraModel)
+                switch ((CameraModels)cameraModel)
                 {
-                    //case 0x09:
-                    //    ret = "HX9";
-                    //    break;
-                    //case 0x45:
-                    //    ret = "MX5";
-                    //    break;
-                    //case 0xc5:
-                    //    ret = "MX5C";
-                    //    break;
-                    //case 0x47:
-                    //    ret = "MX7";
-                    //    break;
-                    //case 0xc7:
-                    //    ret = "MX7C";
-                    //    break;
-                    //case 0x49:
-                    //    ret = "MX9";
-                    //    break;
-                    case 137:
+                    case CameraModels.MODEL_H9:
+                        ret = "H9";
+                        break;
+                    case CameraModels.MODEL_H9C:
                         ret = "H9C";
                         break;
-                    case 0x59:
+                    case CameraModels.MODEL_M25C:
                         ret = "M25C";
+                        break;
+                    default:
+                        ret = String.Format("unknown (and untested) 0x%x", cameraModel);
                         break;
                 }
 
@@ -122,9 +144,15 @@ namespace sx
             {
                 double dReturn;
 
-                switch (cameraModel)
+                switch ((CameraModels)cameraModel)
                 {
-                    case 0x59:
+                    case CameraModels.MODEL_H9:
+                        dReturn = 0.45;
+                        break;
+                    case CameraModels.MODEL_H9C:
+                        dReturn = 0.45;
+                        break;
+                    case CameraModels.MODEL_M25C:
                         dReturn = 0.40;
                         break;
                     default:
