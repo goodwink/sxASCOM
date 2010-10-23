@@ -101,7 +101,7 @@ namespace sx
                         ret = "H9C";
                         break;
                     case 0x59:
-                        ret = "MX25C";
+                        ret = "M25C";
                         break;
                 }
 
