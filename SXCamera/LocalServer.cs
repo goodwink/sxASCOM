@@ -392,8 +392,6 @@ namespace ASCOM.SXCamera
         //
         // Remove all traces of this from the registry. 
         //
-        // **TODO** If the above does AppID/DCOM stuff, this would have
-        // to remove that stuff too.
         //
         private static void UnregisterObjects()
         {
@@ -491,7 +489,6 @@ namespace ASCOM.SXCamera
             bool bRet = true;
 
             //
-            //**TODO** -Embedding is "ActiveX start". Prohibit non_AX starting?
             //
             if (args.Length > 0)
             {

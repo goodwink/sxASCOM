@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -6,13 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-// TODO - Add your authorship information here
 [assembly: AssemblyTitle("SX Main Camera Driver")]
 [assembly: AssemblyDescription("ASCOM Camera Driver for SX Main Camera")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ASCOM Initiative")]
 [assembly: AssemblyProduct("SX Main Camera")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("(C)2010 Dad Dog Development Ltd.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

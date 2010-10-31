@@ -1,25 +1,18 @@
 //tabs=4
 // --------------------------------------------------------------------------------
-// TODO fill in this information for your driver, then remove this line!
 //
 // ASCOM Camera driver for SXCamera
 //
-// Description:	Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam 
-//				nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 
-//				erat, sed diam voluptua. At vero eos et accusam et justo duo 
-//				dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 
-//				sanctus est Lorem ipsum dolor sit amet.
+// Description:	
+//
+// This file contains the implementation for the generic SX camera.  This is 
+// the base class for both the guide and main cameras, and provides the vast majority
+// of the functionality.
 //
 // Implements:	ASCOM Camera interface version: 1.0
-// Author:		(XXX) Your N. Here <your@email.here>
+// Author:		Bret McKee <bretm@daddog.com>
 //
-// Edit Log:
-//
-// Date			Who	Vers	Description
-// -----------	---	-----	-------------------------------------------------------
-// dd-mmm-yyyy	XXX	1.0.0	Initial edit, from ASCOM Camera Driver template
-// --------------------------------------------------------------------------------
-//
+
 using System;
 using System.Collections;
 using System.Text;
@@ -662,7 +655,7 @@ namespace ASCOM.SXGeneric
 
                         try
                         {
-                            sxCamera = new sx.Camera(SXCamera.SharedResources.controller, cameraId);
+                            sxCamera = new sx.Camera(SXCamera.SharedResources.controller, cameraId, config.enableUntested);
                             m_Connected = true;
                             // set properties to defaults. These all talk to the camera, and having them here saves
                             // a lot of try/catch blocks in other places
