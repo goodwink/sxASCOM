@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -82,7 +82,7 @@ namespace sx
         MODEL_MX8C=0xC8,
         // ------------------ MX9 --------------------
         MODEL_MX9=0x49,
-        // ------------------ M25 --------------------
+        // ------------------ M25C --------------------
         MODEL_M25C=0x59,
         // ------------------ Lodestar --------------------
         MODEL_LX1=0x46,
@@ -102,6 +102,7 @@ namespace sx
         private bool imageDataValid;
         private object oImageDataLock;
         private UInt16 idx;
+        private bool bAllowUntested;
 
         // Properties
 
@@ -123,7 +124,14 @@ namespace sx
                         ret = "M25C";
                         break;
                     default:
-                        ret = String.Format("unknown (and untested) 0x%x", cameraModel);
+                        if (bAllowUntested)
+                        {
+                            ret = String.Format("unknown (and untested) 0x%x", cameraModel);
+                        }
+                        else
+                        {
+                            throw new System.Exception("ElectronsPerADU unknown for this camera model");
+                        }
                         break;
                 }
 
@@ -138,6 +146,70 @@ namespace sx
             private set;
         }
 
+#if false
+        // this is currentlly calculated from bits per pixel and ADU/electron
+        public double fullWellCapacity
+        {
+            get
+            {
+                double dReturn;
+
+                switch ((CameraModels)cameraModel)
+                {
+                    case CameraModels.MODEL_H5:
+                        dReturn = 30000;
+                        break;
+                    case CameraModels.MODEL_H5C:
+                        dReturn = 30000;
+                        break;
+                    case CameraModels.MODEL_H9:
+                        dReturn = 27000;
+                        break;
+                    case CameraModels.MODEL_H9C:
+                        dReturn = 27000;
+                        break;
+                    case CameraModels.MODEL_H16:
+                        dReturn = 40000;
+                        break;
+                    case CameraModels.MODEL_H35:
+                        dReturn = 50000;
+                        break;
+                    case CameraModels.MODEL_H36:
+                        dReturn = 30000;
+                        break;
+                    case CameraModels.MODEL_LX1:
+                        dReturn = 50000;
+                        break;
+                    case CameraModels.MODEL_M25C:
+                        dReturn = 25000;
+                        break;
+                    case CameraModels.MODEL_MX5:
+                        dReturn = 60000;
+                        break;
+                    case CameraModels.MODEL_MX5C:
+                        dReturn = 60000;
+                        break;
+                    case CameraModels.MODEL_MX7:
+                        dReturn = 70000;
+                        break;
+                    case CameraModels.MODEL_MX7C:
+                        dReturn = 70000;
+                        break;
+                    case CameraModels.MODEL_MX8C:
+                        dReturn = 10000;
+                        break;
+                    case CameraModels.MODEL_MX9:
+                        dReturn = 100000;
+                        break;
+                    default:
+                        throw new System.Exception("fullWellCapacity unknown for this camera model");
+                }
+
+                return dReturn;
+            }
+        }
+#endif
+
         public double electronsPerADU
         {
             get
@@ -146,14 +218,50 @@ namespace sx
 
                 switch ((CameraModels)cameraModel)
                 {
+                    case CameraModels.MODEL_H5:
+                        dReturn = 0.40;
+                        break;
+                    case CameraModels.MODEL_H5C:
+                        dReturn = 0.40;
+                        break;
                     case CameraModels.MODEL_H9:
                         dReturn = 0.45;
                         break;
                     case CameraModels.MODEL_H9C:
                         dReturn = 0.45;
                         break;
+                    case CameraModels.MODEL_H16:
+                        dReturn = 0.6;
+                        break;
+                    case CameraModels.MODEL_H35:
+                        dReturn = 0.9;
+                        break;
+                    case CameraModels.MODEL_H36:
+                        dReturn = 0.4;
+                        break;
+                    case CameraModels.MODEL_LX1:
+                        dReturn = 0.9;
+                        break;
                     case CameraModels.MODEL_M25C:
                         dReturn = 0.40;
+                        break;
+                    case CameraModels.MODEL_MX5:
+                        dReturn = 1.0;
+                        break;
+                    case CameraModels.MODEL_MX5C:
+                        dReturn = 1.0;
+                        break;
+                    case CameraModels.MODEL_MX7:
+                        dReturn = 1.3;
+                        break;
+                    case CameraModels.MODEL_MX7C:
+                        dReturn = 1.3;
+                        break;
+                    case CameraModels.MODEL_MX8C:
+                        dReturn = 1.0;
+                        break;
+                    case CameraModels.MODEL_MX9:
+                        dReturn = 2.0;
                         break;
                     default:
                         throw new System.Exception("ElectronsPerADU unknown for this camera model");
@@ -370,7 +478,7 @@ namespace sx
                         Int32 binnedWidth = currentExposure.userRequested.width / currentExposure.userRequested.x_bin;
                         Int32 binnedHeight = currentExposure.userRequested.height / currentExposure.userRequested.y_bin;
 
-                        if (idx == 0 && cameraModel == 0x59)
+                        if (idx == 0 && cameraModel == CameraModels.MODEL_M25C)
                         {
                             binnedWidth /= 2;
                             binnedHeight *= 2;
@@ -388,7 +496,7 @@ namespace sx
             }
         }
 
-        public Camera(Controller controller, UInt16 cameraIdx)
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested)
         {
             Log.Write(String.Format("sx.Camera() constructor: controller={0} cameraIdx={1}\n", controller, cameraIdx));
 
@@ -416,6 +524,7 @@ namespace sx
             buildReadDelayedBlock(out nextExposure, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
             imageDataValid = false;
             oImageDataLock = new object();
+            this.bAllowUntested = bAllowUntested;
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
          }
 
