@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using ASCOM.Helper;
 
@@ -12,10 +12,18 @@ namespace ASCOM.SXCamera
         private const string CONFIGURATION_SUBKEY = "Configuration";
 
         private const String ENABLE_UNTESTED = "EnableUntested";
+#if DEBUG
+        private const bool DEFAULT_ENABLE_UNTESTED = true;
+#else
         private const bool   DEFAULT_ENABLE_UNTESTED = false;
+#endif
 
         private const String ENABLE_LOGGING = "EnableLogging";
+#if DEBUG
         private const bool   DEFAULT_ENABLE_LOGGING = true;
+#else
+        private const bool   DEFAULT_ENABLE_LOGGING = false;
+#endif
 
         private const string LOG_FILE_NAME = "LogFileName";
         private string DEFAULT_LOG_FILE_NAME = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + "ascom-sx-camera.log";
