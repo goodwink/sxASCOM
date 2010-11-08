@@ -284,12 +284,12 @@ namespace ASCOM.SXCamera
             try { Process p = Process.Start(si); }
             catch (System.ComponentModel.Win32Exception)
             {
-                MessageBox.Show("The $safeprojectname$ was not " + (arg == "/register" ? "registered" : "unregistered") +
-                    " because you did not allow it.", "$safeprojectname$", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("The SXCamera was not " + (arg == "/register" ? "registered" : "unregistered") +
+                    " because you did not allow it.", "SXCamera", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), "$safeprojectname$", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show(ex.ToString(), "SXCamera", MessageBoxButtons.OK, MessageBoxIcon.Stop);
             }
             return;
         }
