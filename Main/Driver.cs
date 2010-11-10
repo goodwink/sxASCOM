@@ -63,45 +63,11 @@ namespace ASCOM.SXMain
 
                 if (F.ShowDialog() == DialogResult.OK)
                 {
-                    if (config.enableLogging != F.EnableLoggingCheckBox.Checked)
-                    {
-                        config.enableLogging = F.EnableLoggingCheckBox.Checked;
-#if false
-                        if (F.EnableLoggingCheckBox.Checked)
-                        {
-                            SaveFileDialog DebugOutputFileName = new SaveFileDialog();
-
-                            DebugOutputFileName.Title = "Log File Name";
-                            DebugOutputFileName.AddExtension = true;
-                            DebugOutputFileName.FileName = config.logFileName;
-                            DebugOutputFileName.InitialDirectory = ".";
-                            DebugOutputFileName.RestoreDirectory = true;
-                            DebugOutputFileName.CheckFileExists = false;
-                            DebugOutputFileName.DefaultExt = "log";
-                            DebugOutputFileName.Filter = "Log Files|*.log|All Files|*.*";
-
-                            if (DebugOutputFileName.ShowDialog() == DialogResult.OK)
-                            {
-                                config.logFileName = DebugOutputFileName.FileName;
-                            }
-                            else
-                            {
-                                MessageBox.Show("Logging disabled since no file was selected", "Logging Disabled");
-                                config.enableLogging = false;
-                            }
-                            DebugOutputFileName.Dispose();
-                        }
-#endif
-                    }
-
-                    if (config.enableUntested != F.EnableUntestedCheckBox.Checked)
-                    {
-                        config.enableUntested = F.EnableUntestedCheckBox.Checked;
-                    }
-                    if (config.secondsAreMilliseconds != F.secondsAreMiliseconds.Checked)
-                    {
-                        config.secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
-                    }
+                    Log.Write("ShowDialog returned OK - saving parameters\n");
+ 
+                    config.enableLogging = F.EnableLoggingCheckBox.Checked;
+                    config.enableUntested = F.EnableUntestedCheckBox.Checked;
+                    config.secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
                 }
             }
             catch (ASCOM.DriverException ex)

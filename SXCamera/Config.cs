@@ -137,7 +137,7 @@ namespace ASCOM.SXCamera
         public bool secondsAreMilliseconds
         {
             get { return GetBool(SECONDS_ARE_MILLISECONDS, DEFAULT_SECONDS_ARE_MILLISECONDS); }
-            set { SetString(ENABLE_LOGGING, value.ToString()); }
+            set { SetString(SECONDS_ARE_MILLISECONDS, value.ToString()); }
         }
 
         public string logFileName
