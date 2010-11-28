@@ -9,6 +9,13 @@ using Logging;
 namespace sx
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    internal struct SX_COOLER_BLOCK
+    {
+        internal UInt16 setPoint;
+        internal byte coolerEnabled;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     internal struct SX_READ_BLOCK
     {
         internal UInt16 x_offset;
@@ -103,6 +110,7 @@ namespace sx
         private object oImageDataLock;
         private UInt16 idx;
         private bool bAllowUntested;
+        private SX_COOLER_BLOCK m_coolerBlock;
 
         // Properties
 
@@ -525,6 +533,16 @@ namespace sx
             imageDataValid = false;
             oImageDataLock = new object();
             this.bAllowUntested = bAllowUntested;
+            if (hasCoolerControl)
+            {
+                SX_COOLER_BLOCK tempBlock;
+                // get the initial state of the cooler.  The only way to get the cooler values
+                // are to set them.  So we set them to 0, then set them right back
+                tempBlock.setPoint = 0;
+                tempBlock.coolerEnabled  = 0;
+                setCoolerInfo(ref tempBlock, out m_coolerBlock);
+                setCoolerInfo(ref m_coolerBlock, out tempBlock);
+            }
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
          }
 
@@ -772,9 +790,109 @@ namespace sx
                 bytes = controller.ReadBytes(Marshal.SizeOf(model), out numBytesRead);
             }
             Log.Write("getModel has unlocked\n");
+
             model = System.BitConverter.ToUInt16(bytes, 0);
 
             return model;
+        }
+
+        internal void setCoolerInfo(ref SX_COOLER_BLOCK inBlock, out SX_COOLER_BLOCK outBlock)
+        {
+            SX_CMD_BLOCK cmdBlock;
+            Int32 numBytesWritten, numBytesRead;
+            byte[] bytes = new byte[Marshal.SizeOf(inBlock)];
+
+            Log.Write(String.Format("setCoolerInfo inBlock temp={0} enabled={1}\n", inBlock.setPoint, inBlock.coolerEnabled));
+            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_COOLER_CONTROL, inBlock.setPoint, (UInt16)inBlock.coolerEnabled, 0);
+
+            lock (controller)
+            {
+                Log.Write("setCooler has locked\n");
+                controller.Write(cmdBlock, out numBytesWritten);
+
+                bytes = controller.ReadBytes(Marshal.SizeOf(inBlock), out numBytesRead);
+            }
+            Log.Write("setCooler has unlocked");
+
+            outBlock.setPoint = System.BitConverter.ToUInt16(bytes, 0);
+            outBlock.coolerEnabled = bytes[Marshal.SizeOf(outBlock.setPoint)];
+            Log.Write(String.Format("setCoolerInfo outBlock temp={0} enabled={1}\n", outBlock.setPoint, outBlock.coolerEnabled));
+        }
+
+        public UInt16 coolerTemp
+        {
+            get
+            {
+                if (hasCoolerControl)
+                {
+                    Log.Write(String.Format("coolerTemp returning {0}\n", m_coolerBlock.setPoint));
+                    return m_coolerBlock.setPoint;
+                }
+                else
+                {
+                    Log.Write("coolerTemp get(): called when not avaialable - throwing exception\n");
+                    throw new System.Exception("coolerTemp get(): Temperature not available");
+                }
+            }
+            set 
+            {
+                if (hasCoolerControl)
+                {
+                    SX_COOLER_BLOCK tempBlock;
+                    m_coolerBlock.setPoint = value;
+                    Log.Write(String.Format("setting cooler temperature to {0}\n", m_coolerBlock.setPoint));
+                    setCoolerInfo(ref m_coolerBlock, out tempBlock);
+                }
+                else
+                {
+                    Log.Write("coolerTemp set(): called when not available - throwing exception\n");
+                    throw new System.Exception("coolerTemp set(): Invalid attempt to control cooler");
+                }
+            }
+        }
+
+        public bool coolerEnabled
+        {
+            get
+            {
+                if (hasCoolerControl)
+                {
+                   Log.Write(String.Format("coolerEnabled get(): returning {0}\n", m_coolerBlock.coolerEnabled));
+                   return m_coolerBlock.coolerEnabled != 0;
+                }
+                else
+                {
+                    Log.Write("coolerEnabled get(): called when not available - throwing exception\n");
+                    throw new System.Exception("coolerEnabled get(): Invalid attempt to control cooler");
+                }
+            }
+            set 
+            {
+                if (hasCoolerControl)
+                {
+                    if (value)
+                    {
+                        m_coolerBlock.coolerEnabled = 1;
+                    }
+                    else
+                    {
+                        m_coolerBlock.coolerEnabled = 0;
+                    }
+                    SX_COOLER_BLOCK tempBlock;
+                    Log.Write(String.Format("setting coolerEnabled={0}\n", m_coolerBlock.coolerEnabled));
+                    setCoolerInfo(ref m_coolerBlock, out tempBlock);
+                }
+                else
+                {
+                    Log.Write("coolerEnabled set(): called when not available - throwing exception\n");
+                    throw new System.Exception("coolerEnabled() set: Invalid attempt to control cooler");
+                }
+            }
+        }
+
+        public bool hasCoolerControl
+        {
+            get { return (ccdParms.extra_capabilities & SXUSB_CAPS_COOLER) == SXUSB_CAPS_COOLER;}
         }
 
         void dumpParams(SX_CCD_PARAMS parms)

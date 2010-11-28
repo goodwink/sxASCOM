@@ -63,6 +63,7 @@ namespace ASCOM.SXGeneric
         protected bool bLastErrorValid;
         protected string lastErrorMessage;
         protected bool bHasGuideCamera;
+        protected bool bHasCoolerControl;
         protected ASCOM.SXCamera.Configuration config;
         // values that back properties: property foo is in m_foo
         private bool m_Connected;
@@ -125,7 +126,7 @@ namespace ASCOM.SXGeneric
             return errorMessage;
         }
 
-        private void verifyConnected(string caller)
+        protected void verifyConnected(string caller)
         {
             if (!Connected)
             {
@@ -516,39 +517,20 @@ namespace ASCOM.SXGeneric
         /// <summary>
         /// If True, the camera's cooler power setting can be read.
         /// </summary>
-        public bool CanGetCoolerPower
-        {
-            get
-            {
-                try
-                {
-                    Log.Write("CanGetCoolerPower get: false\n");
-
-                    verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                    return false;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns True if the camera can send autoguider pulses to the telescope mount; 
-        public abstract bool CanPulseGuide
+        public abstract bool CanGetCoolerPower
         {
             get;
         }
 
+        /// <summary>
+        /// Returns True if the camera can send autoguider pulses to the telescope mount; 
         /// False if not.  (Note: this does not provide any indication of whether the
         /// autoguider cable is actually connected.)
         /// </summary>
+        public abstract bool CanPulseGuide
+        {
+            get;
+        }
 
 
         /// <summary>
@@ -556,27 +538,9 @@ namespace ASCOM.SXGeneric
         /// either uses open-loop cooling or does not have the ability to adjust temperature
         /// from software, and setting the TemperatureSetpoint property has no effect.
         /// </summary>
-        public bool CanSetCCDTemperature
+        public abstract bool CanSetCCDTemperature
         {
-            get
-            {
-                try
-                {
-                    Log.Write("CanSetCCDTemperature get: false\n");
-
-                    verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                    return false;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+            get;
         }
 
         /// <summary>
@@ -719,46 +683,10 @@ namespace ASCOM.SXGeneric
         /// </summary>
         /// <exception cref=" System.Exception">not supported</exception>
         /// <exception cref=" System.Exception">an error condition such as link failure is present</exception>
-        public bool CoolerOn
+        public abstract bool CoolerOn
         {
-            get
-            {
-                try
-                {
-                    Log.Write("CoolerOn get: true\n");
-
-                    verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                    return true;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
-            set
-            {
-                try
-                {
-                    Log.Write("CoolerOn set to " + value + "\n");
-
-                    verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                    throw new ASCOM.PropertyNotImplementedException(SetError("CoolerOn is not supported"), true);
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -767,27 +695,9 @@ namespace ASCOM.SXGeneric
         /// </summary>
         /// <exception cref=" System.Exception">not supported</exception>
         /// <exception cref=" System.Exception">an error condition such as link failure is present</exception>
-        public double CoolerPower
+        public abstract double CoolerPower
         {
-            get 
-            {
-                try
-                {
-                    Log.Write("CoolerPower get returns hard coded 100\n");
-
-                    verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                    return 100;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+            get;
         }
 
         /// <summary>
@@ -1610,48 +1520,17 @@ namespace ASCOM.SXGeneric
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if command not successful.</exception>
         /// <exception cref=" System.Exception">Must throw exception if CanSetCCDTemperature is False.</exception>
-        public double SetCCDTemperature
+        public abstract double SetCCDTemperature
         {
-            get
-            {
-                try
-                {
-                    Log.Write("SetCCDTemperature get: will throw an exception\n");
-
-                    verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                    throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), false);
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
-            set
-            {
-                try
-                {
-                    Log.Write("SetCCDTemperature set: will throw an exception\n");
-
-                    verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                    throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), true);
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+            get;
+            set;
         }
 
+        /// <summary>
+        /// Launches a configuration dialog box for the driver.  The call will not return
+        /// until the user clicks OK or cancel manually.
+        /// </summary>
+        /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
         abstract public void SetupDialog();
  
         internal void hardwareCapture(double Duration, bool Light)

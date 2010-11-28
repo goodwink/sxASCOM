@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -248,12 +248,12 @@ namespace sx
 
         public Boolean hasGuideCamera
         {
-            get { return (ccdParms.extra_capabilities & INTEGRATED_GUIDER_CCD) == INTEGRATED_GUIDER_CCD; }
+            get { return (ccdParms.extra_capabilities & SXUSB_CAPS_GUIDER) == SXUSB_CAPS_GUIDER;}
         }
 
         public Boolean hasGuidePort
         {
-            get { return (ccdParms.extra_capabilities & STAR2000_PORT) == STAR2000_PORT; }
+            get { return (ccdParms.extra_capabilities & SXUSB_CAPS_STAR2K) == SXUSB_CAPS_STAR2K; }
         }
 
         public void guide(UInt16 direction, int durationMS)

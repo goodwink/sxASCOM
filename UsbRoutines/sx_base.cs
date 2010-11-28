@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
@@ -30,6 +30,7 @@ namespace sx
         internal const Byte SX_CMD_GET_SERIAL = 13;
         internal const Byte SX_CMD_CAMERA_MODEL = 14;
         internal const Byte SX_CMD_LOAD_EEPROM = 15;
+        internal const Byte SX_CMD_COOLER_CONTROL = 30;
 
         // flags
         internal const Byte SX_CCD_FLAGS_FIELD_ODD = 1;        // Specify odd field for MX cameras
@@ -52,10 +53,12 @@ namespace sx
         internal const Byte MAX_Y_BIN = MAX_BIN;
 
 
-        internal const Byte STAR2000_PORT = 0x1;
-        internal const Byte DEPRICATED_COMPRESSED_PIXEL_FORMAT = 0x2;
-        internal const Byte EEPROM = 0x4;
-        internal const Byte INTEGRATED_GUIDER_CCD = 0x8;
+        internal const Byte SXUSB_CAPS_STAR2K       = 0x01;
+        internal const Byte SXUSB_CAPS_COMPRESS     = 0x02;
+        internal const Byte SXUSB_CAPS_EEPROM       = 0x04;
+        internal const Byte SXUSB_CAPS_GUIDER       = 0x08;
+        internal const Byte SXUSB_CAPS_COOLER       = 0x10;
+        internal const Byte SXUSB_CAPS_SHUTTER      = 0x20;
 
         const UInt16 COLOR_MATRIX_PACKED_RGB         = 0x8000;
         const UInt16 COLOR_MATRIX_PACKED_BGR         = 0x4000;
