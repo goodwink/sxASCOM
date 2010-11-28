@@ -115,7 +115,7 @@ namespace ASCOM.SXMain
             {
                 try
                 {
-                    bool bReturn = sxCamera.hasCoolerControl;
+                    bool bReturn = sxCamera.hasCoolerControl && config.enableUntested;
 
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
@@ -151,7 +151,7 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (!sxCamera.hasCoolerControl)
+                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
                     {
                         throw new ASCOM.PropertyNotImplementedException(SetError("CoolerOn get is not supported"), true);
                     }
@@ -177,7 +177,7 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (!sxCamera.hasCoolerControl)
+                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
                     {
                         throw new ASCOM.PropertyNotImplementedException(SetError("CoolerOn set is not supported"), true);
                     }
@@ -240,7 +240,7 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (!sxCamera.hasCoolerControl)
+                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
                     {
                         throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature get: must throw exception if CanSetCCDTemperature is False."), false);
                     }
@@ -266,7 +266,7 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (!sxCamera.hasCoolerControl)
+                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
                     {
                         throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature set: must throw exception if CanSetCCDTemperature is False."), false);
                     }

@@ -105,10 +105,10 @@ namespace ASCOM.SXMain
             this.EnableUntestedCheckBox.AutoSize = true;
             this.EnableUntestedCheckBox.Location = new System.Drawing.Point(15, 155);
             this.EnableUntestedCheckBox.Name = "EnableUntestedCheckBox";
-            this.EnableUntestedCheckBox.Size = new System.Drawing.Size(149, 17);
+            this.EnableUntestedCheckBox.Size = new System.Drawing.Size(195, 17);
             this.EnableUntestedCheckBox.TabIndex = 5;
-            this.EnableUntestedCheckBox.Text = "Enable Untested Cameras";
-            this.toolTip1.SetToolTip(this.EnableUntestedCheckBox, "Attempt to control untested cameras.");
+            this.EnableUntestedCheckBox.Text = "Enable Untested Cameras/Features";
+            this.toolTip1.SetToolTip(this.EnableUntestedCheckBox, "Allowed untested features and untested cameras to be used.");
             this.EnableUntestedCheckBox.UseVisualStyleBackColor = true;
             // 
             // Version
