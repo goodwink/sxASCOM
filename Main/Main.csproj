@@ -177,7 +177,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>mkdir "$(SolutionDir)SXCamera\SXCameraServedClasses\$(TargetName).dll"
+    <PostBuildEvent>mkdir "$(SolutionDir)SXCamera\SXCameraServedClasses"
 copy "$(TargetPath)" "$(SolutionDir)SXCamera\SXCameraServedClasses\$(TargetName).dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>
