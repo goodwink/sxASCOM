@@ -59,6 +59,9 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedVersionNumber.cs">
+      <Link>SharedVersionNumber.cs</Link>
+    </Compile>
     <Compile Include="ClassFactory.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="frmMain.cs">

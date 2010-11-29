@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedVersionNumber.cs">
+      <Link>SharedVersionNumber.cs</Link>
+    </Compile>
     <Compile Include="Acknowlegements.cs" />
     <Compile Include="DeviceManagement.cs" />
     <Compile Include="DeviceManagementApi.cs" />
