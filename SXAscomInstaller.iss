@@ -6,6 +6,7 @@
 #define BUILD_TYPE "Release"
 #define APP_VERSION "1.3.2"
 #define ASCOM_VERSION_REQUIRED  "5.5"
+
 [Setup]
 AppName=ASCOM SX Camera Driver
 AppVerName=ASCOM SX Camera Driver {#APP_VERSION}
@@ -14,13 +15,13 @@ AppPublisherURL=http://www.daddog.com/ascom/sx/index.html
 AppVersion={#APP_VERSION}
 AppSupportURL=http://tech.groups.yahoo.com/group/ASCOM-Talk/
 AppUpdatesURL=http://ascom-standards.org/
-VersionInfoVersion=1.0.0
+VersionInfoVersion="{#APP_VERSION}"
 MinVersion=0,5.0.2195sp4
 DefaultDirName="{cf}\ASCOM\Camera"
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 OutputDir="."
-OutputBaseFilename="SXAscomInstaller"
+OutputBaseFilename="SXAscomInstaller-{#APP_VERSION}"
 Compression=lzma
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
