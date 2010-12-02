@@ -1,59 +1,41 @@
 Copyright (C) 2010 by Dad Dog Development Ltd.
 
-This is the README for the ASCOM driver for Starlight Express cameras.
+What's new for Version 1.3.2:
 
-     This driver was not written by, authorized by, sanctioned by, or any
-     other ... by Starlight Express.  It was independently developed 
-     from the developer documentation available from the SX website. I had
-     a couple of email exchanges with Terry Platt, but that is the extent
-     of SX involvement.  Please do not make them regret providing 
-     developer documentation by asking questions or complaining about 
-     problems to SX.
+    Fix a Datetime parsing in non US locales (2010-12-01 20:26:45 -0700 by Bret McKee <bretm@boneheads.us>)
+    Added more logging in some exception paths (2010-12-01 20:15:30 -0700 by Bret McKee <bretm@boneheads.us>)
+    Added version number to installer executable (2010-11-28 19:56:44 -0700 by Bret McKee <bretm@boneheads.us>)
+    Fix an error in a path name (2010-11-28 19:36:18 -0700 by Bret McKee <bretm@boneheads.us>)
+    Changed to common version numbers (2010-11-28 18:18:43 -0700 by Bret McKee <bretm@boneheads.us>)
+    Installer script changes for Release version (2010-11-28 16:55:16 -0700 by Bret McKee <bretm@boneheads.us>)
+    Moved support for sx cooler under untested (2010-11-28 16:01:56 -0700 by Bret McKee <bretm@boneheads.us>)
+    Initial attempt at adding regulated cooler support (2010-11-27 22:40:25 -0700 by Bret McKee <bretm@boneheads.us>)
+    Improved the handling of config parameters (2010-11-09 21:13:51 -0700 by Bret McKee <bretm@boneheads.us>)
+    Change build file post build action (2010-11-07 23:24:13 -0700 by Bret McKee <bretm@boneheads.us>)
+    Fixed a couple issues with the port (2010-11-07 23:23:47 -0700 by Bret McKee <bretm@boneheads.us>)
+    Ported template code that does privilege elevation (2010-10-30 23:44:14 -0600 by Bret McKee <bretm@boneheads.us>)
+    Went through the driver "todo" items (2010-10-30 22:23:19 -0600 by Bret McKee <bretm@boneheads.us>)
+    Added #if DEBUG to change some setup defaults (2010-10-30 22:21:46 -0600 by Bret McKee <bretm@boneheads.us>)
+    Added tooltips to the setup dialog (2010-10-30 22:21:04 -0600 by Bret McKee <bretm@boneheads.us>)
+    Added electrons/ADU data for more cameras (2010-10-30 22:18:33 -0600 by Bret McKee <bretm@boneheads.us>)
+    Added camera type values + more H9 information (2010-10-23 17:07:26 -0600 by Bret McKee <bretm@boneheads.us>)
+    Fix a typo, changing MX25C to M25C (2010-10-23 16:15:18 -0600 by Bret McKee <bretm@boneheads.us>)
 
-I am moving from DSLR imaging to CCD imaging, and am a professional software 
-developer. I discovered that my two favorite imaging apps (PHD and
-Images Plus) would not work with my new SX camera.  I also had some truely
-lousy weather, and since it was a "simple matter of programming" to make them
-work with my camera, I wrote this driver.
+There is experimental support for SXVR camera coolers.  Because I cannot test the cooler code (since my camera is an SXVF 
+model), cooler support is disabled by default.  If you would like to try cooler support, make sure that you have selected
+the "Enable untested Cameras/Features" checkbox.
 
-This is an BETA release.  That means it isn't quite ready for prime time.  I'm 
-releasing it in the hopes of learning more about how it works with various
-SX cameras and guiders. 
-
-I have acquired several night's worth of images with it, with PHD taking
-a guider exposure every 2 seconds and the main camera taking 4 minutes 
-exposures.  I've not seen any crash issues for some time. 
+This code is an Release Candidate.  That means that it needs a bit more
+testing before being released, but there are currently no known issues
+when the "Enable untested Cameras/Features" checkbox is not selected.
 
 PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER until you have
 tried it during the daylight first. 
-
-I have am SXVF-M25C and the older style 8 bit guide camera, and I managed to 
-borrow a friend's SXF-H9c.  It seems to work with all of them. 
 
 If you are willing to help by loading the driver, and 
 seeing if it works with your camera and guider (if you have one), I'd 
 like to know the results. If it doesn't work, it can create a log file 
 which might help me fix it.
-
-Expected To Work:
-- SXVF-MX25C
-- SXF-H9C
-- SX 8-bit Guide Camera
-- Simultanious use of both cameras by seperate software products
-- Autoguider port - if a guide camera is attached, the guide port shows up
-  as attached to it.  If not, it is attached to the main camera.
-
-Will probably work:
-- other SX cameras
-- SX 16 bit guide camera
-
-Known Limitations/things that don't work:
-
-- There is no support for SXVR cooler features since I don't have a camera
-  which provides these features, and because there is no documentation for 
-  those features on the SX website
-- serial ports - I don't have the serial box, and if I did it would require 
-  writing virtual serial drivers for my telescope to take advantage of them
 
 How can you help?
 
@@ -65,21 +47,6 @@ camera connected, and send me the output.
 If your camera doesn't seem to work correctly, please check the "Enable Logging" option on the properties page.  
 This will create a file named ascom-sx-camera.log on your desktop.  Email me this file along with your 
 camera model.
-
-Disclaimer:
-
-In the interest of full disclosure, I want to make something perfectly
-clear.  I'm a hobbiest, and I'd rather be imaging than writing software. 
-
-Assuming I get the driver working well enough that I can use it for my imaging
-needs, any other work I do on it will be taking time away from some other part
-of my life.  
-
-I hope to get the driver working for a broad range of cameras,
-but supporting cameras that I don't own and can't test on will be a non-trivial 
-undertaking.  If doing so turns out to take a huge amount of time, I might 
-abandon the effort or request donations. If that would offend you, please don't use 
-this software.
 
 The driver is licensed under the Creative Commons Attribution-No Derivative 
 Works 3.0 License.  A copy can be found in the file CreativeCommons.html, or it 
