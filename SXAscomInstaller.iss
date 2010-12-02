@@ -21,7 +21,7 @@ DefaultDirName="{cf}\ASCOM\Camera"
 DisableDirPage=yes
 DisableProgramGroupPage=yes
 OutputDir="."
-OutputBaseFilename="SXAscomInstaller-{#APP_VERSION}"
+OutputBaseFilename="SXAscomInstaller-v{#APP_VERSION}"
 Compression=lzma
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
