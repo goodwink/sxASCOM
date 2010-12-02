@@ -102,10 +102,7 @@ namespace ASCOM.SXGeneric
             }
             catch (Exception ex)
             {
-                String msg = String.Format("Camera constructor caught exception {0}\n", ex.ToString());
-
-                Log.Write(msg);
-                throw new ASCOM.DriverException(msg, ex);
+                throw new ASCOM.DriverException(SetError(String.Format("Camera constructor caught exception {0}\n", ex.ToString())), ex);
             }
         }
         #endregion
@@ -668,7 +665,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (Exception ex)
                 {
-                    throw new ASCOM.DriverException("Camera::connected set caught an exception: " + ex.ToString(), ex);
+                    throw new ASCOM.DriverException(SetError("Camera::connected set caught an exception: " + ex.ToString()), ex);
                 }
 
             }
@@ -774,7 +771,7 @@ namespace ASCOM.SXGeneric
                 catch (Exception ex)
                 {
                     Log.Write("ElectronsPerADU: value not known\n");
-                    throw new ASCOM.PropertyNotImplementedException(String.Format("ElectronsPerADU Must throw exception if data unavailable."), false, ex);
+                    throw new ASCOM.PropertyNotImplementedException(SetError(String.Format("ElectronsPerADU Must throw exception if data unavailable.")), false, ex);
                 }
             }
         }
