@@ -151,6 +151,7 @@ namespace sx
             Int32 numBytesWritten, numBytesRead;
             string s2;
 
+            log.Write(String.Format("echo({0}) begins\n", s);
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_ECHO, 0, 0, (UInt16)s.Length);
 
             lock (this)
@@ -165,15 +166,17 @@ namespace sx
             {
                 throw new System.IO.IOException(String.Format("Echo: s2 != s ({0} != {1})", s2, s));
             }
+            log.Write("echo() completed successfully");
         }
 
-         public void reset()
+        public void reset()
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
 
-            buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_RESET, 0, 0, 0);
+            Log.Write("resetting()\n");
 
+            buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_RESET, 0, 0, 0);
             Write(cmdBlock, out numBytesWritten);
         }
 
@@ -197,6 +200,8 @@ namespace sx
 
             ver = System.BitConverter.ToUInt32(bytes, 0);
 
+            Log.Write(String.Format("getVersion() returns {0}\n", ver));
+
             return ver;
         }
 
@@ -204,6 +209,8 @@ namespace sx
         {
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten, numBytesRead;
+
+            Log.Write("gettings params\n");
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_GET_CCD_PARMS, 0, 0, 0);
 

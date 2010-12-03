@@ -897,7 +897,7 @@ namespace sx
 
         void dumpParams(SX_CCD_PARAMS parms)
         {
-            Log.Write(String.Format("params:"));
+            Log.Write(String.Format("params:\n"));
             Log.Write(String.Format("\thfront_porch={0:d}, hback_porch={1:d}\n", parms.hfront_porch, parms.hback_porch));
             Log.Write(String.Format("\tvfront_porch={0:d}, vback_porch={1:d}\n", parms.vfront_porch, parms.vback_porch));
             Log.Write(String.Format("\twidth={0:d}, height={1:d}\n", parms.width, parms.height));
