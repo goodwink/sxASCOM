@@ -290,26 +290,9 @@ namespace ASCOM.SXGeneric
         /// CanControlTemperature is True.
         /// </summary>
         /// <exception>Must throw exception if data unavailable.</exception>
-        public double CCDTemperature
+        abstract public double CCDTemperature
         {
-            get
-            {
-                try
-                {
-                    Log.Write("CCDTemperature: will throw excpetion\n");
-
-                    verifyConnected(MethodBase.GetCurrentMethod().Name);
-                    throw new ASCOM.PropertyNotImplementedException(SetError("CCDTemperature: must throw exception if data unavailable"), false);
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+            get;
         }
 
         /// <summary>
@@ -514,7 +497,7 @@ namespace ASCOM.SXGeneric
         /// <summary>
         /// If True, the camera's cooler power setting can be read.
         /// </summary>
-        public abstract bool CanGetCoolerPower
+        abstract public bool CanGetCoolerPower
         {
             get;
         }
@@ -524,7 +507,7 @@ namespace ASCOM.SXGeneric
         /// False if not.  (Note: this does not provide any indication of whether the
         /// autoguider cable is actually connected.)
         /// </summary>
-        public abstract bool CanPulseGuide
+        abstract public bool CanPulseGuide
         {
             get;
         }
@@ -535,7 +518,7 @@ namespace ASCOM.SXGeneric
         /// either uses open-loop cooling or does not have the ability to adjust temperature
         /// from software, and setting the TemperatureSetpoint property has no effect.
         /// </summary>
-        public abstract bool CanSetCCDTemperature
+        abstract public bool CanSetCCDTemperature
         {
             get;
         }
@@ -680,7 +663,7 @@ namespace ASCOM.SXGeneric
         /// </summary>
         /// <exception cref=" System.Exception">not supported</exception>
         /// <exception cref=" System.Exception">an error condition such as link failure is present</exception>
-        public abstract bool CoolerOn
+        abstract public bool CoolerOn
         {
             get;
             set;
@@ -692,7 +675,7 @@ namespace ASCOM.SXGeneric
         /// </summary>
         /// <exception cref=" System.Exception">not supported</exception>
         /// <exception cref=" System.Exception">an error condition such as link failure is present</exception>
-        public abstract double CoolerPower
+        abstract public double CoolerPower
         {
             get;
         }
@@ -837,27 +820,9 @@ namespace ASCOM.SXGeneric
         /// manufacturers) in degrees Celsius. Only valid if CanControlTemperature is True.
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if data unavailable.</exception>
-        public double HeatSinkTemperature
+        abstract public double HeatSinkTemperature
         {
-            get
-            { 
-                try
-                {
-                    Log.Write("HeatSinkTemperature get will throw an exception\n");
-
-                    verifyConnected(MethodBase.GetCurrentMethod().Name);
-
-                    throw new ASCOM.PropertyNotImplementedException(SetError("HeatSinkTemperature must throw exception if data unavailable"), true);
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+            get;
         }
 
         /// <summary>
@@ -1517,7 +1482,7 @@ namespace ASCOM.SXGeneric
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if command not successful.</exception>
         /// <exception cref=" System.Exception">Must throw exception if CanSetCCDTemperature is False.</exception>
-        public abstract double SetCCDTemperature
+        abstract public double SetCCDTemperature
         {
             get;
             set;

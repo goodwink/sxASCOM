@@ -42,12 +42,39 @@ namespace ASCOM.SXGuide
         }
 
         /// <summary>
+        /// Returns the current CCD temperature in degrees Celsius. Only valid if
+        /// CanControlTemperature is True.
+        /// </summary>
+        /// <exception>Must throw exception if data unavailable.</exception>
+        override public double CCDTemperature
+        {
+            get
+            {
+                try
+                {
+                    Log.Write("CCDTemperature: will throw excpetion\n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    throw new ASCOM.PropertyNotImplementedException(SetError("CCDTemperature: must throw exception if data unavailable"), false);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns a description of the camera model, such as manufacturer and model
         /// number. Any ASCII characters may be used. The string shall not exceed 68
         /// characters (for compatibility with FITS headers).
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if description unavailable</exception>
-        public override string Description
+        override public string Description
         {
             get
             {
@@ -71,7 +98,7 @@ namespace ASCOM.SXGuide
         /// <summary>
         /// If True, the camera's cooler power setting can be read.
         /// </summary>
-        public override bool CanGetCoolerPower
+        override public bool CanGetCoolerPower
         {
             get
             {
@@ -113,7 +140,7 @@ namespace ASCOM.SXGuide
         /// <param name="Duration">Duration of guide in milliseconds</param>
         /// <exception cref=" System.Exception">PulseGuide command is unsupported</exception>
         /// <exception cref=" System.Exception">PulseGuide command is unsuccessful</exception>
-        public override bool CanPulseGuide
+        override public bool CanPulseGuide
         {
             get
             {
@@ -146,7 +173,7 @@ namespace ASCOM.SXGuide
         /// either uses open-loop cooling or does not have the ability to adjust temperature
         /// from software, and setting the TemperatureSetpoint property has no effect.
         /// </summary>
-        public override bool CanSetCCDTemperature
+        override public bool CanSetCCDTemperature
         {
             get
             {
@@ -178,7 +205,7 @@ namespace ASCOM.SXGuide
         /// </summary>
         /// <exception cref=" System.Exception">not supported</exception>
         /// <exception cref=" System.Exception">an error condition such as link failure is present</exception>
-        public override bool CoolerOn
+        override public bool CoolerOn
         {
             get
             {
@@ -226,7 +253,7 @@ namespace ASCOM.SXGuide
         /// </summary>
         /// <exception cref=" System.Exception">not supported</exception>
         /// <exception cref=" System.Exception">an error condition such as link failure is present</exception>
-        public override double CoolerPower
+        override public double CoolerPower
         {
             get 
             {
@@ -250,6 +277,34 @@ namespace ASCOM.SXGuide
         }
 
         /// <summary>
+        /// Returns the current heat sink temperature (called "ambient temperature" by some
+        /// manufacturers) in degrees Celsius. Only valid if CanControlTemperature is True.
+        /// </summary>
+        /// <exception cref=" System.Exception">Must throw exception if data unavailable.</exception>
+        override public double HeatSinkTemperature
+        {
+            get
+            { 
+                try
+                {
+                    Log.Write("HeatSinkTemperature get will throw an exception\n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    throw new ASCOM.PropertyNotImplementedException(SetError("HeatSinkTemperature must throw exception if data unavailable"), true);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
+            }
+        }
+
+        /// <summary>
         /// Sets the camera cooler setpoint in degrees Celsius, and returns the current
         /// setpoint.
         /// Note:  camera hardware and/or driver should perform cooler ramping, to prevent
@@ -257,7 +312,7 @@ namespace ASCOM.SXGuide
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if command not successful.</exception>
         /// <exception cref=" System.Exception">Must throw exception if CanSetCCDTemperature is False.</exception>
-        public override double SetCCDTemperature
+        override public double SetCCDTemperature
         {
             get
             {
@@ -304,7 +359,7 @@ namespace ASCOM.SXGuide
         /// until the user clicks OK or cancel manually.
         /// </summary>
         /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
-        public override void SetupDialog()
+        override public void SetupDialog()
         {
             try
             {
@@ -328,7 +383,7 @@ namespace ASCOM.SXGuide
         /// <exception cref=" System.Exception">NumX, NumY, XBin, YBin, StartX, StartY, or Duration parameters are invalid.</exception>
         /// <exception cref=" System.Exception">CanAsymmetricBin is False and BinX != BinY</exception>
         /// <exception cref=" System.Exception">the exposure cannot be started for any reason, such as a hardware or communications error</exception>
-        public override void StartExposure(double Duration, bool Light)
+        override public void StartExposure(double Duration, bool Light)
         {
             try
             {

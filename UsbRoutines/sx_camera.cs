@@ -812,7 +812,7 @@ namespace sx
 
                 bytes = controller.ReadBytes(Marshal.SizeOf(inBlock), out numBytesRead);
             }
-            Log.Write("setCooler has unlocked");
+            Log.Write("setCooler has unlocked\n");
 
             outBlock.setPoint = System.BitConverter.ToUInt16(bytes, 0);
             outBlock.coolerEnabled = bytes[Marshal.SizeOf(outBlock.setPoint)];

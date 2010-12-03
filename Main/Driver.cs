@@ -38,15 +38,52 @@ namespace ASCOM.SXMain
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {
+        internal double m_coolerTemp;
+
         public Camera() :
             base(0, "Main")
         {
+            m_coolerTemp = 100;
+        }
+
+        /// <summary>
+        /// Returns the current CCD temperature in degrees Celsius. Only valid if
+        /// CanControlTemperature is True.
+        /// </summary>
+        /// <exception>Must throw exception if data unavailable.</exception>
+        override public double CCDTemperature
+        {
+            get
+            {
+                try
+                {
+                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
+                    {
+                        Log.Write("CCDTemperature get: will throw excpetion\n");
+
+                        verifyConnected(MethodBase.GetCurrentMethod().Name);
+                        throw new ASCOM.PropertyNotImplementedException(SetError("CCDTemperature get: must throw exception if data unavailable"), false);
+                    }
+
+                    Log.Write(String.Format("CCDTemperature get: returns {0}\n", m_coolerTemp));
+
+                    return m_coolerTemp;
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
+            }
         }
 
         /// <summary>
         /// If True, the camera's cooler power setting can be read.
         /// </summary>
-        public override bool CanGetCoolerPower
+        override public bool CanGetCoolerPower
         {
             get
             {
@@ -74,7 +111,7 @@ namespace ASCOM.SXMain
         /// False if not.  (Note: this does not provide any indication of whether the
         /// autoguider cable is actually connected.)
         /// </summary>
-        public override bool CanPulseGuide
+        override public bool CanPulseGuide
         {
             get
             {
@@ -109,7 +146,7 @@ namespace ASCOM.SXMain
         /// either uses open-loop cooling or does not have the ability to adjust temperature
         /// from software, and setting the TemperatureSetpoint property has no effect.
         /// </summary>
-        public override bool CanSetCCDTemperature
+        override public bool CanSetCCDTemperature
         {
             get
             {
@@ -143,7 +180,7 @@ namespace ASCOM.SXMain
         /// </summary>
         /// <exception cref=" System.Exception">not supported</exception>
         /// <exception cref=" System.Exception">an error condition such as link failure is present</exception>
-        public override bool CoolerOn
+        override public bool CoolerOn
         {
             get
             {
@@ -204,7 +241,7 @@ namespace ASCOM.SXMain
         /// </summary>
         /// <exception cref=" System.Exception">not supported</exception>
         /// <exception cref=" System.Exception">an error condition such as link failure is present</exception>
-        public override double CoolerPower
+        override public double CoolerPower
         {
             get 
             {
@@ -225,6 +262,34 @@ namespace ASCOM.SXMain
         }
 
         /// <summary>
+        /// Returns the current heat sink temperature (called "ambient temperature" by some
+        /// manufacturers) in degrees Celsius. Only valid if CanControlTemperature is True.
+        /// </summary>
+        /// <exception cref=" System.Exception">Must throw exception if data unavailable.</exception>
+        override public double HeatSinkTemperature
+        {
+            get
+            { 
+                try
+                {
+                    Log.Write("HeatSinkTemperature get will throw an exception\n");
+
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    throw new ASCOM.PropertyNotImplementedException(SetError("HeatSinkTemperature must throw exception if data unavailable"), true);
+                }
+                catch (ASCOM.DriverException ex)
+                {
+                    throw ex;
+                }
+                catch (System.Exception ex)
+                {
+                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                }
+            }
+        }
+
+        /// <summary>
         /// Sets the camera cooler setpoint in degrees Celsius, and returns the current
         /// setpoint.
         /// Note:  camera hardware and/or driver should perform cooler ramping, to prevent
@@ -232,7 +297,7 @@ namespace ASCOM.SXMain
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if command not successful.</exception>
         /// <exception cref=" System.Exception">Must throw exception if CanSetCCDTemperature is False.</exception>
-        public override double SetCCDTemperature
+        override public double SetCCDTemperature
         {
             get
             {
@@ -245,11 +310,9 @@ namespace ASCOM.SXMain
                         throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature get: must throw exception if CanSetCCDTemperature is False."), false);
                     }
 
-                    double dReturn = sxCamera.coolerTemp/10 - 273.2;
+                    Log.Write(String.Format("SetCCDTemperature get returns {0}\n", m_coolerTemp));
 
-                    Log.Write(String.Format("SetCCDTemperature get returns {0}\n", dReturn));
-
-                    return dReturn;
+                    return m_coolerTemp;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -273,7 +336,8 @@ namespace ASCOM.SXMain
 
                     Log.Write(String.Format("SetCCDTemperature set to {0}\n", value));
 
-                    sxCamera.coolerTemp = (UInt16) ((value * 10) + 2732);
+                    m_coolerTemp = value;
+                    sxCamera.coolerTemp = (UInt16) ((m_coolerTemp * 10) + 2732);
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -291,7 +355,7 @@ namespace ASCOM.SXMain
         /// until the user clicks OK or cancel manually.
         /// </summary>
         /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
-        public override void SetupDialog()
+        override public void SetupDialog()
         {
             try
             {
