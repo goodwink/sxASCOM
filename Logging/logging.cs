@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace Logging
 {
     public class Log
     {
-        private static string logPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + "ascom-sx-camera.log";
+        private static string logPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + "ascom-sx-camera-log.txt";
         private static FileStream logFS = null;
         private static DateTime lastWriteTime;
 
