@@ -52,8 +52,6 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
-                    Log.Write("CCDTemperature: will throw excpetion\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
                     throw new ASCOM.PropertyNotImplementedException(SetError("CCDTemperature: must throw exception if data unavailable"), false);
                 }
@@ -122,24 +120,10 @@ namespace ASCOM.SXGuide
         }
 
         /// <summary>
-        /// This method returns only after the move has completed.
-        ///
-        /// symbolic Constants
-        /// The (symbolic) values for GuideDirections are:
-        /// Constant     Value      Description
-        /// --------     -----      -----------
-        /// guideNorth     0        North (+ declination/elevation)
-        /// guideSouth     1        South (- declination/elevation)
-        /// guideEast      2        East (+ right ascension/azimuth)
-        /// guideWest      3        West (+ right ascension/azimuth)
-        ///
-        /// Note: directions are nominal and may depend on exact mount wiring.  guideNorth
-        /// must be opposite guideSouth, and guideEast must be opposite guideWest.
+        /// Returns True if the camera can send autoguider pulses to the telescope mount; 
+        /// False if not.  (Note: this does not provide any indication of whether the
+        /// autoguider cable is actually connected.)
         /// </summary>
-        /// <param name="Direction">Direction of guide command</param>
-        /// <param name="Duration">Duration of guide in milliseconds</param>
-        /// <exception cref=" System.Exception">PulseGuide command is unsupported</exception>
-        /// <exception cref=" System.Exception">PulseGuide command is unsuccessful</exception>
         override public bool CanPulseGuide
         {
             get

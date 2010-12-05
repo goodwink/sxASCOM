@@ -38,12 +38,9 @@ namespace ASCOM.SXMain
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {
-        internal double m_coolerTemp;
-
         public Camera() :
             base(0, "Main")
         {
-            m_coolerTemp = 100;
         }
 
         /// <summary>
@@ -57,17 +54,18 @@ namespace ASCOM.SXMain
             {
                 try
                 {
-                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
-                    {
-                        Log.Write("CCDTemperature get: will throw excpetion\n");
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                        verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    if (!CanSetCCDTemperature)
+                    {
                         throw new ASCOM.PropertyNotImplementedException(SetError("CCDTemperature get: must throw exception if data unavailable"), false);
                     }
 
-                    Log.Write(String.Format("CCDTemperature get: returns {0}\n", m_coolerTemp));
+                    double dReturn =  ((double)(sxCamera.coolerTemp - 2732)) / 10;
 
-                    return m_coolerTemp;
+                    Log.Write(String.Format("CCDTemperature get: returns {0}\n", dReturn));
+
+                    return dReturn;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -89,9 +87,9 @@ namespace ASCOM.SXMain
             {
                 try
                 {
-                    Log.Write("CanGetCoolerPower get: false\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("CanGetCoolerPower get: false\n");
 
                     return false;
                 }
@@ -152,9 +150,9 @@ namespace ASCOM.SXMain
             {
                 try
                 {
-                    bool bReturn = sxCamera.hasCoolerControl && config.enableUntested;
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    bool bReturn = sxCamera.hasCoolerControl && config.enableUntested;
 
                     Log.Write(String.Format("CanSetCCDTemperature get: {0}\n", bReturn));
 
@@ -188,7 +186,7 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
+                    if (!CanSetCCDTemperature)
                     {
                         throw new ASCOM.PropertyNotImplementedException(SetError("CoolerOn get is not supported"), true);
                     }
@@ -214,7 +212,7 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
+                    if (!CanSetCCDTemperature)
                     {
                         throw new ASCOM.PropertyNotImplementedException(SetError("CoolerOn set is not supported"), true);
                     }
@@ -222,7 +220,6 @@ namespace ASCOM.SXMain
                     Log.Write("CoolerOn set to " + value + "\n");
 
                     sxCamera.coolerEnabled = value;
-
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -272,8 +269,6 @@ namespace ASCOM.SXMain
             { 
                 try
                 {
-                    Log.Write("HeatSinkTemperature get will throw an exception\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     throw new ASCOM.PropertyNotImplementedException(SetError("HeatSinkTemperature must throw exception if data unavailable"), true);
@@ -305,14 +300,16 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
+                    if (!CanSetCCDTemperature)
                     {
                         throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature get: must throw exception if CanSetCCDTemperature is False."), false);
                     }
 
-                    Log.Write(String.Format("SetCCDTemperature get returns {0}\n", m_coolerTemp));
+                    double dReturn =  ((double)(sxCamera.coolerSetPoint - 2732)) / 10;
 
-                    return m_coolerTemp;
+                    Log.Write(String.Format("SetCCDTemperature get returns {0}\n", dReturn));
+
+                    return dReturn;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -329,15 +326,14 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (!(sxCamera.hasCoolerControl && config.enableUntested))
+                    if (!CanSetCCDTemperature)
                     {
                         throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature set: must throw exception if CanSetCCDTemperature is False."), false);
                     }
 
                     Log.Write(String.Format("SetCCDTemperature set to {0}\n", value));
 
-                    m_coolerTemp = value;
-                    sxCamera.coolerTemp = (UInt16) ((m_coolerTemp * 10) + 2732);
+                    sxCamera.coolerSetPoint = (UInt16) ((value * 10) + 2732);
                 }
                 catch (ASCOM.DriverException ex)
                 {

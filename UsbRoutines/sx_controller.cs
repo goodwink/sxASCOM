@@ -151,7 +151,7 @@ namespace sx
             Int32 numBytesWritten, numBytesRead;
             string s2;
 
-            log.Write(String.Format("echo({0}) begins\n", s);
+            Log.Write(String.Format("echo({0}) begins\n", s));
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_ECHO, 0, 0, (UInt16)s.Length);
 
             lock (this)
@@ -166,7 +166,7 @@ namespace sx
             {
                 throw new System.IO.IOException(String.Format("Echo: s2 != s ({0} != {1})", s2, s));
             }
-            log.Write("echo() completed successfully");
+            Log.Write("echo() completed successfully");
         }
 
         public void reset()

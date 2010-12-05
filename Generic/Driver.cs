@@ -63,7 +63,6 @@ namespace ASCOM.SXGeneric
         protected bool bLastErrorValid;
         protected string lastErrorMessage;
         protected bool bHasGuideCamera;
-        protected bool bHasCoolerControl;
         protected ASCOM.SXCamera.Configuration config;
         // values that back properties: property foo is in m_foo
         private bool m_Connected;
