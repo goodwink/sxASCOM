@@ -109,44 +109,9 @@ namespace sx
         private bool imageDataValid;
         private object oImageDataLock;
         private UInt16 idx;
-        private bool bAllowUntested;
         private SX_COOLER_BLOCK m_coolerBlock;
 
         // Properties
-
-        public string description
-        {
-            get
-            {
-                string ret;
-
-                switch ((CameraModels)cameraModel)
-                {
-                    case CameraModels.MODEL_H9:
-                        ret = "H9";
-                        break;
-                    case CameraModels.MODEL_H9C:
-                        ret = "H9C";
-                        break;
-                    case CameraModels.MODEL_M25C:
-                        ret = "M25C";
-                        break;
-                    default:
-                        if (bAllowUntested)
-                        {
-                            ret = String.Format("unknown (and untested) 0x%x", cameraModel);
-                        }
-                        else
-                        {
-                            throw new System.Exception("ElectronsPerADU unknown for this camera model");
-                        }
-                        break;
-                }
-
-                Log.Write("getDescription() returns " + ret + "\n");
-                return ret;
-            }
-        }
 
         public UInt16 cameraModel
         {
@@ -154,129 +119,28 @@ namespace sx
             private set;
         }
 
-#if false
-        // this is currentlly calculated from bits per pixel and ADU/electron
+        public string description
+        {
+            get;
+            internal set;
+        }
+
         public double fullWellCapacity
         {
-            get
-            {
-                double dReturn;
-
-                switch ((CameraModels)cameraModel)
-                {
-                    case CameraModels.MODEL_H5:
-                        dReturn = 30000;
-                        break;
-                    case CameraModels.MODEL_H5C:
-                        dReturn = 30000;
-                        break;
-                    case CameraModels.MODEL_H9:
-                        dReturn = 27000;
-                        break;
-                    case CameraModels.MODEL_H9C:
-                        dReturn = 27000;
-                        break;
-                    case CameraModels.MODEL_H16:
-                        dReturn = 40000;
-                        break;
-                    case CameraModels.MODEL_H35:
-                        dReturn = 50000;
-                        break;
-                    case CameraModels.MODEL_H36:
-                        dReturn = 30000;
-                        break;
-                    case CameraModels.MODEL_LX1:
-                        dReturn = 50000;
-                        break;
-                    case CameraModels.MODEL_M25C:
-                        dReturn = 25000;
-                        break;
-                    case CameraModels.MODEL_MX5:
-                        dReturn = 60000;
-                        break;
-                    case CameraModels.MODEL_MX5C:
-                        dReturn = 60000;
-                        break;
-                    case CameraModels.MODEL_MX7:
-                        dReturn = 70000;
-                        break;
-                    case CameraModels.MODEL_MX7C:
-                        dReturn = 70000;
-                        break;
-                    case CameraModels.MODEL_MX8C:
-                        dReturn = 10000;
-                        break;
-                    case CameraModels.MODEL_MX9:
-                        dReturn = 100000;
-                        break;
-                    default:
-                        throw new System.Exception("fullWellCapacity unknown for this camera model");
-                }
-
-                return dReturn;
-            }
+            get;
+            internal set;
         }
-#endif
 
         public double electronsPerADU
         {
-            get
-            {
-                double dReturn;
+            get;
+            internal set;
+        }
 
-                switch ((CameraModels)cameraModel)
-                {
-                    case CameraModels.MODEL_H5:
-                        dReturn = 0.40;
-                        break;
-                    case CameraModels.MODEL_H5C:
-                        dReturn = 0.40;
-                        break;
-                    case CameraModels.MODEL_H9:
-                        dReturn = 0.45;
-                        break;
-                    case CameraModels.MODEL_H9C:
-                        dReturn = 0.45;
-                        break;
-                    case CameraModels.MODEL_H16:
-                        dReturn = 0.6;
-                        break;
-                    case CameraModels.MODEL_H35:
-                        dReturn = 0.9;
-                        break;
-                    case CameraModels.MODEL_H36:
-                        dReturn = 0.4;
-                        break;
-                    case CameraModels.MODEL_LX1:
-                        dReturn = 0.9;
-                        break;
-                    case CameraModels.MODEL_M25C:
-                        dReturn = 0.40;
-                        break;
-                    case CameraModels.MODEL_MX5:
-                        dReturn = 1.0;
-                        break;
-                    case CameraModels.MODEL_MX5C:
-                        dReturn = 1.0;
-                        break;
-                    case CameraModels.MODEL_MX7:
-                        dReturn = 1.3;
-                        break;
-                    case CameraModels.MODEL_MX7C:
-                        dReturn = 1.3;
-                        break;
-                    case CameraModels.MODEL_MX8C:
-                        dReturn = 1.0;
-                        break;
-                    case CameraModels.MODEL_MX9:
-                        dReturn = 2.0;
-                        break;
-                    default:
-                        throw new System.Exception("ElectronsPerADU unknown for this camera model");
-                }
-
-                return dReturn;
-            }
+        public bool progressive
+        {
+            get;
+            internal set;
         }
 
         public Byte hFrontPorch
@@ -504,6 +368,147 @@ namespace sx
             }
         }
 
+
+        // setINFO sets information for the camera.  It must set:
+        // - description
+        // - fullWellCapacity
+        // - electronsPerADU
+        // - progressive
+        private void setInfo(bool bAllowUntested)
+        {
+            bool bUntested = false;
+
+            switch ((CameraModels)cameraModel)
+            {
+                case CameraModels.MODEL_H5:
+                    bUntested = true;
+                    description = "H5";
+                    fullWellCapacity = 30000;
+                    electronsPerADU = 0.40;
+                    progressive = true;
+                    break;
+#if false
+// I don't know if this is progressive or interlaced
+                case CameraModels.MODEL_H5C:
+                    bUntested = true;
+                    description = "H5C";
+                    fullWellCapacity = 30000;
+                    electronsPerADU = 0.40;
+                    progressive = true;
+#endif
+                case CameraModels.MODEL_H9:
+                    description = "H9";
+                    fullWellCapacity = 27000;
+                    electronsPerADU = 0.45;
+                    progressive = true;
+                    break;
+                case CameraModels.MODEL_H9C:
+                    description = "H9C";
+                    fullWellCapacity = 27000;
+                    electronsPerADU = 0.45;
+                    progressive = true;
+                    break;
+                case CameraModels.MODEL_H16:
+                    bUntested = true;
+                    description = "H16";
+                    fullWellCapacity = 40000;
+                    electronsPerADU = 0.6;
+                    progressive = true;
+                    break;
+                case CameraModels.MODEL_H35:
+                    bUntested = true;
+                    description = "H35";
+                    fullWellCapacity = 50000;
+                    electronsPerADU = 0.9;
+                    progressive = true;
+                    break;
+                case CameraModels.MODEL_H36:
+                    bUntested = true;
+                    description = "H36";
+                    fullWellCapacity = 30000;
+                    electronsPerADU = 0.4;
+                    progressive = true;
+                    break;
+                case CameraModels.MODEL_LX1:
+                    description = "Lodestar";
+                    fullWellCapacity = 50000;
+                    electronsPerADU = 0.9;
+                    progressive = false;
+                    break;
+                case CameraModels.MODEL_M25C:
+                    description = "M25C";
+                    fullWellCapacity = 25000;
+                    electronsPerADU = 0.40;
+                    progressive = true;
+                    break;
+                case CameraModels.MODEL_MX5:
+                    bUntested = true;
+                    description = "MX5";
+                    fullWellCapacity = 60000;
+                    electronsPerADU = 1.0;
+                    progressive = false;
+                    break;
+                case CameraModels.MODEL_MX5C:
+                    bUntested = true;
+                    description = "MX5C";
+                    fullWellCapacity = 60000;
+                    electronsPerADU = 1.0;
+                    progressive = false;
+                    break;
+                case CameraModels.MODEL_MX7:
+                    bUntested = true;
+                    description = "MX7";
+                    fullWellCapacity = 70000;
+                    electronsPerADU = 1.3;
+                    progressive = false;
+                    break;
+                case CameraModels.MODEL_MX7C:
+                    bUntested = true;
+                    description = "MX7C";
+                    fullWellCapacity = 70000;
+                    electronsPerADU = 1.3;
+                    progressive = false;
+                    break;
+                case CameraModels.MODEL_MX8C:
+                    bUntested = true;
+                    description = "MX8C";
+                    fullWellCapacity = 10000;
+                    electronsPerADU = 1.0;
+                    progressive = false;
+                    break;
+                case CameraModels.MODEL_MX9:
+                    bUntested = true;
+                    description = "MX9";
+                    fullWellCapacity = 100000;
+                    electronsPerADU = 2.0;
+                    progressive = false;
+                    break;
+                default:
+                    bUntested = true;
+                    description = String.Format("unknown 0x{0:x}", cameraModel);
+                    fullWellCapacity = 0.0;
+                    electronsPerADU = 0.0;
+                    // This is a guess, but I think I have all the old cameras in the 
+                    // switch statement, and I expect most new models will be 
+                    // progressive
+                    progressive = true;
+                    break;
+            }
+
+            Log.Write(String.Format("setInfo(): description={0} fullWellCapacity={1} electronsPerADU={2} progressive={3} bUntested={4}\n", 
+                        description, fullWellCapacity, electronsPerADU, progressive, bUntested));
+
+            if (bUntested)
+            {
+                if (!bAllowUntested)
+                {
+                    throw new System.Exception(String.Format("camera model {0} is untested and \"Enable Untested\" is not set", description));
+                }
+
+                description = "(untested) " + description;
+            }
+        }
+
         public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested)
         {
             Log.Write(String.Format("sx.Camera() constructor: controller={0} cameraIdx={1}\n", controller, cameraIdx));
@@ -516,7 +521,7 @@ namespace sx
             {
                 if (cameraIdx != 1)
                 {
-                    throw new ArgumentException("Error: Untested with cameraIdx > 1");
+                    throw new ArgumentException("Error: cameraIdx > 1");
                 }
 
                 if (!hasGuideCamera)
@@ -527,12 +532,12 @@ namespace sx
             }
 
             cameraModel = getModel();
+            setInfo(bAllowUntested);
             getParams(ref ccdParms);
             setPixelType();
             buildReadDelayedBlock(out nextExposure, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
             imageDataValid = false;
             oImageDataLock = new object();
-            this.bAllowUntested = bAllowUntested;
             if (hasCoolerControl)
             {
                 SX_COOLER_BLOCK tempBlock;
@@ -947,7 +952,7 @@ namespace sx
 
             if (bitsPerPixel != 16 && bitsPerPixel != 8)
             {
-                throw new ArgumentOutOfRangeException("downloadPixels(): Untested: bitsPerPixel != 16 && bitPerPixel !=8", "bitsPerPixel");
+                throw new ArgumentOutOfRangeException("downloadPixels(): bitsPerPixel != 16 && bitPerPixel !=8", "bitsPerPixel");
             }
 
             imageData = new Int32[binnedWidth, binnedHeight];
