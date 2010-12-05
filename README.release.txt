@@ -1,11 +1,13 @@
 To do a release, be sure to:
 
 - bump the version number
+  - SharedVersionNumber.cs
+  - SXAscomInstaller.iss
 - change the expiration date (if enabled)
-- edit SXCamera.Readme
-- commit changes
 - create a change log with:
 git log --pretty=format:"%s (%ai by %aN <%aE>)" v1.2.1...  > changelog
+- edit SXCamera.Readme
+- commit changes
 - build
 - create a tag
 - Copy the files to 
