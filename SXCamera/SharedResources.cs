@@ -18,6 +18,8 @@ using System.Text;
 using System.Collections.Generic;
 using System.Threading;
 using Logging;
+using System.Reflection;
+
 using sx;
 using ASCOM;
 
@@ -26,8 +28,6 @@ namespace ASCOM.SXCamera
 
     public class SharedResources
     {
-        private static bool m_bConnected;
-        private static sx.Controller m_controller;
         private SharedResources() { }							// Prevent creation of instances
 
         static SharedResources()								// Static initialization
@@ -39,45 +39,45 @@ namespace ASCOM.SXCamera
         // Public access to shared resources
         //
 
+        public static bool controllerConnected
+        {
+            get;
+            private set;
+        }
+
+        public static void controllerConnect(UInt16 vid, UInt16 pid, bool skip)
+        {
+            Log.Write(String.Format("SharedResources.controllerConnect({0}, {1}, {2})", vid, pid, skip));
+
+            try
+            {
+                controller = new sx.Controller(vid, pid, skip);
+            }
+            catch (Exception ex)
+            {
+                controller = null;
+                string msg = String.Format("SharedResources().controllerConnect(): caught an exception {0}\n", ex.ToString());
+                Log.Write(msg);
+                throw new ASCOM.DriverException(msg, ex);
+            }
+            controllerConnected = true;
+            Log.Write("SharedResources().controllerConnect(): object create succeeded\n");
+        }        
 
         public static sx.Controller controller
         {
+            get;
+            private set;
+        }
+
+        public static string versionNumber
+        {
             get
             {
-                if (!m_bConnected)
-                {
-                    Log.Write("SharedResources():controller creating object\n");
-                    try
-                    {
-                        m_controller = new sx.Controller();
-                    }
-                    catch (Exception ex)
-                    {
-                        m_controller = null;
-                        string msg = String.Format("SharedResources()::controller get caught an exception {0}\n", ex.ToString());
-                        Log.Write(msg);
-                        throw new ASCOM.DriverException(msg, ex);
-                    }
-                    m_bConnected = true;
-                    Log.Write("SharedResources():controller object create succeeded\n");
-                }
-
-                return m_controller;
+                string version =  Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                // I only use a 3 digit version number - strip off the .0"
+                return version.Substring(0, version.LastIndexOf("."));
             }
-        }
-
-        public static uint versionMajor
-        {
-            get { return 1; }
-        }
-        public static uint versionMinor
-        {
-            get { return 3; }
-        }
-
-        public static uint versionMaintenance
-        {
-            get { return 1; }
         }
     }
 }

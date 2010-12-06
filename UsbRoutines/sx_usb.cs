@@ -51,12 +51,9 @@ namespace sx
                 Log.Write(String.Format("Considering USB Device {0}\n", devicePathName));
 
                 UInt16 foundVid, foundPid;
-#if False
-                myDeviceManagement.parsePath(out foundVid, out foundPid);
-#else
-                foundVid = 0;
-                foundPid = 0;
-#endif
+
+                DeviceManagement.parsePath(devicePathName, out foundVid, out foundPid);
+
                 if (vid == 0 ||
                     (!skip && foundVid == vid && foundPid == pid) ||
                     (skip && (foundVid != vid || foundPid != pid)))

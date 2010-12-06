@@ -99,7 +99,7 @@ namespace sx
         :sxBase
     {
         // Variables
-        private Controller controller;
+        private Controller m_controller;
         private SX_CCD_PARAMS ccdParms;
         private SX_READ_DELAYED_BLOCK nextExposure;
         private EXPOSURE_INFO currentExposure;
@@ -190,12 +190,12 @@ namespace sx
 
         public Boolean hasGuideCamera
         {
-            get { return controller.hasGuideCamera; }
+            get { return m_controller.hasGuideCamera; }
         }
 
         public Boolean hasGuidePort
         {
-            get { return controller.hasGuidePort; }
+            get { return m_controller.hasGuidePort; }
         }
 
         private Byte extraCapabilities
@@ -515,7 +515,7 @@ namespace sx
 
             idx = cameraIdx;
 
-            this.controller = controller;
+            m_controller = controller;
 
             if (cameraIdx > 0)
             {
@@ -754,16 +754,16 @@ namespace sx
                 throw new ArgumentException("Invalid flags passed to ClearPixels");
             }
 
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
+            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
             
             Log.Write("clear about to Write\n");
-            controller.Write(cmdBlock, out numBytesWritten);
+            m_controller.Write(cmdBlock, out numBytesWritten);
             Log.Write("clear about to return\n");
         }
 
         public void echo(string s)
         {
-            controller.echo(s);
+            m_controller.echo(s);
         }
 
         public void clearCcdPixels()
@@ -787,14 +787,14 @@ namespace sx
             byte[] bytes = new byte[2];
             UInt16 model=0;
 
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (UInt16)Marshal.SizeOf(model));
+            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (UInt16)Marshal.SizeOf(model));
 
-            lock (controller)
+            lock (m_controller)
             {
                 Log.Write("getModel has locked\n");
-                controller.Write(cmdBlock, out numBytesWritten);
+                m_controller.Write(cmdBlock, out numBytesWritten);
 
-                bytes = controller.ReadBytes(Marshal.SizeOf(model), out numBytesRead);
+                bytes = m_controller.ReadBytes(Marshal.SizeOf(model), out numBytesRead);
             }
             Log.Write("getModel has unlocked\n");
 
@@ -810,14 +810,14 @@ namespace sx
             byte[] bytes = new byte[Marshal.SizeOf(inBlock)];
 
             Log.Write(String.Format("setCoolerInfo inBlock temp={0} enabled={1}\n", inBlock.coolerTemp, inBlock.coolerEnabled));
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_COOLER_CONTROL, inBlock.coolerTemp, (UInt16)inBlock.coolerEnabled, 0);
+            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_COOLER_CONTROL, inBlock.coolerTemp, (UInt16)inBlock.coolerEnabled, 0);
 
-            lock (controller)
+            lock (m_controller)
             {
                 Log.Write("setCooler has locked\n");
-                controller.Write(cmdBlock, out numBytesWritten);
+                m_controller.Write(cmdBlock, out numBytesWritten);
 
-                bytes = controller.ReadBytes(Marshal.SizeOf(inBlock), out numBytesRead);
+                bytes = m_controller.ReadBytes(Marshal.SizeOf(inBlock), out numBytesRead);
             }
             Log.Write("setCooler has unlocked\n");
 
@@ -930,14 +930,14 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten, numBytesRead;
 
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_GET_CCD_PARMS, 0, idx, 0);
+            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_GET_CCD_PARMS, 0, idx, 0);
 
-            lock (controller)
+            lock (m_controller)
             {
                 Log.Write("getParams has locked\n");
-                controller.Write(cmdBlock, out numBytesWritten);
+                m_controller.Write(cmdBlock, out numBytesWritten);
 
-                parms = (SX_CCD_PARAMS)controller.ReadObject(typeof(SX_CCD_PARAMS), out numBytesRead);
+                parms = (SX_CCD_PARAMS)m_controller.ReadObject(typeof(SX_CCD_PARAMS), out numBytesRead);
             }
 
             Log.Write("getParams has unlocked\n");
@@ -1125,7 +1125,7 @@ namespace sx
 
             Log.Write(String.Format("downloadPixels(): requesting {0} pixels, {1} bytes each ({2} bytes)\n", imagePixels, Marshal.SizeOf(pixelType), imagePixels * Marshal.SizeOf(pixelType)));
 
-            imageRawData = (Array)controller.ReadArray(pixelType, imagePixels, out numBytesRead);
+            imageRawData = (Array)m_controller.ReadArray(pixelType, imagePixels, out numBytesRead);
 
             lock (oImageDataLock)
             {
@@ -1152,22 +1152,22 @@ namespace sx
 
         public void guideNorth(int durationMS)
         {
-            controller.guide(SX_STAR2K_NORTH, durationMS);
+            m_controller.guide(SX_STAR2K_NORTH, durationMS);
         }
 
         public void guideSouth(int durationMS)
         {
-            controller.guide(SX_STAR2K_SOUTH, durationMS);
+            m_controller.guide(SX_STAR2K_SOUTH, durationMS);
         }
 
         public void guideEast(int durationMS)
         {
-            controller.guide(SX_STAR2K_EAST, durationMS);
+            m_controller.guide(SX_STAR2K_EAST, durationMS);
         }
 
         public void guideWest(int durationMS)
         {
-            controller.guide(SX_STAR2K_WEST, durationMS);
+            m_controller.guide(SX_STAR2K_WEST, durationMS);
         }
 
         public void recordPixels(out DateTimeOffset exposureEnd)
@@ -1181,13 +1181,13 @@ namespace sx
             adjustReadDelayedBlock(nextExposure, ref currentExposure);
             initReadBlock(currentExposure.toCamera, out readBlock);
 
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
+            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
                                SX_CMD_READ_PIXELS,
                                SX_CCD_FLAGS_FIELD_ODD | SX_CCD_FLAGS_FIELD_EVEN,
                                idx,
                                (UInt16)Marshal.SizeOf(readBlock));
 
-            lock (controller)
+            lock (m_controller)
             {
                 Log.Write("recordPixels() has locked\n");
                 lock (oImageDataLock)
@@ -1195,7 +1195,7 @@ namespace sx
                     imageDataValid = false;
                 }
                 Log.Write("recordPixels() requesting read\n");
-                controller.Write(cmdBlock, readBlock, out numBytesWritten);
+                m_controller.Write(cmdBlock, readBlock, out numBytesWritten);
                 exposureEnd = DateTimeOffset.Now;
                 Log.Write("recordPixels() beginning downloading\n");
                 downloadPixels();
@@ -1212,7 +1212,7 @@ namespace sx
 
             adjustReadDelayedBlock(nextExposure, ref currentExposure);
 
-            controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, 
+            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, 
                                          SX_CMD_READ_PIXELS_DELAYED, 
                                          SX_CCD_FLAGS_FIELD_ODD | SX_CCD_FLAGS_FIELD_EVEN,
                                          idx,
@@ -1223,7 +1223,7 @@ namespace sx
             // and read, but that would also open the potential for other problems.
 
 
-            lock (controller)
+            lock (m_controller)
             {
                 Log.Write("recordPixelsDelayed has locked\n");
                 lock (oImageDataLock)
@@ -1231,7 +1231,7 @@ namespace sx
                     imageDataValid = false;
                 }
                 Log.Write("recordPixelsDelayed requesting read\n");
-                controller.Write(cmdBlock, currentExposure.toCamera, out numBytesWritten);
+                m_controller.Write(cmdBlock, currentExposure.toCamera, out numBytesWritten);
                 Log.Write("recordPixelsDelayed requesting download\n");
                 downloadPixels();
             }

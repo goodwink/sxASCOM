@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 
 namespace WinUsbDemo
@@ -84,6 +85,22 @@ namespace WinUsbDemo
             }
 
             return false;
+        }
+
+        internal static void parsePath(string path, out UInt16 vid, out UInt16 pid)
+        {
+            // A sample path looks like:
+            //"\\?\usb#vid_1278&pid_0325#5&1067306a&0&1#{606377c1-2270-11d4-bfd8-00207812f5d5}";
+
+            Match m = Regex.Match(path, @"#vid_(\d+)&pid_(\d+)#");
+
+            if (m.Groups.Count != 3)
+            {
+                throw new System.ArgumentException(String.Format("parsePth: unable to find vid and pid in {0}", path));
+            }
+
+            vid = Convert.ToUInt16(m.Groups[1]);
+            pid = Convert.ToUInt16(m.Groups[2]);
         }
 
         ///  <summary>

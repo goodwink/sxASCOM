@@ -59,6 +59,5 @@ namespace ASCOM.SXMain
                 modelSelectionGroup.Visible = true;
             }
         }
-
     }
 }

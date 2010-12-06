@@ -364,8 +364,7 @@ namespace ASCOM.SXMain
                 F.EnableLoggingCheckBox.Checked = config.enableLogging;
                 F.EnableUntestedCheckBox.Checked = config.enableUntested;
                 F.secondsAreMiliseconds.Checked = config.secondsAreMilliseconds;
-                F.Version.Text = String.Format("Version: {0}.{1}.{2}", SXCamera.SharedResources.versionMajor,
-                    SXCamera.SharedResources.versionMinor, SXCamera.SharedResources.versionMaintenance);
+                F.Version.Text = String.Format("Version: {0}", SXCamera.SharedResources.versionNumber);
 
                 F.cameraSelectionAllowAny.Checked = false;
                 F.cameraSelectionExactModel.Checked = false;

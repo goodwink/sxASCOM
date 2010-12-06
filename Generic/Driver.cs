@@ -597,6 +597,18 @@ namespace ASCOM.SXGeneric
 
                         try
                         {
+                            if (!SXCamera.SharedResources.controllerConnected)
+                            {
+                                UInt16 vid = config.cameraVID;
+                                UInt16 pid = config.cameraPID;
+                                bool skip = (config.cameraSelectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL);
+                                                                
+                                if (config.cameraSelectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)
+                                {
+                                    vid = 0;
+                                }
+                                SXCamera.SharedResources.controllerConnect(vid, pid, skip);
+                            }
                             sxCamera = new sx.Camera(SXCamera.SharedResources.controller, cameraId, config.enableUntested);
                             m_Connected = true;
                             // set properties to defaults. These all talk to the camera, and having them here saves

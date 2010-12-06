@@ -69,12 +69,12 @@ namespace sx
             get {return ccdParms.num_serial_ports;}
         }
 
-        public Controller()
+        public Controller(UInt16 vid, UInt16 pid, bool skip)
         {
-            Log.Write("Controller(): entered\n");
+            Log.Write(String.Format("Controller({0}, {1}, {2}): entered\n", vid, pid, skip));
             Connected = false;
 
-            iface = new USBInterface();
+            iface = new USBInterface(vid, pid, skip);
 
             reset();
             firmwareVersion = getVersion();

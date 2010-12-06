@@ -47,6 +47,7 @@ namespace ASCOM.SXMain
             this.modelVID = new System.Windows.Forms.MaskedTextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.Copyright = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.modelSelectionGroup.SuspendLayout();
@@ -81,10 +82,9 @@ namespace ASCOM.SXMain
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(286, 76);
+            this.label1.Size = new System.Drawing.Size(286, 21);
             this.label1.TabIndex = 101;
-            this.label1.Text = "ASCOM Driver for SX/SXV/SXVF/SXVR Cameras\r\n\r\nCopyright (C) 2010 Dad Dog Developme" +
-                "nt Ltd.\r\nAll Rights Reserved";
+            this.label1.Text = "ASCOM Driver for SX/SXV/SXVF/SXVR Cameras\r\n\r\n";
             // 
             // picASCOM
             // 
@@ -126,7 +126,7 @@ namespace ASCOM.SXMain
             // 
             this.Version.AutoSize = true;
             this.Version.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Version.Location = new System.Drawing.Point(15, 88);
+            this.Version.Location = new System.Drawing.Point(12, 30);
             this.Version.Name = "Version";
             this.Version.Size = new System.Drawing.Size(80, 15);
             this.Version.TabIndex = 102;
@@ -238,11 +238,21 @@ namespace ASCOM.SXMain
             this.label3.TabIndex = 110;
             this.label3.Text = "VID:";
             // 
+            // Copyright
+            // 
+            this.Copyright.Location = new System.Drawing.Point(12, 55);
+            this.Copyright.Name = "Copyright";
+            this.Copyright.Size = new System.Drawing.Size(272, 57);
+            this.Copyright.TabIndex = 103;
+            this.Copyright.Text = "Copyright (C) 2010 Dad Dog Development Ltd.\r\nThis work is licensed under the Crea" +
+                "tive Commons Attribution-No Derivative Works 3.0 License.";
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(380, 424);
+            this.Controls.Add(this.Copyright);
             this.Controls.Add(this.modelSelectionGroup);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.secondsAreMiliseconds);
@@ -291,5 +301,6 @@ namespace ASCOM.SXMain
         internal System.Windows.Forms.GroupBox modelSelectionGroup;
         internal System.Windows.Forms.MaskedTextBox modelPID;
         internal System.Windows.Forms.MaskedTextBox modelVID;
+        private System.Windows.Forms.Label Copyright;
     }
 }

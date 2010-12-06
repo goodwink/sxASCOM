@@ -25,6 +25,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using System.Text.RegularExpressions;
 
 namespace ASCOM.SXCamera
 {
