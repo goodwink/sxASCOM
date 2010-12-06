@@ -31,6 +31,22 @@ namespace ASCOM.SXCamera
         private const string SECONDS_ARE_MILLISECONDS = "SecondsAreMilliseconds";
         private const bool DEFAULT_SECONDS_ARE_MILLISECONDS = false;
 
+        public enum CAMERA_SELECTION_METHOD
+        {
+            CAMERA_SELECTION_ANY,
+            CAMERA_SELECTION_EXACT_MODEL,
+            CAMERA_SELECTION_EXCLUDE_MODEL
+        };
+
+        private const string CAMERA_SELECTION = "CameraSelection";
+        private string DEFAULT_CAMERA_SELECTION = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY);
+
+        private const string CAMERA_VID = "CameraVID";
+        private const UInt16 DEFAULT_CAMERA_VID = 1278;
+
+        private const string CAMERA_PID = "CameraPID";
+        private const UInt16 DEFAULT_CAMERA_PID = 0325;
+        
         private string driverID;
         ProfileClass profile;
         
@@ -63,7 +79,9 @@ namespace ASCOM.SXCamera
         {
             string ret = GetString(name);
 
-            if (ret == null)
+            Log.Write(String.Format("GetString({0}, {1}) ret = [{2}]\n", name, defaultValue, ret));
+
+            if (ret == null || ret=="")
             {
                 ret = defaultValue;
             }
@@ -107,7 +125,7 @@ namespace ASCOM.SXCamera
             bool bRet = defaultValue;
             string str = GetString(name);
 
-            if (str != null)
+            if (str != null && str != "")
             {
                 try
                 {
@@ -119,6 +137,26 @@ namespace ASCOM.SXCamera
                 }
             }
             return bRet;
+        }
+
+        internal UInt16 GetUInt16(string name, UInt16 defaultValue)
+        {
+            UInt16 iRet = defaultValue;
+            string str = GetString(name);
+
+            if (str != null && str != "")
+            {
+                try
+                {
+                    iRet = Convert.ToUInt16(str);
+                }
+                catch
+                {
+                    Log.Write(String.Format("GetUInt16 was unable to convert {0}\n", str));
+                }
+            }
+
+            return iRet;
         }
 
         public bool enableUntested
@@ -144,6 +182,35 @@ namespace ASCOM.SXCamera
         {
             get { return GetString(LOG_FILE_NAME, DEFAULT_LOG_FILE_NAME); }
             set { SetString(LOG_FILE_NAME, value); }
+        }
+
+        public CAMERA_SELECTION_METHOD cameraSelectionMethod
+        {
+            get
+            {
+                Log.Write(String.Format("enum madness =[{0}]\n", Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)));
+                Log.Write(String.Format("default={0}\n", DEFAULT_CAMERA_SELECTION));
+                String selection = GetString(CAMERA_SELECTION, DEFAULT_CAMERA_SELECTION);
+                Log.Write(String.Format("cameraSelectionMethod get converting {0}\n", selection));
+                return (CAMERA_SELECTION_METHOD)Enum.Parse(typeof(CAMERA_SELECTION_METHOD), selection, true);
+            }
+            set
+            {
+                String selection = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), value);
+                SetString(CAMERA_SELECTION, selection);
+            }
+        }
+
+        public UInt16 cameraVID
+        {
+            get { return GetUInt16(CAMERA_VID, DEFAULT_CAMERA_VID); }
+            set { SetString(CAMERA_VID, value.ToString()); }
+        }
+
+        public UInt16 cameraPID
+        {
+            get { return GetUInt16(CAMERA_PID, DEFAULT_CAMERA_PID); }
+            set { SetString(CAMERA_PID, value.ToString()); }
         }
     }
 }

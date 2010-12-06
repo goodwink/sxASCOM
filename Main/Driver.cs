@@ -38,8 +38,11 @@ namespace ASCOM.SXMain
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {
+        private const string m_cameraType = "Main";
+        private const int m_cameraID = 0;
+
         public Camera() :
-            base(0, "Main")
+            base(m_cameraID, m_cameraType)
         {
         }
 
@@ -364,13 +367,83 @@ namespace ASCOM.SXMain
                 F.Version.Text = String.Format("Version: {0}.{1}.{2}", SXCamera.SharedResources.versionMajor,
                     SXCamera.SharedResources.versionMinor, SXCamera.SharedResources.versionMaintenance);
 
+                F.cameraSelectionAllowAny.Checked = false;
+                F.cameraSelectionExactModel.Checked = false;
+                F.cameraSelectionExcludeModel.Checked = false;
+                F.modelSelectionGroup.Visible = false;
+                F.modelVID.Text = config.cameraVID.ToString();
+                F.modelPID.Text = config.cameraPID.ToString();
+
+                Log.Write(String.Format("after assignment, VID={0}\n", F.modelVID.Text));
+
+                switch (config.cameraSelectionMethod)
+                {
+                    case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY:
+                        F.cameraSelectionAllowAny.Checked = true;
+                        break;
+                    case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL:
+                        F.cameraSelectionExactModel.Checked = true;
+                        F.modelSelectionGroup.Visible = true;
+                        break;
+                    case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL:
+                        F.cameraSelectionExcludeModel.Checked = true;
+                        F.modelSelectionGroup.Visible = true;
+                        break;
+                    default:
+                        throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", config.cameraSelectionMethod));
+                }
+
                 if (F.ShowDialog() == DialogResult.OK)
                 {
                     Log.Write("ShowDialog returned OK - saving parameters\n");
- 
+
+                    Log.Write(String.Format("after dialog, VID={0}\n", F.modelVID.Text));
+
                     config.enableLogging = F.EnableLoggingCheckBox.Checked;
                     config.enableUntested = F.EnableUntestedCheckBox.Checked;
                     config.secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
+
+                    if (F.cameraSelectionAllowAny.Checked)
+                    {
+                        config.cameraSelectionMethod = ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY;
+                    }
+                    else
+                    {
+                        bool error = false;
+                        try
+                        {
+                            config.cameraVID = Convert.ToUInt16(F.modelVID.Text);
+                        }
+                        catch (System.FormatException ex)
+                        {
+                            error = true;
+                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}", F.modelVID.Text, ex.ToString()));
+                            MessageBox.Show("An invalid VID was entered.  Value was not changed");
+                        }
+
+                        try
+                        {
+                            config.cameraPID = Convert.ToUInt16(F.modelPID.Text);
+                        }
+                        catch (System.FormatException ex)
+                        {
+                            error = true;
+                            Log.Write(String.Format("Caught an exception converting PID [{0}] to UInt16: {1}", F.modelPID.Text, ex.ToString()));
+                            MessageBox.Show("An invalid PID was entered.  Value was not changed");
+                        }
+
+                        if (!error)
+                        {
+                            if (F.cameraSelectionExactModel.Checked)
+                            {
+                                config.cameraSelectionMethod = ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL;
+                            }
+                            else
+                            {
+                                config.cameraSelectionMethod = ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL;
+                            }
+                        }
+                    }
                 }
             }
             catch (ASCOM.DriverException ex)
@@ -379,7 +452,7 @@ namespace ASCOM.SXMain
             }
             catch (System.Exception ex)
             {
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request" + ex), ex);
             }
         }
     }

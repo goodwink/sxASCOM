@@ -42,5 +42,23 @@ namespace ASCOM.SXMain
                 MessageBox.Show(other.Message);
             }
         }
+
+        private void SetupDialogForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cameraSelectionAllowAny_CheckedChanged(object sender, EventArgs e)
+        {
+            if (cameraSelectionAllowAny.Checked)
+            {
+                modelSelectionGroup.Visible = false;
+            }
+            else
+            {
+                modelSelectionGroup.Visible = true;
+            }
+        }
+
     }
 }

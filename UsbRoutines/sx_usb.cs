@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
@@ -26,24 +26,55 @@ namespace sx
 
         // Variables
         internal SafeFileHandle deviceHandle;
-        internal string devicePathName = "";
+        internal string devicePathName;
         internal DeviceManagement myDeviceManagement = new WinUsbDemo.DeviceManagement();
 
-        public USBInterface()
+        // Look for a device with:
+        //  any Vid/Pid if Vid == 0
+        //  Vid/Pid as specified if skip = False
+        //  any Vid/Pid except the ones specified if skip == True
+        public USBInterface(UInt16 vid, UInt16 pid, bool skip)
         {
             System.Guid Guid = new System.Guid(GUID_STRING);
+            Int32 index = 0;
+            Boolean deviceFound = false;
 
-            Boolean deviceFound = myDeviceManagement.FindDeviceFromGuid(Guid, ref devicePathName);
+            Log.Write(String.Format("USBInterface({0}, {1}, {2}) begins\n", vid, pid, skip));
 
-            if (!deviceFound)
+            do
             {
-                throw new System.IO.IOException(String.Format("Unable to locate a USB device with GUID {0}", Guid));
-            }
+                if (!myDeviceManagement.FindDeviceFromGuid(Guid, out devicePathName, ref index))
+                {
+                    throw new System.IO.IOException(String.Format("Unable to locate a USB device with GUID {0}, vid={1}, pid={2}, skip={3}", Guid, vid, pid, skip));
+                }
 
-            if (!FileIO.GetDeviceHandle(devicePathName, out deviceHandle))
-            {
-                throw new System.IO.IOException(String.Format("Unable to get a device handle for GUID {0} using path {1}", Guid, devicePathName));
-            }
+                Log.Write(String.Format("Considering USB Device {0}\n", devicePathName));
+
+                UInt16 foundVid, foundPid;
+#if False
+                myDeviceManagement.parsePath(out foundVid, out foundPid);
+#else
+                foundVid = 0;
+                foundPid = 0;
+#endif
+                if (vid == 0 ||
+                    (!skip && foundVid == vid && foundPid == pid) ||
+                    (skip && (foundVid != vid || foundPid != pid)))
+                {
+                    if (!FileIO.GetDeviceHandle(devicePathName, out deviceHandle))
+                    {
+                        throw new System.IO.IOException(String.Format("Unable to get a device handle for GUID {0} using path {1}", Guid, devicePathName));
+                    }
+
+                    deviceFound = true;
+                    Log.Write(String.Format("USB deviceHandle={0}\n", deviceHandle));
+                }
+            } while (!deviceFound);
+        }
+
+        public USBInterface()
+            : this(0,0, false)
+        {
         }
 
         internal Int32 ObjectSize(Object o)
@@ -66,7 +97,7 @@ namespace sx
                     }
                     else
                     {
-                        Log.Write("Objectsize: invalid type " + elementType.ToString());
+                        Log.Write("Objectsize: invalid type " + elementType.ToString() + "\n");
                         throw new ArgumentException(String.Format("ObjectSize: invaild type {0}", elementType.ToString()));
                     }
                 }

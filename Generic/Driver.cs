@@ -83,7 +83,6 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                //Thread.Sleep(15000);
                 Log.Write(String.Format("Camera({0},{1})\n", whichCamera, cameraType));
 
                 cameraId = whichCamera;
