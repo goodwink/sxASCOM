@@ -1511,6 +1511,7 @@ namespace ASCOM.SXGeneric
             {
                 Log.Write(String.Format("hardwareCapture({0}, {1}): begins\n", Duration, Light));
                 exposureStart = DateTime.Now;
+                DateTimeOffset exposureEnd;
                 
                 lock (oCameraStateLock)
                 {
@@ -1522,7 +1523,7 @@ namespace ASCOM.SXGeneric
                 }
 
                 sxCamera.delayMs = (uint)(1000 * Duration);
-                sxCamera.recordPixelsDelayed();
+                sxCamera.recordPixels(true, out exposureEnd);
 
                 actualExposureLength = DateTime.Now - exposureStart;
                 Log.Write(String.Format("hardwareCapture(): exposure + download took {0}, requested {1}\n", actualExposureLength.TotalSeconds, Duration));
@@ -1617,7 +1618,7 @@ namespace ASCOM.SXGeneric
                     state = CameraStates.cameraDownload;
                 }
 
-                sxCamera.recordPixels(out exposureEnd);
+                sxCamera.recordPixels(false, out exposureEnd);
 
                 actualExposureLength = exposureEnd - exposureStart;
 
@@ -1703,6 +1704,10 @@ namespace ASCOM.SXGeneric
                         throw new ASCOM.InvalidOperationException(SetError(String.Format("StartExposure called while in state {0}", state)));
                     }
                     state = CameraStates.cameraExposing;
+
+                    // grab the parameters requested for this exposure while we are still 
+                    // running on the calling thread
+                    sxCamera.freezeParameters();
                 }
 
                 try
