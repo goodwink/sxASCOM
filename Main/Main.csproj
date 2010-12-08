@@ -76,12 +76,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="SetupDialogForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SetupDialogForm.designer.cs">
-      <DependentUpon>SetupDialogForm.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ASCOM.Helper">
@@ -108,9 +102,6 @@
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ASCOM.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Generic\Generic.csproj">
@@ -161,10 +152,6 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="SetupDialogForm.resx">
-      <DependentUpon>SetupDialogForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

@@ -2,14 +2,14 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Reflection;
+
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
 using Logging;
 
 namespace sx
 {
-
-
     /// <summary>
     /// This class defines the the functions to access the resources which exist on the 
     /// USB controller board.  If there are two cameras conneted (a main camera and a guide
@@ -47,8 +47,9 @@ namespace sx
         : sxBase
     {
         // Variables
-        private USBInterface iface;
-        private SX_CCD_PARAMS ccdParms;
+        private USBInterface m_iface;
+        private SX_CCD_PARAMS m_ccdParms;
+        UInt32 m_version;
 
         // Properties
 
@@ -58,34 +59,67 @@ namespace sx
             private set;
         }
 
+        protected void verifyConnected(string caller)
+        {
+            if (!Connected)
+            {
+                throw new System.Exception(String.Format("{0}: Camera not connected", caller));
+            }
+        }
+
         public UInt32 firmwareVersion
         {
-            get;
-            private set;
+            get
+            {
+                verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                return m_version;
+            }
+
+            private set
+            {
+                m_version = value;
+            }
         }
 
         public Byte numSerialPorts
         {
-            get {return ccdParms.num_serial_ports;}
+            get 
+            {
+                verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                return m_ccdParms.num_serial_ports;
+            }
         }
 
-        public Controller(UInt16 vid, UInt16 pid, bool skip)
+        public Controller()
         {
-            Log.Write(String.Format("Controller({0}, {1}, {2}): entered\n", vid, pid, skip));
+            Log.Write(String.Format("Controller() entered\n"));
+
             Connected = false;
-
-            iface = new USBInterface(vid, pid, skip);
-
-            reset();
-            firmwareVersion = getVersion();
-            getParams(ref ccdParms);
-            Connected = true;
 
             Log.Write("Controller(): returns\n");
         }
 
+        public void connect(UInt16 vid, UInt16 pid, bool skip)
+        {
+            Log.Write(String.Format("controller.controller({0}, {1}, {2})\n", vid, pid, skip));
+
+            m_iface = new USBInterface(vid, pid, skip);
+
+            reset();
+            firmwareVersion = getVersion();
+            getParams(ref m_ccdParms);
+
+            Connected = true;
+
+            Log.Write("controller.connect(): returns\n");
+        }
+
         internal void buildCommandBlock(out SX_CMD_BLOCK block, Byte cmd_type, Byte cmd, UInt16 cmd_value, UInt16 index, UInt16 cmd_length)
         {
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
+
             block.cmd_type = cmd_type;
             block.cmd = cmd;
             block.cmd_value = cmd_value;
@@ -96,12 +130,14 @@ namespace sx
 
         internal void Write(SX_CMD_BLOCK block, Object data, out Int32 numBytesWritten)
         {
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
+
             // I lock here to prevent the data from two writes from getting interleaved. I doubt windows would actually do that, but 
             // it is easy to prevent it here and then I know I don't have to worry about it.
             lock (this)
             {
                 Log.Write("Write has locked\n");
-                iface.Write(block, data, out numBytesWritten);
+                m_iface.Write(block, data, out numBytesWritten);
             }
             Log.Write("Write has unlocked\n");
         }
@@ -114,12 +150,14 @@ namespace sx
         internal object Read(Type returnType, Int32 numBytesToRead, out Int32 numBytesRead)
         {
             object oReturn;
+            
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
 
             // See the comment above the lock in Write() for more information on this lock. 
             lock (this)
             {
                 Log.Write("Read has locked\n");
-                oReturn = iface.Read(returnType, numBytesToRead, out numBytesRead);
+                oReturn = m_iface.Read(returnType, numBytesToRead, out numBytesRead);
             }
             Log.Write("Read has unlocked\n"); 
             return oReturn;
@@ -152,6 +190,8 @@ namespace sx
             Int32 numBytesWritten, numBytesRead;
             string s2;
 
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
+
             Log.Write(String.Format("echo({0}) begins\n", s));
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_ECHO, 0, 0, (UInt16)s.Length);
 
@@ -175,6 +215,8 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
 
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
+
             Log.Write("resetting()\n");
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_RESET, 0, 0, 0);
@@ -187,6 +229,8 @@ namespace sx
             Int32 numBytesWritten, numBytesRead;
             byte[] bytes;
             UInt32 ver = 0;
+
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_FIRMWARE_VERSION, 0, 0, 0);
 
@@ -211,6 +255,8 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten, numBytesRead;
 
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
+
             Log.Write("gettings params\n");
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_GET_CCD_PARMS, 0, 0, 0);
@@ -226,6 +272,8 @@ namespace sx
             Int32 numBytesWritten, numBytesRead;
             byte[] bytes;
             Int32 ms = 0;
+
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_TIMER, 0, 0, 0);
 
@@ -250,18 +298,28 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
 
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
+
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_TIMER, 0, 0, (UInt16)Marshal.SizeOf(ms));
             Write(cmdBlock, ms, out numBytesWritten);
         }
 
         public Boolean hasGuideCamera
         {
-            get { return (ccdParms.extra_capabilities & SXUSB_CAPS_GUIDER) == SXUSB_CAPS_GUIDER;}
+            get
+            { 
+                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                return (m_ccdParms.extra_capabilities & SXUSB_CAPS_GUIDER) == SXUSB_CAPS_GUIDER;
+            }
         }
 
         public Boolean hasGuidePort
         {
-            get { return (ccdParms.extra_capabilities & SXUSB_CAPS_STAR2K) == SXUSB_CAPS_STAR2K; }
+            get
+            {
+                verifyConnected(MethodBase.GetCurrentMethod().Name);
+                return (m_ccdParms.extra_capabilities & SXUSB_CAPS_STAR2K) == SXUSB_CAPS_STAR2K; 
+            }
         }
 
         public void guide(UInt16 direction, int durationMS)
@@ -269,6 +327,8 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
             DateTime guideStart = DateTime.Now;
+            
+            verifyConnected(MethodBase.GetCurrentMethod().Name);
 
             if (!hasGuidePort)
             {

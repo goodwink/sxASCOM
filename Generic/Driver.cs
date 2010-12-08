@@ -20,6 +20,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 using ASCOM;
 using ASCOM.Helper;
@@ -47,6 +48,7 @@ namespace ASCOM.SXGeneric
         private const double ImageCommandTime = 0.001; // this is about how long it takes to send the "Download Image" command
 
         // members
+        protected sx.Controller m_controller;
         protected sx.Camera sxCamera;
         private DateTimeOffset exposureStart;
         private TimeSpan desiredExposureLength;
@@ -59,7 +61,7 @@ namespace ASCOM.SXGeneric
         private volatile bool bStopRequested;
         private volatile Object oGuideStateLock;
         private volatile bool bGuiding;
-        private static UInt16 cameraId;
+        private static UInt16 m_cameraId;
         protected bool bLastErrorValid;
         protected string lastErrorMessage;
         protected bool bHasGuideCamera;
@@ -85,7 +87,18 @@ namespace ASCOM.SXGeneric
             {
                 Log.Write(String.Format("Camera({0},{1})\n", whichCamera, cameraType));
 
-                cameraId = whichCamera;
+                
+                if (whichCamera < 2)
+                {
+                    m_cameraId = whichCamera;
+                    m_controller = ASCOM.SXCamera.SharedResources.controller1;
+                }
+                else
+                {
+                    m_cameraId = (UInt16)(whichCamera - 2);
+                    Debug.Assert(m_cameraId < 2);
+                    m_controller = ASCOM.SXCamera.SharedResources.controller2;
+                }
 
                 oCameraStateLock = new Object();
                 oGuideStateLock = new Object();
@@ -597,7 +610,7 @@ namespace ASCOM.SXGeneric
 
                         try
                         {
-                            if (!SXCamera.SharedResources.controllerConnected)
+                            if (!m_controller.Connected)
                             {
                                 UInt16 vid = config.cameraVID;
                                 UInt16 pid = config.cameraPID;
@@ -607,9 +620,17 @@ namespace ASCOM.SXGeneric
                                 {
                                     vid = 0;
                                 }
-                                SXCamera.SharedResources.controllerConnect(vid, pid, skip);
+
+                                try
+                                {
+                                    m_controller.connect(vid, pid, skip);
+                                }
+                                catch (Exception ex)
+                                {
+                                    throw new ASCOM.DriverException(SetError(String.Format("SharedResources().controllerConnect(): caught an exception {0}\n", ex.ToString())), ex);
+                                }
                             }
-                            sxCamera = new sx.Camera(SXCamera.SharedResources.controller, cameraId, config.enableUntested);
+                            sxCamera = new sx.Camera(m_controller, m_cameraId, config.enableUntested);
                             m_Connected = true;
                             // set properties to defaults. These all talk to the camera, and having them here saves
                             // a lot of try/catch blocks in other places
@@ -1498,12 +1519,112 @@ namespace ASCOM.SXGeneric
             set;
         }
 
+
         /// <summary>
         /// Launches a configuration dialog box for the driver.  The call will not return
         /// until the user clicks OK or cancel manually.
         /// </summary>
         /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
-        abstract public void SetupDialog();
+        public void SetupDialog()
+        {
+            try
+            {
+                Log.Write("SetupDialog()\n");
+                SetupDialogForm F = new SetupDialogForm();
+
+                F.EnableLoggingCheckBox.Checked = config.enableLogging;
+                F.EnableUntestedCheckBox.Checked = config.enableUntested;
+                F.secondsAreMiliseconds.Checked = config.secondsAreMilliseconds;
+                F.Version.Text = String.Format("Version: {0}", SXCamera.SharedResources.versionNumber);
+
+                F.cameraSelectionAllowAny.Checked = false;
+                F.cameraSelectionExactModel.Checked = false;
+                F.cameraSelectionExcludeModel.Checked = false;
+                F.modelSelectionGroup.Visible = false;
+                F.modelVID.Text = config.cameraVID.ToString();
+                F.modelPID.Text = config.cameraPID.ToString();
+
+                Log.Write(String.Format("after assignment, VID={0}\n", F.modelVID.Text));
+
+                switch (config.cameraSelectionMethod)
+                {
+                    case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY:
+                        F.cameraSelectionAllowAny.Checked = true;
+                        break;
+                    case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL:
+                        F.cameraSelectionExactModel.Checked = true;
+                        F.modelSelectionGroup.Visible = true;
+                        break;
+                    case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL:
+                        F.cameraSelectionExcludeModel.Checked = true;
+                        F.modelSelectionGroup.Visible = true;
+                        break;
+                    default:
+                        throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", config.cameraSelectionMethod));
+                }
+
+                if (F.ShowDialog() == DialogResult.OK)
+                {
+                    Log.Write("ShowDialog returned OK - saving parameters\n");
+
+                    Log.Write(String.Format("after dialog, VID={0}\n", F.modelVID.Text));
+
+                    config.enableLogging = F.EnableLoggingCheckBox.Checked;
+                    config.enableUntested = F.EnableUntestedCheckBox.Checked;
+                    config.secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
+
+                    if (F.cameraSelectionAllowAny.Checked)
+                    {
+                        config.cameraSelectionMethod = ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY;
+                    }
+                    else
+                    {
+                        bool error = false;
+                        try
+                        {
+                            config.cameraVID = Convert.ToUInt16(F.modelVID.Text);
+                        }
+                        catch (System.FormatException ex)
+                        {
+                            error = true;
+                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}", F.modelVID.Text, ex.ToString()));
+                            MessageBox.Show("An invalid VID was entered.  Value was not changed");
+                        }
+
+                        try
+                        {
+                            config.cameraPID = Convert.ToUInt16(F.modelPID.Text);
+                        }
+                        catch (System.FormatException ex)
+                        {
+                            error = true;
+                            Log.Write(String.Format("Caught an exception converting PID [{0}] to UInt16: {1}", F.modelPID.Text, ex.ToString()));
+                            MessageBox.Show("An invalid PID was entered.  Value was not changed");
+                        }
+
+                        if (!error)
+                        {
+                            if (F.cameraSelectionExactModel.Checked)
+                            {
+                                config.cameraSelectionMethod = ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL;
+                            }
+                            else
+                            {
+                                config.cameraSelectionMethod = ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (ASCOM.DriverException ex)
+            {
+                throw ex;
+            }
+            catch (System.Exception ex)
+            {
+                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request" + ex), ex);
+            }
+        }
  
         internal void hardwareCapture(double Duration, bool Light)
         {

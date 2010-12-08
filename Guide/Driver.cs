@@ -36,8 +36,11 @@ namespace ASCOM.SXGuide
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {
+        private const int m_cameraID = 1;
+        private const string m_cameraType = "Guide";
+
         public Camera() :
-            base(1, "Guide")
+            base(m_cameraID, m_cameraType)
         {
         }
 
@@ -335,29 +338,6 @@ namespace ASCOM.SXGuide
                 {
                     throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Launches a configuration dialog box for the driver.  The call will not return
-        /// until the user clicks OK or cancel manually.
-        /// </summary>
-        /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
-        override public void SetupDialog()
-        {
-            try
-            {
-                Log.Write("Guide Camera SetupDialog()\n");
-                SetupDialogForm F = new SetupDialogForm();
-                F.ShowDialog();
-            }
-            catch (ASCOM.DriverException ex)
-            {
-                throw ex;
-            }
-            catch (System.Exception ex)
-            {
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
             }
         }
 

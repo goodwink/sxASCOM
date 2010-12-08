@@ -33,38 +33,24 @@ namespace ASCOM.SXCamera
         static SharedResources()								// Static initialization
         {
             Log.Write("SharedResources()\n");
+
+            controller1 = new sx.Controller();
+            controller2 = new sx.Controller();
+
+            Log.Write("SharedResources() returns\n");
         }
 
         //
         // Public access to shared resources
         //
 
-        public static bool controllerConnected
+        public static sx.Controller controller1
         {
             get;
             private set;
         }
 
-        public static void controllerConnect(UInt16 vid, UInt16 pid, bool skip)
-        {
-            Log.Write(String.Format("SharedResources.controllerConnect({0}, {1}, {2})", vid, pid, skip));
-
-            try
-            {
-                controller = new sx.Controller(vid, pid, skip);
-            }
-            catch (Exception ex)
-            {
-                controller = null;
-                string msg = String.Format("SharedResources().controllerConnect(): caught an exception {0}\n", ex.ToString());
-                Log.Write(msg);
-                throw new ASCOM.DriverException(msg, ex);
-            }
-            controllerConnected = true;
-            Log.Write("SharedResources().controllerConnect(): object create succeeded\n");
-        }        
-
-        public static sx.Controller controller
+        public static sx.Controller controller2
         {
             get;
             private set;
