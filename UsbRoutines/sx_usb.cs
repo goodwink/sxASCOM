@@ -203,6 +203,7 @@ namespace sx
             Object obj = null;
             numBytesRead = 0;
 
+            Log.Write(String.Format("interface Read({0}, {1}) begins\n", returnType, numBytesToRead));
             try
             {
                 unManagedBuffer = Marshal.AllocHGlobal(numBytesToRead);
@@ -288,6 +289,7 @@ namespace sx
                         Int16[] shorts = new Int16[numPixels];
                         Marshal.Copy(unManagedBuffer, shorts, 0, numPixels);
                         obj = shorts;
+
                     }
                     else if (returnType == typeof(Int32[]) || returnType == typeof(UInt32[]))
                     {

@@ -408,7 +408,11 @@ namespace sx
                     description = "H9C";
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
+#if true
                     progressive = true;
+#else
+                    Log.Write("For testing, H9_C set to interleaved\n");
+#endif
                     break;
                 case CameraModels.MODEL_H16:
                     bUntested = true;
@@ -432,6 +436,7 @@ namespace sx
                     progressive = true;
                     break;
                 case CameraModels.MODEL_LX1:
+                    bUntested = true;
                     description = "Lodestar";
                     fullWellCapacity = 50000;
                     electronsPerADU = 0.9;
@@ -1153,14 +1158,15 @@ namespace sx
                     pixelType = typeof(System.Byte);
                     break;
                 case 16:
-                    pixelType = typeof(System.UInt16);
+                    pixelType = typeof(System.Int16);
                     break;
                 case 32:
-                    pixelType = typeof(System.UInt32);
+                    pixelType = typeof(System.Int32);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(String.Format("Unexpected bitsPerPixel {0}", bitsPerPixel), "bitsPerPixel");
             }
+            Log.Write(String.Format("setPixelType set the type to {0}\n", pixelType));
         }
 
         internal void downloadPixels(bool setValid, SX_READ_DELAYED_BLOCK exposure)
@@ -1174,12 +1180,19 @@ namespace sx
 
             imageRawData = (Array)m_controller.ReadArray(pixelType, imagePixels, out numBytesRead);
 
-            if (setValid)
+            Log.Write(String.Format("typeof(pixelType)= {0}\n", pixelType.GetType()));
+            Log.Write("typeof(imageRawDate)=" + imageRawData.GetType().ToString() + "\n");
+
+            lock (oImageDataLock)
             {
-                lock (oImageDataLock)
+                if (setValid)
                 {
                     imageDataValid = true;
                     imageData = null;
+                }
+                else
+                {
+                    Debug.Assert(imageDataValid == false);
                 }
             }
 
@@ -1264,6 +1277,7 @@ namespace sx
                     m_controller.Write(cmdBlock, readBlock, out numBytesWritten);
                 }
 
+                Log.Write(String.Format("recordPixels() requested read, flags = {0}\n", firstExposureFlags)); 
                 exposureEnd = DateTimeOffset.Now;
                 Log.Write("recordPixelsDelayed requesting download\n");
                 downloadPixels(progressive, currentExposure.toCamera);
@@ -1285,13 +1299,20 @@ namespace sx
                                                     idx,
                                                     (UInt16)Marshal.SizeOf(readBlock));
 
-                    Log.Write("recordPixels() second frame requesting read\n");
+                    Log.Write(String.Format("recordPixels() second frame requesting read, flags = {0}\n", secondExposureFlags));
                     m_controller.Write(cmdBlock, readBlock, out numBytesWritten);
                     exposureEnd = DateTimeOffset.Now;
                     Log.Write("recordPixelsDelayed second frame requesting download\n");
                     downloadPixels(false, currentExposure.toCameraSecond);
-                    stitchImages(firstFrame, imageRawData);
                     Log.Write("recordPixels() second frame download completed\n");
+                    try
+                    {
+                        stitchImages(firstFrame, imageRawData);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Log.Write(String.Format("stich caught an exception: {0}\n", ex.ToString()));
+                    }
                 }
             }
             Log.Write("recordPixels() has unlocked\n");
@@ -1301,7 +1322,33 @@ namespace sx
         {
             Log.Write("stitching interlaced images\n");
 
-            Debug.Assert(false);
+            int totalLines = currentExposure.toCamera.height + currentExposure.toCameraSecond.height;
+            int width = currentExposure.toCamera.width;
+
+            imageRawData = System.Array.CreateInstance(pixelType, totalLines * width);
+
+            Log.Write("typeof(firstFrame)=" + firstFrame.GetType().ToString() + "\n");
+            Log.Write("typeof(secondFrame)=" + secondFrame.GetType().ToString() + "\n");
+            Log.Write("typeof(imageRawData)=" + imageRawData.GetType().ToString() + "\n");
+
+            for (int line=0;line < totalLines; line += 2)
+            {
+                // copy line from the first image
+                Array.Copy(firstFrame,    line/2 * width,
+                           imageRawData,  line   * width, 
+                           width);
+
+                // if we have an odd number of lines in the requested exposure, 
+                // the first frame can have 1 more line that the second, so we have
+                // to check to make sure that there is a line in the second image
+                if (line < currentExposure.toCameraSecond.height)
+                {
+                    // copy second line
+                    Array.Copy(secondFrame,   line/2   * width,
+                               imageRawData,  (line+1) * width, 
+                               width);
+                }
+            }
 
             // now that we have built the requested image, mark it as valid
             lock (oImageDataLock)
@@ -1309,7 +1356,7 @@ namespace sx
                 imageDataValid = true;
                 imageData = null;
             }
-            Log.Write("stitched interlaced images, set imageDataValid\n");
+            Log.Write("stitched interlaced images, set imageDataValid = true\n");
         }
     }
 }

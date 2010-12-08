@@ -99,8 +99,8 @@ namespace WinUsbDemo
                 throw new System.ArgumentException(String.Format("parsePth: unable to find vid and pid in {0}", path));
             }
 
-            vid = Convert.ToUInt16(m.Groups[1]);
-            pid = Convert.ToUInt16(m.Groups[2]);
+            vid = Convert.ToUInt16(m.Groups[1].ToString());
+            pid = Convert.ToUInt16(m.Groups[2].ToString());
         }
 
         ///  <summary>
@@ -149,7 +149,6 @@ namespace WinUsbDemo
             deviceInfoSet = SetupDiGetClassDevs(ref myGuid, IntPtr.Zero, IntPtr.Zero, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
 
             deviceFound = false;
-            memberIndex = 0;
 
             // The cbSize element of the MyDeviceInterfaceData structure must be set to
             // the structure's size in bytes. 

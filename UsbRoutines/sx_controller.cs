@@ -127,6 +127,7 @@ namespace sx
 
         internal Array ReadArray(Type elementType, Int32 numElements, out Int32 numBytesRead)
         {
+            Log.Write(String.Format("ReadArry begins, reading {0} elements of type {1}\n", numElements, elementType));
             return (Array)Read(System.Array.CreateInstance(elementType, 0).GetType(), numElements * Marshal.SizeOf(elementType), out numBytesRead);
         }
 
