@@ -2,24 +2,53 @@ from __future__ import print_function, with_statement
 
 import os, sys, getopt
 
+def printList(label, nameList):
+    if len(nameList) > 0:
+        first = True
+        print(label, end="")
+        for fileName in nameList:
+            if not first:
+                print(",", end="")
+            print("{0}".format(fileName), end="")
+            first = False
+    print("")
+
 def process(startDir):
+    dos = []
+    unix = []
+    mixed = []
     for root, dirs, files in os.walk(startDir):
         for fileName in files:
             if fileName.lower().endswith(".cs"):
-                mixed = False
                 fullPath = os.path.join(root, fileName)
                 with open(fullPath, "rb") as f:
-                    eol = None
+                    dosEnding = None
+                    mixedEnding = False
                     for line in f:
-                        if eol == None:
-                            eol = ord(line[-1])
-                        elif not mixed:
-                            if eol == 10:
-                                mixed = (eol != ord(line[-1]))
+                        #print ("dos={0} mixed={1} ".format(dosEnding, mixedEnding), end="")
+                        #if len(line) > 1:
+                        #    print("{0} {1} {2} {3}".format(len(line), ord(line[-2]), ord(line[-1]), line.strip()))
+                        #else:
+                        #    print("{0} {1}".format(len(line), line))
+                        if dosEnding == None:
+                            if len(line) > 1 and ord(line[-2]) == 13:
+                                dosEnding = True
                             else:
-                                mixed = (ord(line[-1]) == 1)
-                if mixed:
-                    print("{0}".format(fullPath))
+                                dosEnding = False
+                        else:
+                            if dosEnding and (len(line) < 2 or ord(line[-2]) != 13):
+                                mixedEnding = True
+                                break
+                    if mixedEnding:
+                        mixed.append(fullPath)
+                    elif dosEnding:
+                        dos.append(fullPath)
+                    else:
+                        unix.append(fullPath)
+
+    printList("dos:", dos)
+    printList("unix:", unix)
+    printList("mixed:", mixed)
 
 def usage():
     print("usage: {0}: [options] <diretory> [<directory>...]".format(sys.argv[0]), file=sys.stderr);
