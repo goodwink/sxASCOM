@@ -39,18 +39,29 @@ namespace ASCOM.SXGeneric
             this.secondsAreMiliseconds = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.cameraSelectionExcludeModel = new System.Windows.Forms.RadioButton();
-            this.cameraSelectionExactModel = new System.Windows.Forms.RadioButton();
-            this.cameraSelectionAllowAny = new System.Windows.Forms.RadioButton();
-            this.modelSelectionGroup = new System.Windows.Forms.GroupBox();
-            this.modelPID = new System.Windows.Forms.MaskedTextBox();
-            this.modelVID = new System.Windows.Forms.MaskedTextBox();
+            this.camera1SelectionExcludeModel = new System.Windows.Forms.RadioButton();
+            this.camera1SelectionExactModel = new System.Windows.Forms.RadioButton();
+            this.camera1SelectionAllowAny = new System.Windows.Forms.RadioButton();
+            this.model1SelectionGroup = new System.Windows.Forms.GroupBox();
+            this.camera1PID = new System.Windows.Forms.MaskedTextBox();
+            this.camera1VID = new System.Windows.Forms.MaskedTextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.Copyright = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.camera2SelectionExcludeModel = new System.Windows.Forms.RadioButton();
+            this.camera2SelectionExactModel = new System.Windows.Forms.RadioButton();
+            this.camera2SelectionAllowAny = new System.Windows.Forms.RadioButton();
+            this.model2SelectionGroup = new System.Windows.Forms.GroupBox();
+            this.camera2PID = new System.Windows.Forms.MaskedTextBox();
+            this.camera2VID = new System.Windows.Forms.MaskedTextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.groupBox1.SuspendLayout();
-            this.modelSelectionGroup.SuspendLayout();
+            this.model1SelectionGroup.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.model2SelectionGroup.SuspendLayout();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -146,79 +157,79 @@ namespace ASCOM.SXGeneric
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.cameraSelectionExcludeModel);
-            this.groupBox1.Controls.Add(this.cameraSelectionExactModel);
-            this.groupBox1.Controls.Add(this.cameraSelectionAllowAny);
+            this.groupBox1.Controls.Add(this.camera1SelectionExcludeModel);
+            this.groupBox1.Controls.Add(this.camera1SelectionExactModel);
+            this.groupBox1.Controls.Add(this.camera1SelectionAllowAny);
             this.groupBox1.Location = new System.Drawing.Point(15, 192);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(200, 89);
+            this.groupBox1.Size = new System.Drawing.Size(147, 89);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Camera Selection";
+            this.groupBox1.Text = "Main Camera Selection";
             // 
-            // cameraSelectionExcludeModel
+            // camera1SelectionExcludeModel
             // 
-            this.cameraSelectionExcludeModel.AutoSize = true;
-            this.cameraSelectionExcludeModel.Location = new System.Drawing.Point(21, 65);
-            this.cameraSelectionExcludeModel.Name = "cameraSelectionExcludeModel";
-            this.cameraSelectionExcludeModel.Size = new System.Drawing.Size(95, 17);
-            this.cameraSelectionExcludeModel.TabIndex = 7;
-            this.cameraSelectionExcludeModel.Text = "Exclude Model";
-            this.cameraSelectionExcludeModel.UseVisualStyleBackColor = true;
+            this.camera1SelectionExcludeModel.AutoSize = true;
+            this.camera1SelectionExcludeModel.Location = new System.Drawing.Point(21, 65);
+            this.camera1SelectionExcludeModel.Name = "camera1SelectionExcludeModel";
+            this.camera1SelectionExcludeModel.Size = new System.Drawing.Size(95, 17);
+            this.camera1SelectionExcludeModel.TabIndex = 7;
+            this.camera1SelectionExcludeModel.Text = "Exclude Model";
+            this.camera1SelectionExcludeModel.UseVisualStyleBackColor = true;
             // 
-            // cameraSelectionExactModel
+            // camera1SelectionExactModel
             // 
-            this.cameraSelectionExactModel.AutoSize = true;
-            this.cameraSelectionExactModel.Location = new System.Drawing.Point(21, 42);
-            this.cameraSelectionExactModel.Name = "cameraSelectionExactModel";
-            this.cameraSelectionExactModel.Size = new System.Drawing.Size(87, 17);
-            this.cameraSelectionExactModel.TabIndex = 6;
-            this.cameraSelectionExactModel.Text = "Select Model";
-            this.cameraSelectionExactModel.UseVisualStyleBackColor = true;
+            this.camera1SelectionExactModel.AutoSize = true;
+            this.camera1SelectionExactModel.Location = new System.Drawing.Point(21, 42);
+            this.camera1SelectionExactModel.Name = "camera1SelectionExactModel";
+            this.camera1SelectionExactModel.Size = new System.Drawing.Size(87, 17);
+            this.camera1SelectionExactModel.TabIndex = 6;
+            this.camera1SelectionExactModel.Text = "Select Model";
+            this.camera1SelectionExactModel.UseVisualStyleBackColor = true;
             // 
-            // cameraSelectionAllowAny
+            // camera1SelectionAllowAny
             // 
-            this.cameraSelectionAllowAny.AutoSize = true;
-            this.cameraSelectionAllowAny.Checked = true;
-            this.cameraSelectionAllowAny.Location = new System.Drawing.Point(21, 19);
-            this.cameraSelectionAllowAny.Name = "cameraSelectionAllowAny";
-            this.cameraSelectionAllowAny.Size = new System.Drawing.Size(71, 17);
-            this.cameraSelectionAllowAny.TabIndex = 5;
-            this.cameraSelectionAllowAny.TabStop = true;
-            this.cameraSelectionAllowAny.Text = "Allow Any";
-            this.cameraSelectionAllowAny.UseVisualStyleBackColor = true;
-            this.cameraSelectionAllowAny.CheckedChanged += new System.EventHandler(this.cameraSelectionAllowAny_CheckedChanged);
+            this.camera1SelectionAllowAny.AutoSize = true;
+            this.camera1SelectionAllowAny.Checked = true;
+            this.camera1SelectionAllowAny.Location = new System.Drawing.Point(21, 19);
+            this.camera1SelectionAllowAny.Name = "camera1SelectionAllowAny";
+            this.camera1SelectionAllowAny.Size = new System.Drawing.Size(71, 17);
+            this.camera1SelectionAllowAny.TabIndex = 5;
+            this.camera1SelectionAllowAny.TabStop = true;
+            this.camera1SelectionAllowAny.Text = "Allow Any";
+            this.camera1SelectionAllowAny.UseVisualStyleBackColor = true;
+            this.camera1SelectionAllowAny.CheckedChanged += new System.EventHandler(this.camera1SelectionAllowAny_CheckedChanged);
             // 
-            // modelSelectionGroup
+            // model1SelectionGroup
             // 
-            this.modelSelectionGroup.Controls.Add(this.modelPID);
-            this.modelSelectionGroup.Controls.Add(this.modelVID);
-            this.modelSelectionGroup.Controls.Add(this.label4);
-            this.modelSelectionGroup.Controls.Add(this.label3);
-            this.modelSelectionGroup.Location = new System.Drawing.Point(18, 296);
-            this.modelSelectionGroup.Name = "modelSelectionGroup";
-            this.modelSelectionGroup.Size = new System.Drawing.Size(200, 100);
-            this.modelSelectionGroup.TabIndex = 8;
-            this.modelSelectionGroup.TabStop = false;
-            this.modelSelectionGroup.Text = "Model Selection";
+            this.model1SelectionGroup.Controls.Add(this.camera1PID);
+            this.model1SelectionGroup.Controls.Add(this.camera1VID);
+            this.model1SelectionGroup.Controls.Add(this.label4);
+            this.model1SelectionGroup.Controls.Add(this.label3);
+            this.model1SelectionGroup.Location = new System.Drawing.Point(18, 296);
+            this.model1SelectionGroup.Name = "model1SelectionGroup";
+            this.model1SelectionGroup.Size = new System.Drawing.Size(144, 100);
+            this.model1SelectionGroup.TabIndex = 8;
+            this.model1SelectionGroup.TabStop = false;
+            this.model1SelectionGroup.Text = "Main Camera Model";
             // 
-            // modelPID
+            // camera1PID
             // 
-            this.modelPID.Location = new System.Drawing.Point(69, 58);
-            this.modelPID.Mask = "9990";
-            this.modelPID.Name = "modelPID";
-            this.modelPID.Size = new System.Drawing.Size(36, 20);
-            this.modelPID.TabIndex = 112;
-            this.modelPID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.camera1PID.Location = new System.Drawing.Point(69, 58);
+            this.camera1PID.Mask = "9990";
+            this.camera1PID.Name = "camera1PID";
+            this.camera1PID.Size = new System.Drawing.Size(36, 20);
+            this.camera1PID.TabIndex = 112;
+            this.camera1PID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
-            // modelVID
+            // camera1VID
             // 
-            this.modelVID.Location = new System.Drawing.Point(69, 29);
-            this.modelVID.Mask = "9990";
-            this.modelVID.Name = "modelVID";
-            this.modelVID.Size = new System.Drawing.Size(36, 20);
-            this.modelVID.TabIndex = 111;
-            this.modelVID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.camera1VID.Location = new System.Drawing.Point(69, 29);
+            this.camera1VID.Mask = "9990";
+            this.camera1VID.Name = "camera1VID";
+            this.camera1VID.Size = new System.Drawing.Size(36, 20);
+            this.camera1VID.TabIndex = 111;
+            this.camera1VID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // label4
             // 
@@ -247,13 +258,109 @@ namespace ASCOM.SXGeneric
             this.Copyright.Text = "Copyright (C) 2010 Dad Dog Development Ltd.\r\nThis work is licensed under the Crea" +
                 "tive Commons Attribution-No Derivative Works 3.0 License.";
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.camera2SelectionExcludeModel);
+            this.groupBox2.Controls.Add(this.camera2SelectionExactModel);
+            this.groupBox2.Controls.Add(this.camera2SelectionAllowAny);
+            this.groupBox2.Location = new System.Drawing.Point(205, 192);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(147, 89);
+            this.groupBox2.TabIndex = 8;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Second Camera Selection";
+            // 
+            // camera2SelectionExcludeModel
+            // 
+            this.camera2SelectionExcludeModel.AutoSize = true;
+            this.camera2SelectionExcludeModel.Location = new System.Drawing.Point(21, 65);
+            this.camera2SelectionExcludeModel.Name = "camera2SelectionExcludeModel";
+            this.camera2SelectionExcludeModel.Size = new System.Drawing.Size(95, 17);
+            this.camera2SelectionExcludeModel.TabIndex = 7;
+            this.camera2SelectionExcludeModel.Text = "Exclude Model";
+            this.camera2SelectionExcludeModel.UseVisualStyleBackColor = true;
+            // 
+            // camera2SelectionExactModel
+            // 
+            this.camera2SelectionExactModel.AutoSize = true;
+            this.camera2SelectionExactModel.Location = new System.Drawing.Point(21, 42);
+            this.camera2SelectionExactModel.Name = "camera2SelectionExactModel";
+            this.camera2SelectionExactModel.Size = new System.Drawing.Size(87, 17);
+            this.camera2SelectionExactModel.TabIndex = 6;
+            this.camera2SelectionExactModel.Text = "Select Model";
+            this.camera2SelectionExactModel.UseVisualStyleBackColor = true;
+            // 
+            // camera2SelectionAllowAny
+            // 
+            this.camera2SelectionAllowAny.AutoSize = true;
+            this.camera2SelectionAllowAny.Checked = true;
+            this.camera2SelectionAllowAny.Location = new System.Drawing.Point(21, 19);
+            this.camera2SelectionAllowAny.Name = "camera2SelectionAllowAny";
+            this.camera2SelectionAllowAny.Size = new System.Drawing.Size(71, 17);
+            this.camera2SelectionAllowAny.TabIndex = 5;
+            this.camera2SelectionAllowAny.TabStop = true;
+            this.camera2SelectionAllowAny.Text = "Allow Any";
+            this.camera2SelectionAllowAny.UseVisualStyleBackColor = true;
+            this.camera2SelectionAllowAny.CheckedChanged += new System.EventHandler(this.camera2SelectionAllowAny_CheckedChanged);
+            // 
+            // model2SelectionGroup
+            // 
+            this.model2SelectionGroup.Controls.Add(this.camera2PID);
+            this.model2SelectionGroup.Controls.Add(this.camera2VID);
+            this.model2SelectionGroup.Controls.Add(this.label2);
+            this.model2SelectionGroup.Controls.Add(this.label5);
+            this.model2SelectionGroup.Location = new System.Drawing.Point(208, 296);
+            this.model2SelectionGroup.Name = "model2SelectionGroup";
+            this.model2SelectionGroup.Size = new System.Drawing.Size(144, 100);
+            this.model2SelectionGroup.TabIndex = 113;
+            this.model2SelectionGroup.TabStop = false;
+            this.model2SelectionGroup.Text = "Second Camera Model";
+            // 
+            // camera2PID
+            // 
+            this.camera2PID.Location = new System.Drawing.Point(69, 58);
+            this.camera2PID.Mask = "9990";
+            this.camera2PID.Name = "camera2PID";
+            this.camera2PID.Size = new System.Drawing.Size(36, 20);
+            this.camera2PID.TabIndex = 112;
+            this.camera2PID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // camera2VID
+            // 
+            this.camera2VID.Location = new System.Drawing.Point(69, 29);
+            this.camera2VID.Mask = "9990";
+            this.camera2VID.Name = "camera2VID";
+            this.camera2VID.Size = new System.Drawing.Size(36, 20);
+            this.camera2VID.TabIndex = 111;
+            this.camera2VID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(38, 58);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(28, 13);
+            this.label2.TabIndex = 109;
+            this.label2.Text = "PID:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(35, 32);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(28, 13);
+            this.label5.TabIndex = 110;
+            this.label5.Text = "VID:";
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(380, 424);
+            this.Controls.Add(this.model2SelectionGroup);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.Copyright);
-            this.Controls.Add(this.modelSelectionGroup);
+            this.Controls.Add(this.model1SelectionGroup);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.secondsAreMiliseconds);
             this.Controls.Add(this.Version);
@@ -274,8 +381,12 @@ namespace ASCOM.SXGeneric
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            this.modelSelectionGroup.ResumeLayout(false);
-            this.modelSelectionGroup.PerformLayout();
+            this.model1SelectionGroup.ResumeLayout(false);
+            this.model1SelectionGroup.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
+            this.model2SelectionGroup.ResumeLayout(false);
+            this.model2SelectionGroup.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -295,12 +406,21 @@ namespace ASCOM.SXGeneric
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
-        internal System.Windows.Forms.RadioButton cameraSelectionAllowAny;
-        internal System.Windows.Forms.RadioButton cameraSelectionExcludeModel;
-        internal System.Windows.Forms.RadioButton cameraSelectionExactModel;
-        internal System.Windows.Forms.GroupBox modelSelectionGroup;
-        internal System.Windows.Forms.MaskedTextBox modelPID;
-        internal System.Windows.Forms.MaskedTextBox modelVID;
+        internal System.Windows.Forms.RadioButton camera1SelectionAllowAny;
+        internal System.Windows.Forms.RadioButton camera1SelectionExcludeModel;
+        internal System.Windows.Forms.RadioButton camera1SelectionExactModel;
+        internal System.Windows.Forms.GroupBox model1SelectionGroup;
+        internal System.Windows.Forms.MaskedTextBox camera1PID;
+        internal System.Windows.Forms.MaskedTextBox camera1VID;
         private System.Windows.Forms.Label Copyright;
+        private System.Windows.Forms.GroupBox groupBox2;
+        internal System.Windows.Forms.RadioButton camera2SelectionExcludeModel;
+        internal System.Windows.Forms.RadioButton camera2SelectionExactModel;
+        internal System.Windows.Forms.RadioButton camera2SelectionAllowAny;
+        internal System.Windows.Forms.GroupBox model2SelectionGroup;
+        internal System.Windows.Forms.MaskedTextBox camera2PID;
+        internal System.Windows.Forms.MaskedTextBox camera2VID;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label5;
     }
 }
