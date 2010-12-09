@@ -81,23 +81,25 @@ namespace ASCOM.SXGeneric
          //
         // Constructor - Must be public for COM registration!
         //
-        protected Camera(UInt16 whichCamera, string cameraType)
+        protected Camera(UInt16 whichCamera, string cameraType, UInt16 whichController)
         {
             try
             {
-                Log.Write(String.Format("Camera({0},{1})\n", whichCamera, cameraType));
+                Log.Write(String.Format("Camera({0}, {1}, {2})\n", whichCamera, cameraType, whichController));
 
                 
-                if (whichCamera < 2)
+                m_cameraId = whichCamera;
+
+                switch (whichController)
                 {
-                    m_cameraId = whichCamera;
-                    m_controller = ASCOM.SXCamera.SharedResources.controller1;
-                }
-                else
-                {
-                    m_cameraId = (UInt16)(whichCamera - 2);
-                    Debug.Assert(m_cameraId < 2);
-                    m_controller = ASCOM.SXCamera.SharedResources.controller2;
+                    case 0:
+                        m_controller = ASCOM.SXCamera.SharedResources.controller0;
+                        break;
+                    case 1:
+                        m_controller = ASCOM.SXCamera.SharedResources.controller1;
+                        break;
+                    default:
+                        throw new ASCOM.InvalidValueException("SXGeneric constructor error: whichController", whichController.ToString(), "0 <= whichController <= 1");
                 }
 
                 oCameraStateLock = new Object();

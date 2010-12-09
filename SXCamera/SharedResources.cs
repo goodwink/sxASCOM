@@ -34,8 +34,8 @@ namespace ASCOM.SXCamera
         {
             Log.Write("SharedResources()\n");
 
+            controller0 = new sx.Controller();
             controller1 = new sx.Controller();
-            controller2 = new sx.Controller();
 
             Log.Write("SharedResources() returns\n");
         }
@@ -44,13 +44,13 @@ namespace ASCOM.SXCamera
         // Public access to shared resources
         //
 
-        public static sx.Controller controller1
+        public static sx.Controller controller0
         {
             get;
             private set;
         }
 
-        public static sx.Controller controller2
+        public static sx.Controller controller1
         {
             get;
             private set;

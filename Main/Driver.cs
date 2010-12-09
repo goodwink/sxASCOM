@@ -38,12 +38,20 @@ namespace ASCOM.SXMain
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {
-        private const int m_cameraID = 0;
-        private const string m_cameraType = "Main";
-        
-        public Camera() :
-            base(m_cameraID, m_cameraType)
+        private const UInt16 DEFAULT_CAMERA_ID = 0;
+        private const string DEFAULT_CAMERA_TYPE = "Main";
+        private const UInt16 DEFAULT_CONTROLLER_NUMBER = 0;
+
+        public Camera(UInt16 cameraId, string cameraType, UInt16 controllerNumber) :
+            base(cameraId, cameraType, controllerNumber)
         {
+            Log.Write(String.Format("Camera({0}, {1}, {2}) called\n", cameraId, cameraType, controllerNumber));
+        }
+
+        public Camera() :
+            this(DEFAULT_CAMERA_ID, DEFAULT_CAMERA_TYPE, DEFAULT_CONTROLLER_NUMBER)
+        {
+            Log.Write(String.Format("Camera() called\n"));
         }
 
         /// <summary>
