@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("ASCOM Camera Driver for SX Main Camera")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ASCOM Initiative")]
-[assembly: AssemblyProduct("SX Main Camera")]
+[assembly: AssemblyProduct("Starlight Express USB Camera")]
 [assembly: AssemblyCopyright("(C)2010 Dad Dog Development Ltd.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

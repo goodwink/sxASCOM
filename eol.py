@@ -11,7 +11,7 @@ def printList(label, nameList):
                 print(",", end="")
             print("{0}".format(fileName), end="")
             first = False
-    print("")
+    print("\n")
 
 def process(startDir):
     dos = []

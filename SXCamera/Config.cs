@@ -38,23 +38,23 @@ namespace ASCOM.SXCamera
             CAMERA_SELECTION_EXCLUDE_MODEL
         };
 
-        private const string CAMERA1_SELECTION = "Camera1Selection";
-        private string DEFAULT_CAMERA1_SELECTION = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL);
+        private const string CAMERA0_SELECTION = "camera0Selection";
+        private string DEFAULT_CAMERA0_SELECTION = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL);
 
-        private const string CAMERA1_VID = "Camera1VID";
+        private const string CAMERA0_VID = "camera0VID";
+        private const UInt16 DEFAULT_CAMERA0_VID = 1278;
+
+        private const string CAMERA0_PID = "camera0PID";
+        private const UInt16 DEFAULT_CAMERA0_PID = 507;
+
+        private const string CAMERA1_SELECTION = "camera1Selection";
+        private string DEFAULT_CAMERA1_SELECTION = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL);
+
+        private const string CAMERA1_VID = "camera1VID";
         private const UInt16 DEFAULT_CAMERA1_VID = 1278;
 
-        private const string CAMERA1_PID = "Camera1PID";
-        private const UInt16 DEFAULT_CAMERA1_PID = 507;
-
-        private const string CAMERA2_SELECTION = "Camera2Selection";
-        private string DEFAULT_CAMERA2_SELECTION = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL);
-
-        private const string CAMERA2_VID = "Camera2VID";
-        private const UInt16 DEFAULT_CAMERA2_VID = 1278;
-
-        private const string CAMERA2_PID = "Camera2PID";
-        private const UInt16 DEFAULT_CAMERA2_PID = 507;  
+        private const string CAMERA1_PID = "camera1PID";
+        private const UInt16 DEFAULT_CAMERA1_PID = 507;  
       
         private string driverID;
         ProfileClass profile;
@@ -193,14 +193,40 @@ namespace ASCOM.SXCamera
             set { SetString(LOG_FILE_NAME, value); }
         }
 
+        public CAMERA_SELECTION_METHOD camera0SelectionMethod
+        {
+            get
+            {
+                Log.Write(String.Format("default={0}\n", DEFAULT_CAMERA0_SELECTION));
+                String selection = GetString(CAMERA0_SELECTION, DEFAULT_CAMERA0_SELECTION);
+                Log.Write(String.Format("CAMERA0SelectionMethod get converting {0}\n", selection));
+                return (CAMERA_SELECTION_METHOD)Enum.Parse(typeof(CAMERA_SELECTION_METHOD), selection, true);
+            }
+            set
+            {
+                String selection = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), value);
+                SetString(CAMERA0_SELECTION, selection);
+            }
+        }
+
+        public UInt16 camera0VID
+        {
+            get { return GetUInt16(CAMERA0_VID, DEFAULT_CAMERA0_VID); }
+            set { SetString(CAMERA0_VID, value.ToString()); }
+        }
+
+        public UInt16 camera0PID
+        {
+            get { return GetUInt16(CAMERA0_PID, DEFAULT_CAMERA0_PID); }
+            set { SetString(CAMERA0_PID, value.ToString()); }
+        }
         public CAMERA_SELECTION_METHOD camera1SelectionMethod
         {
             get
             {
-                Log.Write(String.Format("enum madness =[{0}]\n", Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)));
                 Log.Write(String.Format("default={0}\n", DEFAULT_CAMERA1_SELECTION));
                 String selection = GetString(CAMERA1_SELECTION, DEFAULT_CAMERA1_SELECTION);
-                Log.Write(String.Format("camera1SelectionMethod get converting {0}\n", selection));
+                Log.Write(String.Format("CAMERA1SelectionMethod get converting {0}\n", selection));
                 return (CAMERA_SELECTION_METHOD)Enum.Parse(typeof(CAMERA_SELECTION_METHOD), selection, true);
             }
             set
@@ -220,34 +246,6 @@ namespace ASCOM.SXCamera
         {
             get { return GetUInt16(CAMERA1_PID, DEFAULT_CAMERA1_PID); }
             set { SetString(CAMERA1_PID, value.ToString()); }
-        }
-        public CAMERA_SELECTION_METHOD camera2SelectionMethod
-        {
-            get
-            {
-                Log.Write(String.Format("enum madness =[{0}]\n", Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)));
-                Log.Write(String.Format("default={0}\n", DEFAULT_CAMERA2_SELECTION));
-                String selection = GetString(CAMERA2_SELECTION, DEFAULT_CAMERA2_SELECTION);
-                Log.Write(String.Format("camera1SelectionMethod get converting {0}\n", selection));
-                return (CAMERA_SELECTION_METHOD)Enum.Parse(typeof(CAMERA_SELECTION_METHOD), selection, true);
-            }
-            set
-            {
-                String selection = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), value);
-                SetString(CAMERA2_SELECTION, selection);
-            }
-        }
-
-        public UInt16 camera2VID
-        {
-            get { return GetUInt16(CAMERA2_VID, DEFAULT_CAMERA2_VID); }
-            set { SetString(CAMERA2_VID, value.ToString()); }
-        }
-
-        public UInt16 camera2PID
-        {
-            get { return GetUInt16(CAMERA2_PID, DEFAULT_CAMERA2_PID); }
-            set { SetString(CAMERA2_PID, value.ToString()); }
         }
     }
 }

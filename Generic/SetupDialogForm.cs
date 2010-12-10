@@ -50,6 +50,18 @@ namespace ASCOM.SXGeneric
 
         private void camera1SelectionAllowAny_CheckedChanged(object sender, EventArgs e)
         {
+            if (camera0SelectionAllowAny.Checked)
+            {
+                model0SelectionGroup.Visible = false;
+            }
+            else
+            {
+                model0SelectionGroup.Visible = true;
+            }
+        }
+
+        private void camera2SelectionAllowAny_CheckedChanged(object sender, EventArgs e)
+        {
             if (camera1SelectionAllowAny.Checked)
             {
                 model1SelectionGroup.Visible = false;
@@ -57,18 +69,6 @@ namespace ASCOM.SXGeneric
             else
             {
                 model1SelectionGroup.Visible = true;
-            }
-        }
-
-        private void camera2SelectionAllowAny_CheckedChanged(object sender, EventArgs e)
-        {
-            if (camera2SelectionAllowAny.Checked)
-            {
-                model2SelectionGroup.Visible = false;
-            }
-            else
-            {
-                model2SelectionGroup.Visible = true;
             }
         }
     }
