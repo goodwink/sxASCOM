@@ -39,6 +39,9 @@ def process(startDir):
                             if dosEnding and (len(line) < 2 or ord(line[-2]) != 13):
                                 mixedEnding = True
                                 break
+                            elif not dosEnding and len(line) > 1 and ord(line[-2]) == 13:
+                                mixedEnding = True
+                                break
                     if mixedEnding:
                         mixed.append(fullPath)
                     elif dosEnding:
