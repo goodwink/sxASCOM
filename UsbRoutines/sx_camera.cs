@@ -600,7 +600,7 @@ namespace sx
 
             if (height % yBin != 0)
             {
-                throw new ArgumentOutOfRangeException("height % yBin != 0");
+                throw new ArgumentOutOfRangeException(String.Format("height ({0}) % yBin ({1}) != 0 ({2}", height, yBin, height % yBin));
             }
 
         }
@@ -625,6 +625,7 @@ namespace sx
 
         public void freezeParameters()
         {
+            dumpReadDelayedBlock(nextExposure, "freezing parameters");
             currentExposure.userRequested = nextExposure;
         }
 
@@ -632,11 +633,11 @@ namespace sx
         {
             UInt16 fieldFlags;
 
+            dumpReadDelayedBlock(currentExposure.userRequested, "as requested - before adjustments");
+
             checkParms(currentExposure.userRequested.width, currentExposure.userRequested.height, currentExposure.userRequested.x_offset, currentExposure.userRequested.y_offset, currentExposure.userRequested.x_bin, currentExposure.userRequested.y_bin);
 
             currentExposure.toCamera = currentExposure.userRequested;
-
-            dumpReadDelayedBlock(currentExposure.toCamera, "as requested - before adjustments");
 
             // cameras with a Bayer matrix need the offsets to be even so that the subframe returned 
             // has the same color representation as a full frame.  Since this (at most) offsets 

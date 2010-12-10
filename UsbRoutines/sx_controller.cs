@@ -107,11 +107,11 @@ namespace sx
 
             m_iface = new USBInterface(vid, pid, skip);
 
+            Connected = true;
+
             reset();
             firmwareVersion = getVersion();
             getParams(ref m_ccdParms);
-
-            Connected = true;
 
             Log.Write("controller.connect(): returns\n");
         }

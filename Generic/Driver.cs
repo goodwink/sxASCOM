@@ -1897,9 +1897,6 @@ namespace ASCOM.SXGeneric
                     }
                     state = CameraStates.cameraExposing;
 
-                    // grab the parameters requested for this exposure while we are still 
-                    // running on the calling thread
-                    sxCamera.freezeParameters();
                 }
 
                 try
@@ -1958,6 +1955,10 @@ namespace ASCOM.SXGeneric
                     {
                         captureDelegate = new CaptureDelegate(softwareCapture);
                     }
+
+                    // grab the parameters requested for this exposure while we are still 
+                    // running on the calling thread
+                    sxCamera.freezeParameters();
 
                     Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
 
