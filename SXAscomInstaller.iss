@@ -4,7 +4,7 @@
 ;
 
 #define BUILD_TYPE "Debug"
-#define APP_VERSION "1.3.4"
+#define APP_VERSION "1.3.5"
 #define ASCOM_VERSION_REQUIRED  "5.5"
 
 [Setup]
@@ -44,6 +44,7 @@ Source: "SXCamera\bin\{#BUILD_TYPE}\ASCOM.SXCamera.exe"; DestDir: "{app}"
 Source: "ASCOM.SXCamera.exe.config"; DestDir: "{app}"
 ; TODO: Add driver assemblies into the ServedClasses folder
 Source: "Main\bin\{#BUILD_TYPE}\ASCOM.SXMain.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
+Source: "Main2\bin\{#BUILD_TYPE}\ASCOM.SXMain2.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
 Source: "Guide\bin\{#BUILD_TYPE}\ASCOM.SXGuide.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
 Source: "Generic\bin\{#BUILD_TYPE}\ASCOM.SXGeneric.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
 Source: "CreativeCommons.html"; DestDir: "{app}\SXCamera" ; Flags: isreadme
