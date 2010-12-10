@@ -162,7 +162,7 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    bool bReturn = sxCamera.hasCoolerControl && config.enableUntested;
+                    bool bReturn = sxCamera.hasCoolerControl;
 
                     Log.Write(String.Format("CanSetCCDTemperature get: {0}\n", bReturn));
 
