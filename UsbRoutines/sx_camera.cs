@@ -415,7 +415,6 @@ namespace sx
 #endif
                     break;
                 case CameraModels.MODEL_H16:
-                    bUntested = true;
                     description = "H16";
                     fullWellCapacity = 40000;
                     electronsPerADU = 0.6;
