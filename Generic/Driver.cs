@@ -87,7 +87,7 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write(String.Format("Camera({0}, {1})\n", whichCamera, whichController));
+                Log.Write(String.Format("Generic::Camera({0}, {1})\n", whichCamera, whichController));
                                 
                 m_cameraId = whichCamera;
 
@@ -128,7 +128,7 @@ namespace ASCOM.SXGeneric
                 oCameraStateLock = new Object();
                 oGuideStateLock = new Object();
 
-                Log.Write("Camera() constructor ends\n");
+                Log.Write(String.Format("Generic::Camera() ends for vid={0} pid={1} skip={2}\n", m_vid, m_pid, m_skip));
             }
             catch (ASCOM.DriverException ex)
             {
@@ -153,7 +153,7 @@ namespace ASCOM.SXGeneric
             bLastErrorValid = true;
             lastErrorMessage = errorMessage;
 
-            Log.Write("SetError(" + errorMessage + ")\n");
+            Log.Write(String.Format("Generic::SetError({0})\n", errorMessage));
             return errorMessage;
         }
 
@@ -177,11 +177,12 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write("AbortExposure()\n");
+                verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                Log.Write("Generic::AbortExposure() begins\n");
 
                 bLastErrorValid = false;
 
-                verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                 lock (oCameraStateLock)
                 {
@@ -222,9 +223,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("BinX get: m_Binx =" + m_BinX + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::BinX get returns {0}\n", m_BinX));
 
                     return m_BinX;
                 }
@@ -241,12 +242,11 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("BinX set to " + value + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     m_BinX = value;
-                    sxCamera.xBin = (byte)value;
+                    sxCamera.xBin = (byte)m_BinX;
+                    Log.Write(String.Format("Generic::BinX set to {0}\n", m_BinX));
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
@@ -277,9 +277,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("BinY get: m_BinY =" + m_BinY +"\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::BinY get returns {0}\n", m_BinY));
 
                     return m_BinY;
                 }
@@ -296,12 +296,11 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("BinY set to " + value +" \n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     m_BinY = value;
-                    sxCamera.yBin = (byte)value;
+                    sxCamera.yBin = (byte)m_BinY;
+                    Log.Write(String.Format("Generic::BinY set to {0}\n", m_BinY));
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
@@ -364,12 +363,11 @@ namespace ASCOM.SXGeneric
             { 
                 try
                 {
-                    Log.Write("CameraState() called from state " + state +"\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     lock (oCameraStateLock)
                     {
+                        Log.Write(String.Format("Generic::CameraState() called from state {0}\n", state));
                         return state;
                     }
                 }
@@ -394,9 +392,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("CameraXSize get: m_CameraXSize = " + m_CameraXSize + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::CameraXSize get returns m_CameraXSize {0}\n", m_CameraXSize));
 
                     return m_CameraXSize;
                 }
@@ -414,6 +412,7 @@ namespace ASCOM.SXGeneric
                 try
                 {
                     m_CameraXSize = value;
+                    Log.Write(String.Format("Generic::CameraXSize set to {0}\n", m_CameraXSize));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -436,9 +435,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("CameraYSize get: m_CameraYSize = " + m_CameraYSize +"\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::CameraYSize get returns CameraYSize {0}\n", m_CameraYSize));
 
                     return m_CameraYSize;
                 }
@@ -457,6 +456,7 @@ namespace ASCOM.SXGeneric
                 try
                 {
                     m_CameraYSize = value;
+                    Log.Write(String.Format("Generic::CameraYSize set to {0}\n", m_CameraYSize));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -478,9 +478,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("CanAbortExposure get\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Generic::CanAbortExposure get returns true\n");
 
                     return true;
                 }
@@ -508,12 +508,12 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("CanAsymetricBin get: false\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     // The SX cameras can actualy do asymmetric binning, but with bayer color cameras it makes things weird, 
                     // and I don't need it, so I'm disallowing it.
+
+                    Log.Write("Generic::CanAsymetricBin get returns false\n");
 
                     return false;
                 }
@@ -570,9 +570,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("CanStopExposure get: true\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Generic::CanStopExposure get returns true\n");
 
                     return true;
                 }
@@ -599,7 +599,7 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("Connected get: returning " + m_Connected +"\n");
+                    Log.Write(String.Format("Generic::Connected get returning {0}\n", m_Connected));
 
                     return  m_Connected;
                 }
@@ -614,7 +614,7 @@ namespace ASCOM.SXGeneric
             }
             set
             {
-                Log.Write(String.Format("Connected set: Current Value is {0}, requested value is {1}\n", m_Connected, value));
+                Log.Write(String.Format("Generic::Connected set: Current Value is {0}, requested value is {1}\n", m_Connected, value));
 
                 try
                 {
@@ -633,6 +633,7 @@ namespace ASCOM.SXGeneric
 
                         try
                         {
+                            Log.Write(String.Format("m_controller.Connected={0}\n", m_controller.Connected));
                             if (!m_controller.Connected)
                             {
                                 try
@@ -685,7 +686,7 @@ namespace ASCOM.SXGeneric
                         m_Connected = false;
                     }
 
-                    Log.Write("Camera::conneted set ends\n");
+                    Log.Write("Generic::conneted set ends\n");
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -693,7 +694,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Camera::connected set caught an exception: " + ex.ToString()), ex);
+                    throw new ASCOM.DriverException(SetError("Generic::Camera::connected set caught an exception: " + ex.ToString()), ex);
                 }
 
             }
@@ -737,9 +738,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("Generic Description get: " + m_Description + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::Description get returns {0}\n", m_Description));
 
                     return m_Description;
                 }
@@ -757,8 +758,8 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("Generic Description set: " + value + "\n");
                     m_Description = value;
+                    Log.Write(String.Format("Generic::Description set to {0}\n", m_Description));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -783,12 +784,11 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    double dRet;
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
-                    dRet = sxCamera.electronsPerADU;
 
-                    Log.Write("ElectronsPerADU get returns " + dRet + "\n");
+                    double dRet = sxCamera.electronsPerADU;
+
+                    Log.Write(String.Format("Generic::ElectronsPerADU get returns {0}\n", dRet));
 
                     return dRet;
                 }
@@ -798,7 +798,6 @@ namespace ASCOM.SXGeneric
                 }
                 catch (Exception ex)
                 {
-                    Log.Write("ElectronsPerADU: value not known\n");
                     throw new ASCOM.PropertyNotImplementedException(SetError(String.Format("ElectronsPerADU Must throw exception if data unavailable.")), false, ex);
                 }
             }
@@ -815,11 +814,13 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("FullWellCapacity get returns " + MaxADU * ElectronsPerADU / (BinX * BinY) + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    return MaxADU * ElectronsPerADU / (BinX * BinY);
+                    double dRet =  MaxADU * ElectronsPerADU / (BinX * BinY);
+
+                    Log.Write(String.Format("Generic::FullWellCapacity get returns {0}\n", dRet));
+
+                    return dRet;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -843,9 +844,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("HasShutter get returns hard coded false\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Generic::HasShutter get returns hard coded false\n");
 
                     return false;
                 }
@@ -889,13 +890,13 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("ImageArray get\n");
+                    Log.Write("Generic::ImageArray get\n");
 
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     if (!bImageValid)
                     {
-                        throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
+                        throw new ASCOM.ValueNotSetException(SetError("ImageArray get called when the image is not valid."));
                     }
 
                     try
@@ -939,13 +940,13 @@ namespace ASCOM.SXGeneric
             { 
                 try
                 {
-                    Log.Write("ImageArrayVariant get\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Generic::ImageArrayVariant get\n");
 
                     if (!bImageValid)
                     {
-                        throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
+                        throw new ASCOM.ValueNotSetException(SetError("ImageArrayVarient get called when the image is not valid."));
                     }
 
                     Int32[,] data = (Int32[,])ImageArray;
@@ -987,9 +988,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("ImageReady get: bImageValid = " + bImageValid + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::ImageReady get returns {0}\n", bImageValid));
 
                     return bImageValid;
                 }
@@ -1015,9 +1016,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("IsPulseGuiding get: bGuiding = " + bGuiding + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::IsPulseGuiding get returns {0}\n", bGuiding));
 
                     lock (oGuideStateLock)
                     {
@@ -1047,12 +1048,13 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("LastError()\n");
-
                     if (!bLastErrorValid)
                     {
                         throw new ASCOM.InvalidOperationException(SetError("LastError called when there was no last error"));
                     }
+
+                    Log.Write(String.Format("Generic::LastError get returns {0}\n", lastErrorMessage));
+
                     return lastErrorMessage;
                 }
                 catch (ASCOM.DriverException ex)
@@ -1078,14 +1080,14 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("LastExposureDuration get: " + actualExposureLength.TotalSeconds + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     if (!bImageValid)
                     {
                         throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
                     }
+
+                    Log.Write(String.Format("Generic::LastExposureDuration get returns {0}\n", actualExposureLength.TotalSeconds));
 
                     return actualExposureLength.TotalSeconds;
                 }
@@ -1111,16 +1113,18 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("LastExposureStartTime get" + exposureStart.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff") + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     if (!bImageValid)
                     {
                         throw new ASCOM.ValueNotSetException(SetError("The image is not valid."));
                     }
-     
-                    return exposureStart.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff");
+
+                    string sRet = exposureStart.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fff");
+
+                    Log.Write(String.Format("Generic::LastExposureStartTime get returns {0}\n", sRet));
+
+                    return sRet;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1143,9 +1147,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("MaxADU get" + m_MaxADU + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::MaxADU get returns {0}\n", m_MaxADU));
 
                     return m_MaxADU;
                 }
@@ -1164,6 +1168,7 @@ namespace ASCOM.SXGeneric
                 try
                 {
                     m_MaxADU = value;
+                    Log.Write(String.Format("Generic::MaxADU set to {0}\n", m_MaxADU));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1187,9 +1192,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("MaxBinX get" + m_MaxBinX + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::MaxBinX get returns {0}\n", m_MaxBinX));
 
                     return m_MaxBinX;
                 }
@@ -1208,6 +1213,7 @@ namespace ASCOM.SXGeneric
                 try
                 {
                     m_MaxBinX = value;
+                    Log.Write(String.Format("Generic::MaxBinX set to {0}\n", m_MaxBinX));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1231,9 +1237,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("MaxBinY get" + m_MaxBinY + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::MaxBinY get returns {0}\n", m_MaxBinY));
 
                     return m_MaxBinY;
                 }
@@ -1252,6 +1258,7 @@ namespace ASCOM.SXGeneric
                 try
                 {
                     m_MaxBinY = value;
+                    Log.Write(String.Format("Generic::MaxBinY set to {0}\n", m_MaxBinY));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1275,9 +1282,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("NumX get: " + m_NumX + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::NumX get returns {0}\n",  m_NumX));
 
                     return m_NumX;
                 }
@@ -1295,11 +1302,10 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("NumX set: " + value + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     m_NumX = value;
+                    Log.Write(String.Format("Generic::NumX set to {0}\n", m_NumX));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1323,9 +1329,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("NumY get: " + m_NumY + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::NumY get returns {0}\n",  m_NumY));
 
                     return m_NumY;
                 }
@@ -1342,11 +1348,11 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("NumY set: " + value + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     m_NumY = value;
+
+                    Log.Write(String.Format("Generic::NumX set to {0}\n", m_NumX));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1370,9 +1376,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("PixelSizeX get: m_PixelSizeX = " + m_PixelSizeX + "\n"); 
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::PixelSizeX get returns {0}\n", m_PixelSizeX));
 
                     return m_PixelSizeX;
                 }
@@ -1389,8 +1395,8 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("PixelSizeX set: " + value + "\n"); 
                     m_PixelSizeX = value;
+                    Log.Write(String.Format("Generic::PixelSizeX set to {0}\n", m_PixelSizeX));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1414,8 +1420,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("PixelSizeX get: m_PixelSizeY = " + m_PixelSizeY + "\n"); 
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::PixelSizeY get returns {0}\n", m_PixelSizeY));
 
                     return m_PixelSizeY;
                 }
@@ -1433,8 +1440,8 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("PixelSizeY set: " + value + "\n"); 
                     m_PixelSizeY = value;
+                    Log.Write(String.Format("Generic::PixelSizeY set to {0}\n", m_PixelSizeY));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1470,15 +1477,16 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write("PulseGuide(" + Direction + "," + Duration + ")\n");
-                bLastErrorValid = false;
-                
                 verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                 if (!CanPulseGuide)
                 {
                     throw new ASCOM.InvalidOperationException(SetError(String.Format("PulseGuide() cannot be called if CanPuluseGuide == false")));
                 }
+
+                Log.Write(String.Format("Generic::PulseGuide({0}, {1})",  Direction, Duration));
+
+                bLastErrorValid = false;
 
                 lock (oGuideStateLock)
                 {
@@ -1701,7 +1709,7 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write(String.Format("hardwareCapture({0}, {1}): begins\n", Duration, Light));
+                Log.Write(String.Format("Generic::hardwareCapture({0}, {1}): begins\n", Duration, Light));
                 exposureStart = DateTime.Now;
                 DateTimeOffset exposureEnd;
                 
@@ -1721,7 +1729,7 @@ namespace ASCOM.SXGeneric
                 Log.Write(String.Format("hardwareCapture(): exposure + download took {0}, requested {1}\n", actualExposureLength.TotalSeconds, Duration));
                 actualExposureLength = new TimeSpan(0, 0, 0, 0, (int)(1000*Duration));
 
-                Log.Write("hardwareCapture(): ends successfully\n");
+                Log.Write("Generic::hardwareCapture(): ends successfully\n");
 
                 bImageValid = true;
             }
@@ -1746,7 +1754,7 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write(String.Format("softwareCapture({0}, {1}): begins\n", Duration, Light));
+                Log.Write(String.Format("Generic::softwareCapture({0}, {1}): begins\n", Duration, Light));
 
                 sxCamera.clearCcdPixels(); // This clears both the CCD and the recorded pixels.  For
                                            // exposures > 1 second we will clear the recorded pixels again just before
@@ -1814,7 +1822,7 @@ namespace ASCOM.SXGeneric
 
                 actualExposureLength = exposureEnd - exposureStart;
 
-                Log.Write(String.Format("softwareCapture(): delay ends, actualExposureLength={0}, requested={1}\n", actualExposureLength.TotalSeconds, Duration));
+                Log.Write(String.Format("Generic::softwareCapture(): delay ends, actualExposureLength={0}, requested={1}\n", actualExposureLength.TotalSeconds, Duration));
                 
                 bImageValid = true;
             }
@@ -1845,14 +1853,13 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write(String.Format("StartExposure({0}, {1}) begins\n", Duration, Light));
+                Log.Write(String.Format("Generic::StartExposure({0}, {1}) begins\n", Duration, Light));
 
                 if (config.secondsAreMilliseconds)
                 {
                     Duration /= 1000;
-                    Log.Write(String.Format("StartExposure(): after secondsAreMilliseconds adjustment, duration={0}\n", Duration));
+                    Log.Write(String.Format("Generic::StartExposure(): after secondsAreMilliseconds adjustment, duration={0}\n", Duration));
                 }
-
 
                 // because of timing accuracy, we do all short exposures with the HW timer
                 if (Duration <= 1.0)
@@ -1878,9 +1885,6 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write(String.Format("StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
-                bLastErrorValid = false;
-
                 verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                 if (Duration < 0)
@@ -1889,6 +1893,10 @@ namespace ASCOM.SXGeneric
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, Duration.ToString(), ">= 0");
                 }
 
+                Log.Write(String.Format("Generic::StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
+
+                bLastErrorValid = false;
+
                 lock (oCameraStateLock)
                 {
                     if (state != CameraStates.cameraIdle)
@@ -1896,7 +1904,6 @@ namespace ASCOM.SXGeneric
                         throw new ASCOM.InvalidOperationException(SetError(String.Format("StartExposure called while in state {0}", state)));
                     }
                     state = CameraStates.cameraExposing;
-
                 }
 
                 try
@@ -1995,9 +2002,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("StartX get: m_StartX = " + m_StartX + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::StartX get returns {0}\n", m_StartX));
 
                     return m_StartX;
                 }
@@ -2015,11 +2022,10 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("StartX set: " + value + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     m_StartX = value;
+                    Log.Write(String.Format("Generic::StartX set to {0}\n", m_StartX));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -2042,9 +2048,9 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("StartY get: m_StartY = " + m_StartY + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("Generic::StartY get returns {0}\n", m_StartY));
 
                     return m_StartY;
                 }
@@ -2062,11 +2068,10 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write("StartY set: " + value + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     m_StartY = value;
+                    Log.Write(String.Format("Generic::StartY set to {0}\n", m_StartY));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -2091,10 +2096,11 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write("StopExposure() requested when in state " + state + "\n");
-                bLastErrorValid = false;
-
                 verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                Log.Write("Generic::StopExposure() requested when in state " + state + "\n");
+
+                bLastErrorValid = false;
 
                 lock (oCameraStateLock)
                 {

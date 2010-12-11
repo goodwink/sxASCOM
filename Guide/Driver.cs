@@ -42,13 +42,13 @@ namespace ASCOM.SXGuide
         public Camera(UInt16 cameraId, UInt16 controllerNumber) :
             base(cameraId, controllerNumber)
         {
-            Log.Write(String.Format("Camera({0}, {2}) called\n", cameraId, controllerNumber));
+            Log.Write(String.Format("Guide::Camera({0}, {2}) executing\n", cameraId, controllerNumber));
         }
 
         public Camera() :
             this(DEFAULT_CAMERAID, DEFAULT_CONTROLLER_NUMBER)
         {
-            Log.Write(String.Format("Camera() called\n"));
+            Log.Write(String.Format("Guide::Camera() executing\n"));
         }
 
         /// <summary>
@@ -63,6 +63,9 @@ namespace ASCOM.SXGuide
                 try
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Guide Camera CCDTemperature get will throw an exception\n");
+
                     throw new ASCOM.PropertyNotImplementedException(SetError("CCDTemperature: must throw exception if data unavailable"), false);
                 }
                 catch (ASCOM.DriverException ex)
@@ -88,8 +91,10 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
-                    string sReturn = "SX-Guider (" + base.Description + ")";
-                    Log.Write("Guide Camera Description" + sReturn + "\n");
+                    string sReturn = String.Format("SX-Guider ({0})", base.Description);
+
+                    Log.Write(String.Format("Guide::Descripton get returns {0}\n", sReturn));
+
                     return sReturn;
                 }
                 catch (ASCOM.DriverException ex)
@@ -112,9 +117,9 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
-                    Log.Write("CanGetCoolerPower get: false\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Guide::CanGetCoolerPower get returns: false\n");
 
                     return false;
                 }
@@ -140,14 +145,11 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
                     bool bReturn = bHasGuideCamera;
 
-                    Log.Write("Guide Camera CanPulseGuide returns " + bReturn+ "\n");
-
-                    if (!Connected)
-                    {
-                        throw new ASCOM.NotConnectedException(SetError("Camera not connected"));
-                    }
+                    Log.Write(String.Format("Guide::CanPulseGuide returns {0}\n",bReturn));
 
                     return bReturn;
                 }
@@ -173,9 +175,9 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
-                    Log.Write("CanSetCCDTemperature get: false\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Guide::CanSetCCDTemperature get returns false\n");
 
                     return false;
                 }
@@ -205,9 +207,9 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
-                    Log.Write("CoolerOn get: true\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Guide::CoolerOn get will throw an exception\n");
 
                     throw new ASCOM.PropertyNotImplementedException(SetError("CoolerOn get is not supported"), true);
                 }
@@ -224,9 +226,9 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
-                    Log.Write("CoolerOn set to " + value + "\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Guide Camera CoolerOn set will throw an exception\n");
 
                     throw new ASCOM.PropertyNotImplementedException(SetError("CoolerOn set is not supported"), true);
                 }
@@ -253,9 +255,9 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
-                    Log.Write("CoolerPower get returns hard coded 100\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Guide::CoolerPower will throw an exception\n");
 
                     throw new ASCOM.PropertyNotImplementedException(SetError("CoolerPower get is not supported"), true);
                 }
@@ -281,9 +283,9 @@ namespace ASCOM.SXGuide
             { 
                 try
                 {
-                    Log.Write("HeatSinkTemperature get will throw an exception\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Guide::HeatSinkTemperature get will throw an exception\n");
 
                     throw new ASCOM.PropertyNotImplementedException(SetError("HeatSinkTemperature must throw exception if data unavailable"), true);
                 }
@@ -312,9 +314,9 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
-                    Log.Write("SetCCDTemperature get: will throw an exception\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Giide::SetCCDTemperature get will throw an exception\n");
 
                     throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), false);
                 }
@@ -331,9 +333,9 @@ namespace ASCOM.SXGuide
             {
                 try
                 {
-                    Log.Write("SetCCDTemperature set: will throw an exception\n");
-
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write("Giide Camera SetCCDTemperature set will throw an exception\n");
 
                     throw new ASCOM.PropertyNotImplementedException(String.Format("SetCCDTemperature must throw exception if CanSetCCDTemperature is False."), true);
                 }
@@ -365,7 +367,7 @@ namespace ASCOM.SXGuide
                     useHardwareTimer = true;
                 }
 
-                Log.Write(String.Format("Guide Camera StartExposure({0}, {1}) useHardwareTimer = {2}\n", Duration, Light, useHardwareTimer));
+                Log.Write(String.Format("Guide::StartExposure({0}, {1}) useHardwareTimer = {2}\n", Duration, Light, useHardwareTimer));
 
                 base.StartExposure(Duration, Light, useHardwareTimer);
             }

@@ -103,7 +103,7 @@ namespace sx
 
         public void connect(UInt16 vid, UInt16 pid, bool skip)
         {
-            Log.Write(String.Format("controller.controller({0}, {1}, {2})\n", vid, pid, skip));
+            Log.Write(String.Format("controller.connect({0}, {1}, {2})\n", vid, pid, skip));
 
             m_iface = new USBInterface(vid, pid, skip);
 

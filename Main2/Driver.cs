@@ -27,7 +27,7 @@ namespace ASCOM.SXMain2
         public Camera() :
             base(DEFAULT_CAMERA_ID, DEFAULT_CONTROLLER_NUMBER)
         {
-            Log.Write(String.Format("Camera() called for main2\n"));
+            Log.Write(String.Format("Main2::Camera() executing\n"));
         }
     }
 }
