@@ -52,11 +52,17 @@ namespace ASCOM.SXGeneric
         {
             if (camera0SelectionAllowAny.Checked)
             {
-                model0SelectionGroup.Visible = false;
+                vid0Label.Visible = false;
+                pid0Label.Visible = false;
+                camera0VID.Visible = false;
+                camera0PID.Visible = false;
             }
             else
             {
-                model0SelectionGroup.Visible = true;
+                vid0Label.Visible = true;
+                pid0Label.Visible = true;
+                camera0VID.Visible = true;
+                camera0PID.Visible = true;
             }
         }
 
@@ -64,11 +70,17 @@ namespace ASCOM.SXGeneric
         {
             if (camera1SelectionAllowAny.Checked)
             {
-                model1SelectionGroup.Visible = false;
+                vid1Label.Visible = false;
+                pid1Label.Visible = false;
+                camera1VID.Visible = false;
+                camera1PID.Visible = false;
             }
             else
             {
-                model1SelectionGroup.Visible = true;
+                vid1Label.Visible = true;
+                pid1Label.Visible = true;
+                camera1VID.Visible = true;
+                camera1PID.Visible = true;
             }
         }
     }

@@ -1561,22 +1561,28 @@ namespace ASCOM.SXGeneric
                 F.camera0SelectionAllowAny.Checked = false;
                 F.camera0SelectionExactModel.Checked = false;
                 F.camera0SelectionExcludeModel.Checked = false;
-                F.model0SelectionGroup.Visible = false;
                 F.camera0VID.Text = config.camera0VID.ToString();
                 F.camera0PID.Text = config.camera0PID.ToString();
+
+                F.vid0Label.Visible = true;
+                F.pid0Label.Visible = true;
+                F.camera0VID.Visible = true;
+                F.camera0PID.Visible = true;
 
                 switch (config.camera0SelectionMethod)
                 {
                     case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY:
                         F.camera0SelectionAllowAny.Checked = true;
+                        F.vid0Label.Visible = false;
+                        F.pid0Label.Visible = false;
+                        F.camera0VID.Visible = false;
+                        F.camera0PID.Visible = false;
                         break;
                     case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL:
                         F.camera0SelectionExactModel.Checked = true;
-                        F.model0SelectionGroup.Visible = true;
                         break;
                     case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL:
                         F.camera0SelectionExcludeModel.Checked = true;
-                        F.model0SelectionGroup.Visible = true;
                         break;
                     default:
                         throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", config.camera0SelectionMethod));
@@ -1584,19 +1590,25 @@ namespace ASCOM.SXGeneric
 
                 F.camera1VID.Text = config.camera1VID.ToString();
                 F.camera1PID.Text = config.camera1PID.ToString();
+                F.vid1Label.Visible = true;
+                F.pid1Label.Visible = true;
+                F.camera1VID.Visible = true;
+                F.camera1PID.Visible = true;
 
                 switch (config.camera1SelectionMethod)
                 {
                     case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY:
                         F.camera1SelectionAllowAny.Checked = true;
+                        F.vid1Label.Visible = true;
+                        F.pid1Label.Visible = true;
+                        F.camera1VID.Visible = true;
+                        F.camera1PID.Visible = true;
                         break;
                     case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL:
                         F.camera1SelectionExactModel.Checked = true;
-                        F.model1SelectionGroup.Visible = true;
                         break;
                     case ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL:
                         F.camera1SelectionExcludeModel.Checked = true;
-                        F.model1SelectionGroup.Visible = true;
                         break;
                     default:
                         throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", config.camera0SelectionMethod));
