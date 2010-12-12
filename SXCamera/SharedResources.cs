@@ -25,7 +25,6 @@ using ASCOM;
 
 namespace ASCOM.SXCamera
 {
-
     public class SharedResources
     {
         private SharedResources() { }							// Prevent creation of instances

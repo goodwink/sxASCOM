@@ -1,4 +1,4 @@
-namespace ASCOM.SXGeneric
+namespace ASCOM.SXCamera
 {
     partial class SetupDialogForm
     {
@@ -96,7 +96,7 @@ namespace ASCOM.SXGeneric
             // picASCOM
             // 
             this.picASCOM.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.picASCOM.Image = global::ASCOM.SXGeneric.Properties.Resources.ASCOM;
+            this.picASCOM.Image = global::ASCOM.SXCamera.Properties.Resources.ASCOM;
             this.picASCOM.Location = new System.Drawing.Point(304, 13);
             this.picASCOM.Name = "picASCOM";
             this.picASCOM.Size = new System.Drawing.Size(48, 56);
