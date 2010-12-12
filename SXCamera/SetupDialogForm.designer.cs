@@ -66,7 +66,7 @@ namespace ASCOM.SXCamera
             this.cmdOK.Location = new System.Drawing.Point(293, 88);
             this.cmdOK.Name = "cmdOK";
             this.cmdOK.Size = new System.Drawing.Size(59, 24);
-            this.cmdOK.TabIndex = 11;
+            this.cmdOK.TabIndex = 6;
             this.cmdOK.Text = "OK";
             this.toolTip1.SetToolTip(this.cmdOK, "Close this dialog saving changes.");
             this.cmdOK.UseVisualStyleBackColor = true;
@@ -153,11 +153,12 @@ namespace ASCOM.SXCamera
             // 
             // camera0PID
             // 
-            this.camera0PID.Location = new System.Drawing.Point(43, 126);
+            this.camera0PID.Location = new System.Drawing.Point(43, 116);
             this.camera0PID.Mask = "9990";
             this.camera0PID.Name = "camera0PID";
+            this.camera0PID.PromptChar = ' ';
             this.camera0PID.Size = new System.Drawing.Size(36, 20);
-            this.camera0PID.TabIndex = 112;
+            this.camera0PID.TabIndex = 6;
             this.camera0PID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // camera0SelectionExcludeModel
@@ -166,26 +167,27 @@ namespace ASCOM.SXCamera
             this.camera0SelectionExcludeModel.Location = new System.Drawing.Point(12, 65);
             this.camera0SelectionExcludeModel.Name = "camera0SelectionExcludeModel";
             this.camera0SelectionExcludeModel.Size = new System.Drawing.Size(95, 17);
-            this.camera0SelectionExcludeModel.TabIndex = 7;
+            this.camera0SelectionExcludeModel.TabIndex = 2;
             this.camera0SelectionExcludeModel.Text = "Exclude Model";
             this.camera0SelectionExcludeModel.UseVisualStyleBackColor = true;
             // 
             // camera0VID
             // 
-            this.camera0VID.Location = new System.Drawing.Point(43, 97);
+            this.camera0VID.Location = new System.Drawing.Point(43, 90);
             this.camera0VID.Mask = "9990";
             this.camera0VID.Name = "camera0VID";
+            this.camera0VID.PromptChar = ' ';
             this.camera0VID.Size = new System.Drawing.Size(36, 20);
-            this.camera0VID.TabIndex = 111;
+            this.camera0VID.TabIndex = 4;
             this.camera0VID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // pid0Label
             // 
             this.pid0Label.AutoSize = true;
-            this.pid0Label.Location = new System.Drawing.Point(9, 129);
+            this.pid0Label.Location = new System.Drawing.Point(9, 116);
             this.pid0Label.Name = "pid0Label";
             this.pid0Label.Size = new System.Drawing.Size(28, 13);
-            this.pid0Label.TabIndex = 109;
+            this.pid0Label.TabIndex = 5;
             this.pid0Label.Text = "PID:";
             // 
             // camera0SelectionExactModel
@@ -194,7 +196,7 @@ namespace ASCOM.SXCamera
             this.camera0SelectionExactModel.Location = new System.Drawing.Point(12, 42);
             this.camera0SelectionExactModel.Name = "camera0SelectionExactModel";
             this.camera0SelectionExactModel.Size = new System.Drawing.Size(87, 17);
-            this.camera0SelectionExactModel.TabIndex = 6;
+            this.camera0SelectionExactModel.TabIndex = 1;
             this.camera0SelectionExactModel.Text = "Select Model";
             this.camera0SelectionExactModel.UseVisualStyleBackColor = true;
             // 
@@ -205,7 +207,7 @@ namespace ASCOM.SXCamera
             this.camera0SelectionAllowAny.Location = new System.Drawing.Point(12, 19);
             this.camera0SelectionAllowAny.Name = "camera0SelectionAllowAny";
             this.camera0SelectionAllowAny.Size = new System.Drawing.Size(71, 17);
-            this.camera0SelectionAllowAny.TabIndex = 5;
+            this.camera0SelectionAllowAny.TabIndex = 0;
             this.camera0SelectionAllowAny.TabStop = true;
             this.camera0SelectionAllowAny.Text = "Allow Any";
             this.camera0SelectionAllowAny.UseVisualStyleBackColor = true;
@@ -214,10 +216,10 @@ namespace ASCOM.SXCamera
             // vid0Label
             // 
             this.vid0Label.AutoSize = true;
-            this.vid0Label.Location = new System.Drawing.Point(9, 97);
+            this.vid0Label.Location = new System.Drawing.Point(9, 93);
             this.vid0Label.Name = "vid0Label";
             this.vid0Label.Size = new System.Drawing.Size(28, 13);
-            this.vid0Label.TabIndex = 110;
+            this.vid0Label.TabIndex = 3;
             this.vid0Label.Text = "VID:";
             // 
             // Copyright
@@ -240,18 +242,19 @@ namespace ASCOM.SXCamera
             this.groupBox2.Controls.Add(this.vid1Label);
             this.groupBox2.Location = new System.Drawing.Point(205, 192);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(147, 174);
-            this.groupBox2.TabIndex = 8;
+            this.groupBox2.Size = new System.Drawing.Size(147, 153);
+            this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "USB Camera #2 Selection";
+            this.groupBox2.Text = "USB Camera #2";
             // 
             // camera1PID
             // 
-            this.camera1PID.Location = new System.Drawing.Point(52, 126);
+            this.camera1PID.Location = new System.Drawing.Point(52, 118);
             this.camera1PID.Mask = "9990";
             this.camera1PID.Name = "camera1PID";
+            this.camera1PID.PromptChar = ' ';
             this.camera1PID.Size = new System.Drawing.Size(36, 20);
-            this.camera1PID.TabIndex = 112;
+            this.camera1PID.TabIndex = 6;
             this.camera1PID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // camera1SelectionExcludeModel
@@ -260,17 +263,18 @@ namespace ASCOM.SXCamera
             this.camera1SelectionExcludeModel.Location = new System.Drawing.Point(21, 65);
             this.camera1SelectionExcludeModel.Name = "camera1SelectionExcludeModel";
             this.camera1SelectionExcludeModel.Size = new System.Drawing.Size(95, 17);
-            this.camera1SelectionExcludeModel.TabIndex = 7;
+            this.camera1SelectionExcludeModel.TabIndex = 2;
             this.camera1SelectionExcludeModel.Text = "Exclude Model";
             this.camera1SelectionExcludeModel.UseVisualStyleBackColor = true;
             // 
             // camera1VID
             // 
-            this.camera1VID.Location = new System.Drawing.Point(52, 97);
+            this.camera1VID.Location = new System.Drawing.Point(52, 92);
             this.camera1VID.Mask = "9990";
             this.camera1VID.Name = "camera1VID";
+            this.camera1VID.PromptChar = ' ';
             this.camera1VID.Size = new System.Drawing.Size(36, 20);
-            this.camera1VID.TabIndex = 111;
+            this.camera1VID.TabIndex = 4;
             this.camera1VID.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // camera1SelectionExactModel
@@ -279,17 +283,17 @@ namespace ASCOM.SXCamera
             this.camera1SelectionExactModel.Location = new System.Drawing.Point(21, 42);
             this.camera1SelectionExactModel.Name = "camera1SelectionExactModel";
             this.camera1SelectionExactModel.Size = new System.Drawing.Size(87, 17);
-            this.camera1SelectionExactModel.TabIndex = 6;
+            this.camera1SelectionExactModel.TabIndex = 1;
             this.camera1SelectionExactModel.Text = "Select Model";
             this.camera1SelectionExactModel.UseVisualStyleBackColor = true;
             // 
             // pid1Label
             // 
             this.pid1Label.AutoSize = true;
-            this.pid1Label.Location = new System.Drawing.Point(18, 130);
+            this.pid1Label.Location = new System.Drawing.Point(18, 121);
             this.pid1Label.Name = "pid1Label";
             this.pid1Label.Size = new System.Drawing.Size(28, 13);
-            this.pid1Label.TabIndex = 109;
+            this.pid1Label.TabIndex = 5;
             this.pid1Label.Text = "PID:";
             // 
             // camera1SelectionAllowAny
@@ -299,7 +303,7 @@ namespace ASCOM.SXCamera
             this.camera1SelectionAllowAny.Location = new System.Drawing.Point(21, 19);
             this.camera1SelectionAllowAny.Name = "camera1SelectionAllowAny";
             this.camera1SelectionAllowAny.Size = new System.Drawing.Size(71, 17);
-            this.camera1SelectionAllowAny.TabIndex = 5;
+            this.camera1SelectionAllowAny.TabIndex = 0;
             this.camera1SelectionAllowAny.TabStop = true;
             this.camera1SelectionAllowAny.Text = "Allow Any";
             this.camera1SelectionAllowAny.UseVisualStyleBackColor = true;
@@ -308,10 +312,10 @@ namespace ASCOM.SXCamera
             // vid1Label
             // 
             this.vid1Label.AutoSize = true;
-            this.vid1Label.Location = new System.Drawing.Point(18, 100);
+            this.vid1Label.Location = new System.Drawing.Point(18, 95);
             this.vid1Label.Name = "vid1Label";
             this.vid1Label.Size = new System.Drawing.Size(28, 13);
-            this.vid1Label.TabIndex = 110;
+            this.vid1Label.TabIndex = 3;
             this.vid1Label.Text = "VID:";
             // 
             // groupBox1
@@ -325,16 +329,16 @@ namespace ASCOM.SXCamera
             this.groupBox1.Controls.Add(this.camera0SelectionExcludeModel);
             this.groupBox1.Location = new System.Drawing.Point(32, 192);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(147, 174);
-            this.groupBox1.TabIndex = 105;
+            this.groupBox1.Size = new System.Drawing.Size(147, 153);
+            this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "USB Camera #1 Selection";
+            this.groupBox1.Text = "USB Camera #1";
             // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(380, 371);
+            this.ClientSize = new System.Drawing.Size(380, 357);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.Copyright);
