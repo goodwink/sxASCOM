@@ -206,10 +206,10 @@ namespace ASCOM.SXCamera
             this.camera0SelectionAllowAny.Checked = true;
             this.camera0SelectionAllowAny.Location = new System.Drawing.Point(12, 19);
             this.camera0SelectionAllowAny.Name = "camera0SelectionAllowAny";
-            this.camera0SelectionAllowAny.Size = new System.Drawing.Size(71, 17);
+            this.camera0SelectionAllowAny.Size = new System.Drawing.Size(75, 17);
             this.camera0SelectionAllowAny.TabIndex = 0;
             this.camera0SelectionAllowAny.TabStop = true;
-            this.camera0SelectionAllowAny.Text = "Allow Any";
+            this.camera0SelectionAllowAny.Text = "Any Model";
             this.camera0SelectionAllowAny.UseVisualStyleBackColor = true;
             this.camera0SelectionAllowAny.CheckedChanged += new System.EventHandler(this.camera1SelectionAllowAny_CheckedChanged);
             // 
@@ -302,10 +302,10 @@ namespace ASCOM.SXCamera
             this.camera1SelectionAllowAny.Checked = true;
             this.camera1SelectionAllowAny.Location = new System.Drawing.Point(21, 19);
             this.camera1SelectionAllowAny.Name = "camera1SelectionAllowAny";
-            this.camera1SelectionAllowAny.Size = new System.Drawing.Size(71, 17);
+            this.camera1SelectionAllowAny.Size = new System.Drawing.Size(75, 17);
             this.camera1SelectionAllowAny.TabIndex = 0;
             this.camera1SelectionAllowAny.TabStop = true;
-            this.camera1SelectionAllowAny.Text = "Allow Any";
+            this.camera1SelectionAllowAny.Text = "Any Model";
             this.camera1SelectionAllowAny.UseVisualStyleBackColor = true;
             this.camera1SelectionAllowAny.CheckedChanged += new System.EventHandler(this.camera2SelectionAllowAny_CheckedChanged);
             // 
