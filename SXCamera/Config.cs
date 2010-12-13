@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-using ASCOM.Helper;
+using ASCOM.Utilities;
 
 using Logging;
 
@@ -10,7 +10,6 @@ namespace ASCOM.SXCamera
     public class Configuration
     {
         private const string DEVICE_TYPE = "Camera";
-        private const string CONFIGURATION_SUBKEY = "Configuration";
 
         private const String ENABLE_UNTESTED = "EnableUntested";
 #if DEBUG
@@ -58,15 +57,15 @@ namespace ASCOM.SXCamera
         private const UInt16 DEFAULT_CAMERA1_PID = 507;  
       
         private string driverID;
-        ProfileClass profile;
+        Profile profile;
         
         public Configuration()
         {
             driverID = String.Format("ASCOM.SXMain.{0}", DEVICE_TYPE);
             Log.Write("Config class constructor called for driverID " + driverID + "\n");
 
-            profile = new ProfileClass();
-            profile.DeviceTypeV = DEVICE_TYPE;
+            profile = new Profile();
+            profile.DeviceType = DEVICE_TYPE;
         }
 
         internal string GetString(string name)
@@ -75,7 +74,7 @@ namespace ASCOM.SXCamera
 
             try
             {
-                ret = profile.GetValue(driverID, name, CONFIGURATION_SUBKEY);
+                ret = profile.GetValue(driverID, name);
             }
             catch (Exception ex)
             {
@@ -101,28 +100,11 @@ namespace ASCOM.SXCamera
 
         internal void SetString(string name, string value)
         {
-            try
-            {
-                profile.SubKeys(driverID, CONFIGURATION_SUBKEY);
-            }
-            catch
-            {
-                Log.Write(String.Format("config: creating configuration subkey {0} of driver {1}\n", CONFIGURATION_SUBKEY, driverID));
-                try
-                {
-                    profile.CreateSubKey(driverID, CONFIGURATION_SUBKEY);
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(String.Format("config: CreateSubKey caught an exception: {0}\n", ex.ToString()));
-                }
-            }
-
-            Log.Write(String.Format("config: writing {0}={1} to configuration subkey {2} of driver {3}\n", name, value, CONFIGURATION_SUBKEY, driverID));
+            Log.Write(String.Format("config: writing {0}={1} to driver {2}\n", name, value, driverID));
 
             try
             {
-                profile.WriteValue(driverID, name, value, CONFIGURATION_SUBKEY);
+                profile.WriteValue(driverID, name, value);
             }
             catch (Exception ex)
             {
@@ -249,6 +231,11 @@ namespace ASCOM.SXCamera
             set { SetString(CAMERA1_PID, value.ToString()); }
         }
 
+        public String description
+        {
+            get { return GetString("", "default"); }
+        }
+
         /// <summary>
         /// Launches a configuration dialog box for the driver.  The call will not return
         /// until the user clicks OK or cancel manually.
@@ -258,7 +245,8 @@ namespace ASCOM.SXCamera
         {
             try
             {
-                Log.Write("SetupDialog()\n");
+                Log.Write(String.Format("SetupDialog, description = {0}\n", description));
+
                 SetupDialogForm F = new SetupDialogForm();
 
                 F.EnableLoggingCheckBox.Checked = enableLogging;

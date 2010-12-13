@@ -27,6 +27,8 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
 
+using ASCOM.Utilities;
+
 namespace ASCOM.SXCamera
 {
     public class SXCamera
@@ -412,8 +414,8 @@ namespace ASCOM.SXCamera
                     assy = type.Assembly;
                     attr = Attribute.GetCustomAttribute(assy, typeof(AssemblyProductAttribute));
                     string chooserName = ((AssemblyProductAttribute)attr).Product;
-                    Helper.Profile P = new Helper.Profile();
-                    P.DeviceTypeV = progid.Substring(progid.LastIndexOf('.') + 1);	//  Requires Helper 5.0.3 or later
+                    Profile P = new Profile();
+                    P.DeviceType = progid.Substring(progid.LastIndexOf('.') + 1);	//  Requires Helper 5.0.3 or later
                     P.Register(progid, chooserName);
                     try										// In case Helper becomes native .NET
                     {
@@ -486,8 +488,8 @@ namespace ASCOM.SXCamera
                     //
                     // ASCOM
                     //
-                    Helper.Profile P = new Helper.Profile();
-                    P.DeviceTypeV = progid.Substring(progid.LastIndexOf('.') + 1);	//  Requires Helper 5.0.3 or later
+                    Profile P = new Profile();
+                    P.DeviceType = progid.Substring(progid.LastIndexOf('.') + 1);	//  Requires Helper 5.0.3 or later
                     P.Unregister(progid);
                     try										// In case Helper becomes native .NET
                     {
