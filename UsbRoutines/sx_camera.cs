@@ -138,10 +138,18 @@ namespace sx
             internal set;
         }
 
-        public bool progressive
+        private bool progressive
         {
             get;
-            internal set;
+            set;
+        }
+
+        private bool interlaced
+        {
+            get
+            {
+                return !progressive;
+            }
         }
 
         public Byte hFrontPorch
@@ -171,7 +179,17 @@ namespace sx
 
         public UInt16 ccdHeight
         {
-            get { return ccdParms.height; }
+            get 
+            { 
+                UInt16 ret=ccdParms.height; 
+
+                if (interlaced)
+                {
+                    ret *= 2;
+                }
+
+                return ret;
+            }
         }
 
         public double pixelWidth
