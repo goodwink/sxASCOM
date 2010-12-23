@@ -68,6 +68,9 @@ namespace ASCOM.SXGeneric
         protected ASCOM.SXCamera.Configuration config;
         private UInt16 m_vid, m_pid;
         private bool m_skip;
+        // elminiate lots of log chatter
+        private CameraStates m_lastLoggedState;
+        private bool m_lastLoggedConnected;
         // values that back properties: property foo is in m_foo
         private bool m_Connected;
         private short m_BinX, m_BinY;
@@ -90,6 +93,7 @@ namespace ASCOM.SXGeneric
                 Log.Write(String.Format("Generic::Camera({0}, {1})\n", whichCamera, whichController));
                                 
                 m_cameraId = whichCamera;
+                m_lastLoggedConnected = true;
 
                 config = new ASCOM.SXCamera.Configuration();
 
@@ -367,7 +371,11 @@ namespace ASCOM.SXGeneric
 
                     lock (oCameraStateLock)
                     {
-                        Log.Write(String.Format("Generic::CameraState() called from state {0}\n", state));
+                        if (m_lastLoggedState != state)
+                        {
+                            Log.Write(String.Format("Generic::CameraState() called from state {0}\n", state));
+                            m_lastLoggedState = state;
+                        }
                         return state;
                     }
                 }
@@ -599,7 +607,11 @@ namespace ASCOM.SXGeneric
             {
                 try
                 {
-                    Log.Write(String.Format("Generic::Connected get returning {0}\n", m_Connected));
+                    if (m_lastLoggedConnected != m_Connected)
+                    {
+                        Log.Write(String.Format("Generic::Connected get returning {0}\n", m_Connected));
+                        m_lastLoggedConnected = m_Connected;
+                    }
 
                     return  m_Connected;
                 }
@@ -685,6 +697,11 @@ namespace ASCOM.SXGeneric
                         sxCamera = null;
                         m_Connected = false;
                     }
+
+                    // set the last logged values to something that they are not, so that 
+                    // the next time the are gotten we log them
+                    m_lastLoggedConnected = !m_Connected;
+                    m_lastLoggedState = CameraStates.cameraError;
 
                     Log.Write("Generic::conneted set ends\n");
                 }
