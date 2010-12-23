@@ -1301,7 +1301,7 @@ namespace sx
                 downloadPixels(progressive, currentExposure.toCamera);
                 Log.Write("recordPixels() download completed\n");
 
-                if (!progressive)
+                if (interlaced)
                 {
                     SX_READ_BLOCK readBlock;
                     Array firstFrame = imageRawData;
@@ -1329,7 +1329,7 @@ namespace sx
                     }
                     catch (System.Exception ex)
                     {
-                        Log.Write(String.Format("stich caught an exception: {0}\n", ex.ToString()));
+                        Log.Write(String.Format("stitch caught an exception: {0}\n", ex.ToString()));
                     }
                 }
             }
@@ -1338,23 +1338,32 @@ namespace sx
 
         internal void stitchImages(Array firstFrame, Array secondFrame)
         {
-            Log.Write("stitching interlaced images\n");
 
             int totalLines = currentExposure.toCamera.height + currentExposure.toCameraSecond.height;
             int width = currentExposure.toCamera.width;
 
+            Log.Write(String.Format("stitching interlaced images. totalLines={0} width={1}\n", totalLines, width));
+
             imageRawData = System.Array.CreateInstance(pixelType, totalLines * width);
 
-            Log.Write("typeof(firstFrame)=" + firstFrame.GetType().ToString() + "\n");
-            Log.Write("typeof(secondFrame)=" + secondFrame.GetType().ToString() + "\n");
-            Log.Write("typeof(imageRawData)=" + imageRawData.GetType().ToString() + "\n");
+            Log.Write(String.Format("firstFrame:   typeof()={0} rank={1} length={2}\n", firstFrame.GetType().ToString(), firstFrame.Rank, firstFrame.LongLength));
+            Log.Write(String.Format("secondFrame:  typeof()={0} rank={1} length={2}\n", secondFrame.GetType().ToString(), secondFrame.Rank, secondFrame.LongLength));
+            Log.Write(String.Format("imageRawData: typeof()={0} rank={1} length={2}\n", imageRawData.GetType().ToString(), secondFrame.Rank, imageRawData.LongLength));
 
             for (int line=0;line < totalLines; line += 2)
             {
                 // copy line from the first image
-                Array.Copy(firstFrame,    line/2 * width,
-                           imageRawData,  line   * width, 
-                           width);
+                try
+                {
+                    Array.Copy(firstFrame,    line/2 * width,
+                               imageRawData,  line   * width, 
+                               width);
+                }
+                catch
+                {
+                    Log.Write(String.Format("stitch exception in line={0} first Copy(firstFrame, {1}, imageRawData, {2}, {3})\n", line, line/2*width, line*width, width));
+                    throw;
+                }
 
                 // if we have an odd number of lines in the requested exposure, 
                 // the first frame can have 1 more line that the second, so we have
@@ -1362,9 +1371,17 @@ namespace sx
                 if (line < currentExposure.toCameraSecond.height)
                 {
                     // copy second line
-                    Array.Copy(secondFrame,   line/2   * width,
-                               imageRawData,  (line+1) * width, 
-                               width);
+                    try
+                    {
+                        Array.Copy(secondFrame,   line/2   * width,
+                                   imageRawData,  (line+1) * width, 
+                                   width);
+                    }
+                    catch
+                    {
+                        Log.Write(String.Format("stitch exception in line={0} second Copy(firstFrame, {1}, imageRawData, {2}, {3})\n", line, line/2*width, (line+1)*width, width));
+                        throw;
+                    }
                 }
             }
 
