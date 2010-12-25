@@ -308,7 +308,7 @@ namespace ASCOM.SXCamera
         // adds DCOM info for the local server itself, so it can be activated
         // via an outboiud connection from TheSky.
         //
-        private static void RegisterObjects()
+        private static void RegisterObjects(string [] args)
         {
             RegistryKey key = null;
             RegistryKey key2 = null;
@@ -316,9 +316,48 @@ namespace ASCOM.SXCamera
 
             if (!IsAdministrator)
             {
-                ElevateSelf("/register");
+                string arg = null;
+                foreach (string a in args)
+                {
+                    if (arg == null)
+                        arg = a;
+                    else
+                        arg += " " + a;
+                }
+                ElevateSelf(arg);
                 return;
             }
+
+            bool registerMain = false;
+            bool registerAutoGuide = false;
+            bool registerLodeStar = false;
+
+            foreach (string opt in args)
+            {
+                switch (opt.ToLower())
+                {
+                    case "-lodestar":
+                    case "/lodestar":
+                        registerLodeStar = true;
+                        break;
+                    case "-main":
+                    case "/main":
+                        registerMain = true;
+                        break;
+                    case "-autoguide":
+                    case "/autoguide":
+                        registerAutoGuide = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (registerAutoGuide && !registerMain)
+            {
+                registerAutoGuide = false;
+            }
+
             //
             // If reached here, we're running elevated
             //
@@ -368,75 +407,103 @@ namespace ASCOM.SXCamera
             foreach (Type type in m_ComObjectTypes)
             {
                 bool bFail = false;
-                try
+                bool registerThisOne = true;
+                string ascomName = null;
+
+                switch (type.ToString().ToLower())
                 {
-                    //
-                    // HKCR\CLSID\clsid
-                    //
-                    string clsid = Marshal.GenerateGuidForType(type).ToString("B");
-                    string progid = Marshal.GenerateProgIdForType(type);
-                    key = Registry.ClassesRoot.CreateSubKey("CLSID\\" + clsid);
-                    key.SetValue(null, progid);						// Could be assyTitle/Desc??, but .NET components show ProgId here
-                    key.SetValue("AppId", m_sAppId);
-                    key2 = key.CreateSubKey("Implemented Categories");
-                    key3 = key2.CreateSubKey("{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}");
-                    key3.Close();
-                    key3 = null;
-                    key2.Close();
-                    key2 = null;
-                    key2 = key.CreateSubKey("ProgId");
-                    key2.SetValue(null, progid);
-                    key2.Close();
-                    key2 = null;
-                    key2 = key.CreateSubKey("Programmable");
-                    key2.Close();
-                    key2 = null;
-                    key2 = key.CreateSubKey("LocalServer32");
-                    key2.SetValue(null, Application.ExecutablePath);
-                    key2.Close();
-                    key2 = null;
-                    key.Close();
-                    key = null;
-                    //
-                    // HKCR\CLSID\progid
-                    //
-                    key = Registry.ClassesRoot.CreateSubKey(progid);
-                    key.SetValue(null, assyTitle);
-                    key2 = key.CreateSubKey("CLSID");
-                    key2.SetValue(null, clsid);
-                    key2.Close();
-                    key2 = null;
-                    key.Close();
-                    key = null;
-                    //
-                    // ASCOM 
-                    //
-                    assy = type.Assembly;
-                    attr = Attribute.GetCustomAttribute(assy, typeof(AssemblyProductAttribute));
-                    string chooserName = ((AssemblyProductAttribute)attr).Product;
-                    Profile P = new Profile();
-                    P.DeviceType = progid.Substring(progid.LastIndexOf('.') + 1);	//  Requires Helper 5.0.3 or later
-                    P.Register(progid, chooserName);
-                    try										// In case Helper becomes native .NET
+                    case "ascom.sxguide.camera":
+                        registerThisOne = registerAutoGuide;
+                        ascomName = "Starlight Xpress Autoguide Camera";
+                        break;
+                    case "ascom.sxmain.camera":
+                        registerThisOne = registerMain;
+                        ascomName = "Starlight Xpress Main Camera";
+                        break;
+                    case "ascom.sxmain2.camera":
+                        registerThisOne = registerLodeStar;
+                        ascomName = "Starlight Xpress Lodestar Guider";
+                        break;
+                    default:
+                        break;
+                }
+
+                if (registerThisOne)
+                {
+                    try
                     {
-                        Marshal.ReleaseComObject(P);
+                        //
+                        // HKCR\CLSID\clsid
+                        //
+                        string clsid = Marshal.GenerateGuidForType(type).ToString("B");
+                        string progid = Marshal.GenerateProgIdForType(type);
+                        key = Registry.ClassesRoot.CreateSubKey("CLSID\\" + clsid);
+                        key.SetValue(null, progid);						// Could be assyTitle/Desc??, but .NET components show ProgId here
+                        key.SetValue("AppId", m_sAppId);
+                        key2 = key.CreateSubKey("Implemented Categories");
+                        key3 = key2.CreateSubKey("{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}");
+                        key3.Close();
+                        key3 = null;
+                        key2.Close();
+                        key2 = null;
+                        key2 = key.CreateSubKey("ProgId");
+                        key2.SetValue(null, progid);
+                        key2.Close();
+                        key2 = null;
+                        key2 = key.CreateSubKey("Programmable");
+                        key2.Close();
+                        key2 = null;
+                        key2 = key.CreateSubKey("LocalServer32");
+                        key2.SetValue(null, Application.ExecutablePath);
+                        key2.Close();
+                        key2 = null;
+                        key.Close();
+                        key = null;
+                        //
+                        // HKCR\CLSID\progid
+                        //
+                        key = Registry.ClassesRoot.CreateSubKey(progid);
+                        key.SetValue(null, assyTitle);
+                        key2 = key.CreateSubKey("CLSID");
+                        key2.SetValue(null, clsid);
+                        key2.Close();
+                        key2 = null;
+                        key.Close();
+                        key = null;
+                        //
+                        // ASCOM 
+                        //
+                        assy = type.Assembly;
+                        attr = Attribute.GetCustomAttribute(assy, typeof(AssemblyProductAttribute));
+                        string chooserName = ((AssemblyProductAttribute)attr).Product;
+                        Profile P = new Profile();
+                        P.DeviceType = progid.Substring(progid.LastIndexOf('.') + 1);	//  Requires Helper 5.0.3 or later
+                        if (ascomName != null)
+                        {
+                            chooserName = ascomName;
+                        }
+                        P.Register(progid, chooserName);
+                        try										// In case Helper becomes native .NET
+                        {
+                            Marshal.ReleaseComObject(P);
+                        }
+                        catch (Exception) { }
+                        P = null;
                     }
-                    catch (Exception) { }
-                    P = null;
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error while registering the server:\n" + ex.ToString(),
+                                "SXCamera", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                        bFail = true;
+                    }
+                    finally
+                    {
+                        if (key != null) key.Close();
+                        if (key2 != null) key2.Close();
+                        if (key3 != null) key3.Close();
+                    }
+                    if (bFail) break;
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error while registering the server:\n" + ex.ToString(),
-                            "SXCamera", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                    bFail = true;
-                }
-                finally
-                {
-                    if (key != null) key.Close();
-                    if (key2 != null) key2.Close();
-                    if (key3 != null) key3.Close();
-                }
-                if (bFail) break;
             }
         }
 
@@ -560,7 +627,7 @@ namespace ASCOM.SXCamera
                     case "/register":
                     case "-regserver":											// Emulate VB6
                     case "/regserver":
-                        RegisterObjects();										// Register each served object
+                        RegisterObjects(args);										// Register each served object
                         bRet = false;
                         break;
 

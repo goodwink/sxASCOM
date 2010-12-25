@@ -43,11 +43,6 @@ namespace ASCOM.SXCamera
             }
         }
 
-        private void SetupDialogForm_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void camera1SelectionAllowAny_CheckedChanged(object sender, EventArgs e)
         {
             if (camera0SelectionAllowAny.Checked)
@@ -81,6 +76,20 @@ namespace ASCOM.SXCamera
                 pid1Label.Visible = true;
                 camera1VID.Visible = true;
                 camera1PID.Visible = true;
+            }
+        }
+
+        private void handleAdvancedUsbPropertiesChange(object sender, EventArgs e)
+        {
+            if (advancedUSBParmsEnabled.Checked)
+            {
+                camera0Group.Enabled = true;
+                camera1Group.Enabled = true;
+            }
+            else
+            {
+                camera0Group.Enabled = false;
+                camera1Group.Enabled = false;
             }
         }
     }

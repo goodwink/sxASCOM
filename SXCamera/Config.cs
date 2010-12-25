@@ -310,6 +310,10 @@ namespace ASCOM.SXCamera
                         throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", camera0SelectionMethod));
                 }
 
+                F.advancedUSBParmsEnabled.Checked = false;
+                F.camera0Group.Enabled = false;
+                F.camera1Group.Enabled = false;
+
                 if (F.ShowDialog() == DialogResult.OK)
                 {
                     Log.Write("ShowDialog returned OK - saving parameters\n");

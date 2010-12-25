@@ -46,7 +46,7 @@ namespace ASCOM.SXCamera
             this.camera0SelectionAllowAny = new System.Windows.Forms.RadioButton();
             this.vid0Label = new System.Windows.Forms.Label();
             this.Copyright = new System.Windows.Forms.Label();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.camera1Group = new System.Windows.Forms.GroupBox();
             this.camera1PID = new System.Windows.Forms.MaskedTextBox();
             this.camera1SelectionExcludeModel = new System.Windows.Forms.RadioButton();
             this.camera1VID = new System.Windows.Forms.MaskedTextBox();
@@ -54,10 +54,11 @@ namespace ASCOM.SXCamera
             this.pid1Label = new System.Windows.Forms.Label();
             this.camera1SelectionAllowAny = new System.Windows.Forms.RadioButton();
             this.vid1Label = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.camera0Group = new System.Windows.Forms.GroupBox();
+            this.advancedUSBParmsEnabled = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
-            this.groupBox2.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.camera1Group.SuspendLayout();
+            this.camera0Group.SuspendLayout();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -231,21 +232,21 @@ namespace ASCOM.SXCamera
             this.Copyright.Text = "Copyright (C) 2010 Dad Dog Development Ltd.\r\nThis work is licensed under the Crea" +
                 "tive Commons Attribution-No Derivative Works 3.0 License.";
             // 
-            // groupBox2
+            // camera1Group
             // 
-            this.groupBox2.Controls.Add(this.camera1PID);
-            this.groupBox2.Controls.Add(this.camera1SelectionExcludeModel);
-            this.groupBox2.Controls.Add(this.camera1VID);
-            this.groupBox2.Controls.Add(this.camera1SelectionExactModel);
-            this.groupBox2.Controls.Add(this.pid1Label);
-            this.groupBox2.Controls.Add(this.camera1SelectionAllowAny);
-            this.groupBox2.Controls.Add(this.vid1Label);
-            this.groupBox2.Location = new System.Drawing.Point(205, 192);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(147, 153);
-            this.groupBox2.TabIndex = 5;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "USB Camera #2";
+            this.camera1Group.Controls.Add(this.camera1PID);
+            this.camera1Group.Controls.Add(this.camera1SelectionExcludeModel);
+            this.camera1Group.Controls.Add(this.camera1VID);
+            this.camera1Group.Controls.Add(this.camera1SelectionExactModel);
+            this.camera1Group.Controls.Add(this.pid1Label);
+            this.camera1Group.Controls.Add(this.camera1SelectionAllowAny);
+            this.camera1Group.Controls.Add(this.vid1Label);
+            this.camera1Group.Location = new System.Drawing.Point(205, 218);
+            this.camera1Group.Name = "camera1Group";
+            this.camera1Group.Size = new System.Drawing.Size(147, 153);
+            this.camera1Group.TabIndex = 5;
+            this.camera1Group.TabStop = false;
+            this.camera1Group.Text = "USB Camera #2";
             // 
             // camera1PID
             // 
@@ -318,29 +319,41 @@ namespace ASCOM.SXCamera
             this.vid1Label.TabIndex = 3;
             this.vid1Label.Text = "VID:";
             // 
-            // groupBox1
+            // camera0Group
             // 
-            this.groupBox1.Controls.Add(this.camera0PID);
-            this.groupBox1.Controls.Add(this.vid0Label);
-            this.groupBox1.Controls.Add(this.camera0SelectionAllowAny);
-            this.groupBox1.Controls.Add(this.pid0Label);
-            this.groupBox1.Controls.Add(this.camera0SelectionExactModel);
-            this.groupBox1.Controls.Add(this.camera0VID);
-            this.groupBox1.Controls.Add(this.camera0SelectionExcludeModel);
-            this.groupBox1.Location = new System.Drawing.Point(32, 192);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(147, 153);
-            this.groupBox1.TabIndex = 4;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "USB Camera #1";
+            this.camera0Group.Controls.Add(this.camera0PID);
+            this.camera0Group.Controls.Add(this.vid0Label);
+            this.camera0Group.Controls.Add(this.camera0SelectionAllowAny);
+            this.camera0Group.Controls.Add(this.pid0Label);
+            this.camera0Group.Controls.Add(this.camera0SelectionExactModel);
+            this.camera0Group.Controls.Add(this.camera0VID);
+            this.camera0Group.Controls.Add(this.camera0SelectionExcludeModel);
+            this.camera0Group.Location = new System.Drawing.Point(32, 218);
+            this.camera0Group.Name = "camera0Group";
+            this.camera0Group.Size = new System.Drawing.Size(147, 153);
+            this.camera0Group.TabIndex = 4;
+            this.camera0Group.TabStop = false;
+            this.camera0Group.Text = "USB Camera #1";
+            // 
+            // advancedUSBParmsEnabled
+            // 
+            this.advancedUSBParmsEnabled.AutoSize = true;
+            this.advancedUSBParmsEnabled.Location = new System.Drawing.Point(15, 192);
+            this.advancedUSBParmsEnabled.Name = "advancedUSBParmsEnabled";
+            this.advancedUSBParmsEnabled.Size = new System.Drawing.Size(192, 17);
+            this.advancedUSBParmsEnabled.TabIndex = 104;
+            this.advancedUSBParmsEnabled.Text = "Enable Advanced USB Parameters";
+            this.advancedUSBParmsEnabled.UseVisualStyleBackColor = true;
+            this.advancedUSBParmsEnabled.CheckedChanged += new System.EventHandler(this.handleAdvancedUsbPropertiesChange);
             // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(380, 357);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.groupBox2);
+            this.ClientSize = new System.Drawing.Size(380, 383);
+            this.Controls.Add(this.advancedUSBParmsEnabled);
+            this.Controls.Add(this.camera0Group);
+            this.Controls.Add(this.camera1Group);
             this.Controls.Add(this.Copyright);
             this.Controls.Add(this.secondsAreMiliseconds);
             this.Controls.Add(this.Version);
@@ -357,15 +370,13 @@ namespace ASCOM.SXCamera
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SXCamera Setup";
-            this.Load += new System.EventHandler(this.SetupDialogForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.camera1Group.ResumeLayout(false);
+            this.camera1Group.PerformLayout();
+            this.camera0Group.ResumeLayout(false);
+            this.camera0Group.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
@@ -385,7 +396,6 @@ namespace ASCOM.SXCamera
         internal System.Windows.Forms.MaskedTextBox camera0PID;
         internal System.Windows.Forms.MaskedTextBox camera0VID;
         private System.Windows.Forms.Label Copyright;
-        private System.Windows.Forms.GroupBox groupBox2;
         internal System.Windows.Forms.RadioButton camera1SelectionExcludeModel;
         internal System.Windows.Forms.RadioButton camera1SelectionExactModel;
         internal System.Windows.Forms.RadioButton camera1SelectionAllowAny;
@@ -395,6 +405,8 @@ namespace ASCOM.SXCamera
         internal System.Windows.Forms.Label vid1Label;
         internal System.Windows.Forms.Label pid0Label;
         internal System.Windows.Forms.Label pid1Label;
-        private System.Windows.Forms.GroupBox groupBox1;
+        internal System.Windows.Forms.CheckBox advancedUSBParmsEnabled;
+        internal System.Windows.Forms.GroupBox camera1Group;
+        internal System.Windows.Forms.GroupBox camera0Group;
     }
 }

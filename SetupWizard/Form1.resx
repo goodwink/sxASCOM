@@ -117,4 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="autoGuideLabel.Text" xml:space="preserve">
+    <value>Do you have a Starlight Xpress 
+SXV or Exview AutoGuide Camera?
+
+This is a small camera that  plugs into
+the back of an SX main camera.
+
+This is only available if you have indicated
+you have a Main Camera.</value>
+  </data>
 </root>

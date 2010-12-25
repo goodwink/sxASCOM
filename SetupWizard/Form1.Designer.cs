@@ -28,397 +28,402 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SetupWizardScreen1));
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.pag31BeginButton = new System.Windows.Forms.Button();
-            this.page1CancelButton = new System.Windows.Forms.Button();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
-            this.label3 = new System.Windows.Forms.Label();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.radioButton4 = new System.Windows.Forms.RadioButton();
-            this.radioButton3 = new System.Windows.Forms.RadioButton();
-            this.label4 = new System.Windows.Forms.Label();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.button6 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.radioButton6 = new System.Windows.Forms.RadioButton();
-            this.radioButton5 = new System.Windows.Forms.RadioButton();
-            this.label5 = new System.Windows.Forms.Label();
-            this.tabPage5 = new System.Windows.Forms.TabPage();
-            this.button8 = new System.Windows.Forms.Button();
-            this.button7 = new System.Windows.Forms.Button();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.label6 = new System.Windows.Forms.Label();
+            this.introTab = new System.Windows.Forms.TabPage();
+            this.introGroup = new System.Windows.Forms.GroupBox();
+            this.introLabel = new System.Windows.Forms.Label();
+            this.beginButton = new System.Windows.Forms.Button();
+            this.cancelButton = new System.Windows.Forms.Button();
+            this.lodestarTab = new System.Windows.Forms.TabPage();
+            this.lodestarNext = new System.Windows.Forms.Button();
+            this.lodestarPrevious = new System.Windows.Forms.Button();
+            this.lodestarGroup = new System.Windows.Forms.GroupBox();
+            this.lodestarNo = new System.Windows.Forms.RadioButton();
+            this.lodestarYes = new System.Windows.Forms.RadioButton();
+            this.lodestarLabel = new System.Windows.Forms.Label();
+            this.mainCameraTab = new System.Windows.Forms.TabPage();
+            this.mainCameraNext = new System.Windows.Forms.Button();
+            this.mainCameraPrevous = new System.Windows.Forms.Button();
+            this.mainGroup = new System.Windows.Forms.GroupBox();
+            this.mainCameraNo = new System.Windows.Forms.RadioButton();
+            this.mainCameraYes = new System.Windows.Forms.RadioButton();
+            this.mainLabel = new System.Windows.Forms.Label();
+            this.autoGuideTab = new System.Windows.Forms.TabPage();
+            this.autoGuideNext = new System.Windows.Forms.Button();
+            this.autoGuidePrevious = new System.Windows.Forms.Button();
+            this.autoGuideGroup = new System.Windows.Forms.GroupBox();
+            this.autoGuideNo = new System.Windows.Forms.RadioButton();
+            this.autoGuideYes = new System.Windows.Forms.RadioButton();
+            this.autoGuideLabel = new System.Windows.Forms.Label();
+            this.confirmTab = new System.Windows.Forms.TabPage();
+            this.finishButton = new System.Windows.Forms.Button();
+            this.confirmPrevious = new System.Windows.Forms.Button();
+            this.confirmGroup = new System.Windows.Forms.GroupBox();
+            this.confirmText = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.tabPage3.SuspendLayout();
-            this.groupBox3.SuspendLayout();
-            this.tabPage4.SuspendLayout();
-            this.groupBox4.SuspendLayout();
-            this.tabPage5.SuspendLayout();
-            this.groupBox5.SuspendLayout();
+            this.introTab.SuspendLayout();
+            this.introGroup.SuspendLayout();
+            this.lodestarTab.SuspendLayout();
+            this.lodestarGroup.SuspendLayout();
+            this.mainCameraTab.SuspendLayout();
+            this.mainGroup.SuspendLayout();
+            this.autoGuideTab.SuspendLayout();
+            this.autoGuideGroup.SuspendLayout();
+            this.confirmTab.SuspendLayout();
+            this.confirmGroup.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Controls.Add(this.tabPage4);
-            this.tabControl1.Controls.Add(this.tabPage5);
+            this.tabControl1.Controls.Add(this.introTab);
+            this.tabControl1.Controls.Add(this.lodestarTab);
+            this.tabControl1.Controls.Add(this.mainCameraTab);
+            this.tabControl1.Controls.Add(this.autoGuideTab);
+            this.tabControl1.Controls.Add(this.confirmTab);
             this.tabControl1.Location = new System.Drawing.Point(-3, 4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(223, 239);
             this.tabControl1.TabIndex = 6;
+            this.tabControl1.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControl1_Selecting);
             // 
-            // tabPage1
+            // introTab
             // 
-            this.tabPage1.Controls.Add(this.groupBox2);
-            this.tabPage1.Controls.Add(this.pag31BeginButton);
-            this.tabPage1.Controls.Add(this.page1CancelButton);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(215, 213);
-            this.tabPage1.TabIndex = 1;
-            this.tabPage1.Text = "Introduction";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.introTab.Controls.Add(this.introGroup);
+            this.introTab.Controls.Add(this.beginButton);
+            this.introTab.Controls.Add(this.cancelButton);
+            this.introTab.Location = new System.Drawing.Point(4, 22);
+            this.introTab.Name = "introTab";
+            this.introTab.Padding = new System.Windows.Forms.Padding(3);
+            this.introTab.Size = new System.Drawing.Size(215, 213);
+            this.introTab.TabIndex = 1;
+            this.introTab.Text = "Introduction";
+            this.introTab.UseVisualStyleBackColor = true;
             // 
-            // groupBox2
+            // introGroup
             // 
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Location = new System.Drawing.Point(0, 0);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(215, 178);
-            this.groupBox2.TabIndex = 3;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Introduction";
+            this.introGroup.Controls.Add(this.introLabel);
+            this.introGroup.Location = new System.Drawing.Point(0, 0);
+            this.introGroup.Name = "introGroup";
+            this.introGroup.Size = new System.Drawing.Size(215, 178);
+            this.introGroup.TabIndex = 3;
+            this.introGroup.TabStop = false;
+            this.introGroup.Text = "Introduction";
             // 
-            // label1
+            // introLabel
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 16);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(203, 65);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Welcome to the sxASCOM Setup Wizard.\r\n\r\nYou will be asked a series of questions\r\n" +
+            this.introLabel.AutoSize = true;
+            this.introLabel.Location = new System.Drawing.Point(9, 16);
+            this.introLabel.Name = "introLabel";
+            this.introLabel.Size = new System.Drawing.Size(203, 65);
+            this.introLabel.TabIndex = 0;
+            this.introLabel.Text = "Welcome to the sxASCOM Setup Wizard.\r\n\r\nYou will be asked a series of questions\r\n" +
                 "that will allow the driver to be configured\r\nfor your equipement.";
             // 
-            // pag31BeginButton
+            // beginButton
             // 
-            this.pag31BeginButton.Location = new System.Drawing.Point(110, 184);
-            this.pag31BeginButton.Name = "pag31BeginButton";
-            this.pag31BeginButton.Size = new System.Drawing.Size(75, 23);
-            this.pag31BeginButton.TabIndex = 2;
-            this.pag31BeginButton.Text = "Begin";
-            this.pag31BeginButton.UseVisualStyleBackColor = true;
-            this.pag31BeginButton.Click += new System.EventHandler(this.nextTab);
+            this.beginButton.Location = new System.Drawing.Point(110, 184);
+            this.beginButton.Name = "beginButton";
+            this.beginButton.Size = new System.Drawing.Size(75, 23);
+            this.beginButton.TabIndex = 2;
+            this.beginButton.Text = "Begin";
+            this.beginButton.UseVisualStyleBackColor = true;
+            this.beginButton.Click += new System.EventHandler(this.nextTab);
             // 
-            // page1CancelButton
+            // cancelButton
             // 
-            this.page1CancelButton.Location = new System.Drawing.Point(12, 184);
-            this.page1CancelButton.Name = "page1CancelButton";
-            this.page1CancelButton.Size = new System.Drawing.Size(75, 23);
-            this.page1CancelButton.TabIndex = 1;
-            this.page1CancelButton.Text = "Cancel";
-            this.page1CancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Location = new System.Drawing.Point(12, 184);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelButton.TabIndex = 1;
+            this.cancelButton.Text = "Cancel";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.handleCancelClick);
             // 
-            // tabPage2
+            // lodestarTab
             // 
-            this.tabPage2.Controls.Add(this.button2);
-            this.tabPage2.Controls.Add(this.button1);
-            this.tabPage2.Controls.Add(this.groupBox1);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(215, 213);
-            this.tabPage2.TabIndex = 2;
-            this.tabPage2.Text = "Lodestar";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.lodestarTab.Controls.Add(this.lodestarNext);
+            this.lodestarTab.Controls.Add(this.lodestarPrevious);
+            this.lodestarTab.Controls.Add(this.lodestarGroup);
+            this.lodestarTab.Location = new System.Drawing.Point(4, 22);
+            this.lodestarTab.Name = "lodestarTab";
+            this.lodestarTab.Padding = new System.Windows.Forms.Padding(3);
+            this.lodestarTab.Size = new System.Drawing.Size(215, 213);
+            this.lodestarTab.TabIndex = 2;
+            this.lodestarTab.Text = "Lodestar";
+            this.lodestarTab.UseVisualStyleBackColor = true;
             // 
-            // button2
+            // lodestarNext
             // 
-            this.button2.Location = new System.Drawing.Point(110, 184);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 2;
-            this.button2.Text = "Next";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.nextTab);
+            this.lodestarNext.Location = new System.Drawing.Point(110, 184);
+            this.lodestarNext.Name = "lodestarNext";
+            this.lodestarNext.Size = new System.Drawing.Size(75, 23);
+            this.lodestarNext.TabIndex = 2;
+            this.lodestarNext.Text = "Next";
+            this.lodestarNext.UseVisualStyleBackColor = true;
+            this.lodestarNext.Click += new System.EventHandler(this.nextTab);
             // 
-            // button1
+            // lodestarPrevious
             // 
-            this.button1.Location = new System.Drawing.Point(12, 184);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "Previous";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.previousTab);
+            this.lodestarPrevious.Location = new System.Drawing.Point(12, 184);
+            this.lodestarPrevious.Name = "lodestarPrevious";
+            this.lodestarPrevious.Size = new System.Drawing.Size(75, 23);
+            this.lodestarPrevious.TabIndex = 1;
+            this.lodestarPrevious.Text = "Previous";
+            this.lodestarPrevious.UseVisualStyleBackColor = true;
+            this.lodestarPrevious.Click += new System.EventHandler(this.previousTab);
             // 
-            // groupBox1
+            // lodestarGroup
             // 
-            this.groupBox1.Controls.Add(this.radioButton2);
-            this.groupBox1.Controls.Add(this.radioButton1);
-            this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Location = new System.Drawing.Point(3, 0);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(212, 178);
-            this.groupBox1.TabIndex = 0;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "LodeStar Configuration";
+            this.lodestarGroup.Controls.Add(this.lodestarNo);
+            this.lodestarGroup.Controls.Add(this.lodestarYes);
+            this.lodestarGroup.Controls.Add(this.lodestarLabel);
+            this.lodestarGroup.Location = new System.Drawing.Point(3, 0);
+            this.lodestarGroup.Name = "lodestarGroup";
+            this.lodestarGroup.Size = new System.Drawing.Size(212, 178);
+            this.lodestarGroup.TabIndex = 0;
+            this.lodestarGroup.TabStop = false;
+            this.lodestarGroup.Text = "LodeStar Configuration";
             // 
-            // radioButton2
+            // lodestarNo
             // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(9, 120);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(39, 17);
-            this.radioButton2.TabIndex = 2;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "No";
-            this.radioButton2.UseVisualStyleBackColor = true;
+            this.lodestarNo.AutoSize = true;
+            this.lodestarNo.Location = new System.Drawing.Point(9, 120);
+            this.lodestarNo.Name = "lodestarNo";
+            this.lodestarNo.Size = new System.Drawing.Size(39, 17);
+            this.lodestarNo.TabIndex = 2;
+            this.lodestarNo.TabStop = true;
+            this.lodestarNo.Text = "No";
+            this.lodestarNo.UseVisualStyleBackColor = true;
             // 
-            // radioButton1
+            // lodestarYes
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(9, 97);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(43, 17);
-            this.radioButton1.TabIndex = 1;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "Yes";
-            this.radioButton1.UseVisualStyleBackColor = true;
+            this.lodestarYes.AutoSize = true;
+            this.lodestarYes.Location = new System.Drawing.Point(9, 97);
+            this.lodestarYes.Name = "lodestarYes";
+            this.lodestarYes.Size = new System.Drawing.Size(43, 17);
+            this.lodestarYes.TabIndex = 1;
+            this.lodestarYes.TabStop = true;
+            this.lodestarYes.Text = "Yes";
+            this.lodestarYes.UseVisualStyleBackColor = true;
             // 
-            // label3
+            // lodestarLabel
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 16);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(199, 65);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Do you have a LodeStar Guide Camera?\r\n\r\nThis is a small guide camera which \r\nplug" +
+            this.lodestarLabel.AutoSize = true;
+            this.lodestarLabel.Location = new System.Drawing.Point(6, 16);
+            this.lodestarLabel.Name = "lodestarLabel";
+            this.lodestarLabel.Size = new System.Drawing.Size(199, 65);
+            this.lodestarLabel.TabIndex = 0;
+            this.lodestarLabel.Text = "Do you have a LodeStar Guide Camera?\r\n\r\nThis is a small guide camera which \r\nplug" +
                 "s into the computer via a USB\r\nplug.";
             // 
-            // tabPage3
+            // mainCameraTab
             // 
-            this.tabPage3.Controls.Add(this.button4);
-            this.tabPage3.Controls.Add(this.button3);
-            this.tabPage3.Controls.Add(this.groupBox3);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(215, 213);
-            this.tabPage3.TabIndex = 3;
-            this.tabPage3.Text = "MainCamera";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.mainCameraTab.Controls.Add(this.mainCameraNext);
+            this.mainCameraTab.Controls.Add(this.mainCameraPrevous);
+            this.mainCameraTab.Controls.Add(this.mainGroup);
+            this.mainCameraTab.Location = new System.Drawing.Point(4, 22);
+            this.mainCameraTab.Name = "mainCameraTab";
+            this.mainCameraTab.Padding = new System.Windows.Forms.Padding(3);
+            this.mainCameraTab.Size = new System.Drawing.Size(215, 213);
+            this.mainCameraTab.TabIndex = 3;
+            this.mainCameraTab.Text = "MainCamera";
+            this.mainCameraTab.UseVisualStyleBackColor = true;
             // 
-            // button4
+            // mainCameraNext
             // 
-            this.button4.Location = new System.Drawing.Point(110, 184);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(75, 23);
-            this.button4.TabIndex = 2;
-            this.button4.Text = "Next";
-            this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.nextTab);
+            this.mainCameraNext.Location = new System.Drawing.Point(110, 184);
+            this.mainCameraNext.Name = "mainCameraNext";
+            this.mainCameraNext.Size = new System.Drawing.Size(75, 23);
+            this.mainCameraNext.TabIndex = 2;
+            this.mainCameraNext.Text = "Next";
+            this.mainCameraNext.UseVisualStyleBackColor = true;
+            this.mainCameraNext.Click += new System.EventHandler(this.nextTab);
             // 
-            // button3
+            // mainCameraPrevous
             // 
-            this.button3.Location = new System.Drawing.Point(12, 184);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 1;
-            this.button3.Text = "Previous";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.previousTab);
+            this.mainCameraPrevous.Location = new System.Drawing.Point(12, 184);
+            this.mainCameraPrevous.Name = "mainCameraPrevous";
+            this.mainCameraPrevous.Size = new System.Drawing.Size(75, 23);
+            this.mainCameraPrevous.TabIndex = 1;
+            this.mainCameraPrevous.Text = "Previous";
+            this.mainCameraPrevous.UseVisualStyleBackColor = true;
+            this.mainCameraPrevous.Click += new System.EventHandler(this.previousTab);
             // 
-            // groupBox3
+            // mainGroup
             // 
-            this.groupBox3.Controls.Add(this.radioButton4);
-            this.groupBox3.Controls.Add(this.radioButton3);
-            this.groupBox3.Controls.Add(this.label4);
-            this.groupBox3.Location = new System.Drawing.Point(0, 0);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(212, 178);
-            this.groupBox3.TabIndex = 0;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Main Imaging Camera Configuration";
+            this.mainGroup.Controls.Add(this.mainCameraNo);
+            this.mainGroup.Controls.Add(this.mainCameraYes);
+            this.mainGroup.Controls.Add(this.mainLabel);
+            this.mainGroup.Location = new System.Drawing.Point(0, 0);
+            this.mainGroup.Name = "mainGroup";
+            this.mainGroup.Size = new System.Drawing.Size(212, 178);
+            this.mainGroup.TabIndex = 0;
+            this.mainGroup.TabStop = false;
+            this.mainGroup.Text = "Main Imaging Camera Configuration";
             // 
-            // radioButton4
+            // mainCameraNo
             // 
-            this.radioButton4.AutoSize = true;
-            this.radioButton4.Location = new System.Drawing.Point(12, 118);
-            this.radioButton4.Name = "radioButton4";
-            this.radioButton4.Size = new System.Drawing.Size(39, 17);
-            this.radioButton4.TabIndex = 2;
-            this.radioButton4.TabStop = true;
-            this.radioButton4.Text = "No";
-            this.radioButton4.UseVisualStyleBackColor = true;
+            this.mainCameraNo.AutoSize = true;
+            this.mainCameraNo.Location = new System.Drawing.Point(12, 118);
+            this.mainCameraNo.Name = "mainCameraNo";
+            this.mainCameraNo.Size = new System.Drawing.Size(39, 17);
+            this.mainCameraNo.TabIndex = 2;
+            this.mainCameraNo.TabStop = true;
+            this.mainCameraNo.Text = "No";
+            this.mainCameraNo.UseVisualStyleBackColor = true;
             // 
-            // radioButton3
+            // mainCameraYes
             // 
-            this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(12, 95);
-            this.radioButton3.Name = "radioButton3";
-            this.radioButton3.Size = new System.Drawing.Size(43, 17);
-            this.radioButton3.TabIndex = 1;
-            this.radioButton3.TabStop = true;
-            this.radioButton3.Text = "Yes";
-            this.radioButton3.UseVisualStyleBackColor = true;
+            this.mainCameraYes.AutoSize = true;
+            this.mainCameraYes.Location = new System.Drawing.Point(12, 95);
+            this.mainCameraYes.Name = "mainCameraYes";
+            this.mainCameraYes.Size = new System.Drawing.Size(43, 17);
+            this.mainCameraYes.TabIndex = 1;
+            this.mainCameraYes.TabStop = true;
+            this.mainCameraYes.Text = "Yes";
+            this.mainCameraYes.UseVisualStyleBackColor = true;
             // 
-            // label4
+            // mainLabel
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(9, 16);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(164, 65);
-            this.label4.TabIndex = 0;
-            this.label4.Text = "Do you have a  Starligt Xpress\r\nMain Imaging camera?\r\n\r\nThis is any USB camera ex" +
+            this.mainLabel.AutoSize = true;
+            this.mainLabel.Location = new System.Drawing.Point(9, 16);
+            this.mainLabel.Name = "mainLabel";
+            this.mainLabel.Size = new System.Drawing.Size(164, 65);
+            this.mainLabel.TabIndex = 0;
+            this.mainLabel.Text = "Do you have a  Starligt Xpress\r\nMain Imaging camera?\r\n\r\nThis is any USB camera ex" +
                 "cept a\r\nLodeStar Guide Camera";
             // 
-            // tabPage4
+            // autoGuideTab
             // 
-            this.tabPage4.Controls.Add(this.button6);
-            this.tabPage4.Controls.Add(this.button5);
-            this.tabPage4.Controls.Add(this.groupBox4);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(215, 213);
-            this.tabPage4.TabIndex = 4;
-            this.tabPage4.Text = "AutoGuider";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.autoGuideTab.Controls.Add(this.autoGuideNext);
+            this.autoGuideTab.Controls.Add(this.autoGuidePrevious);
+            this.autoGuideTab.Controls.Add(this.autoGuideGroup);
+            this.autoGuideTab.Location = new System.Drawing.Point(4, 22);
+            this.autoGuideTab.Name = "autoGuideTab";
+            this.autoGuideTab.Padding = new System.Windows.Forms.Padding(3);
+            this.autoGuideTab.Size = new System.Drawing.Size(215, 213);
+            this.autoGuideTab.TabIndex = 4;
+            this.autoGuideTab.Text = "AutoGuider";
+            this.autoGuideTab.UseVisualStyleBackColor = true;
             // 
-            // button6
+            // autoGuideNext
             // 
-            this.button6.Location = new System.Drawing.Point(110, 184);
-            this.button6.Name = "button6";
-            this.button6.Size = new System.Drawing.Size(75, 23);
-            this.button6.TabIndex = 2;
-            this.button6.Text = "Next";
-            this.button6.UseVisualStyleBackColor = true;
-            this.button6.Click += new System.EventHandler(this.nextTab);
+            this.autoGuideNext.Location = new System.Drawing.Point(110, 184);
+            this.autoGuideNext.Name = "autoGuideNext";
+            this.autoGuideNext.Size = new System.Drawing.Size(75, 23);
+            this.autoGuideNext.TabIndex = 2;
+            this.autoGuideNext.Text = "Next";
+            this.autoGuideNext.UseVisualStyleBackColor = true;
+            this.autoGuideNext.Click += new System.EventHandler(this.nextTab);
             // 
-            // button5
+            // autoGuidePrevious
             // 
-            this.button5.Location = new System.Drawing.Point(12, 184);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(75, 23);
-            this.button5.TabIndex = 1;
-            this.button5.Text = "Previous";
-            this.button5.UseVisualStyleBackColor = true;
-            this.button5.Click += new System.EventHandler(this.previousTab);
+            this.autoGuidePrevious.Location = new System.Drawing.Point(12, 184);
+            this.autoGuidePrevious.Name = "autoGuidePrevious";
+            this.autoGuidePrevious.Size = new System.Drawing.Size(75, 23);
+            this.autoGuidePrevious.TabIndex = 1;
+            this.autoGuidePrevious.Text = "Previous";
+            this.autoGuidePrevious.UseVisualStyleBackColor = true;
+            this.autoGuidePrevious.Click += new System.EventHandler(this.previousTab);
             // 
-            // groupBox4
+            // autoGuideGroup
             // 
-            this.groupBox4.Controls.Add(this.radioButton6);
-            this.groupBox4.Controls.Add(this.radioButton5);
-            this.groupBox4.Controls.Add(this.label5);
-            this.groupBox4.Location = new System.Drawing.Point(0, 0);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(212, 178);
-            this.groupBox4.TabIndex = 0;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Autoguide Camea Configuration";
+            this.autoGuideGroup.Controls.Add(this.autoGuideNo);
+            this.autoGuideGroup.Controls.Add(this.autoGuideYes);
+            this.autoGuideGroup.Controls.Add(this.autoGuideLabel);
+            this.autoGuideGroup.Location = new System.Drawing.Point(0, 0);
+            this.autoGuideGroup.Name = "autoGuideGroup";
+            this.autoGuideGroup.Size = new System.Drawing.Size(212, 178);
+            this.autoGuideGroup.TabIndex = 0;
+            this.autoGuideGroup.TabStop = false;
+            this.autoGuideGroup.Text = "Autoguide Camea Configuration";
             // 
-            // radioButton6
+            // autoGuideNo
             // 
-            this.radioButton6.AutoSize = true;
-            this.radioButton6.Location = new System.Drawing.Point(12, 121);
-            this.radioButton6.Name = "radioButton6";
-            this.radioButton6.Size = new System.Drawing.Size(39, 17);
-            this.radioButton6.TabIndex = 2;
-            this.radioButton6.TabStop = true;
-            this.radioButton6.Text = "No";
-            this.radioButton6.UseVisualStyleBackColor = true;
+            this.autoGuideNo.AutoSize = true;
+            this.autoGuideNo.Location = new System.Drawing.Point(12, 155);
+            this.autoGuideNo.Name = "autoGuideNo";
+            this.autoGuideNo.Size = new System.Drawing.Size(39, 17);
+            this.autoGuideNo.TabIndex = 2;
+            this.autoGuideNo.TabStop = true;
+            this.autoGuideNo.Text = "No";
+            this.autoGuideNo.UseVisualStyleBackColor = true;
             // 
-            // radioButton5
+            // autoGuideYes
             // 
-            this.radioButton5.AutoSize = true;
-            this.radioButton5.Location = new System.Drawing.Point(12, 98);
-            this.radioButton5.Name = "radioButton5";
-            this.radioButton5.Size = new System.Drawing.Size(43, 17);
-            this.radioButton5.TabIndex = 1;
-            this.radioButton5.TabStop = true;
-            this.radioButton5.Text = "Yes";
-            this.radioButton5.UseVisualStyleBackColor = true;
+            this.autoGuideYes.AutoSize = true;
+            this.autoGuideYes.Location = new System.Drawing.Point(11, 132);
+            this.autoGuideYes.Name = "autoGuideYes";
+            this.autoGuideYes.Size = new System.Drawing.Size(43, 17);
+            this.autoGuideYes.TabIndex = 1;
+            this.autoGuideYes.TabStop = true;
+            this.autoGuideYes.Text = "Yes";
+            this.autoGuideYes.UseVisualStyleBackColor = true;
             // 
-            // label5
+            // autoGuideLabel
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(9, 16);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(182, 65);
-            this.label5.TabIndex = 0;
-            this.label5.Text = "Do you have a Starlight Xpress \r\nSXV or Exview AutoGuide Camera?\r\n\r\nThis is a sma" +
-                "ll camera that  plugs into\r\nthe back of an SX main camera.";
+            this.autoGuideLabel.AutoSize = true;
+            this.autoGuideLabel.Location = new System.Drawing.Point(9, 16);
+            this.autoGuideLabel.Name = "autoGuideLabel";
+            this.autoGuideLabel.Size = new System.Drawing.Size(205, 104);
+            this.autoGuideLabel.TabIndex = 0;
+            this.autoGuideLabel.Text = resources.GetString("autoGuideLabel.Text");
             // 
-            // tabPage5
+            // confirmTab
             // 
-            this.tabPage5.Controls.Add(this.button8);
-            this.tabPage5.Controls.Add(this.button7);
-            this.tabPage5.Controls.Add(this.groupBox5);
-            this.tabPage5.Location = new System.Drawing.Point(4, 22);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(215, 213);
-            this.tabPage5.TabIndex = 5;
-            this.tabPage5.Text = "Confirmation";
-            this.tabPage5.UseVisualStyleBackColor = true;
+            this.confirmTab.Controls.Add(this.finishButton);
+            this.confirmTab.Controls.Add(this.confirmPrevious);
+            this.confirmTab.Controls.Add(this.confirmGroup);
+            this.confirmTab.Location = new System.Drawing.Point(4, 22);
+            this.confirmTab.Name = "confirmTab";
+            this.confirmTab.Padding = new System.Windows.Forms.Padding(3);
+            this.confirmTab.Size = new System.Drawing.Size(215, 213);
+            this.confirmTab.TabIndex = 5;
+            this.confirmTab.Text = "Confirmation";
+            this.confirmTab.UseVisualStyleBackColor = true;
             // 
-            // button8
+            // finishButton
             // 
-            this.button8.Location = new System.Drawing.Point(110, 184);
-            this.button8.Name = "button8";
-            this.button8.Size = new System.Drawing.Size(75, 23);
-            this.button8.TabIndex = 2;
-            this.button8.Text = "Finish";
-            this.button8.UseVisualStyleBackColor = true;
+            this.finishButton.Location = new System.Drawing.Point(110, 184);
+            this.finishButton.Name = "finishButton";
+            this.finishButton.Size = new System.Drawing.Size(75, 23);
+            this.finishButton.TabIndex = 2;
+            this.finishButton.Text = "Finish";
+            this.finishButton.UseVisualStyleBackColor = true;
+            this.finishButton.Click += new System.EventHandler(this.handleFinishClick);
             // 
-            // button7
+            // confirmPrevious
             // 
-            this.button7.Location = new System.Drawing.Point(12, 184);
-            this.button7.Name = "button7";
-            this.button7.Size = new System.Drawing.Size(75, 23);
-            this.button7.TabIndex = 1;
-            this.button7.Text = "Previous";
-            this.button7.UseVisualStyleBackColor = true;
-            this.button7.Click += new System.EventHandler(this.previousTab);
+            this.confirmPrevious.Location = new System.Drawing.Point(12, 184);
+            this.confirmPrevious.Name = "confirmPrevious";
+            this.confirmPrevious.Size = new System.Drawing.Size(75, 23);
+            this.confirmPrevious.TabIndex = 1;
+            this.confirmPrevious.Text = "Previous";
+            this.confirmPrevious.UseVisualStyleBackColor = true;
+            this.confirmPrevious.Click += new System.EventHandler(this.previousTab);
             // 
-            // groupBox5
+            // confirmGroup
             // 
-            this.groupBox5.Controls.Add(this.label6);
-            this.groupBox5.Location = new System.Drawing.Point(0, 0);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(219, 178);
-            this.groupBox5.TabIndex = 0;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "Confirmtion";
+            this.confirmGroup.Controls.Add(this.confirmText);
+            this.confirmGroup.Location = new System.Drawing.Point(0, 0);
+            this.confirmGroup.Name = "confirmGroup";
+            this.confirmGroup.Size = new System.Drawing.Size(219, 178);
+            this.confirmGroup.TabIndex = 0;
+            this.confirmGroup.TabStop = false;
+            this.confirmGroup.Text = "Confirmtion";
             // 
-            // label6
+            // confirmText
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(9, 16);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(35, 13);
-            this.label6.TabIndex = 0;
-            this.label6.Text = "label6";
+            this.confirmText.BackColor = System.Drawing.SystemColors.Window;
+            this.confirmText.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.confirmText.Location = new System.Drawing.Point(12, 20);
+            this.confirmText.Multiline = true;
+            this.confirmText.Name = "confirmText";
+            this.confirmText.ReadOnly = true;
+            this.confirmText.Size = new System.Drawing.Size(197, 132);
+            this.confirmText.TabIndex = 0;
             // 
             // SetupWizardScreen1
             // 
@@ -429,21 +434,21 @@
             this.Name = "SetupWizardScreen1";
             this.Text = "Setup Wizard";
             this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.tabPage3.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
-            this.tabPage4.ResumeLayout(false);
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox4.PerformLayout();
-            this.tabPage5.ResumeLayout(false);
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
+            this.introTab.ResumeLayout(false);
+            this.introGroup.ResumeLayout(false);
+            this.introGroup.PerformLayout();
+            this.lodestarTab.ResumeLayout(false);
+            this.lodestarGroup.ResumeLayout(false);
+            this.lodestarGroup.PerformLayout();
+            this.mainCameraTab.ResumeLayout(false);
+            this.mainGroup.ResumeLayout(false);
+            this.mainGroup.PerformLayout();
+            this.autoGuideTab.ResumeLayout(false);
+            this.autoGuideGroup.ResumeLayout(false);
+            this.autoGuideGroup.PerformLayout();
+            this.confirmTab.ResumeLayout(false);
+            this.confirmGroup.ResumeLayout(false);
+            this.confirmGroup.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -451,37 +456,37 @@
         #endregion
 
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.Button pag31BeginButton;
-        private System.Windows.Forms.Button page1CancelButton;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton radioButton2;
-        private System.Windows.Forms.RadioButton radioButton1;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.Button button4;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.RadioButton radioButton3;
-        private System.Windows.Forms.RadioButton radioButton4;
-        private System.Windows.Forms.TabPage tabPage4;
-        private System.Windows.Forms.GroupBox groupBox4;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.RadioButton radioButton6;
-        private System.Windows.Forms.RadioButton radioButton5;
-        private System.Windows.Forms.Button button6;
-        private System.Windows.Forms.Button button5;
-        private System.Windows.Forms.TabPage tabPage5;
-        private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.TabPage introTab;
+        private System.Windows.Forms.Button beginButton;
+        private System.Windows.Forms.Button cancelButton;
+        private System.Windows.Forms.TabPage lodestarTab;
+        private System.Windows.Forms.GroupBox lodestarGroup;
+        private System.Windows.Forms.RadioButton lodestarNo;
+        private System.Windows.Forms.RadioButton lodestarYes;
+        private System.Windows.Forms.Label lodestarLabel;
+        private System.Windows.Forms.Button lodestarPrevious;
+        private System.Windows.Forms.GroupBox introGroup;
+        private System.Windows.Forms.Label introLabel;
+        private System.Windows.Forms.Button lodestarNext;
+        private System.Windows.Forms.TabPage mainCameraTab;
+        private System.Windows.Forms.Button mainCameraNext;
+        private System.Windows.Forms.Button mainCameraPrevous;
+        private System.Windows.Forms.GroupBox mainGroup;
+        private System.Windows.Forms.Label mainLabel;
+        private System.Windows.Forms.RadioButton mainCameraYes;
+        private System.Windows.Forms.RadioButton mainCameraNo;
+        private System.Windows.Forms.TabPage autoGuideTab;
+        private System.Windows.Forms.GroupBox autoGuideGroup;
+        private System.Windows.Forms.Label autoGuideLabel;
+        private System.Windows.Forms.RadioButton autoGuideNo;
+        private System.Windows.Forms.RadioButton autoGuideYes;
+        private System.Windows.Forms.Button autoGuideNext;
+        private System.Windows.Forms.Button autoGuidePrevious;
+        private System.Windows.Forms.TabPage confirmTab;
+        private System.Windows.Forms.GroupBox confirmGroup;
+        private System.Windows.Forms.Button finishButton;
+        private System.Windows.Forms.Button confirmPrevious;
+        private System.Windows.Forms.TextBox confirmText;
 
     }
 }
