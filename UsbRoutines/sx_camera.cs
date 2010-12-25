@@ -635,7 +635,6 @@ namespace sx
             {
                 throw new ArgumentOutOfRangeException(String.Format("height ({0}) % yBin ({1}) != 0 ({2}", height, yBin, height % yBin));
             }
-
         }
 
         // we use a READ_DELAYED_BLOCK to store paramters that are accessed as properties.  
@@ -666,7 +665,7 @@ namespace sx
         {
             UInt16 fieldFlags = SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD;
 
-            dumpReadDelayedBlock(currentExposure.userRequested, "as requested - before adjustments");
+            dumpReadDelayedBlock(currentExposure.userRequested, "exposure as requested - before any adjustments");
 
             checkParms(false, currentExposure.userRequested.width, currentExposure.userRequested.height, currentExposure.userRequested.x_offset, currentExposure.userRequested.y_offset, currentExposure.userRequested.x_bin, currentExposure.userRequested.y_bin);
 
@@ -674,12 +673,19 @@ namespace sx
 
             // interlaced cameras require some special care.  Some of it is handled
             // later, but we have to divide the offset and the height by 2
-            // we need to make sure that the height requested is a multiple of 
+            // we need to make sure that the new height requested is a multiple of
             // the y binning factor
 
             if (interlaced)
             {
                 currentExposure.toCamera.y_offset /= 2;
+
+                // if we are binning, it is possible that dividing the height by 2 will elminiate a
+                // a binned row that would exist in a progressive camera
+                //
+                // suppose a sensor has 10 lines and we are binning by 3.  If the sensor was progressive,
+                // there would be 3 binned lines.  But with a progressive sensor, we can only get 2 binned lines, 
+                // 1 from each "half" of the sensor
 
                 UInt16 binnedRows = (UInt16)(currentExposure.toCamera.height/currentExposure.toCamera.y_bin);
                 currentExposure.toCamera.height = (UInt16)(binnedRows/2 * currentExposure.toCamera.y_bin);
@@ -721,7 +727,7 @@ namespace sx
             Debug.Assert(currentExposure.toCamera.width % currentExposure.toCamera.x_bin == 0);
             Debug.Assert(currentExposure.toCamera.height % currentExposure.toCamera.y_bin == 0);
 
-            dumpReadDelayedBlock(currentExposure.toCamera, "after bayer adjust, before M25C adjustment");
+            dumpReadDelayedBlock(currentExposure.toCamera, "after bayer adjustments");
 
             // See if our modified parameters are still legal
             try
@@ -730,30 +736,32 @@ namespace sx
             }
             catch (Exception ex)
             {
-                Log.Write(String.Format("checkParms for toCamera generated exception {0}\n", ex));
+                Log.Write(String.Format("checkParms after bayer adjustment generated exception {0}\n", ex));
                 throw;
             }
 
             // interlaced cameras require some special care
             // we have to divide the offset and the height by 2, but that can lead to
             // issues
-            // +--------+--------+-------+----------------
+            // +--------+--------+-------+---------------------
             // | Height | Offset | First | Adjustments
-            // +--------+--------+-------+----------------
+            // +--------+--------+-------+---------------------
             // |  Even  +  Even  | Even  | None
-            // +--------+--------+-------+----------------
+            // +--------+--------+-------+---------------------
             // |  Even  |  Odd   | Odd   | None
-            // +--------+--------+-------+----------------
-            // |  Odd   |  Even  | Even  | second height - 1
-            // +--------+--------+-------+----------------
-            // |  Odd   |  Odd   | Odd   | second height - 1
-            // +--------+--------+------------------------
+            // +--------+--------+-------+---------------------
+            // |  Odd   |  Even  | Even  | second height  += 1
+            // +--------+--------+-------+---------------------
+            // |  Odd   |  Odd   | Odd   | second height  += 1
+            // +--------+--------+-----------------------------
             // 
 
             if (interlaced)
             {
                 bool offsetIsOdd = (currentExposure.userRequested.y_offset % 2) != 0;
                 bool heightIsOdd = (currentExposure.userRequested.height % 2) != 0;
+
+                Log.Write(String.Format("making final interlaced adjustments, offsetIsOdd={0}, heightIsOdd={1}\n", offsetIsOdd, heightIsOdd));
 
                 currentExposure.toCameraSecond = currentExposure.toCamera;
 
@@ -782,7 +790,6 @@ namespace sx
                     throw;
                 }
 
-                // Check the second frame's parameters
                 try
                 {
                     checkParms(true, currentExposure.toCameraSecond.width, currentExposure.toCameraSecond.height, currentExposure.toCameraSecond.x_offset, currentExposure.toCameraSecond.y_offset, currentExposure.toCameraSecond.x_bin, currentExposure.toCameraSecond.y_bin);
@@ -793,18 +800,17 @@ namespace sx
                     throw;
                 }
 
-
-                dumpReadDelayedBlock(currentExposure.toCamera, "after progressive adjustments");
-                dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after progressive adjustments");
+                dumpReadDelayedBlock(currentExposure.toCamera, "after second progressive adjustments");
+                dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after second progressive adjustments");
             }
 
             // Make any adjustments required for specific cameras
 
-            // I have no idea why the next bit is required, but it is.  If it isn't there,
-            // the read of the image data fails. I found this in the sample basic application from SX.
-
             if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M25C)
             {
+                // I have no idea why the next bit is required, but it is.  If it isn't there,
+                // the read of the image data fails. I found this in the sample basic application from SX.
+
                 currentExposure.toCamera.width *= 2;
 
                 // in order for this to work, the height must be even
@@ -837,7 +843,7 @@ namespace sx
 
                 currentExposure.toCamera.y_offset /= 2;
 
-                dumpReadDelayedBlock(currentExposure.toCamera, "after M25C adjustment");
+                dumpReadDelayedBlock(currentExposure.toCamera, "after M25C adjustments");
             }
 
             return fieldFlags;
@@ -1154,7 +1160,7 @@ namespace sx
 
                         // This loop is based on cameraBinnedWidth, not binnedWidth because we have to 
                         // get all the pixels accoss each row every time, even if we don't want them all.
-                        // Otherwise we will give the wrong data to next ro
+                        // Otherwise we will give the wrong data to next row
                         for (x = 0; x < cameraBinnedWidth; x += 2)
                         {
                             UInt16 pixel;
