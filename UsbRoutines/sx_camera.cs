@@ -172,6 +172,11 @@ namespace sx
             get { return ccdParms.hback_porch; }
         }
 
+        public UInt16 frameHeight
+        {
+            get { return ccdParms.height; }
+        }
+
         public UInt16 ccdWidth
         {
             get { return ccdParms.width; }
@@ -577,31 +582,42 @@ namespace sx
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
         }
 
-        internal void checkParms(UInt16 width, UInt16 height, UInt16 xOffset, UInt16 yOffset, Byte xBin, Byte yBin)
+        internal void checkParms(bool useFrameHeight, UInt16 width, UInt16 height, UInt16 xOffset, UInt16 yOffset, Byte xBin, Byte yBin)
         {
+            UInt16 effectiveHeight;
+
+            if (useFrameHeight)
+            {
+                effectiveHeight = frameHeight;
+            }
+            else
+            {
+                effectiveHeight = ccdHeight;
+            }
+
             if (width > ccdWidth)
             {
                 throw new ArgumentOutOfRangeException(String.Format("Invalid width {0}: 0<=width<={1}", width, ccdWidth), "width");
             }
-            if (height > ccdHeight)
+            if (height > effectiveHeight)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", height, ccdHeight), "height");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", height, effectiveHeight), "height");
             }
             if (xOffset > ccdWidth)
             {
                 throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0}: 0<=width<={1}", xOffset, ccdWidth), "xOffset");
             }
-            if (yOffset > ccdHeight)
+            if (yOffset > effectiveHeight)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", yOffset, ccdHeight), "yOffset");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", yOffset, effectiveHeight), "yOffset");
             }
             if (xOffset + width > ccdWidth)
             {
                 throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", xOffset, width, ccdWidth), "width+xOffset");
             }
-            if (yOffset + height > ccdHeight)
+            if (yOffset + height > effectiveHeight)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", yOffset, height, ccdHeight), "height+yOffset");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", yOffset, height, effectiveHeight), "height+yOffset");
             }
             // The following if disallows asymmetric binning. The SX cameras will do it, but it there are difficulties that arise from
             // asymmetric binning and bayer matrices that I don't want to deal with at this point...
@@ -648,21 +664,44 @@ namespace sx
 
         internal UInt16 adjustReadDelayedBlock()
         {
-            UInt16 fieldFlags;
+            UInt16 fieldFlags = SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD;
 
             dumpReadDelayedBlock(currentExposure.userRequested, "as requested - before adjustments");
 
-            checkParms(currentExposure.userRequested.width, currentExposure.userRequested.height, currentExposure.userRequested.x_offset, currentExposure.userRequested.y_offset, currentExposure.userRequested.x_bin, currentExposure.userRequested.y_bin);
+            checkParms(false, currentExposure.userRequested.width, currentExposure.userRequested.height, currentExposure.userRequested.x_offset, currentExposure.userRequested.y_offset, currentExposure.userRequested.x_bin, currentExposure.userRequested.y_bin);
 
             currentExposure.toCamera = currentExposure.userRequested;
 
+            // interlaced cameras require some special care.  Some of it is handled
+            // later, but we have to divide the offset and the height by 2
+            // we need to make sure that the height requested is a multiple of 
+            // the y binning factor
+
+            if (interlaced)
+            {
+                currentExposure.toCamera.y_offset /= 2;
+
+                UInt16 binnedRows = (UInt16)(currentExposure.toCamera.height/currentExposure.toCamera.y_bin);
+                currentExposure.toCamera.height = (UInt16)(binnedRows/2 * currentExposure.toCamera.y_bin);
+
+                // See if our modified parameters are still legal
+                try
+                {
+                    checkParms(true, currentExposure.toCamera.width, currentExposure.toCamera.height, currentExposure.toCamera.x_offset, currentExposure.toCamera.y_offset, currentExposure.toCamera.x_bin, currentExposure.toCamera.y_bin);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(String.Format("checkParms for toCamera generated exception {0}\n", ex));
+                    throw;
+                }
+
+                dumpReadDelayedBlock(currentExposure.userRequested, "after initial progressive adjustments");
+            }
+
             // cameras with a Bayer matrix need the offsets to be even so that the subframe returned 
             // has the same color representation as a full frame.  Since this (at most) offsets 
-            // the image by 1 pixel on each axis, just do it for all cameras
+            // the image by 1 pixel on each axis, we just do it for all cameras
 
-            // This also helps with progressive scan cameras - since the offsets are always 
-            // even,  we always start at on the even frame.
-            // 
             // If it isn't divisible by 2, we move it one back.  
 
             if (currentExposure.toCamera.x_bin == 1 && (currentExposure.toCamera.x_offset % 2) != 0)
@@ -687,7 +726,7 @@ namespace sx
             // See if our modified parameters are still legal
             try
             {
-                checkParms(currentExposure.toCamera.width, currentExposure.toCamera.height, currentExposure.toCamera.x_offset, currentExposure.toCamera.y_offset, currentExposure.toCamera.x_bin, currentExposure.toCamera.y_bin);
+                checkParms(true, currentExposure.toCamera.width, currentExposure.toCamera.height, currentExposure.toCamera.x_offset, currentExposure.toCamera.y_offset, currentExposure.toCamera.x_bin, currentExposure.toCamera.y_bin);
             }
             catch (Exception ex)
             {
@@ -695,65 +734,35 @@ namespace sx
                 throw;
             }
 
-            if (progressive)
+            // interlaced cameras require some special care
+            // we have to divide the offset and the height by 2, but that can lead to
+            // issues
+            // +--------+--------+-------+----------------
+            // | Height | Offset | First | Adjustments
+            // +--------+--------+-------+----------------
+            // |  Even  +  Even  | Even  | None
+            // +--------+--------+-------+----------------
+            // |  Even  |  Odd   | Odd   | None
+            // +--------+--------+-------+----------------
+            // |  Odd   |  Even  | Even  | second height - 1
+            // +--------+--------+-------+----------------
+            // |  Odd   |  Odd   | Odd   | second height - 1
+            // +--------+--------+------------------------
+            // 
+
+            if (interlaced)
             {
-                fieldFlags = SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD;
-
-                // There are no adjustments that need to be made for progressive mode, 
-                // but there are adjustments required for some cameras
-
-                // I have no idea why the next bit is required, but it is.  If it isn't there,
-                // the read of the image data fails. I found this in the sample basic application from SX.
-
-                if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M25C)
-                {
-                    currentExposure.toCamera.width *= 2;
-
-                    // in order for this to work, the height must be even
-
-                    if (currentExposure.toCamera.height % 2 == 1)
-                    {
-                        if (currentExposure.toCamera.height + currentExposure.toCamera.y_bin <= ccdHeight)
-                        {
-                            currentExposure.toCamera.height += currentExposure.toCamera.y_bin;
-                        }
-                        else
-                        {
-                            currentExposure.toCamera.height -= currentExposure.toCamera.y_bin;
-                        }
-                    }
-
-                    Debug.Assert(currentExposure.toCamera.height % 2 == 0);
-                    currentExposure.toCamera.height /= 2;
-
-                    currentExposure.toCamera.x_offset *= 2;
-
-                    // The y_offset must also be even.
-
-                    if (currentExposure.toCamera.y_offset % 2 == 1)
-                    {
-                        Debug.Assert(currentExposure.toCamera.y_offset >= currentExposure.toCamera.y_bin);
-                        currentExposure.toCamera.y_offset -= currentExposure.toCamera.y_bin;
-                        Debug.Assert(currentExposure.toCamera.y_offset % 2 == 0);
-                    }
-
-                    currentExposure.toCamera.y_offset /= 2;
-
-                }
-
-                dumpReadDelayedBlock(currentExposure.toCamera, "after M25C adjustment");
-            }
-            else
-            {
-                bool offsetOdd = (currentExposure.toCamera.y_offset % 2) != 0;
-                bool heightOdd = (currentExposure.toCamera.height % 2) != 0;
-
-                currentExposure.toCamera.height /= 2;
-                currentExposure.toCamera.y_offset /= 2;
+                bool offsetIsOdd = (currentExposure.userRequested.y_offset % 2) != 0;
+                bool heightIsOdd = (currentExposure.userRequested.height % 2) != 0;
 
                 currentExposure.toCameraSecond = currentExposure.toCamera;
 
-                if (offsetOdd)
+                if (heightIsOdd)
+                {
+                    currentExposure.toCamera.height += 1;
+                }
+
+                if (offsetIsOdd)
                 {
                     fieldFlags = SX_CCD_FLAGS_FIELD_ODD;
                 }
@@ -762,13 +771,73 @@ namespace sx
                     fieldFlags = SX_CCD_FLAGS_FIELD_EVEN;
                 }
 
-                if (heightOdd)
+                // See if our modified parameters are still legal
+                try
                 {
-                    currentExposure.toCamera.height += 1;
+                    checkParms(true, currentExposure.toCamera.width, currentExposure.toCamera.height, currentExposure.toCamera.x_offset, currentExposure.toCamera.y_offset, currentExposure.toCamera.x_bin, currentExposure.toCamera.y_bin);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(String.Format("checkParms for toCamera generated exception {0}\n", ex));
+                    throw;
                 }
 
-                dumpReadDelayedBlock(currentExposure.toCamera, "first frame block after progressive adjustments");
-                dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame block after progressive adjustments");
+                // Check the second frame's parameters
+                try
+                {
+                    checkParms(true, currentExposure.toCameraSecond.width, currentExposure.toCameraSecond.height, currentExposure.toCameraSecond.x_offset, currentExposure.toCameraSecond.y_offset, currentExposure.toCameraSecond.x_bin, currentExposure.toCameraSecond.y_bin);
+                }
+                catch (Exception ex)
+                {
+                    Log.Write(String.Format("checkParms for toCameraSecond generated exception {0}\n", ex));
+                    throw;
+                }
+
+
+                dumpReadDelayedBlock(currentExposure.toCamera, "after progressive adjustments");
+                dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after progressive adjustments");
+            }
+
+            // Make any adjustments required for specific cameras
+
+            // I have no idea why the next bit is required, but it is.  If it isn't there,
+            // the read of the image data fails. I found this in the sample basic application from SX.
+
+            if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M25C)
+            {
+                currentExposure.toCamera.width *= 2;
+
+                // in order for this to work, the height must be even
+
+                if (currentExposure.toCamera.height % 2 == 1)
+                {
+                    if (currentExposure.toCamera.height + currentExposure.toCamera.y_bin <= ccdHeight)
+                    {
+                        currentExposure.toCamera.height += currentExposure.toCamera.y_bin;
+                    }
+                    else
+                    {
+                        currentExposure.toCamera.height -= currentExposure.toCamera.y_bin;
+                    }
+                }
+
+                Debug.Assert(currentExposure.toCamera.height % 2 == 0);
+                currentExposure.toCamera.height /= 2;
+
+                currentExposure.toCamera.x_offset *= 2;
+
+                // The y_offset must also be even.
+
+                if (currentExposure.toCamera.y_offset % 2 == 1)
+                {
+                    Debug.Assert(currentExposure.toCamera.y_offset >= currentExposure.toCamera.y_bin);
+                    currentExposure.toCamera.y_offset -= currentExposure.toCamera.y_bin;
+                    Debug.Assert(currentExposure.toCamera.y_offset % 2 == 0);
+                }
+
+                currentExposure.toCamera.y_offset /= 2;
+
+                dumpReadDelayedBlock(currentExposure.toCamera, "after M25C adjustment");
             }
 
             return fieldFlags;
