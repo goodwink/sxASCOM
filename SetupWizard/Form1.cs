@@ -48,8 +48,6 @@ namespace SetupWizard
 
                 string serverPath = String.Format(@"{0}\{1}", dirPart, "ASCOM.SXCamera.exe");
 
-                MessageBox.Show(serverPath);
-
                 ProcessStartInfo si = new ProcessStartInfo();
 
                 string args = "/register";
