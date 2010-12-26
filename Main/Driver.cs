@@ -257,7 +257,7 @@ namespace ASCOM.SXMain
 
                     Log.Write("Main::CoolerPower will throw exception\n");
 
-                    throw new ASCOM.PropertyNotImplementedException(String.Format("Cooler Power Must throw exception if not supported."), false);
+                    throw new ASCOM.PropertyNotImplementedException(SetError(String.Format("Cooler Power Must throw exception if not supported.")), false);
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -283,7 +283,7 @@ namespace ASCOM.SXMain
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write("Main::CoolerPower will throw exception\n");
+                    Log.Write("Main::HeatSinkTemperature will throw exception\n");
 
                     throw new ASCOM.PropertyNotImplementedException(SetError("HeatSinkTemperature must throw exception if data unavailable"), true);
                 }
