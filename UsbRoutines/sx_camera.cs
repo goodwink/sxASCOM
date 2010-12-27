@@ -126,7 +126,7 @@ namespace sx
             internal set;
         }
 
-        public double fullWellCapacity
+        public int fullWellCapacity
         {
             get;
             internal set;
@@ -303,14 +303,20 @@ namespace sx
                 {
                     throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 1<=height<={1}", value, MAX_BIN), "xBin");
                 }
-
+#if false
+                if (value == 7)
+                {
+                    throw new ArgumentException(String.Format("sx cameras do not support x binning by 7"));
+                }
+#endif
+#if false
                 // note that this disallows non power of 2 binning values.  The camera hardware can deal with them, but 
                 // there are interactions with bayer matrices that I don't want to deal with now
-                //if ((value & (value - 1)) != 0)
-                //{
-                //    throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
-                //}
-
+                if ((value & (value - 1)) != 0)
+                {
+                    throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
+                }
+#endif
                 nextExposure.x_bin = value;
             }
         }
@@ -515,7 +521,7 @@ namespace sx
                 default:
                     bUntested = true;
                     description = String.Format("unknown 0x{0:x}", cameraModel);
-                    fullWellCapacity = 0.0;
+                    fullWellCapacity = 0;
                     electronsPerADU = 0.0;
                     // This is a guess, but I think I have all the old cameras in the 
                     // switch statement, and I expect most new models will be 

@@ -73,13 +73,7 @@ namespace ASCOM.SXGeneric
         private bool m_lastLoggedConnected;
         // values that back properties: property foo is in m_foo
         private bool m_Connected;
-        private short m_BinX, m_BinY;
-        private short m_MaxBinX, m_MaxBinY;
-        private int m_CameraXSize, m_CameraYSize;
-        protected string m_Description;
-        private int m_MaxADU;
         private int m_NumX, m_NumY;
-        private double m_PixelSizeX, m_PixelSizeY;
         private int m_StartX, m_StartY;
 
         #region Camera Constructor
@@ -229,9 +223,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::BinX get returns {0}\n", m_BinX));
+                    short ret = sxCamera.xBin;
 
-                    return m_BinX;
+                    Log.Write(String.Format("Generic::BinX get returns {0}\n", ret));
+
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -248,14 +244,13 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    m_BinX = value;
-                    sxCamera.xBin = (byte)m_BinX;
-                    Log.Write(String.Format("Generic::BinX set to {0}\n", m_BinX));
+                    sxCamera.xBin = (byte)value;
+                    Log.Write(String.Format("Generic::BinX set to {0}\n", value));
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
                     SetError(ex.ToString());
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + m_MaxBinX.ToString(), ex);
+                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinX.ToString(), ex);
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -283,9 +278,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::BinY get returns {0}\n", m_BinY));
+                    short ret = sxCamera.yBin;
 
-                    return m_BinY;
+                    Log.Write(String.Format("Generic::BinY get returns {0}\n", ret));
+
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -302,9 +299,8 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    m_BinY = value;
-                    sxCamera.yBin = (byte)m_BinY;
-                    Log.Write(String.Format("Generic::BinY set to {0}\n", m_BinY));
+                    sxCamera.yBin = (byte)value;
+                    Log.Write(String.Format("Generic::BinY set to {0}\n", value));
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
@@ -402,25 +398,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::CameraXSize get returns m_CameraXSize {0}\n", m_CameraXSize));
+                    int ret = sxCamera.ccdWidth;
 
-                    return m_CameraXSize;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
-            private set
-            {
-                try
-                {
-                    m_CameraXSize = value;
-                    Log.Write(String.Format("Generic::CameraXSize set to {0}\n", m_CameraXSize));
+                    Log.Write(String.Format("Generic::CameraXSize get returns m_CameraXSize {0}\n", ret));
+
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -445,26 +427,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::CameraYSize get returns CameraYSize {0}\n", m_CameraYSize));
+                    int ret = sxCamera.ccdHeight;
 
-                    return m_CameraYSize;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+                    Log.Write(String.Format("Generic::CameraYSize get returns CameraYSize {0}\n", ret));
 
-            private set
-            {
-                try
-                {
-                    m_CameraYSize = value;
-                    Log.Write(String.Format("Generic::CameraYSize set to {0}\n", m_CameraYSize));
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -626,6 +593,7 @@ namespace ASCOM.SXGeneric
             }
             set
             {
+                Log.Write("Hello\n");
                 Log.Write(String.Format("Generic::Connected set: Current Value is {0}, requested value is {1}\n", m_Connected, value));
 
                 try
@@ -661,18 +629,10 @@ namespace ASCOM.SXGeneric
                             m_Connected = true;
                             // set properties to defaults. These all talk to the camera, and having them here saves
                             // a lot of try/catch blocks in other places
-                            MaxBinX = sxCamera.xBinMax;
-                            MaxBinY = sxCamera.yBinMax;
-                            CameraXSize = sxCamera.ccdWidth;
-                            CameraYSize = sxCamera.ccdHeight;
                             BinX = 1;
                             BinY = 1;
                             NumX = sxCamera.ccdWidth;
                             NumY = sxCamera.ccdHeight;
-                            Description = sxCamera.description;
-                            MaxADU = (1 << sxCamera.bitsPerPixel) - 1;
-                            PixelSizeX = sxCamera.pixelWidth;
-                            PixelSizeY = sxCamera.pixelHeight;
                             StartX = 0;
                             StartY = 0;
                             bHasGuideCamera = sxCamera.hasGuideCamera;
@@ -757,9 +717,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::Description get returns {0}\n", m_Description));
+                    string ret = sxCamera.description;
 
-                    return m_Description;
+                    Log.Write(String.Format("Generic::Description get returns {0}\n", ret));
+
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -770,22 +732,6 @@ namespace ASCOM.SXGeneric
                     throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
                 }
 
-            }
-            protected set
-            {
-                try
-                {
-                    m_Description = value;
-                    Log.Write(String.Format("Generic::Description set to {0}\n", m_Description));
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
             }
         }
 
@@ -1166,26 +1112,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::MaxADU get returns {0}\n", m_MaxADU));
+                    int ret = sxCamera.fullWellCapacity;
 
-                    return m_MaxADU;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+                    Log.Write(String.Format("Generic::MaxADU get returns {0}\n", ret));
 
-            protected set
-            {
-                try
-                {
-                    m_MaxADU = value;
-                    Log.Write(String.Format("Generic::MaxADU set to {0}\n", m_MaxADU));
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1211,26 +1142,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::MaxBinX get returns {0}\n", m_MaxBinX));
+                    short ret = sxCamera.xBinMax;
 
-                    return m_MaxBinX;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+                    Log.Write(String.Format("Generic::MaxBinX get returns {0}\n", ret));
 
-            private set
-            {
-                try
-                {
-                    m_MaxBinX = value;
-                    Log.Write(String.Format("Generic::MaxBinX set to {0}\n", m_MaxBinX));
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1256,26 +1172,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::MaxBinY get returns {0}\n", m_MaxBinY));
+                    short ret = sxCamera.yBinMax;
 
-                    return m_MaxBinY;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+                    Log.Write(String.Format("Generic::MaxBinY get returns {0}\n", ret));
 
-            private set
-            {
-                try
-                {
-                    m_MaxBinY = value;
-                    Log.Write(String.Format("Generic::MaxBinY set to {0}\n", m_MaxBinY));
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1395,25 +1296,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::PixelSizeX get returns {0}\n", m_PixelSizeX));
+                    double ret = sxCamera.pixelWidth;
 
-                    return m_PixelSizeX;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
-            private set
-            {
-                try
-                {
-                    m_PixelSizeX = value;
-                    Log.Write(String.Format("Generic::PixelSizeX set to {0}\n", m_PixelSizeX));
+                    Log.Write(String.Format("Generic::PixelSizeX get returns {0}\n", ret));
+
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1439,26 +1326,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    Log.Write(String.Format("Generic::PixelSizeY get returns {0}\n", m_PixelSizeY));
+                    double ret = sxCamera.pixelHeight;
 
-                    return m_PixelSizeY;
-                }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
-                catch (System.Exception ex)
-                {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
-                }
-            }
+                    Log.Write(String.Format("Generic::PixelSizeY get returns {0}\n", ret));
 
-            private set
-            {
-                try
-                {
-                    m_PixelSizeY = value;
-                    Log.Write(String.Format("Generic::PixelSizeY set to {0}\n", m_PixelSizeY));
+                    return ret;
                 }
                 catch (ASCOM.DriverException ex)
                 {
