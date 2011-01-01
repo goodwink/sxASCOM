@@ -114,14 +114,17 @@
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{1C61F66B-383E-493C-AF71-216F3F61A64A}</Project>
       <Name>Logging</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\SXCamera\SXCamera.csproj">
       <Project>{D2998653-2206-4026-8AB7-03D0189B4E36}</Project>
       <Name>SXCamera</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\UsbRoutines\UsbRoutines.csproj">
       <Project>{71435F1C-132A-4130-A01B-7B3C15B51079}</Project>
       <Name>UsbRoutines</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

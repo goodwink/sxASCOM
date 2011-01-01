@@ -47,18 +47,22 @@
     <ProjectReference Include="..\Generic\Generic.csproj">
       <Project>{A98969EA-BFA8-48FE-9968-D434F05E0EF5}</Project>
       <Name>Generic</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{1C61F66B-383E-493C-AF71-216F3F61A64A}</Project>
       <Name>Logging</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Main\Main.csproj">
       <Project>{0D4A2103-3948-43E7-BAF9-961FA8DE9CA5}</Project>
       <Name>Main</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\SXCamera\SXCamera.csproj">
       <Project>{D2998653-2206-4026-8AB7-03D0189B4E36}</Project>
       <Name>SXCamera</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
