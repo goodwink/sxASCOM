@@ -228,9 +228,13 @@ namespace ASCOM.SXCamera
             string assyPath = Assembly.GetEntryAssembly().Location;
             int i = assyPath.LastIndexOf(@"\SXCamera\bin\");						// Look for us running in IDE
             if (i == -1) i = assyPath.LastIndexOf('\\');
-            assyPath = assyPath.Remove(i, assyPath.Length - i) + "\\SXCamera\\SXCameraServedClasses";
+            assyPath = assyPath.Remove(i, assyPath.Length - i) + "\\SXCameraServedClasses";
 
             DirectoryInfo d = new DirectoryInfo(assyPath);
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain2.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXGuide.Camera"));
+#if False
             foreach (FileInfo fi in d.GetFiles("*.dll"))
             {
                 if (!fi.Name.ToLower().Contains("generic"))
@@ -247,6 +251,7 @@ namespace ASCOM.SXCamera
                         Assembly so = Assembly.LoadFrom(aPath);
                         m_ComObjectTypes.Add(so.GetType(fqClassName, true));
                         m_ComObjectAssys.Add(so);
+                        MessageBox.Show(String.Format("Adding so={0}\ntype={1}\n", so, so.GetType(fqClassName, true)));
                     }
                     catch (Exception e)
                     {
@@ -256,6 +261,7 @@ namespace ASCOM.SXCamera
                     }
                 }
             }
+#endif
             return true;
         }
         #endregion

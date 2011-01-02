@@ -42,11 +42,11 @@ namespace SetupWizard
 
             if (pos >= 0)
             {
-                pos = fullPath.LastIndexOf(@"\", pos - 1);
-
                 string dirPart = fullPath.Substring(0, pos);
 
                 string serverPath = String.Format(@"{0}\{1}", dirPart, "ASCOM.SXCamera.exe");
+
+                MessageBox.Show(String.Format("fullPath={0}\npos={1}\ndirpart={2}\nserverPath={3}\n", fullPath, pos, dirPart, serverPath));
 
                 ProcessStartInfo si = new ProcessStartInfo();
 

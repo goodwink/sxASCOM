@@ -29,38 +29,28 @@ WizardImageFile="C:\Program Files (x86)\ASCOM\InstallGen\Resources\WizardImage.b
 LicenseFile="C:\Users\bretm\Astronomy\src\sxASCOM\CreativeCommons.txt"
 
 ; {cf}\ASCOM\Uninstall\Camera folder created by Platform, always
-UninstallFilesDir="{cf}\ASCOM\Uninstall\Camera\SX"
+UninstallFilesDir="{cf}\ASCOM\Uninstall\Camera\sxASCOM"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
-Name: "{cf}\ASCOM\Uninstall\Camera\SX"
-Name: "{app}\SXCamera"
-Name: "{app}\SXCamera\SXCameraServedClasses"
+Name: "{cf}\ASCOM\Uninstall\Camera\sxASCOM"
+Name: "{app}"
+Name: "{app}\SXCameraServedClasses"
 
 [Files]
-Source: "SXCamera\bin\{#BUILD_TYPE}\ASCOM.SXCamera.exe"; DestDir: "{app}"
-Source: "ASCOM.SXCamera.exe.config"; DestDir: "{app}"
-; TODO: Add driver assemblies into the ServedClasses folder
-Source: "Main\bin\{#BUILD_TYPE}\ASCOM.SXMain.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
-Source: "Main2\bin\{#BUILD_TYPE}\ASCOM.SXMain2.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
-Source: "Guide\bin\{#BUILD_TYPE}\ASCOM.SXGuide.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
-Source: "Generic\bin\{#BUILD_TYPE}\ASCOM.SXGeneric.Camera.dll"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
-Source: "CreativeCommons.html"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
+Source: "SXCamera\bin\{#BUILD_TYPE}\combined.ASCOM.SXCamera.exe"; DestDir: "{app}\ASCOM.SXCamera.exe"
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
-Source: "SXCamera.Readme.txt"; DestDir: "{app}\SXCamera"; Flags: isreadme
-Source: "SXCamera.Readme.txt"; DestDir: "{app}\SXCamera\SXCameraServedClasses"
+Source: "SXCamera.Readme.txt"; DestDir: "{app}\SXCameraServedClasses"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
-Source: "UsbRoutines\bin\{#BUILD_TYPE}\ASCOM.SXCamera.UsbRoutines.dll"; DestDir: "{app}\SXCamera"
-Source: "SetupWizard\bin\{#BUILD_TYPE}\ASCOM.SXCamera.SetupWizard.exe"; DestDir: "{app}\SXCamera"
-Source: "Logging\bin\{#BUILD_TYPE}\ASCOM.SXLogging.dll"; DestDir: "{app}\SXCamera"
+Source: "SetupWizard\bin\{#BUILD_TYPE}\ASCOM.SXCamera.SetupWizard.exe"; DestDir: "{app}"
 
 
 ; Only if driver is .NET
 [Run]
 ; Only for .NET local-server drivers
-Filename: "{app}\SXCamera\ASCOM.SXCamera.SetupWizard.exe"
+Filename: "{app}\ASCOM.SXCamera.SetupWizard.exe"
 
 ; Only if driver is .NET
 [UninstallRun]

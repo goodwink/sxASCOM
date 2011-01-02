@@ -76,6 +76,7 @@
     </Compile>
     <Compile Include="GarbageCollection.cs" />
     <Compile Include="LocalServer.cs" />
+    <Compile Include="logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmMain.resx">
       <SubType>Designer</SubType>
@@ -102,6 +103,18 @@
       <DependentUpon>SetupDialogForm.cs</DependentUpon>
     </Compile>
     <Compile Include="SharedResources.cs" />
+    <Compile Include="sxGeneric\Driver.cs" />
+    <Compile Include="sxGuide\Driver.cs" />
+    <Compile Include="sxMain2\Driver.cs" />
+    <Compile Include="sxMain\Driver.cs" />
+    <Compile Include="UsbRoutines\Acknowlegements.cs" />
+    <Compile Include="UsbRoutines\DeviceManagement.cs" />
+    <Compile Include="UsbRoutines\DeviceManagementApi.cs" />
+    <Compile Include="UsbRoutines\FileIOApi.cs" />
+    <Compile Include="UsbRoutines\sx_base.cs" />
+    <Compile Include="UsbRoutines\sx_camera.cs" />
+    <Compile Include="UsbRoutines\sx_controller.cs" />
+    <Compile Include="UsbRoutines\sx_usb.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ASCOM.png" />
@@ -135,16 +148,30 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Logging\Logging.csproj">
-      <Project>{1C61F66B-383E-493C-AF71-216F3F61A64A}</Project>
-      <Name>Logging</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\UsbRoutines\UsbRoutines.csproj">
-      <Project>{71435F1C-132A-4130-A01B-7B3C15B51079}</Project>
-      <Name>UsbRoutines</Name>
-      <Private>False</Private>
-    </ProjectReference>
+    <COMReference Include="ASCOM.Helper">
+      <Guid>{12DC26BD-E8F7-4328-8A8B-B16C6D87A077}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="ASCOM.Helper2">
+      <Guid>{55B16037-26C0-4F1E-A6DC-4C0E702D9FBE}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="ASCOM.Interface">
+      <Guid>{76618F90-032F-4424-A680-802467A55742}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -157,7 +184,6 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>rem "C:\Program Files (x86)\Microsoft\ILMerge\ILMerge.exe" /out:combined.ASCOM.SXCamera.exe ASCOM.SXCamera.exe ASCOM.SXCamera.UsbRoutines.dll ASCOM.SXLogging.dll ASCOM.SXGeneric.Camera.dll</PostBuildEvent>
   </PropertyGroup>
 </Project>
