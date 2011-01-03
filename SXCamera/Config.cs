@@ -80,23 +80,22 @@ namespace ASCOM.SXCamera
             m_profile = new Profile();
             m_profile.DeviceType = DEVICE_TYPE;
 
-            m_driverId = "ASCOM.";
+            // Note that this picks main camera configuraitons for guide cameras too - 
+            // there are currently no configuration values for guide cameras
+            
+            m_driverId = "ASCOM.SXMain" + whichController.ToString() + "." + DEVICE_TYPE;
 
-            if (whichCamera == 0)
-            {
-                m_driverId  += "SXMain" + whichController.ToString();
-            }
-            else
-            {
-                m_driverId  += "SXGuide";
-            }
-
-            m_driverId += "." + DEVICE_TYPE;
+            Log.Write(String.Format("Configuration() computes driverId={0}\n", m_driverId));
 
             m_whichController = whichController;
             m_whichCamera = whichCamera;
 
-            Log.Write(String.Format("Configuration() computes driverId={0}\n", m_driverId));
+            if (enableLogging && !Log.enabled)
+            {
+                Log.enabled = true;
+                Log.Write("Configuration() has enabled logging\n");
+            }
+
         }
 
         internal string GetString(string name)

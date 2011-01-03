@@ -44,8 +44,6 @@ Source: "SXCamera\bin\{#BUILD_TYPE}\{#DRIVER_EXE_NAME}"; DestDir: "{app}"
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
 Source: "SXCamera.Readme.txt"; DestDir: "{app}"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
-Source: "SetupWizard\bin\{#BUILD_TYPE}\ASCOM.SXCamera.SetupWizard.exe"; DestDir: "{app}"
-
 
 ; Only if driver is .NET
 [Run]
@@ -75,7 +73,6 @@ var
    H : Variant;
    H2 : Variant;
    P  : Variant;
-   PrevDir : String;
 begin
     Result := FALSE;  // Assume failure
     try               // Will catch all errors including missing reg data
@@ -86,20 +83,14 @@ begin
         then
             begin
             P := CreateOLEObject('ASCOM.Utilities.Profile');
+            P.DeviceType := 'Camera';
 
-            if P.IsRegistered('SXMain.Camera') then
-                MsgBox('ASCOM.SXMain.Camera is registered', mbInformation, MB_OK);
-            if P.IsRegistered('SXMain2.Camera') then
-                MsgBox('ASCOM.SXMain2.Camera is registered', mbInformation, MB_OK);
-            if P.IsRegistered('SXGuide.Camera') then
-                MsgBox('ASCOM.SXGuide.Camera is registered', mbInformation, MB_OK);
-
-            //MsgBox('Checking ' + ExpandConstant('{app}') + '\{#DRIVER_EXE_NAME}', mbInformation, MB_OK);
-            //if FileExists(ExpandConstant('{DefaultDirName}') + '\{#DRIVER_EXE_NAME}')
-            if False
+            if P.IsRegistered('ASCOM.SXMain0.Camera') or 
+               P.IsRegistered('ASCOM.SXMain1.Camera') or
+               P.IsRegistered('ASCOM.SXGuide.Camera')
             then
                 begin
-                    MsgBox('You must uninstall the previous version before installation can proceed.', mbInformation, MB_OK);
+                    MsgBox('A previous version of this driver was detected. You must uninstall the previous before installation can proceed.', mbInformation, MB_OK);
                 end
             else
                 begin
