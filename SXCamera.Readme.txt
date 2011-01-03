@@ -1,38 +1,36 @@
 Copyright (C) 2010 by Dad Dog Development Ltd.
 
-This code should be regared as Alpha quality. As the changelog below shows, 
-there were almost 500 lines of code added, and another 500 moved around.  
-It is very likely that all these changes have broken something.
+This code should be regared as Beta quality. There have been a number of
+changes for this release, but most of them involve setup/config.  There
+have been very few actual changes to the driver.
 
-I have added a setup wizard that will create reasonably named SX entries depending
-upon a users equipment.
+I have replaced the setup wizard I wrote with changes to the installer
+so that it provides a more seamless experience. The installer now includes
+a check to require previous versions to be uninstalled.
 
-This release tries to improve support for interlaced cameras, but I'm unable to test 
-it myself because I don't have one.  I do not expect binning or subimages to work
-with interlaced cameras, but there is some change that full frame images will work
-with this release. If you have one, please test it.
+This release tries to improve support for interlaced cameras, but I'm unable 
+to test it myself because I don't have one.  I do not expect binning or 
+subimages to work with interlaced cameras, but there is some chance that 
+full frame images will work with this release. If you have one, including
+Lodestar, please test it.
 
-PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER until you have
-tried it during the daylight first. 
+PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER until 
+you have tried it during the daylight first. 
 
-What's changed for Version 1.3.6:
-    Removed a debug MessageBox (2010-12-25 22:32:19 -0700 by Bret McKee <bretm@boneheads.us>)
-    Fixed a couple minor exception/seterror problems (2010-12-25 22:31:53 -0700 by Bret McKee <bretm@boneheads.us>)
-    More work to clean up interlaced cameras (2010-12-25 15:01:30 -0700 by Bret McKee <bretm@boneheads.us>)
-    Setup wizard work.  It seems to work (2010-12-25 14:10:45 -0700 by Bret McKee <bretm@boneheads.us>)
-    Initial checkin of the setup wizard (2010-12-25 00:25:52 -0700 by Bret McKee <bretm@boneheads.us>)
-    Some changes for interlaced cameras (2010-12-25 00:25:22 -0700 by Bret McKee <bretm@boneheads.us>)
-    Quiet down some logging (2010-12-22 19:08:37 -0700 by Bret McKee <bretm@boneheads.us>)
-    Added more debug info to stitchImages (2010-12-22 18:38:59 -0700 by Bret McKee <bretm@boneheads.us>)
-    Fixed a problem with interlaced cameras (2010-12-22 17:15:00 -0700 by Bret McKee <bretm@boneheads.us>)
-    Moved to the .NET profile class (2010-12-12 18:33:46 -0700 by Bret McKee <bretm@boneheads.us>)
-    More label changes to setup dialog (2010-12-11 22:24:05 -0700 by Bret McKee <bretm@boneheads.us>)
-    a few changs to the setup dialog (2010-12-11 22:07:11 -0700 by Bret McKee <bretm@boneheads.us>)
-    Moved setupdialog() to config.cs (2010-12-11 21:43:08 -0700 by Bret McKee <bretm@boneheads.us>)
-    Make the setup dialog easier to understand (2010-12-11 12:07:41 -0700 by Bret McKee <bretm@boneheads.us>)
-    Removed "untested" status from H16 (2010-12-11 00:41:56 -0700 by Bret McKee <bretm@boneheads.us>)
-    A bunch of changes to make logging more consitent (2010-12-11 00:21:45 -0700 by Bret McKee <bretm@boneheads.us>) 
-34 files changed, 2596 insertions(+), 1041 deletions(-)
+What's changed for Version 1.3.7:
+    Removed SetupWizard and SharedVersionNumber.cs (2011-01-02 21:13:09 -0700 by Bret McKee <bretm@boneheads.us>)
+    Changes to use Main config for Guider (2011-01-02 20:32:52 -0700 by Bret McKee <bretm@boneheads.us>)
+    Seperate the config date for the cameras (2011-01-02 19:08:25 -0700 by Bret McKee <bretm@boneheads.us>)
+    Massive reorganization into a single .exe (2011-01-01 19:40:44 -0700 by Bret McKee <bretm@boneheads.us>)
+    Build Cleanup (2011-01-01 11:47:34 -0700 by Bret McKee <bretm@boneheads.us>)
+    Fix the com setting that prevented release builds (2010-12-27 17:56:53 -0700 by Bret McKee <bretm@boneheads.us>)
+    Added .swp files to .gitignore (2010-12-27 11:58:34 -0700 by Bret McKee <bretm@boneheads.us>)
+    Removed some redundant member variables (2010-12-27 11:51:27 -0700 by Bret McKee <bretm@boneheads.us>)
+    Fixed an error in guide camera initialization (2010-12-27 11:46:43 -0700 by Bret McKee <bretm@boneheads.us>)
+72 files changed, 6092 insertions(+), 9045 deletions(-)
+
+Note: several files have been renamed, so the line counts above are grossly
+exaggerated.
 
 Clear Skies, 
 
