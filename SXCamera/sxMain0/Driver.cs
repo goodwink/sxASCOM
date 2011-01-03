@@ -25,7 +25,7 @@ using ASCOM.Interface;
 
 using Logging;
 
-namespace ASCOM.SXMain
+namespace ASCOM.SXMain0
 {
     //
     // Your driver's ID is ASCOM.SXCamera.Camera
@@ -38,17 +38,17 @@ namespace ASCOM.SXMain
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {
-        private const UInt16 DEFAULT_CAMERA_ID = 0;
         private const UInt16 DEFAULT_CONTROLLER_NUMBER = 0;
+        private const UInt16 DEFAULT_CAMERA_ID = 0;
 
-        public Camera(UInt16 cameraId, UInt16 controllerNumber) :
-            base(cameraId, controllerNumber)
+        public Camera(UInt16 controllerNumber, UInt16 cameraId) :
+            base(controllerNumber, cameraId)
         {
             Log.Write(String.Format("Main::Camera({0}, {1}) executing\n", cameraId, controllerNumber));
         }
 
         public Camera() :
-            this(DEFAULT_CAMERA_ID, DEFAULT_CONTROLLER_NUMBER)
+            this(DEFAULT_CONTROLLER_NUMBER, DEFAULT_CAMERA_ID)
         {
             Log.Write(String.Format("Main::Camera() executing\n"));
         }

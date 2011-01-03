@@ -65,7 +65,7 @@ namespace ASCOM.SXGeneric
         protected bool bLastErrorValid;
         protected string lastErrorMessage;
         protected bool bHasGuideCamera;
-        protected ASCOM.SXCamera.Configuration config;
+        protected ASCOM.SXCamera.Configuration m_config;
         private UInt16 m_vid, m_pid;
         private bool m_skip;
         // elminiate lots of log chatter
@@ -80,7 +80,7 @@ namespace ASCOM.SXGeneric
          //
         // Constructor - Must be public for COM registration!
         //
-        protected Camera(UInt16 whichCamera, UInt16 whichController)
+        protected Camera(UInt16 whichController, UInt16 whichCamera)
         {
             try
             {
@@ -89,39 +89,30 @@ namespace ASCOM.SXGeneric
                 m_cameraId = whichCamera;
                 m_lastLoggedConnected = true;
 
-                config = new ASCOM.SXCamera.Configuration();
+                m_config = new ASCOM.SXCamera.Configuration(whichController, whichCamera);
 
                 switch (whichController)
                 {
                     case 0:
                         m_controller = ASCOM.SXCamera.SharedResources.controller0;
-                        if (config.camera0SelectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)
-                        {
-                            m_vid = m_pid = 0;
-                        }
-                        else
-                        {
-                            m_vid = config.camera0VID;
-                            m_pid = config.camera0PID;
-                        }
-                        m_skip = (config.camera0SelectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL);
                         break;
                     case 1:
                         m_controller = ASCOM.SXCamera.SharedResources.controller1;
-                        if (config.camera0SelectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)
-                        {
-                            m_vid = m_pid = 0;
-                        }
-                        else
-                        {
-                            m_vid = config.camera1VID;
-                            m_pid = config.camera1PID;
-                        }
-                        m_skip = (config.camera1SelectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL);
                         break;
                     default:
                         throw new ASCOM.InvalidValueException("SXGeneric constructor error: whichController", whichController.ToString(), "0 <= whichController <= 1");
                 }
+
+                if (m_config.selectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)
+                {
+                    m_vid = m_pid = 0;
+                }
+                else
+                {
+                    m_vid = m_config.VID;
+                    m_pid = m_config.PID;
+                }
+                m_skip = (m_config.selectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL);
 
                 oCameraStateLock = new Object();
                 oGuideStateLock = new Object();
@@ -625,7 +616,7 @@ namespace ASCOM.SXGeneric
                                     throw new ASCOM.DriverException(SetError(String.Format("SharedResources().controllerConnect(): caught an exception {0}\n", ex.ToString())), ex);
                                 }
                             }
-                            sxCamera = new sx.Camera(m_controller, m_cameraId, config.enableUntested);
+                            sxCamera = new sx.Camera(m_controller, m_cameraId, m_config.enableUntested);
                             m_Connected = true;
                             // set properties to defaults. These all talk to the camera, and having them here saves
                             // a lot of try/catch blocks in other places
@@ -1439,7 +1430,7 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                config.SetupDialog();
+                m_config.SetupDialog();
             }
             catch (ASCOM.DriverException ex)
             {
@@ -1602,7 +1593,7 @@ namespace ASCOM.SXGeneric
             {
                 Log.Write(String.Format("Generic::StartExposure({0}, {1}) begins\n", Duration, Light));
 
-                if (config.secondsAreMilliseconds)
+                if (m_config.secondsAreMilliseconds)
                 {
                     Duration /= 1000;
                     Log.Write(String.Format("Generic::StartExposure(): after secondsAreMilliseconds adjustment, duration={0}\n", Duration));

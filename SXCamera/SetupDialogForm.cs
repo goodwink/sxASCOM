@@ -45,37 +45,19 @@ namespace ASCOM.SXCamera
 
         private void camera1SelectionAllowAny_CheckedChanged(object sender, EventArgs e)
         {
-            if (camera0SelectionAllowAny.Checked)
+            if (selectionAllowAny.Checked)
             {
-                vid0Label.Visible = false;
-                pid0Label.Visible = false;
-                camera0VID.Visible = false;
-                camera0PID.Visible = false;
+                vidLabel.Visible = false;
+                pidLabel.Visible = false;
+                VID.Visible = false;
+                PID.Visible = false;
             }
             else
             {
-                vid0Label.Visible = true;
-                pid0Label.Visible = true;
-                camera0VID.Visible = true;
-                camera0PID.Visible = true;
-            }
-        }
-
-        private void camera2SelectionAllowAny_CheckedChanged(object sender, EventArgs e)
-        {
-            if (camera1SelectionAllowAny.Checked)
-            {
-                vid1Label.Visible = false;
-                pid1Label.Visible = false;
-                camera1VID.Visible = false;
-                camera1PID.Visible = false;
-            }
-            else
-            {
-                vid1Label.Visible = true;
-                pid1Label.Visible = true;
-                camera1VID.Visible = true;
-                camera1PID.Visible = true;
+                vidLabel.Visible = true;
+                pidLabel.Visible = true;
+                VID.Visible = true;
+                PID.Visible = true;
             }
         }
 
@@ -83,13 +65,11 @@ namespace ASCOM.SXCamera
         {
             if (advancedUSBParmsEnabled.Checked)
             {
-                camera0Group.Enabled = true;
-                camera1Group.Enabled = true;
+                usbGroup.Enabled = true;
             }
             else
             {
-                camera0Group.Enabled = false;
-                camera1Group.Enabled = false;
+                usbGroup.Enabled = false;
             }
         }
     }

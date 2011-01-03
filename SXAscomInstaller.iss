@@ -6,6 +6,7 @@
 #define BUILD_TYPE "Debug"
 #define APP_VERSION "1.3.6"
 #define ASCOM_VERSION_REQUIRED  "5.5"
+#define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
 
 [Setup]
 AppName=ASCOM SX Camera Driver
@@ -37,12 +38,11 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Dirs]
 Name: "{cf}\ASCOM\Uninstall\Camera\sxASCOM"
 Name: "{app}"
-Name: "{app}\SXCameraServedClasses"
 
 [Files]
-Source: "SXCamera\bin\{#BUILD_TYPE}\combined.ASCOM.SXCamera.exe"; DestDir: "{app}\ASCOM.SXCamera.exe"
+Source: "SXCamera\bin\{#BUILD_TYPE}\{#DRIVER_EXE_NAME}"; DestDir: "{app}"
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
-Source: "SXCamera.Readme.txt"; DestDir: "{app}\SXCameraServedClasses"; Flags: isreadme
+Source: "SXCamera.Readme.txt"; DestDir: "{app}"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
 Source: "SetupWizard\bin\{#BUILD_TYPE}\ASCOM.SXCamera.SetupWizard.exe"; DestDir: "{app}"
 
@@ -50,7 +50,7 @@ Source: "SetupWizard\bin\{#BUILD_TYPE}\ASCOM.SXCamera.SetupWizard.exe"; DestDir:
 ; Only if driver is .NET
 [Run]
 ; Only for .NET local-server drivers
-Filename: "{app}\ASCOM.SXCamera.SetupWizard.exe"
+Filename: "{app}\ASCOM.SXCamera.exe"; Parameters: "{code:RegistrationArgs}"
 
 ; Only if driver is .NET
 [UninstallRun]
@@ -58,8 +58,13 @@ Filename: "{app}\ASCOM.SXCamera.SetupWizard.exe"
 Filename: "{app}\ASCOM.SXCamera.exe"; Parameters: "/unregister"
 
 
-
 [CODE]
+// Global Variables
+var
+  LodeStarPage: TInputOptionWizardPage;
+  MainCameraPage: TInputOptionWizardPage;
+  GuideCameraPage: TInputOptionWizardPage;
+
 //
 // Before the installer UI appears, verify that the (prerequisite)
 // ASCOM Platform 5 or greater is installed, including both Helper
@@ -69,16 +74,100 @@ function InitializeSetup(): Boolean;
 var
    H : Variant;
    H2 : Variant;
+   P  : Variant;
+   PrevDir : String;
 begin
-   Result := FALSE;  // Assume failure
-   try               // Will catch all errors including missing reg data
-      H := CreateOLEObject('DriverHelper.Util');  // Assure both are available
-      H2 := CreateOleObject('DriverHelper2.Util');
-      if (H2.PlatformVersion >= {#ASCOM_VERSION_REQUIRED}) then
-         Result := TRUE;
-   except
-   end;
-   if(not Result) then
-      MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED} or greater is required for this driver.', mbInformation, MB_OK);
+    Result := FALSE;  // Assume failure
+    try               // Will catch all errors including missing reg data
+        H := CreateOLEObject('DriverHelper.Util');  // Assure both are available
+        H2 := CreateOleObject('DriverHelper2.Util');
+
+        if (H2.PlatformVersion >= {#ASCOM_VERSION_REQUIRED})
+        then
+            begin
+            P := CreateOLEObject('ASCOM.Utilities.Profile');
+
+            if P.IsRegistered('SXMain.Camera') then
+                MsgBox('ASCOM.SXMain.Camera is registered', mbInformation, MB_OK);
+            if P.IsRegistered('SXMain2.Camera') then
+                MsgBox('ASCOM.SXMain2.Camera is registered', mbInformation, MB_OK);
+            if P.IsRegistered('SXGuide.Camera') then
+                MsgBox('ASCOM.SXGuide.Camera is registered', mbInformation, MB_OK);
+
+            //MsgBox('Checking ' + ExpandConstant('{app}') + '\{#DRIVER_EXE_NAME}', mbInformation, MB_OK);
+            //if FileExists(ExpandConstant('{DefaultDirName}') + '\{#DRIVER_EXE_NAME}')
+            if False
+            then
+                begin
+                    MsgBox('You must uninstall the previous version before installation can proceed.', mbInformation, MB_OK);
+                end
+            else
+                begin
+                    Result := TRUE;
+                end
+            end
+        else
+            begin
+                MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED} or greater is required for this driver.', mbInformation, MB_OK);
+            end
+    except
+        MsgBox('Caught an exception', mbInformation, MB_OK);
+    end;
 end;
 
+function ShouldSkipPage(PageID: Integer): Boolean;
+begin
+    Result := FALSE;
+
+    if PageID = GuideCameraPage.ID then
+        Result := MainCameraPage.Values[1];
+end;
+
+procedure InitializeWizard();
+begin
+
+    LodeStarPage := CreateInputOptionPage(wpLicense,
+      'Lodestar Configuration', 'Do you have a Starlight Xpress LodeStar USB Guide Camera?',
+      'This is a small, eyepiece sized guide camera that connets to your PC via USB.',
+      True, False);
+    LodeStarPage.Add('Yes');
+    LodeStarPage.Add('No');
+
+    LodeStarPage.Values[0] := False;
+    LodeStarPage.Values[1] := True;
+
+    MainCameraPage := CreateInputOptionPage(LodeStarPage.ID,
+      'Main Camera Configuration', 'Do you have a Starlight Xpress Imaging Camera?',
+      'This is a camera which connects to to your PC via USB.',
+      True, False);
+    MainCameraPage.Add('Yes');
+    MainCameraPage.Add('No');
+
+    MainCameraPage.Values[0] := False;
+    MainCameraPage.Values[1] := True;
+
+    GuideCameraPage := CreateInputOptionPage(MainCameraPage.ID,
+      'Autoguide Camera Configuration', 'Do you have a Starlight Xpress SXV or ExView Autoguide Camera?',
+      'This is a small, eyepiece sized guide camera that plugs into the back of an imaging camera.',
+      True, False);
+    GuideCameraPage.Add('Yes');
+    GuideCameraPage.Add('No');
+
+    GuideCameraPage.Values[0] := False;
+    GuideCameraPage.Values[1] := True;
+
+end;
+
+function RegistrationArgs(Param : String) : String;
+begin
+    Result := '/register';
+
+    if (LodeStarPage.Values[0]) then
+        Result := Result + ' /lodestar';
+
+    if (MainCameraPage.Values[0]) then
+        Result := Result + ' /main';
+
+    if (GuideCameraPage.Values[0]) then
+        Result := Result + ' /autoguide ';
+end;

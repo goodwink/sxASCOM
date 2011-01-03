@@ -36,17 +36,17 @@ namespace ASCOM.SXGuide
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {
-        private const UInt16 DEFAULT_CAMERAID = 1;
         private const UInt16 DEFAULT_CONTROLLER_NUMBER = 0;
+        private const UInt16 DEFAULT_CAMERAID = 1;
 
-        public Camera(UInt16 cameraId, UInt16 controllerNumber) :
-            base(cameraId, controllerNumber)
+        public Camera(UInt16 controllerNumber, UInt16 cameraId) :
+            base(controllerNumber, cameraId)
         {
             Log.Write(String.Format("Guide::Camera({0}, {1}) executing\n", cameraId, controllerNumber));
         }
 
         public Camera() :
-            this(DEFAULT_CAMERAID, DEFAULT_CONTROLLER_NUMBER)
+            this(DEFAULT_CONTROLLER_NUMBER, DEFAULT_CAMERAID)
         {
             Log.Write(String.Format("Guide::Camera() executing\n"));
         }

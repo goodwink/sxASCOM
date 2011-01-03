@@ -9,27 +9,32 @@ namespace ASCOM.SXCamera
 {
     public class Configuration
     {
-        private const string DEVICE_TYPE = "Camera";
+        private const String DEVICE_TYPE = "Camera";
 
-        private const String ENABLE_UNTESTED = "EnableUntested";
+        private const String KEY_ENABLE_UNTESTED = "EnableUntested";
 #if DEBUG
         private const bool DEFAULT_ENABLE_UNTESTED = true;
 #else
         private const bool   DEFAULT_ENABLE_UNTESTED = false;
 #endif
 
-        private const String ENABLE_LOGGING = "EnableLogging";
+        private const String KEY_ENABLE_LOGGING = "EnableLogging";
 #if DEBUG
         private const bool   DEFAULT_ENABLE_LOGGING = true;
 #else
         private const bool   DEFAULT_ENABLE_LOGGING = false;
 #endif
 
-        private const string LOG_FILE_NAME = "LogFileName";
+        private const string KEY_LOG_FILE_NAME = "LogFileName";
         private string DEFAULT_LOG_FILE_NAME = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + "ascom-sx-camera.log";
 
-        private const string SECONDS_ARE_MILLISECONDS = "SecondsAreMilliseconds";
+        private const string KEY_SECONDS_ARE_MILLISECONDS = "SecondsAreMilliseconds";
         private const bool DEFAULT_SECONDS_ARE_MILLISECONDS = false;
+
+        private const string KEY_SELECTION_METHOD = "Selection";
+        private const string KEY_VID = "VID";
+        private const string KEY_PID = "PID";
+
 
         public enum CAMERA_SELECTION_METHOD
         {
@@ -38,34 +43,60 @@ namespace ASCOM.SXCamera
             CAMERA_SELECTION_EXCLUDE_MODEL
         };
 
-        private const string CAMERA0_SELECTION = "camera0Selection";
-        private string DEFAULT_CAMERA0_SELECTION = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL);
-
-        private const string CAMERA0_VID = "camera0VID";
-        private const UInt16 DEFAULT_CAMERA0_VID = 1278;
-
-        private const string CAMERA0_PID = "camera0PID";
-        private const UInt16 DEFAULT_CAMERA0_PID = 507;
-
-        private const string CAMERA1_SELECTION = "camera1Selection";
-        private string DEFAULT_CAMERA1_SELECTION = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL);
-
-        private const string CAMERA1_VID = "camera1VID";
-        private const UInt16 DEFAULT_CAMERA1_VID = 1278;
-
-        private const string CAMERA1_PID = "camera1PID";
-        private const UInt16 DEFAULT_CAMERA1_PID = 507;  
-      
-        private string driverID;
-        Profile profile;
-        
-        public Configuration()
+        internal struct CAMERA_VALUES
         {
-            driverID = String.Format("ASCOM.SXMain.{0}", DEVICE_TYPE);
-            Log.Write("Config class constructor called for driverID " + driverID + "\n");
+            public bool enableUntested;
+            public bool enableLogging;
+            public bool secondsAreMilliseconds;
+            public string selectionMethod;
+            public UInt16 VID;
+            public UInt16 PID;
 
-            profile = new Profile();
-            profile.DeviceType = DEVICE_TYPE;
+            internal CAMERA_VALUES(bool enableUntested, bool enableLogging, bool secondsAreMilliseconds, string selectionMethod, UInt16 VID, UInt16 PID)
+            {
+                this.enableUntested = enableUntested;
+                this.enableLogging = enableLogging;
+                this.secondsAreMilliseconds = secondsAreMilliseconds;
+                this.selectionMethod = selectionMethod;
+                this.VID = VID;
+                this.PID = PID;
+            }
+        };
+
+        internal CAMERA_VALUES[] DEFAULT_VALUES = {
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 507),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507)
+        };
+
+        private Profile m_profile;
+        private string m_driverId;
+        private UInt16 m_whichController,
+                       m_whichCamera;
+        
+        public Configuration(UInt16 whichController, UInt16 whichCamera)
+        {
+            Log.Write(String.Format("Configuration({0}, {1} starts\n", whichController, whichCamera));
+
+            m_profile = new Profile();
+            m_profile.DeviceType = DEVICE_TYPE;
+
+            m_driverId = "ASCOM.";
+
+            if (whichCamera == 0)
+            {
+                m_driverId  += "SXMain" + whichController.ToString();
+            }
+            else
+            {
+                m_driverId  += "SXGuide";
+            }
+
+            m_driverId += "." + DEVICE_TYPE;
+
+            m_whichController = whichController;
+            m_whichCamera = whichCamera;
+
+            Log.Write(String.Format("Configuration() computes driverId={0}\n", m_driverId));
         }
 
         internal string GetString(string name)
@@ -74,7 +105,7 @@ namespace ASCOM.SXCamera
 
             try
             {
-                ret = profile.GetValue(driverID, name);
+                ret = m_profile.GetValue(m_driverId, name);
             }
             catch (Exception ex)
             {
@@ -100,11 +131,11 @@ namespace ASCOM.SXCamera
 
         internal void SetString(string name, string value)
         {
-            Log.Write(String.Format("config: writing {0}={1} to driver {2}\n", name, value, driverID));
+            Log.Write(String.Format("config: writing {0}={1} to driver {2}\n", name, value, m_driverId));
 
             try
             {
-                profile.WriteValue(driverID, name, value);
+               m_profile.WriteValue(m_driverId, name, value);
             }
             catch (Exception ex)
             {
@@ -154,82 +185,53 @@ namespace ASCOM.SXCamera
         public bool enableUntested
         {
             
-            get { return GetBool(ENABLE_UNTESTED, DEFAULT_ENABLE_UNTESTED);}
-            set { SetString(ENABLE_UNTESTED, value.ToString());}
+            get { return GetBool(KEY_ENABLE_UNTESTED, DEFAULT_VALUES[m_whichController].enableUntested);}
+            set { SetString(KEY_ENABLE_UNTESTED, value.ToString());}
         }
 
         public bool enableLogging
         {
-            get { return GetBool(ENABLE_LOGGING, DEFAULT_ENABLE_LOGGING); }
-            set { SetString(ENABLE_LOGGING, value.ToString()); }
+            get { return GetBool(KEY_ENABLE_LOGGING, DEFAULT_VALUES[m_whichController].enableLogging); }
+            set { SetString(KEY_ENABLE_LOGGING, value.ToString()); }
         }
 
         public bool secondsAreMilliseconds
         {
-            get { return GetBool(SECONDS_ARE_MILLISECONDS, DEFAULT_SECONDS_ARE_MILLISECONDS); }
-            set { SetString(SECONDS_ARE_MILLISECONDS, value.ToString()); }
+            get { return GetBool(KEY_SECONDS_ARE_MILLISECONDS, DEFAULT_VALUES[m_whichController].secondsAreMilliseconds); }
+            set { SetString(KEY_SECONDS_ARE_MILLISECONDS, value.ToString()); }
         }
 
         public string logFileName
         {
-            get { return GetString(LOG_FILE_NAME, DEFAULT_LOG_FILE_NAME); }
-            set { SetString(LOG_FILE_NAME, value); }
+            get { return GetString(KEY_LOG_FILE_NAME, DEFAULT_LOG_FILE_NAME); }
+            set { SetString(KEY_LOG_FILE_NAME, value); }
         }
 
-        public CAMERA_SELECTION_METHOD camera0SelectionMethod
+        public CAMERA_SELECTION_METHOD selectionMethod
         {
             get
             {
-                Log.Write(String.Format("default={0}\n", DEFAULT_CAMERA0_SELECTION));
-                String selection = GetString(CAMERA0_SELECTION, DEFAULT_CAMERA0_SELECTION);
-                Log.Write(String.Format("CAMERA0SelectionMethod get converting {0}\n", selection));
+                String selection = GetString(KEY_SELECTION_METHOD, DEFAULT_VALUES[m_whichController].selectionMethod);
                 return (CAMERA_SELECTION_METHOD)Enum.Parse(typeof(CAMERA_SELECTION_METHOD), selection, true);
             }
             set
             {
                 String selection = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), value);
-                SetString(CAMERA0_SELECTION, selection);
+                SetString(KEY_SELECTION_METHOD, selection);
             }
         }
 
-        public UInt16 camera0VID
+        public UInt16 VID
         {
-            get { return GetUInt16(CAMERA0_VID, DEFAULT_CAMERA0_VID); }
-            set { SetString(CAMERA0_VID, value.ToString()); }
+            get { return GetUInt16(KEY_VID, DEFAULT_VALUES[m_whichController].VID); }
+            set { SetString(KEY_VID, value.ToString()); }
         }
 
-        public UInt16 camera0PID
+        public UInt16 PID
         {
-            get { return GetUInt16(CAMERA0_PID, DEFAULT_CAMERA0_PID); }
-            set { SetString(CAMERA0_PID, value.ToString()); }
-        }
-        public CAMERA_SELECTION_METHOD camera1SelectionMethod
-        {
-            get
-            {
-                Log.Write(String.Format("default={0}\n", DEFAULT_CAMERA1_SELECTION));
-                String selection = GetString(CAMERA1_SELECTION, DEFAULT_CAMERA1_SELECTION);
-                Log.Write(String.Format("CAMERA1SelectionMethod get converting {0}\n", selection));
-                return (CAMERA_SELECTION_METHOD)Enum.Parse(typeof(CAMERA_SELECTION_METHOD), selection, true);
-            }
-            set
-            {
-                String selection = Enum.GetName(typeof(CAMERA_SELECTION_METHOD), value);
-                SetString(CAMERA1_SELECTION, selection);
-            }
-        }
-
-        public UInt16 camera1VID
-        {
-            get { return GetUInt16(CAMERA1_VID, DEFAULT_CAMERA1_VID); }
-            set { SetString(CAMERA1_VID, value.ToString()); }
-        }
-
-        public UInt16 camera1PID
-        {
-            get { return GetUInt16(CAMERA1_PID, DEFAULT_CAMERA1_PID); }
-            set { SetString(CAMERA1_PID, value.ToString()); }
-        }
+            get { return GetUInt16(KEY_PID, DEFAULT_VALUES[m_whichController].PID); }
+            set { SetString(KEY_PID, value.ToString()); }
+        }   
 
         public String description
         {
@@ -243,6 +245,26 @@ namespace ASCOM.SXCamera
         /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
         public void SetupDialog()
         {
+            switch (m_whichCamera)
+            {
+                case 0:
+                    mainCameraSetupDialog();
+                    break;
+                case 1:
+                    guideCameraSetupDialog();
+                    break;
+                default:
+                    throw new System.Exception(String.Format("Unknown cameraID {0} in SetupDialog", m_whichCamera));
+            }
+        }
+
+        private void guideCameraSetupDialog()
+        {
+            MessageBox.Show(String.Format("There are no configurable settings for guide cameras.  All configuration is done from the main camera's configuration screen."));
+        }
+
+        private void mainCameraSetupDialog()
+        {
             try
             {
                 Log.Write(String.Format("SetupDialog, description = {0}\n", description));
@@ -254,65 +276,38 @@ namespace ASCOM.SXCamera
                 F.secondsAreMiliseconds.Checked = secondsAreMilliseconds;
                 F.Version.Text = String.Format("Version: {0}", SharedResources.versionNumber);
 
-                F.camera0SelectionAllowAny.Checked = false;
-                F.camera0SelectionExactModel.Checked = false;
-                F.camera0SelectionExcludeModel.Checked = false;
-                F.camera0VID.Text = camera0VID.ToString();
-                F.camera0PID.Text = camera0PID.ToString();
+                F.selectionAllowAny.Checked = false;
+                F.selectionExactModel.Checked = false;
+                F.selectionExcludeModel.Checked = false;
+                F.VID.Text = VID.ToString();
+                F.PID.Text = PID.ToString();
 
-                F.vid0Label.Visible = true;
-                F.pid0Label.Visible = true;
-                F.camera0VID.Visible = true;
-                F.camera0PID.Visible = true;
+                F.vidLabel.Visible = true;
+                F.pidLabel.Visible = true;
+                F.VID.Visible = true;
+                F.PID.Visible = true;
 
-                switch (camera0SelectionMethod)
+                switch (selectionMethod)
                 {
                     case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY:
-                        F.camera0SelectionAllowAny.Checked = true;
-                        F.vid0Label.Visible = false;
-                        F.pid0Label.Visible = false;
-                        F.camera0VID.Visible = false;
-                        F.camera0PID.Visible = false;
+                        F.selectionAllowAny.Checked = true;
+                        F.vidLabel.Visible = false;
+                        F.pidLabel.Visible = false;
+                        F.VID.Visible = false;
+                        F.PID.Visible = false;
                         break;
                     case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL:
-                        F.camera0SelectionExactModel.Checked = true;
+                        F.selectionExactModel.Checked = true;
                         break;
                     case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL:
-                        F.camera0SelectionExcludeModel.Checked = true;
+                        F.selectionExcludeModel.Checked = true;
                         break;
                     default:
-                        throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", camera0SelectionMethod));
-                }
-
-                F.camera1VID.Text = camera1VID.ToString();
-                F.camera1PID.Text = camera1PID.ToString();
-                F.vid1Label.Visible = true;
-                F.pid1Label.Visible = true;
-                F.camera1VID.Visible = true;
-                F.camera1PID.Visible = true;
-
-                switch (camera1SelectionMethod)
-                {
-                    case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY:
-                        F.camera1SelectionAllowAny.Checked = true;
-                        F.vid1Label.Visible = true;
-                        F.pid1Label.Visible = true;
-                        F.camera1VID.Visible = true;
-                        F.camera1PID.Visible = true;
-                        break;
-                    case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL:
-                        F.camera1SelectionExactModel.Checked = true;
-                        break;
-                    case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL:
-                        F.camera1SelectionExcludeModel.Checked = true;
-                        break;
-                    default:
-                        throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", camera0SelectionMethod));
+                        throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", selectionMethod));
                 }
 
                 F.advancedUSBParmsEnabled.Checked = false;
-                F.camera0Group.Enabled = false;
-                F.camera1Group.Enabled = false;
+                F.usbGroup.Enabled = false;
 
                 if (F.ShowDialog() == DialogResult.OK)
                 {
@@ -322,86 +317,44 @@ namespace ASCOM.SXCamera
                     enableUntested = F.EnableUntestedCheckBox.Checked;
                     secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
 
-                    if (F.camera0SelectionAllowAny.Checked)
+                    if (F.selectionAllowAny.Checked)
                     {
-                        camera0SelectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY;
+                        selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY;
                     }
                     else
                     {
                         bool error = false;
                         try
                         {
-                            camera0VID = Convert.ToUInt16(F.camera0VID.Text);
+                            VID = Convert.ToUInt16(F.VID.Text);
                         }
                         catch (System.FormatException ex)
                         {
                             error = true;
-                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}", F.camera0VID.Text, ex.ToString()));
+                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}", F.VID.Text, ex.ToString()));
                             MessageBox.Show("An invalid VID was entered.  Value was not changed");
                         }
 
                         try
                         {
-                            camera0PID = Convert.ToUInt16(F.camera0PID.Text);
+                            PID = Convert.ToUInt16(F.PID.Text);
                         }
                         catch (System.FormatException ex)
                         {
                             error = true;
-                            Log.Write(String.Format("Caught an exception converting PID [{0}] to UInt16: {1}", F.camera0PID.Text, ex.ToString()));
+                            Log.Write(String.Format("Caught an exception converting PID [{0}] to UInt16: {1}", F.PID.Text, ex.ToString()));
                             MessageBox.Show("An invalid PID was entered.  Value was not changed");
                         }
 
                         if (!error)
                         {
-                            if (F.camera0SelectionExactModel.Checked)
+                            if (F.selectionExactModel.Checked)
                             {
-                                camera0SelectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL;
+                                selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL;
                             }
                             else
                             {
-                                camera0SelectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL;
-                            }
-                        }
-                    }
-
-                    if (F.camera1SelectionAllowAny.Checked)
-                    {
-                        camera1SelectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY;
-                    }
-                    else
-                    {
-                        bool error = false;
-                        try
-                        {
-                            camera1VID = Convert.ToUInt16(F.camera0VID.Text);
-                        }
-                        catch (System.FormatException ex)
-                        {
-                            error = true;
-                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}", F.camera0VID.Text, ex.ToString()));
-                            MessageBox.Show("An invalid VID was entered.  Value was not changed");
-                        }
-
-                        try
-                        {
-                            camera1PID = Convert.ToUInt16(F.camera0PID.Text);
-                        }
-                        catch (System.FormatException ex)
-                        {
-                            error = true;
-                            Log.Write(String.Format("Caught an exception converting PID [{0}] to UInt16: {1}", F.camera0PID.Text, ex.ToString()));
-                            MessageBox.Show("An invalid PID was entered.  Value was not changed");
-                        }
-
-                        if (!error)
-                        {
-                            if (F.camera1SelectionExactModel.Checked)
-                            {
-                                camera1SelectionMethod = CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL;
-                            }
-                            else
-                            {
-                                camera1SelectionMethod = CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL;
+                                selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL;
                             }
                         }
                     }

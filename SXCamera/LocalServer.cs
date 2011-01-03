@@ -231,8 +231,8 @@ namespace ASCOM.SXCamera
             assyPath = assyPath.Remove(i, assyPath.Length - i) + "\\SXCameraServedClasses";
 
             DirectoryInfo d = new DirectoryInfo(assyPath);
-            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain.Camera"));
-            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain2.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain0.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain1.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXGuide.Camera"));
 #if False
             foreach (FileInfo fi in d.GetFiles("*.dll"))
@@ -422,11 +422,11 @@ namespace ASCOM.SXCamera
                         registerThisOne = registerAutoGuide;
                         ascomName = "Starlight Xpress Autoguide Camera";
                         break;
-                    case "ascom.sxmain.camera":
+                    case "ascom.sxmain0.camera":
                         registerThisOne = registerMain;
                         ascomName = "Starlight Xpress Main Camera";
                         break;
-                    case "ascom.sxmain2.camera":
+                    case "ascom.sxmain1.camera":
                         registerThisOne = registerLodeStar;
                         ascomName = "Starlight Xpress Lodestar Guider";
                         break;
