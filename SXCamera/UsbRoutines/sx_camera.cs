@@ -806,7 +806,7 @@ namespace sx
                     throw;
                 }
 
-                dumpReadDelayedBlock(currentExposure.toCamera, "after second progressive adjustments");
+                dumpReadDelayedBlock(currentExposure.toCamera, "first frame after second progressive adjustments");
                 dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after second progressive adjustments");
             }
 
@@ -1420,8 +1420,8 @@ namespace sx
         internal void stitchImages(Array firstFrame, Array secondFrame)
         {
 
-            int totalLines = currentExposure.toCamera.height + currentExposure.toCameraSecond.height;
-            int width = currentExposure.toCamera.width;
+            int totalLines = currentExposure.toCamera.height/currentExposure.toCamera.y_bin + currentExposure.toCameraSecond.height/currentExposure.toCameraSecond.y_bin;
+            int width = currentExposure.toCamera.width/currentExposure.toCamera.x_bin;
 
             Log.Write(String.Format("stitching interlaced images. totalLines={0} width={1}\n", totalLines, width));
 
@@ -1446,7 +1446,7 @@ namespace sx
                     throw;
                 }
 
-                // if we have an odd number of lines in the requested exposure, 
+                // if we have an odd number of lines in the requested exposure,
                 // the first frame can have 1 more line that the second, so we have
                 // to check to make sure that there is a line in the second image
                 if (line < currentExposure.toCameraSecond.height)
