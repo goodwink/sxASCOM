@@ -1,36 +1,30 @@
 Copyright (C) 2010 by Dad Dog Development Ltd.
 
-This code should be regared as Beta quality. There have been a number of
-changes for this release, but most of them involve setup/config.  There
-have been very few actual changes to the driver.
+This code seems to be approaching production quality for interlaced
+cameras and the SXF guider.  If you have one of the tested progressive 
+cameras (M25C/H9/H9C) you should have good luck. 
 
-I have replaced the setup wizard I wrote with changes to the installer
-so that it provides a more seamless experience. The installer now includes
-a check to require previous versions to be uninstalled.
+Full screen, unbinned images with progressive cameras are Alpha quality.
 
 This release tries to improve support for interlaced cameras, but I'm unable 
-to test it myself because I don't have one.  I do not expect binning or 
-subimages to work with interlaced cameras, but there is some chance that 
-full frame images will work with this release. If you have one, including
-Lodestar, please test it.
+to test it myself because I don't have one.  In the previous version full screen, 
+unbinned interlaced images seemed to work.  This release attempts to get 
+the beginnings of binning to work - it is likely that only binning that the
+the resolution of the sensor can be divided by will work (i.e. if you want 
+to bin by 3, the size of the sensor probably needs to be divisible by 3). 
+For lodestar, this means only 2X bining.
+
+If you have an interlaced camera, including Lodestar, please test it.
 
 PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER until 
 you have tried it during the daylight first. 
 
-What's changed for Version 1.3.7:
-    Removed SetupWizard and SharedVersionNumber.cs (2011-01-02 21:13:09 -0700 by Bret McKee <bretm@boneheads.us>)
-    Changes to use Main config for Guider (2011-01-02 20:32:52 -0700 by Bret McKee <bretm@boneheads.us>)
-    Seperate the config date for the cameras (2011-01-02 19:08:25 -0700 by Bret McKee <bretm@boneheads.us>)
-    Massive reorganization into a single .exe (2011-01-01 19:40:44 -0700 by Bret McKee <bretm@boneheads.us>)
-    Build Cleanup (2011-01-01 11:47:34 -0700 by Bret McKee <bretm@boneheads.us>)
-    Fix the com setting that prevented release builds (2010-12-27 17:56:53 -0700 by Bret McKee <bretm@boneheads.us>)
-    Added .swp files to .gitignore (2010-12-27 11:58:34 -0700 by Bret McKee <bretm@boneheads.us>)
-    Removed some redundant member variables (2010-12-27 11:51:27 -0700 by Bret McKee <bretm@boneheads.us>)
-    Fixed an error in guide camera initialization (2010-12-27 11:46:43 -0700 by Bret McKee <bretm@boneheads.us>)
-72 files changed, 6092 insertions(+), 9045 deletions(-)
-
-Note: several files have been renamed, so the line counts above are grossly
-exaggerated.
+What's changed for Version 1.3.8:
+    Updated a reference (2011-01-20 22:08:26 -0700 by Bret McKee <bretm@boneheads.us>)
+    Changes to interlaced binning (2011-01-20 22:07:23 -0700 by Bret McKee <bretm@boneheads.us>)
+    More changes for v1.3.7 (2011-01-02 21:36:38 -0700 by Bret McKee <bretm@boneheads.us>)
+    Changes for v1.3.7 (2011-01-02 21:36:38 -0700 by Bret McKee <bretm@boneheads.us>) 
+    2 files changed, 4 insertions(+), 4 deletions(-)
 
 Clear Skies, 
 
