@@ -1460,7 +1460,6 @@ namespace ASCOM.SXGeneric
                     state = CameraStates.cameraExposing;
                 }
 
-                sxCamera.delayMs = (uint)(1000 * Duration);
                 sxCamera.recordPixels(true, out exposureEnd);
 
                 actualExposureLength = DateTime.Now - exposureStart;
@@ -1694,6 +1693,7 @@ namespace ASCOM.SXGeneric
 
                     if (useHardwareTimer)
                     {
+                        sxCamera.delayMs = (uint)(1000 * Duration);
                         captureDelegate = new CaptureDelegate(hardwareCapture);
                     }
                     else
