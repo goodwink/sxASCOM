@@ -22,10 +22,9 @@ If you have an interlaced camera, including Lodestar, please test it.
 PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER until 
 you have tried it during the daylight first. 
 
-What's changed for Version 1.3.9:
-    Move setting of delayMS before freezeParamters() (2011-01-30 20:12:17 -0700 by Bret McKee <bretm@boneheads.us>)
-    Adding absolute time to log messages (2011-01-30 20:11:55 -0700 by Bret McKee <bretm@boneheads.us>) 
-2 files changed, 41 insertions(+), 8 deletions(-)
+What's changed for Version 1.3.10:
+    Fix a problem with interlaced stitching (2011-02-01 00:28:40 -0700 by Bret McKee <bretm@boneheads.us>) 
+1 files changed, 1 insertions(+), 1 deletions(-)
 
 Clear Skies, 
 
