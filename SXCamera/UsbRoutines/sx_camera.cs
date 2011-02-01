@@ -1449,7 +1449,7 @@ namespace sx
                 // if we have an odd number of lines in the requested exposure,
                 // the first frame can have 1 more line that the second, so we have
                 // to check to make sure that there is a line in the second image
-                if (line < currentExposure.toCameraSecond.height)
+                if (line/2 < currentExposure.toCameraSecond.height)
                 {
                     // copy second line
                     try
