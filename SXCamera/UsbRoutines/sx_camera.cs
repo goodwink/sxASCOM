@@ -437,11 +437,7 @@ namespace sx
                     description = "H9C";
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
-#if true
                     progressive = true;
-#else
-                    Log.Write("For testing, H9_C set to interleaved\n");
-#endif
                     break;
                 case CameraModels.MODEL_H16:
                     description = "H16";
