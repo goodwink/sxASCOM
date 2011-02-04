@@ -584,7 +584,7 @@ namespace sx
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
         }
 
-        internal void checkParms(bool useFrameHeight, UInt16 width, UInt16 height, UInt16 xOffset, UInt16 yOffset, Byte xBin, Byte yBin)
+        internal void checkParms(bool useFrameHeight, SX_READ_DELAYED_BLOCK exposure)
         {
             UInt16 effectiveHeight;
 
@@ -597,30 +597,36 @@ namespace sx
                 effectiveHeight = ccdHeight;
             }
 
-            if (width > ccdWidth)
+            if (exposure.width > ccdWidth)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid width {0}: 0<=width<={1}", width, ccdWidth), "width");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid width {0}: 0<=width<={1}", exposure.width, ccdWidth), "width");
             }
-            if (height > effectiveHeight)
+
+            if (exposure.height > effectiveHeight)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", height, effectiveHeight), "height");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", exposure.height, effectiveHeight), "height");
             }
-            if (xOffset > ccdWidth)
+
+            if (exposure.x_offset > ccdWidth)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0}: 0<=width<={1}", xOffset, ccdWidth), "xOffset");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0}: 0<=width<={1}", exposure.x_offset, ccdWidth), "xOffset");
             }
-            if (yOffset > effectiveHeight)
+
+            if (exposure.y_offset > effectiveHeight)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", yOffset, effectiveHeight), "yOffset");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", exposure.y_offset, effectiveHeight), "yOffset");
             }
-            if (xOffset + width > ccdWidth)
+
+            if (exposure.x_offset + exposure.width > ccdWidth)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", xOffset, width, ccdWidth), "width+xOffset");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", exposure.x_offset, exposure.width, ccdWidth), "width+xOffset");
             }
-            if (yOffset + height > effectiveHeight)
+
+            if (exposure.y_offset + exposure.height > effectiveHeight)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", yOffset, height, effectiveHeight), "height+yOffset");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", exposure.y_offset, exposure.height, effectiveHeight), "height+yOffset");
             }
+
             // The following if disallows asymmetric binning. The SX cameras will do it, but it there are difficulties that arise from
             // asymmetric binning and bayer matrices that I don't want to deal with at this point...
             if (xBin != yBin)
@@ -628,14 +634,14 @@ namespace sx
                 throw new ArgumentOutOfRangeException("xBin != yBin");
             }
 
-            if (width % xBin != 0)
+            if (exposure.width % exposure.x_bin != 0)
             {
-                throw new ArgumentOutOfRangeException("width % xBin != 0");
+                throw new ArgumentOutOfRangeException(String.Format("width ({0}) % x_bin ({1}) != 0 ({2})", exposure.width, exposure.x_bin, exposure.width % exposure.x_bin));
             }
 
-            if (height % yBin != 0)
+            if (exposure.height % exposure.y_bin != 0)
             {
-                throw new ArgumentOutOfRangeException(String.Format("height ({0}) % yBin ({1}) != 0 ({2}", height, yBin, height % yBin));
+                throw new ArgumentOutOfRangeException(String.Format("height ({0}) % y_bin ({1}) != 0 ({2}", exposure.height, exposure.y_bin, exposure.height % exposure.y_bin));
             }
         }
 
@@ -669,7 +675,7 @@ namespace sx
 
             dumpReadDelayedBlock(currentExposure.userRequested, "exposure as requested - before any adjustments");
 
-            checkParms(false, currentExposure.userRequested.width, currentExposure.userRequested.height, currentExposure.userRequested.x_offset, currentExposure.userRequested.y_offset, currentExposure.userRequested.x_bin, currentExposure.userRequested.y_bin);
+            checkParms(false, currentExposure.userRequested);
 
             currentExposure.toCamera = currentExposure.userRequested;
 
@@ -695,7 +701,7 @@ namespace sx
                 // See if our modified parameters are still legal
                 try
                 {
-                    checkParms(true, currentExposure.toCamera.width, currentExposure.toCamera.height, currentExposure.toCamera.x_offset, currentExposure.toCamera.y_offset, currentExposure.toCamera.x_bin, currentExposure.toCamera.y_bin);
+                    checkParms(true, currentExposure.toCamera);
                 }
                 catch (Exception ex)
                 {
@@ -734,7 +740,7 @@ namespace sx
             // See if our modified parameters are still legal
             try
             {
-                checkParms(true, currentExposure.toCamera.width, currentExposure.toCamera.height, currentExposure.toCamera.x_offset, currentExposure.toCamera.y_offset, currentExposure.toCamera.x_bin, currentExposure.toCamera.y_bin);
+                checkParms(true, currentExposure.toCamera);
             }
             catch (Exception ex)
             {
@@ -784,7 +790,7 @@ namespace sx
                 // See if our modified parameters are still legal
                 try
                 {
-                    checkParms(true, currentExposure.toCamera.width, currentExposure.toCamera.height, currentExposure.toCamera.x_offset, currentExposure.toCamera.y_offset, currentExposure.toCamera.x_bin, currentExposure.toCamera.y_bin);
+                    checkParms(true, currentExposure.toCamera);
                 }
                 catch (Exception ex)
                 {
@@ -794,7 +800,7 @@ namespace sx
 
                 try
                 {
-                    checkParms(true, currentExposure.toCameraSecond.width, currentExposure.toCameraSecond.height, currentExposure.toCameraSecond.x_offset, currentExposure.toCameraSecond.y_offset, currentExposure.toCameraSecond.x_bin, currentExposure.toCameraSecond.y_bin);
+                    checkParms(true, currentExposure.toCameraSecond);
                 }
                 catch (Exception ex)
                 {
