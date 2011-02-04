@@ -1109,7 +1109,7 @@ namespace sx
 
             Log.Write(String.Format("convertCameraDataToImageData(): x_bin = {0} binnedWidth={1} binnedHeight={2}\n", currentExposure.toCamera.x_bin, binnedWidth, binnedHeight));
 
-            if (idx == 0 && cameraModel == 0x59)
+            if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M25C)
             {
 
                 Log.Write("convertCameraDataToImageData(): decoding M25C data\n");
