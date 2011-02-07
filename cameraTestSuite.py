@@ -45,8 +45,6 @@ class ConnectionTestCases(unittest.TestCase):
             camera.Connected = True
         except win32com.client.pywintypes.com_error:
             pass
-        except:
-            raise
 
         self.assertTrue(camera.Connected)
 
@@ -65,8 +63,6 @@ class ConnectionTestCases(unittest.TestCase):
             camera.Connected = False
         except win32com.client.pywintypes.com_error:
             pass
-        except:
-            raise
 
         self.assertFalse(camera.Connected)
 
@@ -98,9 +94,15 @@ class BinnedTestCases(unittest.TestCase):
                 camera.NumY = camera.CameraYSize/bin
                 camera.StartExposure(defaultExposure, False)
                 time.sleep(defaultExposure)
-                for retries in xrange(50):
+                for retries in xrange(50): # wait up to 5 seconds after the exposure ends
                     if camera.ImageReady:
                         break
+                    try:
+                        err = camera.LastError
+                    except win32com.client.pywintypes.com_error:
+                        pass
+                    else:
+                        self.fail("got error {0} binning {1}".format(err, bin))
                     time.sleep(0.1)
                 self.assertTrue(camera.ImageReady, "image not ready for bin value {0}".format(bin))
                 image = camera.ImageArray
@@ -111,7 +113,42 @@ class BinnedSubImageTestCases(unittest.TestCase):
     def tearDown(self):
         camera.Connected = False
     def testBinnedModes(self):
-        pass
+        if camera.CanAsymmetricBin:
+            pass
+        else:
+            self.assertEqual(camera.MaxBinX, camera.MaxBinY)
+            for i in xrange(camera.MaxBinX):
+                bin = i + 1
+
+                for start in xrange(bin):
+                    for height in xrange(1, camera.CameraYSize/bin - start):
+
+                        camera.BinX = bin
+                        camera.BinY = bin
+
+                        camera.StartX = 0
+                        camera.StartY = start
+
+                        #camera.NumX = camera.CameraXSize/bin - (start + num)
+                        #camera.NumY = camera.CameraYSize/bin - (start + num)
+
+                        camera.NumX = bin
+                        camera.NumY = height
+
+                        camera.StartExposure(defaultExposure, False)
+                        time.sleep(defaultExposure)
+                        for retries in xrange(50): # wait up to 5 seconds after the exposure ends
+                            if camera.ImageReady:
+                                break
+                            try:
+                                err = camera.LastError
+                            except win32com.client.pywintypes.com_error:
+                                pass
+                            else:
+                                self.fail("got error {0} binning {1}, start={2}, height={3}".format(err, bin, start, height))
+                            time.sleep(0.1)
+                        self.assertTrue(camera.ImageReady, "image not ready for bin value {0}".format(bin))
+                        image = camera.ImageArray
 
 def usage():
     print >>sys.stderr, "usage: %s [<camera_name>]"
