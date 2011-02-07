@@ -705,7 +705,7 @@ namespace sx
                 }
                 catch (Exception ex)
                 {
-                    Log.Write(String.Format("checkParms for toCamera generated exception {0}\n", ex));
+                    Log.Write(String.Format("checkParms after intial interlaced adjustments generated an exception {0}\n", ex));
                     throw;
                 }
 
@@ -766,16 +766,18 @@ namespace sx
 
             if (interlaced)
             {
-                bool offsetIsOdd = (currentExposure.userRequested.y_offset % 2) != 0;
-                bool heightIsOdd = (currentExposure.userRequested.height % 2) != 0;
+                bool binnedHeightIsOdd = ((currentExposure.userRequested.height/currentExposure.userRequested.y_bin) % 2) != 0;
+                bool offsetIsOdd = ((currentExposure.toCamera.y_offset/currentExposure.userRequested.y_bin) % 2) != 0;
+                bool heightIsOdd = ((currentExposure.toCamera.height/currentExposure.userRequested.y_bin) % 2) != 0;
 
-                Log.Write(String.Format("making final interlaced adjustments, offsetIsOdd={0}, heightIsOdd={1}\n", offsetIsOdd, heightIsOdd));
+                Log.Write(String.Format("making final interlaced adjustments, offsetIsOdd={0}, binnedHeightIsOdd={1}\n", offsetIsOdd, binnedHeightIsOdd));
 
                 currentExposure.toCameraSecond = currentExposure.toCamera;
 
-                if (heightIsOdd)
+                Log.Write(String.Format("binnedHeightIsOdd = {0}, height={1}, ccdHeigth={2}\n", binnedHeightIsOdd, currentExposure.toCamera.height, frameHeight));
+                if (binnedHeightIsOdd && currentExposure.toCamera.height + currentExposure.userRequested.y_bin < frameHeight)
                 {
-                    currentExposure.toCamera.height += 1;
+                    currentExposure.toCamera.height += currentExposure.userRequested.y_bin;
                 }
 
                 if (offsetIsOdd)
@@ -787,6 +789,7 @@ namespace sx
                     fieldFlags = SX_CCD_FLAGS_FIELD_EVEN;
                 }
 
+                dumpReadDelayedBlock(currentExposure.toCamera, "first frame after final progressive adjustments");
                 // See if our modified parameters are still legal
                 try
                 {
@@ -794,22 +797,20 @@ namespace sx
                 }
                 catch (Exception ex)
                 {
-                    Log.Write(String.Format("checkParms for toCamera generated exception {0}\n", ex));
+                    Log.Write(String.Format("checkParms of first frame after final interlaced adjusments generated exception {0}\n", ex));
                     throw;
                 }
 
+                dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after final progressive adjustments");
                 try
                 {
                     checkParms(true, currentExposure.toCameraSecond);
                 }
                 catch (Exception ex)
                 {
-                    Log.Write(String.Format("checkParms for toCameraSecond generated exception {0}\n", ex));
+                    Log.Write(String.Format("checkParms of second frame after final interlaced adjustments generated exception {0}\n", ex));
                     throw;
                 }
-
-                dumpReadDelayedBlock(currentExposure.toCamera, "first frame after second progressive adjustments");
-                dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after second progressive adjustments");
             }
 
             // Make any adjustments required for specific cameras
@@ -1229,7 +1230,7 @@ namespace sx
             else
             {
                 int srcIdx = 0;
-                int x, y;
+                int x=-1, y=-1;
 
                 try
                 {
@@ -1237,13 +1238,22 @@ namespace sx
                     {
                         for (x = 0; x < binnedWidth; x++)
                         {
-                            imageData[x, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            if (srcIdx < imageRawData.Length)
+                            {
+                                imageData[x, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            }
+                            else
+                            {
+                                // sometimes with interlaced cameras, there is 1 less row than might be expected (10 rows, 3x3 binning only gives 2 row)
+                                Debug.Assert(interlaced && y == binnedHeight - 1);
+                                imageData[x, y] = 0;
+                            }
                         }
                     }
                 }
                 catch (System.Exception ex)
                 {
-                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing non-M25C data - {0}\n", ex.ToString()));
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing non-M25C data at pixel ({0}, {1}) from {2} - {3}\n", x, y, srcIdx, ex.ToString()));
                     throw ex;
                 }
             }
