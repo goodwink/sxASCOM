@@ -1689,7 +1689,7 @@ namespace ASCOM.SXGeneric
                         throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
                     }
 
-                    // we have passed all the parameter wanity checsks, and are still 
+                    // we have passed all the parameter sanity checsks, and are still 
                     // running on the calling thread.  Tell the camera to freeze the
                     // parameters for this exposure
                     sxCamera.freezeParameters();
