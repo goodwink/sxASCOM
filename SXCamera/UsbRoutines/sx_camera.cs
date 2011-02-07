@@ -614,7 +614,7 @@ namespace sx
 
             if (exposure.y_offset > effectiveHeight)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", exposure.y_offset, effectiveHeight), "yOffset");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset {0}: 0<=yOffset<={1}", exposure.y_offset, effectiveHeight), "yOffset");
             }
 
             if (exposure.x_offset + exposure.width > ccdWidth)
@@ -686,14 +686,15 @@ namespace sx
 
             if (interlaced)
             {
-                currentExposure.toCamera.y_offset /= 2;
-
                 // if we are binning, it is possible that dividing the height by 2 will elminiate a
                 // a binned row that would exist in a progressive camera
                 //
                 // suppose a sensor has 10 lines and we are binning by 3.  If the sensor was progressive,
                 // there would be 3 binned lines.  But with a progressive sensor, we can only get 2 binned lines, 
                 // 1 from each "half" of the sensor
+
+                UInt16 binnedOffset = (UInt16)(currentExposure.toCamera.y_offset/currentExposure.toCamera.y_bin);
+                currentExposure.toCamera.y_offset = (UInt16)(binnedOffset/2 * currentExposure.toCamera.y_bin);
 
                 UInt16 binnedRows = (UInt16)(currentExposure.toCamera.height/currentExposure.toCamera.y_bin);
                 currentExposure.toCamera.height = (UInt16)(binnedRows/2 * currentExposure.toCamera.y_bin);
@@ -709,7 +710,7 @@ namespace sx
                     throw;
                 }
 
-                dumpReadDelayedBlock(currentExposure.userRequested, "after initial progressive adjustments");
+                dumpReadDelayedBlock(currentExposure.toCamera, "after initial progressive adjustments");
             }
 
             // cameras with a Bayer matrix need the offsets to be even so that the subframe returned 
@@ -751,42 +752,68 @@ namespace sx
             // interlaced cameras require some special care
             // we have to divide the offset and the height by 2, but that can lead to
             // issues
-            // +--------+--------+-------+---------------------
-            // | Height | Offset | First | Adjustments
-            // +--------+--------+-------+---------------------
-            // |  Even  +  Even  | Even  | None
-            // +--------+--------+-------+---------------------
-            // |  Even  |  Odd   | Odd   | None
-            // +--------+--------+-------+---------------------
-            // |  Odd   |  Even  | Even  | second height  += 1
-            // +--------+--------+-------+---------------------
-            // |  Odd   |  Odd   | Odd   | second height  += 1
-            // +--------+--------+-----------------------------
+            // +--------+--------+-------+--------------------------------------------
+            // | Offset | Height | First | Adjustments to First Frame
+            // +--------+--------+-------+--------------------------------------------
+            // |  Even  |  Even  | Even  | None
+            // +--------+--------+-------+--------------------------------------------
+            // |  Even  |  Odd   | Even  | height += ybin
+            // +--------+--------+-------+--------------------------------------------
+            // |  Odd   |  Even  | Odd   | start -= ybin
+            // +--------+--------+-------+--------------------------------------------
+            // |  Odd   |  Odd   | Odd   | start -= ybin; height  += ybin
+            // +--------+--------+----------------------------------------------------
+            //
+            // Put another way: 
+            //   if the offset is odd, start -= ybin
+            //   if the height is odd, height += ybin (if possible)
             // 
 
             if (interlaced)
             {
-                bool binnedHeightIsOdd = ((currentExposure.userRequested.height/currentExposure.userRequested.y_bin) % 2) != 0;
-                bool offsetIsOdd = ((currentExposure.toCamera.y_offset/currentExposure.userRequested.y_bin) % 2) != 0;
-                bool heightIsOdd = ((currentExposure.toCamera.height/currentExposure.userRequested.y_bin) % 2) != 0;
+                UInt16 yBin = currentExposure.userRequested.y_bin;
+                bool binnedOffsetIsOdd = ((currentExposure.userRequested.y_offset/yBin) % 2) != 0;
+                bool binnedHeightIsOdd = ((currentExposure.userRequested.height/yBin) % 2) != 0;
 
-                Log.Write(String.Format("making final interlaced adjustments, offsetIsOdd={0}, binnedHeightIsOdd={1}\n", offsetIsOdd, binnedHeightIsOdd));
+                Log.Write(String.Format("making final interlaced adjustments, binnedOffsetIsOdd={0}, binnedHeightIsOdd={1}\n", binnedOffsetIsOdd, binnedHeightIsOdd));
 
                 currentExposure.toCameraSecond = currentExposure.toCamera;
 
-                Log.Write(String.Format("binnedHeightIsOdd = {0}, height={1}, ccdHeigth={2}\n", binnedHeightIsOdd, currentExposure.toCamera.height, frameHeight));
-                if (binnedHeightIsOdd && currentExposure.toCamera.height + currentExposure.userRequested.y_bin < frameHeight)
-                {
-                    currentExposure.toCamera.height += currentExposure.userRequested.y_bin;
-                }
-
-                if (offsetIsOdd)
+                Log.Write(String.Format("binnedHeightIsOdd = {0}, height={1}, frameHeight={2}\n", binnedHeightIsOdd, currentExposure.userRequested.height, frameHeight));
+                if (binnedOffsetIsOdd)
                 {
                     fieldFlags = SX_CCD_FLAGS_FIELD_ODD;
+
+#if False
+                    if (currentExposure.toCamera.y_offset + currentExposure.toCamera.height + yBin < frameHeight)
+                    {
+                        Log.Write(String.Format("adding {0} to first camera y_offset ({1}) for odd offset\n", yBin, currentExposure.toCamera.y_offset));
+                        currentExposure.toCamera.y_offset += yBin;
+                    }
+                    else if (currentExposure.toCameraSecond.y_offset >= yBin)
+                    {
+                        Log.Write(String.Format("subtracting {0} to second camera y_offset ({1}) for odd offset\n", yBin, currentExposure.toCameraSecond.y_offset));
+                        currentExposure.toCameraSecond.y_offset -= yBin;
+                    }
+                    else
+                    {
+                        Log.Write(String.Format("Interlaced camera is losing a row in for odd offset\n"));
+                    }
+#endif
                 }
                 else
                 {
                     fieldFlags = SX_CCD_FLAGS_FIELD_EVEN;
+                }
+
+                if (binnedHeightIsOdd && currentExposure.toCamera.y_offset + currentExposure.toCamera.height + yBin < frameHeight)
+                {
+                    Log.Write(String.Format("adding {0} to first camera height ({1}) for odd height\n", yBin, currentExposure.toCamera.height));
+                    currentExposure.toCamera.height += yBin;
+                }
+                else
+                {
+                    Log.Write(String.Format("Interlaced camera is losing a row in for odd height\n"));
                 }
 
                 dumpReadDelayedBlock(currentExposure.toCamera, "first frame after final progressive adjustments");
@@ -811,6 +838,26 @@ namespace sx
                     Log.Write(String.Format("checkParms of second frame after final interlaced adjustments generated exception {0}\n", ex));
                     throw;
                 }
+#if DEBUG
+                int expectedRows = currentExposure.userRequested.height/yBin;
+                int actualRows = currentExposure.toCamera.height/yBin + currentExposure.toCameraSecond.height/yBin;
+                int rowDelta = expectedRows - actualRows;
+
+                Debug.Assert(rowDelta == 0 || rowDelta == 1);
+
+                int expectedStartRow = currentExposure.userRequested.y_offset / yBin;
+                int actualStartRow = 2 * (currentExposure.toCamera.y_offset / yBin);
+
+                if (fieldFlags == SX_CCD_FLAGS_FIELD_ODD)
+                {
+                    actualStartRow += 1;
+                }
+
+                int startDelta = expectedStartRow - actualStartRow;
+                Debug.Assert(startDelta == 0);
+
+                Log.Write(String.Format("rowDelta={0} startDelta={1}\n", rowDelta, startDelta));
+#endif
             }
 
             // Make any adjustments required for specific cameras
@@ -1454,14 +1501,14 @@ namespace sx
                 }
                 catch
                 {
-                    Log.Write(String.Format("stitch exception in line={0} first Copy(firstFrame, {1}, imageRawData, {2}, {3})\n", line, line/2*width, line*width, width));
+                    Log.Write(String.Format("stitch exception in line={0} first Copy(secondFrame, {1}, {2}, imageRawData, {2}, {3})\n", line, line/2*width, line*width, width));
                     throw;
                 }
 
                 // if we have an odd number of lines in the requested exposure,
                 // the first frame can have 1 more line that the second, so we have
                 // to check to make sure that there is a line in the second image
-                if (line/2 < currentExposure.toCameraSecond.height)
+                if (line/2 < currentExposure.toCameraSecond.height/currentExposure.toCameraSecond.y_bin)
                 {
                     // copy second line
                     try
@@ -1472,7 +1519,7 @@ namespace sx
                     }
                     catch
                     {
-                        Log.Write(String.Format("stitch exception in line={0} second Copy(firstFrame, {1}, imageRawData, {2}, {3})\n", line, line/2*width, (line+1)*width, width));
+                        Log.Write(String.Format("stitch exception in line={0} second Copy(secondFrame, {1}, imageRawData, {2}, {3})\n", line, line/2 * width, (line+1)*width, width));
                         throw;
                     }
                 }
