@@ -194,7 +194,7 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
         }
 
@@ -226,7 +226,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
             set
@@ -249,7 +249,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -281,7 +281,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
             set
@@ -304,7 +304,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -372,7 +372,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -401,7 +401,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -430,7 +430,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -456,7 +456,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -489,7 +489,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -548,7 +548,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -579,12 +579,11 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
             set
             {
-                Log.Write("Hello\n");
                 Log.Write(String.Format("Generic::Connected set: Current Value is {0}, requested value is {1}\n", m_Connected, value));
 
                 try
@@ -632,7 +631,7 @@ namespace ASCOM.SXGeneric
                         {
                             sxCamera = null;
                             m_Connected = true;
-                            throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request: " + ex.ToString()), ex);
+                            throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                         }
                         // setup state variables
                         state = CameraStates.cameraIdle;
@@ -720,7 +719,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
 
             }
@@ -782,7 +781,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -810,7 +809,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -869,7 +868,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -954,7 +953,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -985,7 +984,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1004,7 +1003,7 @@ namespace ASCOM.SXGeneric
                 {
                     if (!bLastErrorValid)
                     {
-                        throw new ASCOM.InvalidOperationException(SetError("LastError called when there was no last error"));
+                        throw new ASCOM.InvalidOperationException("LastError called when there was no last error");
                     }
 
                     Log.Write(String.Format("Generic::LastError get returns {0}\n", lastErrorMessage));
@@ -1017,7 +1016,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1051,7 +1050,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1086,7 +1085,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1115,7 +1114,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1145,7 +1144,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1175,7 +1174,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1203,7 +1202,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
 
@@ -1222,7 +1221,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1250,7 +1249,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
             set
@@ -1269,7 +1268,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1299,7 +1298,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1329,7 +1328,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1396,7 +1395,7 @@ namespace ASCOM.SXGeneric
             catch (System.Exception ex)
             {
                 SetError(ex.ToString());
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
             finally
             {
@@ -1439,7 +1438,7 @@ namespace ASCOM.SXGeneric
             catch (System.Exception ex)
             {
                 SetError(ex.ToString());
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
         }
 
@@ -1476,7 +1475,7 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
             finally
             {
@@ -1614,7 +1613,7 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
         }
 
@@ -1728,7 +1727,7 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
         }
 
@@ -1754,7 +1753,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
 
@@ -1773,7 +1772,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1800,7 +1799,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
 
@@ -1819,7 +1818,7 @@ namespace ASCOM.SXGeneric
                 }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
                 }
             }
         }
@@ -1866,7 +1865,7 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
-                throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
         }
         #endregion
