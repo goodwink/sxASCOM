@@ -1260,7 +1260,7 @@ namespace ASCOM.SXGeneric
 
                     m_NumY = value;
 
-                    Log.Write(String.Format("Generic::NumX set to {0}\n", m_NumX));
+                    Log.Write(String.Format("Generic::NumY set to {0}\n", m_NumY));
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1363,7 +1363,7 @@ namespace ASCOM.SXGeneric
                     throw new ASCOM.InvalidOperationException(SetError(String.Format("PulseGuide() cannot be called if CanPuluseGuide == false")));
                 }
 
-                Log.Write(String.Format("Generic::PulseGuide({0}, {1})",  Direction, Duration));
+                Log.Write(String.Format("Generic::PulseGuide({0}, {1})\n",  Direction, Duration));
 
                 bLastErrorValid = false;
 
