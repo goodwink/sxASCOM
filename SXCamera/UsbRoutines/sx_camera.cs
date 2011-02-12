@@ -714,7 +714,7 @@ namespace sx
                 // See if our modified parameters are still legal
                 try
                 {
-                    checkParms(true, currentExposure.toCamera);
+                    checkParms(false, currentExposure.toCamera);
                 }
                 catch (Exception ex)
                 {
