@@ -476,12 +476,14 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
+                    bool bRet = ! m_config.symetricBinning;
+
                     // The SX cameras can actualy do asymmetric binning, but with bayer color cameras it makes things weird, 
                     // and I don't need it, so I'm disallowing it.
 
-                    Log.Write("Generic::CanAsymetricBin get returns false\n");
+                    Log.Write(String.Format("Generic::CanAsymetricBin get returns {0}\n", bRet));
 
-                    return false;
+                    return bRet;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1132,7 +1134,7 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    short ret = sxCamera.xBinMax;
+                    short ret = m_config.maxXBin;
 
                     Log.Write(String.Format("Generic::MaxBinX get returns {0}\n", ret));
 
@@ -1162,7 +1164,7 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    short ret = sxCamera.yBinMax;
+                    short ret = m_config.maxYBin;
 
                     Log.Write(String.Format("Generic::MaxBinY get returns {0}\n", ret));
 

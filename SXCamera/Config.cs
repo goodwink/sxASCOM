@@ -35,6 +35,14 @@ namespace ASCOM.SXCamera
         private const string KEY_VID = "VID";
         private const string KEY_PID = "PID";
 
+        private const string KEY_SYMETRIC_BINNING = "SymetricBinning";
+        private const bool DEFAULT_SYMETRIC_BINNING = false;
+
+        private const string KEY_MAX_Y_BIN = "MaxYBin";
+        private const byte DEFAULT_MAX_Y_BIN = 8;
+
+        private const string KEY_MAX_X_BIN = "MaxXBin";
+        private const byte DEFAULT_MAX_X_BIN = 8;
 
         public enum CAMERA_SELECTION_METHOD
         {
@@ -51,8 +59,12 @@ namespace ASCOM.SXCamera
             public string selectionMethod;
             public UInt16 VID;
             public UInt16 PID;
+            public bool symetricBinning;
+            public byte maxXBin;
+            public byte maxYBin;
 
-            internal CAMERA_VALUES(bool enableUntested, bool enableLogging, bool secondsAreMilliseconds, string selectionMethod, UInt16 VID, UInt16 PID)
+
+            internal CAMERA_VALUES(bool enableUntested, bool enableLogging, bool secondsAreMilliseconds, string selectionMethod, UInt16 VID, UInt16 PID, bool symetricBinning, byte maxXBin, byte maxYBin)
             {
                 this.enableUntested = enableUntested;
                 this.enableLogging = enableLogging;
@@ -60,12 +72,15 @@ namespace ASCOM.SXCamera
                 this.selectionMethod = selectionMethod;
                 this.VID = VID;
                 this.PID = PID;
+                this.symetricBinning = symetricBinning;
+                this.maxXBin = maxXBin;
+                this.maxYBin = maxYBin;
             }
         };
 
         internal CAMERA_VALUES[] DEFAULT_VALUES = {
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 507),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507)
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN)
         };
 
         private Profile m_profile;
@@ -181,6 +196,26 @@ namespace ASCOM.SXCamera
             return iRet;
         }
 
+        internal byte GetByte(string name, byte defaultValue)
+        {
+            byte iRet = defaultValue;
+            string str = GetString(name);
+
+            if (str != null && str != "")
+            {
+                try
+                {
+                    iRet = Convert.ToByte(str);
+                }
+                catch
+                {
+                    Log.Write(String.Format("GetByte was unable to convert {0}\n", str));
+                }
+            }
+
+            return iRet;
+        }
+
         public bool enableUntested
         {
             
@@ -236,6 +271,25 @@ namespace ASCOM.SXCamera
         {
             get { return GetString("", "default"); }
         }
+
+        public bool symetricBinning
+        {
+            get { return GetBool(KEY_SYMETRIC_BINNING, DEFAULT_VALUES[m_whichController].symetricBinning); }
+            set { SetString(KEY_SYMETRIC_BINNING, value.ToString()); }
+        }
+
+        public byte maxXBin
+        {
+            get { return GetByte(KEY_MAX_X_BIN, DEFAULT_VALUES[m_whichController].maxXBin); }
+            set { SetString(KEY_MAX_X_BIN, value.ToString()); }
+        }
+
+        public byte maxYBin
+        {
+            get { return GetByte(KEY_MAX_Y_BIN, DEFAULT_VALUES[m_whichController].maxYBin); }
+            set { SetString(KEY_MAX_Y_BIN, value.ToString()); }
+        }
+
 
         /// <summary>
         /// Launches a configuration dialog box for the driver.  The call will not return
@@ -308,6 +362,24 @@ namespace ASCOM.SXCamera
                 F.advancedUSBParmsEnabled.Checked = false;
                 F.usbGroup.Enabled = false;
 
+                if (symetricBinning)
+                {
+                    F.symetricBinning.Checked = true;
+                    F.binLabel.Text = "Max Y Bin";
+                    F.xBinLabel.Visible = true;
+                    F.maxXBin.Visible = true;
+                }
+                else
+                {
+                    F.symetricBinning.Checked = true;
+                    F.binLabel.Text = "Max Bin";
+                    F.xBinLabel.Visible = false;
+                    F.maxXBin.Visible = false;
+                }
+
+                F.maxXBin.Value  = maxXBin;
+                F.maxYBin.Value  = maxYBin;
+
                 if (F.ShowDialog() == DialogResult.OK)
                 {
                     Log.Write("ShowDialog returned OK - saving parameters\n");
@@ -356,6 +428,18 @@ namespace ASCOM.SXCamera
                                 selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL;
                             }
                         }
+                    }
+
+                    symetricBinning = F.symetricBinning.Checked;
+                    maxYBin = (byte)F.maxYBin.Value;
+
+                    if (symetricBinning)
+                    {
+                        maxXBin = maxYBin;
+                    }
+                    else
+                    {
+                        maxXBin = (byte)F.maxXBin.Value;
                     }
                 }
             }

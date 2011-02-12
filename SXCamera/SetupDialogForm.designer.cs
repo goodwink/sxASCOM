@@ -48,8 +48,18 @@ namespace ASCOM.SXCamera
             this.Copyright = new System.Windows.Forms.Label();
             this.usbGroup = new System.Windows.Forms.GroupBox();
             this.advancedUSBParmsEnabled = new System.Windows.Forms.CheckBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.symetricBinning = new System.Windows.Forms.RadioButton();
+            this.xBinLabel = new System.Windows.Forms.Label();
+            this.maxXBin = new System.Windows.Forms.NumericUpDown();
+            this.binLabel = new System.Windows.Forms.Label();
+            this.maxYBin = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.usbGroup.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.maxXBin)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.maxYBin)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -269,11 +279,114 @@ namespace ASCOM.SXCamera
             this.advancedUSBParmsEnabled.UseVisualStyleBackColor = true;
             this.advancedUSBParmsEnabled.CheckedChanged += new System.EventHandler(this.handleAdvancedUsbPropertiesChange);
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.maxYBin);
+            this.groupBox1.Controls.Add(this.radioButton2);
+            this.groupBox1.Controls.Add(this.symetricBinning);
+            this.groupBox1.Controls.Add(this.xBinLabel);
+            this.groupBox1.Controls.Add(this.maxXBin);
+            this.groupBox1.Controls.Add(this.binLabel);
+            this.groupBox1.Location = new System.Drawing.Point(223, 271);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(204, 187);
+            this.groupBox1.TabIndex = 105;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Binning Control";
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Location = new System.Drawing.Point(9, 49);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(141, 21);
+            this.radioButton2.TabIndex = 6;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "Asymetric Binning";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            // 
+            // symetricBinning
+            // 
+            this.symetricBinning.AutoSize = true;
+            this.symetricBinning.Location = new System.Drawing.Point(9, 21);
+            this.symetricBinning.Name = "symetricBinning";
+            this.symetricBinning.Size = new System.Drawing.Size(134, 21);
+            this.symetricBinning.TabIndex = 5;
+            this.symetricBinning.TabStop = true;
+            this.symetricBinning.Text = "Symetric Binning";
+            this.symetricBinning.UseVisualStyleBackColor = true;
+            this.symetricBinning.CheckedChanged += new System.EventHandler(this.symetricBinning_CheckedChanged);
+            // 
+            // xBinLabel
+            // 
+            this.xBinLabel.AutoSize = true;
+            this.xBinLabel.Location = new System.Drawing.Point(6, 117);
+            this.xBinLabel.Name = "xBinLabel";
+            this.xBinLabel.Size = new System.Drawing.Size(70, 17);
+            this.xBinLabel.TabIndex = 4;
+            this.xBinLabel.Text = "Max X Bin";
+            // 
+            // maxXBin
+            // 
+            this.maxXBin.Location = new System.Drawing.Point(82, 115);
+            this.maxXBin.Maximum = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
+            this.maxXBin.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.maxXBin.Name = "maxXBin";
+            this.maxXBin.Size = new System.Drawing.Size(68, 22);
+            this.maxXBin.TabIndex = 3;
+            this.maxXBin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.maxXBin.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // binLabel
+            // 
+            this.binLabel.AutoSize = true;
+            this.binLabel.Location = new System.Drawing.Point(6, 86);
+            this.binLabel.Name = "binLabel";
+            this.binLabel.Size = new System.Drawing.Size(57, 17);
+            this.binLabel.TabIndex = 2;
+            this.binLabel.Text = "Max Bin";
+            // 
+            // maxYBin
+            // 
+            this.maxYBin.Location = new System.Drawing.Point(82, 86);
+            this.maxYBin.Maximum = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
+            this.maxYBin.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.maxYBin.Name = "maxYBin";
+            this.maxYBin.Size = new System.Drawing.Size(68, 22);
+            this.maxYBin.TabIndex = 7;
+            this.maxYBin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.maxYBin.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(507, 471);
+            this.ClientSize = new System.Drawing.Size(449, 471);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.advancedUSBParmsEnabled);
             this.Controls.Add(this.usbGroup);
             this.Controls.Add(this.Copyright);
@@ -296,6 +409,10 @@ namespace ASCOM.SXCamera
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             this.usbGroup.ResumeLayout(false);
             this.usbGroup.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.maxXBin)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.maxYBin)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -322,5 +439,12 @@ namespace ASCOM.SXCamera
         internal System.Windows.Forms.Label pidLabel;
         internal System.Windows.Forms.CheckBox advancedUSBParmsEnabled;
         internal System.Windows.Forms.GroupBox usbGroup;
+        private System.Windows.Forms.GroupBox groupBox1;
+        public System.Windows.Forms.Label xBinLabel;
+        public System.Windows.Forms.NumericUpDown maxXBin;
+        public System.Windows.Forms.Label binLabel;
+        public System.Windows.Forms.RadioButton radioButton2;
+        public System.Windows.Forms.RadioButton symetricBinning;
+        public System.Windows.Forms.NumericUpDown maxYBin;
     }
 }

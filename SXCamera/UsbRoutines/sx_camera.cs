@@ -321,11 +321,6 @@ namespace sx
             }
         }
 
-        public Byte xBinMax
-        {
-            get { return MAX_X_BIN; }
-        }
-
         public Byte yBin
         {
             get { return nextExposure.y_bin; }
@@ -345,11 +340,6 @@ namespace sx
 
                 nextExposure.y_bin = value;
             }
-        }
-
-        public Byte yBinMax
-        {
-            get { return MAX_Y_BIN; }
         }
 
         public UInt32 delayMs

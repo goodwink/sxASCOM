@@ -72,5 +72,21 @@ namespace ASCOM.SXCamera
                 usbGroup.Enabled = false;
             }
         }
+
+        private void symetricBinning_CheckedChanged(object sender, EventArgs e)
+        {
+            if (symetricBinning.Checked)
+            {
+                binLabel.Text = "Max Bin";
+                xBinLabel.Visible = false;
+                maxXBin.Visible = false;
+            }
+            else
+            {
+                binLabel.Text = "Max Y Bin";
+                xBinLabel.Visible = true;
+                maxXBin.Visible = true;
+            }
+        }
     }
 }
