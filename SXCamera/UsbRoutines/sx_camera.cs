@@ -854,7 +854,7 @@ namespace sx
                 }
 
                 int startDelta = expectedStartRow - actualStartRow;
-                Debug.Assert(startDelta == 0);
+                Debug.Assert(startDelta == 0 || startDelta == 2);
 
                 Log.Write(String.Format("rowDelta={0} startDelta={1}\n", rowDelta, startDelta));
 #endif
