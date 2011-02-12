@@ -127,8 +127,9 @@ class RandomTests(ASCOMCameraTest):
     def runRandomTests(self):
         for i in xrange(1000):
             xBin = random.randint(1,camera.MaxBinX)
+
             if camera.CanAsymmetricBin:
-                xBin = random.randint(1,camera.MaxBinY)
+                yBin = random.randint(1,camera.MaxBinY)
             else:
                 yBin = xBin
 
