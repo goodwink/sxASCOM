@@ -36,7 +36,7 @@ namespace ASCOM.SXCamera
         private const string KEY_PID = "PID";
 
         private const string KEY_SYMETRIC_BINNING = "SymetricBinning";
-        private const bool DEFAULT_SYMETRIC_BINNING = false;
+        private const bool DEFAULT_SYMETRIC_BINNING = true;
 
         private const string KEY_MAX_Y_BIN = "MaxYBin";
         private const byte DEFAULT_MAX_Y_BIN = 8;
@@ -365,16 +365,16 @@ namespace ASCOM.SXCamera
                 if (symetricBinning)
                 {
                     F.symetricBinning.Checked = true;
-                    F.binLabel.Text = "Max Y Bin";
-                    F.xBinLabel.Visible = true;
-                    F.maxXBin.Visible = true;
-                }
-                else
-                {
-                    F.symetricBinning.Checked = true;
                     F.binLabel.Text = "Max Bin";
                     F.xBinLabel.Visible = false;
                     F.maxXBin.Visible = false;
+                }
+                else
+                {
+                    F.symetricBinning.Checked = false;
+                    F.binLabel.Text = "Max Y Bin";
+                    F.xBinLabel.Visible = true;
+                    F.maxXBin.Visible = true;
                 }
 
                 F.maxXBin.Value  = maxXBin;
