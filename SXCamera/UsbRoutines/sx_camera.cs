@@ -204,7 +204,19 @@ namespace sx
 
         public double pixelHeight
         {
-            get { return ccdParms.pixel_uheight / (double)256; }
+            get 
+            { 
+                double dRet =  ccdParms.pixel_uheight / (double)256; 
+
+                // interlaced cameras report their pixel height as 2X what
+                // it actually is
+                if (idx == 0 && interlaced)
+                {
+                    dRet /= 2.0;
+                }
+
+                return dRet;
+            }
         }
 
         public Byte bitsPerPixel
