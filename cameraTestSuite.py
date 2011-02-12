@@ -1,10 +1,10 @@
-import sys, time, getopt
+import sys, time, getopt, random, unittest
 import win32com.client
-from HTMLParser import HTMLParser
-import urllib2
-import urllib, cookielib, mimetools, mimetypes
-import re
-import unittest
+
+# import the ascom python bindings
+from win32com.client import gencache
+gencache.EnsureModule('{76618F90-032F-4424-A680-802467A55742}', 0, 1, 0)
+from win32com.client import constants
 
 ### Global variables
 verbose = False
@@ -66,21 +66,96 @@ class ConnectionTestCases(unittest.TestCase):
 
         self.assertFalse(camera.Connected)
 
-class SubImageTestCases(unittest.TestCase):
+
+class ASCOMCameraTest(unittest.TestCase):
     def setUp(self):
         camera.Connected = True
+
     def tearDown(self):
         camera.Connected = False
+
+    def expose(self,
+                binX=1, binY=1, 
+                startX=0, startY=0, 
+                numX = -1, numY = -1, 
+                exposure = defaultExposure):
+        try:
+
+            camera.BinX = binX
+            camera.BinY = binY
+
+            camera.StartX = startX
+            camera.StartY = startY
+
+            if numX == -1:
+                camera.NumX = camera.CameraXSize
+            else:
+                camera.NumX = numX
+
+            if numY == -1:
+                camera.NumY = camera.CameraYSize
+            else:
+                camera.NumY = numY
+
+            camera.StartExposure(exposure, False)
+
+            time.sleep(exposure)
+
+            for retries in xrange(50): # wait up to 5 seconds after the exposure ends
+                if camera.CameraState == constants.cameraIdle:
+                    break
+#            try:
+#                err = camera.LastError
+#            except win32com.client.pywintypes.com_error:
+#                pass
+#            else:
+#                self.fail("got error {0} during exposure".format(err))
+                time.sleep(0.1)
+
+            self.assertTrue(camera.ImageReady, "image not ready")
+        except:
+            print "exception in expose({0}, {1}, {2}, {3}, {4}, {5}, {6})".format(binX, binY, startX, startY, numX, numY, exposure)
+            raise
+
+        return camera.ImageArray
+
+class RegressionTestCases(ASCOMCameraTest):
+    def testRegression1(self):
+        image = self.expose(1, 1, 462, 128, 100, 101)
+
+class RandomTests(ASCOMCameraTest):
+    def runRandomTests(self):
+        for i in xrange(1000):
+            xBin = random.randint(1,camera.MaxBinX)
+            if camera.CanAsymmetricBin:
+                xBin = random.randint(1,camera.MaxBinY)
+            else:
+                yBin = xBin
+
+            binnedXSize = camera.CameraXSize/xBin
+            binnedYSize = camera.CameraYSize/yBin
+
+            startX = random.randint(0, binnedXSize - 2)
+            startY = random.randint(0, binnedYSize - 2)
+
+            numX = random.randint(1, (binnedXSize - 1 -startX))
+            numY = random.randint(1, (binnedYSize - 1 -startY))
+
+            self.expose(xBin, yBin, startX, startY, numX, numY)
+    def repeatableRandomTests(self):
+        random.seed(0)
+        self.runRandomTests()
+    def randomTests(self):
+        random.seed()
+        self.runRandomTests()
+
+class SubImageTestCases(ASCOMCameraTest):
     def testFullSubImage(self):
         pass
     def testOnePixelSubImage(self):
         pass
 
-class BinnedTestCases(unittest.TestCase):
-    def setUp(self):
-        camera.Connected = True
-    def tearDown(self):
-        camera.Connected = False
+class BinnedTestCases(ASCOMCameraTest):
     def testBinnedModes(self):
         if camera.CanAsymmetricBin:
             pass
@@ -88,30 +163,9 @@ class BinnedTestCases(unittest.TestCase):
             self.assertEqual(camera.MaxBinX, camera.MaxBinY)
             for i in xrange(camera.MaxBinX):
                 bin = i + 1
-                camera.BinX = bin
-                camera.BinY = bin
-                camera.NumX = camera.CameraXSize/bin
-                camera.NumY = camera.CameraYSize/bin
-                camera.StartExposure(defaultExposure, False)
-                time.sleep(defaultExposure)
-                for retries in xrange(50): # wait up to 5 seconds after the exposure ends
-                    if camera.ImageReady:
-                        break
-                    try:
-                        err = camera.LastError
-                    except win32com.client.pywintypes.com_error:
-                        pass
-                    else:
-                        self.fail("got error {0} binning {1}".format(err, bin))
-                    time.sleep(0.1)
-                self.assertTrue(camera.ImageReady, "image not ready for bin value {0}".format(bin))
-                image = camera.ImageArray
+                image = self.expose (bin, bin, 0, 0, camera.CameraXSize/bin, camera.CameraYSize/bin)
 
-class BinnedSubImageTestCases(unittest.TestCase):
-    def setUp(self):
-        camera.Connected = True
-    def tearDown(self):
-        camera.Connected = False
+class BinnedSubImageTestCases(ASCOMCameraTest):
     def testBinnedModes(self):
         if camera.CanAsymmetricBin:
             pass
@@ -122,33 +176,7 @@ class BinnedSubImageTestCases(unittest.TestCase):
 
                 for start in xrange(bin):
                     for height in xrange(1, camera.CameraYSize/bin - start):
-
-                        camera.BinX = bin
-                        camera.BinY = bin
-
-                        camera.StartX = 0
-                        camera.StartY = start
-
-                        #camera.NumX = camera.CameraXSize/bin - (start + num)
-                        #camera.NumY = camera.CameraYSize/bin - (start + num)
-
-                        camera.NumX = bin
-                        camera.NumY = height
-
-                        camera.StartExposure(defaultExposure, False)
-                        time.sleep(defaultExposure)
-                        for retries in xrange(50): # wait up to 5 seconds after the exposure ends
-                            if camera.ImageReady:
-                                break
-                            try:
-                                err = camera.LastError
-                            except win32com.client.pywintypes.com_error:
-                                pass
-                            else:
-                                self.fail("got error {0} binning {1}, start={2}, height={3}".format(err, bin, start, height))
-                            time.sleep(0.1)
-                        self.assertTrue(camera.ImageReady, "image not ready for bin value {0}".format(bin))
-                        image = camera.ImageArray
+                        image = self.expose(bin, bin, 0,  start, bin, height)
 
 def usage():
     print >>sys.stderr, "usage: %s [<camera_name>]"
@@ -201,9 +229,12 @@ def main():
     allTests = unittest.TestSuite()
 
     allTests.addTest(unittest.makeSuite(ConnectionTestCases,'test'))
-    allTests.addTest(unittest.makeSuite(SubImageTestCases,'test'))
-    allTests.addTest(unittest.makeSuite(BinnedTestCases,'test'))
-    allTests.addTest(unittest.makeSuite(BinnedSubImageTestCases,'test'))
+    allTests.addTest(unittest.makeSuite(RegressionTestCases,'test'))
+    allTests.addTest(RandomTests("repeatableRandomTests"))
+    allTests.addTest(RandomTests("randomTests"))
+    #allTests.addTest(unittest.makeSuite(SubImageTestCases,'test'))
+    #allTests.addTest(unittest.makeSuite(BinnedTestCases,'test'))
+    #allTests.addTest(unittest.makeSuite(BinnedSubImageTestCases,'test'))
 
     runner = unittest.TextTestRunner()
     runner.run(allTests)
