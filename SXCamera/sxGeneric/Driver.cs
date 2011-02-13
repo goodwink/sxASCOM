@@ -1707,7 +1707,6 @@ namespace ASCOM.SXGeneric
                     // parameters for this exposure
                     sxCamera.freezeParameters();
 
-
                     Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
 
                     captureDelegate.BeginInvoke(Duration, Light, null, null);
