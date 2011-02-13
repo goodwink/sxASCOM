@@ -1389,6 +1389,30 @@ namespace sx
                 imageDataValid = false;
             }
 
+            if (currentExposure.toCamera.x_bin == 7 || currentExposure.toCamera.y_bin == 7)
+            {
+                // SX cameras support binning 1-6, and 8, but not 7.  ASCOM only allows you to 
+                // specify a max value.  So in order to all 8, we have to deal with 7, but 7 seems
+                // to crash some cameras sometimes.  So we short circuit it here.
+                //
+                
+                int totalLines = currentExposure.userRequested.height/currentExposure.userRequested.y_bin;
+                int width = currentExposure.toCamera.width/currentExposure.toCamera.x_bin;
+
+                Log.Write(String.Format("creating dummy image for 7X binning. totalLines={0} width={1}\n", totalLines, width));
+
+                imageRawData = System.Array.CreateInstance(pixelType, totalLines * width);
+
+                exposureEnd = DateTimeOffset.Now;
+
+                lock (oImageDataLock)
+                {
+                    imageDataValid = true;
+                }
+
+                return;
+            }
+
             lock (m_controller)
             {
                 Log.Write("recordPixels() has locked\n");
