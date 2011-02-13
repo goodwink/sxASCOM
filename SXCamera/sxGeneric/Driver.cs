@@ -1690,12 +1690,6 @@ namespace ASCOM.SXGeneric
                         throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
                     }
 
-                    // we have passed all the parameter sanity checsks, and are still 
-                    // running on the calling thread.  Tell the camera to freeze the
-                    // parameters for this exposure
-                    sxCamera.freezeParameters();
-
-
                     CaptureDelegate captureDelegate;
 
                     if (useHardwareTimer)
@@ -1707,6 +1701,12 @@ namespace ASCOM.SXGeneric
                     {
                         captureDelegate = new CaptureDelegate(softwareCapture);
                     }
+
+                    // we have passed all the parameter sanity checsks, and are still 
+                    // running on the calling thread.  Tell the camera to freeze the
+                    // parameters for this exposure
+                    sxCamera.freezeParameters();
+
 
                     Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
 
