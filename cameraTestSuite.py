@@ -9,8 +9,9 @@ from win32com.client import constants
 ### Global variables
 verbose = False
 util = None
-camera = None
 defaultExposure = 0.100
+camera = None
+randomExposures=0
 
 ### Classes
 
@@ -121,11 +122,12 @@ class ASCOMCameraTest(unittest.TestCase):
 
 class RegressionTestCases(ASCOMCameraTest):
     def testRegression1(self):
-        image = self.expose(1, 1, 462, 128, 100, 101)
+        image = self.expose(2, 2, 284, 283, 89, 4)
+        image = self.expose(7, 7, 80, 34, 7, 25)
 
 class RandomTests(ASCOMCameraTest):
     def runRandomTests(self):
-        for i in xrange(1000):
+        for i in xrange(randomExposures):
             xBin = random.randint(1,camera.MaxBinX)
 
             if camera.CanAsymmetricBin:
@@ -186,11 +188,12 @@ def usage():
 
 def main():
     global camera
+    global randomExposures
 
     cameraName = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hv", ["help"])
+        opts, args = getopt.getopt(sys.argv[1:], "hr:v", ["help","random="])
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -204,6 +207,8 @@ def main():
         elif o in ("-h", "--help"):
             usage()
             sys.exit()
+        elif o in ("-r", "--random"):
+            randomExposures = int(a)
         else:
             assert False, "unhandled option"
 
