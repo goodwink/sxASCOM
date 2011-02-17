@@ -61,9 +61,7 @@ namespace ASCOM.SXCamera
         {
             get
             {
-                string version =  Assembly.GetExecutingAssembly().GetName().Version.ToString();
-                // I only use a 3 digit version number - strip off the .0"
-                return version.Substring(0, version.LastIndexOf("."));
+                return Assembly.GetExecutingAssembly().GetName().Version.ToString();
             }
         }
     }
