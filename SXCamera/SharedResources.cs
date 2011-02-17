@@ -28,13 +28,15 @@ namespace ASCOM.SXCamera
     public class SharedResources
     {
         private SharedResources() { }							// Prevent creation of instances
+        private static object m_mutex;
 
         static SharedResources()								// Static initialization
         {
             Log.Write("SharedResources()\n");
 
-            controller0 = new sx.Controller();
-            controller1 = new sx.Controller();
+            m_mutex = new object();
+            controller0 = new sx.Controller(m_mutex);
+            controller1 = new sx.Controller(m_mutex);
 
             Log.Write("SharedResources() returns\n");
         }

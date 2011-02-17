@@ -971,7 +971,7 @@ namespace sx
 
             m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (UInt16)Marshal.SizeOf(model));
 
-            lock (m_controller)
+            lock (m_controller.mutex)
             {
                 Log.Write("getModel has locked\n");
                 m_controller.Write(cmdBlock, out numBytesWritten);
@@ -994,7 +994,7 @@ namespace sx
             Log.Write(String.Format("setCoolerInfo inBlock temp={0} enabled={1}\n", inBlock.coolerTemp, inBlock.coolerEnabled));
             m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_COOLER_CONTROL, inBlock.coolerTemp, (UInt16)inBlock.coolerEnabled, 0);
 
-            lock (m_controller)
+            lock (m_controller.mutex)
             {
                 Log.Write("setCooler has locked\n");
                 m_controller.Write(cmdBlock, out numBytesWritten);
@@ -1114,7 +1114,7 @@ namespace sx
 
             m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_GET_CCD_PARMS, 0, idx, 0);
 
-            lock (m_controller)
+            lock (m_controller.mutex)
             {
                 Log.Write("getParams has locked\n");
                 m_controller.Write(cmdBlock, out numBytesWritten);
@@ -1413,7 +1413,7 @@ namespace sx
                 return;
             }
 
-            lock (m_controller)
+            lock (m_controller.mutex)
             {
                 Log.Write("recordPixels() has locked\n");
 

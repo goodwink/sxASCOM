@@ -16,12 +16,15 @@ namespace sx
     /// camera), there is still only one of these devices present.
     ///
     /// Locking:
-    ///    The controller object is used as the lock.  It is necessary to lock the interface when
+    ///    The controller object has a mutex field that is used as the lock.  It is necessary to lock the interface when
     /// a transaction is occuring.  There are three types of transactions:
     /// - simple command writes that return no data
     /// - operations that require a write to begin, and which return data that is collected with read
     /// - operations that require a write to begin and another write to end (STAR2K guiding is the only one)
     /// 
+    /// Note: it appears that the is an issue in the the SX usb driver which can occaisonally cause a
+    ///       problem when reading from two independent USB cameras. 
+    ///
     /// Much of the functionality is defined by the hardware.  The controller on the SX cameras is fairly simple,
     /// and the following limitations were observed:
     /// - It is not possible to perform full duplex operations - you cannot write to the device if a read is in progress. I
@@ -41,7 +44,7 @@ namespace sx
     ///   having the controller locked for the entire time isn't too bad. Also, the autoguiding programs I have looked at tend to take
     ///   an exposure, then guide, then take an exposure.  This usage pattern prevents the "lock during HW exposure" and the "lock while guiding"
     ///   from actually colliding.
-    /// </summary>
+    ///</summary>
 
     public class Controller
         : sxBase
@@ -92,11 +95,19 @@ namespace sx
             }
         }
 
-        public Controller()
+        public object mutex
+        {
+            get;
+            private set;
+        }
+
+
+        public Controller(object mutex)
         {
             Log.Write(String.Format("Controller() entered\n"));
 
             Connected = false;
+            this.mutex = mutex;
 
             Log.Write("Controller(): returns\n");
         }
@@ -134,7 +145,7 @@ namespace sx
 
             // I lock here to prevent the data from two writes from getting interleaved. I doubt windows would actually do that, but 
             // it is easy to prevent it here and then I know I don't have to worry about it.
-            lock (this)
+            lock (this.mutex)
             {
                 Log.Write("Write has locked\n");
                 m_iface.Write(block, data, out numBytesWritten);
@@ -154,7 +165,7 @@ namespace sx
             verifyConnected(MethodBase.GetCurrentMethod().Name);
 
             // See the comment above the lock in Write() for more information on this lock. 
-            lock (this)
+            lock (this.mutex)
             {
                 Log.Write("Read has locked\n");
                 oReturn = m_iface.Read(returnType, numBytesToRead, out numBytesRead);
@@ -195,7 +206,7 @@ namespace sx
             Log.Write(String.Format("echo({0}) begins\n", s));
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_ECHO, 0, 0, (UInt16)s.Length);
 
-            lock (this)
+            lock (this.mutex)
             {
 
                 Write(cmdBlock, s, out numBytesWritten);
@@ -234,7 +245,7 @@ namespace sx
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_FIRMWARE_VERSION, 0, 0, 0);
 
-            lock (this)
+            lock (this.mutex)
             {
                 Log.Write("getVersion has locked\n");
                 Write(cmdBlock, out numBytesWritten);
@@ -277,7 +288,7 @@ namespace sx
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_TIMER, 0, 0, 0);
 
-            lock (this)
+            lock (this.mutex)
             {
                 Log.Write("getTimer has locked\n");
                 Write(cmdBlock, out numBytesWritten);
@@ -339,7 +350,7 @@ namespace sx
 
             Log.Write(String.Format("guide({0}, {1}) begins\n", direction, durationMS));
 
-            lock (this)
+            lock (this.mutex)
             {
                 try
                 {
