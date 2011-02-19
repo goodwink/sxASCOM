@@ -184,7 +184,9 @@ class BinnedSubImageTestCases(ASCOMCameraTest):
 def usage():
     print >>sys.stderr, "usage: %s [<camera_name>]"
     print >>sys.stderr, "where options can be:"
-    print >>sys.stderr, "\t-v\t\t-> verbose output"
+    print >>sys.stderr, "\t-h|--help\t\t\t\t-> display this help message"
+    print >>sys.stderr, "\t-v|--verbose\t\t\t\t-> verbose output"
+    print >>sys.stderr, "\t-r <iterations>|--random <iterations>\t-> perform <iterations> random tests (default=0)"
 
 def main():
     global camera
@@ -193,7 +195,7 @@ def main():
     cameraName = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hr:v", ["help","random="])
+        opts, args = getopt.getopt(sys.argv[1:], "hr:v", ["help", "verbose", "random="])
     except getopt.GetoptError, err:
         # print help information and exit:
         print str(err) # will print something like "option -a not recognized"
@@ -202,7 +204,7 @@ def main():
     output = None
     global verbose
     for o, a in opts:
-        if o == "-v":
+        if o in ("-v", "--verbose"):
             verbose = True
         elif o in ("-h", "--help"):
             usage()
