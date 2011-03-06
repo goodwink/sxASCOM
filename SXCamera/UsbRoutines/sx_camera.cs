@@ -950,23 +950,23 @@ namespace sx
 
         public void clearPixels()
         {
-            Log.Write("clearCcdPixels entered\n");
+            Log.Write("clearPixels entered\n");
             clear(0);
-            Log.Write("clearCcdPixels returns\n");
+            Log.Write("clearPixels returns\n");
         }
 
         public void clearAllRegisters()
         {
-            Log.Write("clearRecordedPixels entered\n");
+            Log.Write("clearAllRegisters entered\n");
             clear(SX_CCD_FLAGS_NOWIPE_FRAME);
-            Log.Write("clearRecordedPixels returns\n");
+            Log.Write("clearAllRegisters returns\n");
         }
 
         public void clearVerticalRegisters()
         {
-            Log.Write("clearRecordedPixels entered\n");
+            Log.Write("clearVertialRegisters entered\n");
             clear(SX_CCD_FLAGS_CLEAR_VERT);
-            Log.Write("clearRecordedPixels returns\n");
+            Log.Write("clearVertialRegisters returns\n");
         }
 
         public UInt16 getModel()

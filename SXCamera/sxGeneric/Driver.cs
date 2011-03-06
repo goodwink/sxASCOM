@@ -1541,6 +1541,7 @@ namespace ASCOM.SXGeneric
                     }
                     else if (remainingExposureTime.TotalSeconds < 1.0 && !bVerticalRegistersCleareded)
                     {
+                        Log.Write("softwareCapture(): doing clearVerticalRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         sxCamera.clearVerticalRegisters();
                         bVerticalRegistersCleareded = true;
                     }
