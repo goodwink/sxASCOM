@@ -931,7 +931,7 @@ namespace sx
             SX_CMD_BLOCK cmdBlock;
             Int32 numBytesWritten;
 
-            if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME)) != 0)
+            if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME | SX_CCD_FLAGS_CLEAR_VERT)) != 0)
             {
                 throw new ArgumentException("Invalid flags passed to ClearPixels");
             }
@@ -948,17 +948,24 @@ namespace sx
             m_controller.echo(s);
         }
 
-        public void clearCcdPixels()
+        public void clearPixels()
         {
             Log.Write("clearCcdPixels entered\n");
             clear(0);
             Log.Write("clearCcdPixels returns\n");
         }
 
-        public void clearRecordedPixels()
+        public void clearAllRegisters()
         {
             Log.Write("clearRecordedPixels entered\n");
             clear(SX_CCD_FLAGS_NOWIPE_FRAME);
+            Log.Write("clearRecordedPixels returns\n");
+        }
+
+        public void clearVerticalRegisters()
+        {
+            Log.Write("clearRecordedPixels entered\n");
+            clear(SX_CCD_FLAGS_CLEAR_VERT);
             Log.Write("clearRecordedPixels returns\n");
         }
 

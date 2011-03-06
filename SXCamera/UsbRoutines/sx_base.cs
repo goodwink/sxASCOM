@@ -39,6 +39,7 @@ namespace sx
         internal const Byte SX_CCD_FLAGS_NOWIPE_FRAME = 8;	   // Don't apply WIPE when clearing frame
         internal const Byte SX_CCD_FLAGS_TDI = 32;	           // Implement TDI (drift scan) operation
         internal const Byte SX_CCD_FLAGS_NOCLEAR_FRAME = 64;   // Don't clear frame, even when asked
+        internal const Byte SX_CCD_FLAGS_CLEAR_VERT = 128;     // Clear the vertical and horizontal registers
 
         // STAR2K values
         internal const UInt16 SX_STAR2K_STOP  = 0;
@@ -48,7 +49,7 @@ namespace sx
         internal const UInt16 SX_STAR2K_EAST  = 8;
         
         // limits
-        internal const Byte MAX_BIN=8; // I made this up 
+        internal const Byte MAX_BIN=8; // The hardware will bin 1-6 & 8, skipping 7
         internal const Byte MAX_X_BIN = MAX_BIN;
         internal const Byte MAX_Y_BIN = MAX_BIN;
 

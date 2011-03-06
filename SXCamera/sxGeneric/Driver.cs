@@ -1494,10 +1494,11 @@ namespace ASCOM.SXGeneric
             {
                 Log.Write(String.Format("Generic::softwareCapture({0}, {1}): begins\n", Duration, Light));
 
-                sxCamera.clearCcdPixels(); // This clears both the CCD and the recorded pixels.  For
+                sxCamera.clearPixels(); // This clears both the CCD and the recorded pixels.  For
                                            // exposures > 1 second we will clear the recorded pixels again just before
                                            // the exposure ends to clear any accumulated noise.
-                bool bRecordedCleared = false;
+                bool bAllRegistersCleareded = false;
+                bool bVerticalRegistersCleareded = false;
 
                 if (Duration > ImageCommandTime)
                 {
@@ -1509,10 +1510,14 @@ namespace ASCOM.SXGeneric
                 }
                 desiredExposureLength = TimeSpan.FromSeconds(Duration);
 
-                if (desiredExposureLength.TotalSeconds < 1.0)
+                if (desiredExposureLength.TotalSeconds < 2.0)
                 {
-                    bRecordedCleared = true; // we don't do the clear again inside the loop for short exposures
                     sxCamera.echo("done"); // the clear takes a long time - send something to the camera so we know it is done
+                    sxCamera.clearAllRegisters();
+                    sxCamera.echo("done");   // wait for this clear too
+                    // For short exposures we don't do the clear the registers inside the loop
+                    bAllRegistersCleareded = true;
+                    bVerticalRegistersCleareded = true; 
                 }
                 
                 exposureStart = DateTime.Now;
@@ -1528,11 +1533,16 @@ namespace ASCOM.SXGeneric
                     remainingExposureTime = exposureEnd - DateTime.Now)
                 {
                     
-                    if (remainingExposureTime.TotalSeconds < 1.0 && !bRecordedCleared)
+                    if (remainingExposureTime.TotalSeconds < 2.0 && !bAllRegistersCleareded)
                     {
-                        Log.Write("softwareCapture(): doing clearRecordedPixels() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
-                        sxCamera.clearRecordedPixels();
-                        bRecordedCleared = true;
+                        Log.Write("softwareCapture(): doing clearAllRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        sxCamera.clearAllRegisters();
+                        bAllRegistersCleareded = true;
+                    }
+                    else if (remainingExposureTime.TotalSeconds < 1.0 && !bVerticalRegistersCleareded)
+                    {
+                        sxCamera.clearVerticalRegisters();
+                        bVerticalRegistersCleareded = true;
                     }
                     else if (remainingExposureTime.TotalMilliseconds > 75)
                     {
