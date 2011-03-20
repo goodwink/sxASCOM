@@ -43,16 +43,20 @@ namespace Logging
                             m_logFS = new FileStream(m_logPath, FileMode.Create, FileAccess.Write, FileShare.Read, 1);
                             m_lastWriteTime = DateTime.Now;
                             m_startTime = m_lastWriteTime;
+                            m_enabled = true;
+
+                            Log.Write(String.Format("Logging begins at {0}\n", m_startTime));
                         }
                         else
                         {
+                            m_enabled = false;
                             if (m_logFS != null)
                             {
                                 m_logFS.Close();
                                 m_logFS = null;
                             }
                         }
-                        m_enabled = value;
+                        
                     }
                 }
                 catch (System.Exception ex)
