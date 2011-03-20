@@ -1,3 +1,5 @@
+//#define INTERLACED_DEBUG
+
 using System;
 using System.IO;
 using System.Diagnostics;
@@ -926,6 +928,11 @@ namespace sx
             dumpReadDelayedBlock(block, "buildReadDelayedBlock");
         }
 
+        public void echo(string s)
+        {
+            m_controller.echo(s);
+        }
+
         internal void clear(Byte Flags)
         {
             SX_CMD_BLOCK cmdBlock;
@@ -940,33 +947,31 @@ namespace sx
 
             Log.Write("clear about to Write\n");
             m_controller.Write(cmdBlock, out numBytesWritten);
+            echo("done"); // the clear takes a long time - when the echo returns we know it is done
             Log.Write("clear about to return\n");
         }
 
-        public void echo(string s)
+        public void clearCCDAndRegisters()
         {
-            m_controller.echo(s);
-        }
-
-        public void clearPixels()
-        {
-            Log.Write("clearPixels entered\n");
+            Log.Write("clearCCDAndRegisters() entered\n");
             clear(0);
-            Log.Write("clearPixels returns\n");
+            Log.Write("clearCCDAndRegisters() returns\n");
         }
 
         public void clearAllRegisters()
         {
-            Log.Write("clearAllRegisters entered\n");
+            Log.Write("clearAllRegisters() entered\n");
             clear(SX_CCD_FLAGS_NOWIPE_FRAME);
-            Log.Write("clearAllRegisters returns\n");
+            Log.Write("clearAllRegisters() returns\n");
         }
 
         public void clearVerticalRegisters()
         {
+#if false // this might be M26C specific - don't call until better understood
             Log.Write("clearVertialRegisters entered\n");
             clear(SX_CCD_FLAGS_CLEAR_VERT);
             Log.Write("clearVertialRegisters returns\n");
+#endif
         }
 
         public UInt16 getModel()
@@ -1385,7 +1390,6 @@ namespace sx
             Int32 numBytesWritten;
 
             Log.Write(String.Format("recordPixels entered - bDelayed = {0}\n", bDelayed));
-
             UInt16 firstExposureFlags = adjustReadDelayedBlock();
             UInt16 secondExposureFlags = (UInt16)((SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD) & ~firstExposureFlags);
 
@@ -1460,9 +1464,10 @@ namespace sx
                     Log.Write("recordPixels() preparing for second frame download\n");
 
                     Debug.Assert(secondExposureFlags != 0);
+                    Debug.Assert(secondExposureFlags != firstExposureFlags);
 
+                    clearAllRegisters();
                     initReadBlock(currentExposure.toCamera, out readBlock);
-
                     m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
                                                     SX_CMD_READ_PIXELS,
                                                     secondExposureFlags,
@@ -1471,8 +1476,9 @@ namespace sx
 
                     Log.Write(String.Format("recordPixels() second frame requesting read, flags = {0}\n", secondExposureFlags));
                     m_controller.Write(cmdBlock, readBlock, out numBytesWritten);
+
                     exposureEnd = DateTimeOffset.Now;
-                    Log.Write("recordPixelsDelayed second frame requesting download\n");
+                    Log.Write("recordPixels() second frame requesting download\n");
                     downloadPixels(false, currentExposure.toCameraSecond);
                     Log.Write("recordPixels() second frame download completed\n");
                     try
@@ -1500,15 +1506,24 @@ namespace sx
 
             Log.Write(String.Format("firstFrame:   typeof()={0} rank={1} length={2}\n", firstFrame.GetType().ToString(), firstFrame.Rank, firstFrame.LongLength));
             Log.Write(String.Format("secondFrame:  typeof()={0} rank={1} length={2}\n", secondFrame.GetType().ToString(), secondFrame.Rank, secondFrame.LongLength));
-            Log.Write(String.Format("imageRawData: typeof()={0} rank={1} length={2}\n", imageRawData.GetType().ToString(), secondFrame.Rank, imageRawData.LongLength));
+            Log.Write(String.Format("imageRawData: typeof()={0} rank={1} length={2}\n", imageRawData.GetType().ToString(), imageRawData.Rank, imageRawData.LongLength));
 
-            for (int line=0;line < totalLines; line += 2)
+            for (int line=0;line < totalLines/2; line++)
             {
                 // copy line from the first image
+#if INTERLACED_DEBUG
+                Log.Write(String.Format("Array.Copy(firstframe, {0}, imageRawData, {1}, {2}\n", line*width, (2*line)*width, width));
+#endif
                 try
                 {
-                    Array.Copy(firstFrame,    line/2 * width,
-                               imageRawData,  line   * width, 
+                    Array.Copy(firstFrame,    line     * width,
+#if INTERLACED_DEBUG
+                               imageRawData, (line) * width,
+                               
+#else
+                               imageRawData,  (2*line) * width, 
+ 
+#endif
                                width);
                 }
                 catch
@@ -1520,18 +1535,26 @@ namespace sx
                 // if we have an odd number of lines in the requested exposure,
                 // the first frame can have 1 more line that the second, so we have
                 // to check to make sure that there is a line in the second image
-                if (line/2 < currentExposure.toCameraSecond.height/currentExposure.toCameraSecond.y_bin)
+                if (line < currentExposure.toCameraSecond.height/currentExposure.toCameraSecond.y_bin)
                 {
+#if INTERLACED_DEBUG
+                    Log.Write(String.Format("Array.Copy(secondframe, {0}, imageRawData, {1}, {2}\n", line*width, (2*line+1)*width, width));
+#endif
                     // copy second line
                     try
                     {
-                        Array.Copy(secondFrame,   line/2   * width,
-                                   imageRawData,  (line+1) * width, 
+                        Array.Copy(secondFrame,   line       * width,
+#if INTERLACED_DEBUG
+                                   imageRawData, (line + totalLines / 2) * width,
+#else
+                                   imageRawData, (2*line + 1) * width, 
+                            
+#endif
                                    width);
                     }
                     catch
                     {
-                        Log.Write(String.Format("stitch exception in line={0} second Copy(secondFrame, {1}, imageRawData, {2}, {3})\n", line, line/2 * width, (line+1)*width, width));
+                        Log.Write(String.Format("stitch exception in line={0} second Copy(secondframe, {0}, imageRawData, {1}, {2}\n", line*width, (2*line+1)*width, width));
                         throw;
                     }
                 }

@@ -1494,9 +1494,8 @@ namespace ASCOM.SXGeneric
             {
                 Log.Write(String.Format("Generic::softwareCapture({0}, {1}): begins\n", Duration, Light));
 
-                sxCamera.clearPixels(); // This clears both the CCD and the recorded pixels.  For
-                                           // exposures > 1 second we will clear the recorded pixels again just before
-                                           // the exposure ends to clear any accumulated noise.
+                sxCamera.clearCCDAndRegisters(); // For exposures > 1 second we will clear the registers again just before
+                                                    // the exposure ends to clear any accumulated noise.
                 bool bAllRegistersCleareded = false;
                 bool bVerticalRegistersCleareded = false;
 
@@ -1512,9 +1511,7 @@ namespace ASCOM.SXGeneric
 
                 if (desiredExposureLength.TotalSeconds < 2.0)
                 {
-                    sxCamera.echo("done"); // the clear takes a long time - send something to the camera so we know it is done
                     sxCamera.clearAllRegisters();
-                    sxCamera.echo("done");   // wait for this clear too
                     // For short exposures we don't do the clear the registers inside the loop
                     bAllRegistersCleareded = true;
                     bVerticalRegistersCleareded = true; 
@@ -1702,7 +1699,10 @@ namespace ASCOM.SXGeneric
                     }
 
                     CaptureDelegate captureDelegate;
-
+#if false
+                    Log.Write("Forcing use of software timer\n");
+                    useHardwareTimer = false;
+#endif
                     if (useHardwareTimer)
                     {
                         sxCamera.delayMs = (uint)(1000 * Duration);

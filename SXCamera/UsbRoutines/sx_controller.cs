@@ -218,7 +218,7 @@ namespace sx
             {
                 throw new System.IO.IOException(String.Format("Echo: s2 != s ({0} != {1})", s2, s));
             }
-            Log.Write("echo() completed successfully");
+            Log.Write("echo() completed successfully\n");
         }
 
         public void reset()
