@@ -592,10 +592,10 @@ namespace ASCOM.SXGeneric
                 {
                     if (value)
                     {
-                        if (DateTime.Now.CompareTo(new DateTime(2011,5,1)) > 0)
+                        if (DateTime.Now.CompareTo(new DateTime(2011,6,1)) > 0)
                         {
-                            MessageBox.Show("This Beta Release has expired.  Please update your bits", "Expired");
-                            throw new ASCOM.PropertyNotImplementedException(SetError("connected: Beta release expired"), true);
+                            MessageBox.Show("This non-production release has expired.  Please update your bits", "Expired");
+                            throw new ASCOM.PropertyNotImplementedException(SetError("connected: non-production release expired"), true);
                         }
 
                         if (m_Connected)
