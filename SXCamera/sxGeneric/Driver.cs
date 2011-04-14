@@ -1608,7 +1608,7 @@ namespace ASCOM.SXGeneric
                 }
 
                 // because of timing accuracy, we do all short exposures with the HW timer
-                if (Duration <= 1.0)
+                if (Duration <= 1.1)
                 {
                     StartExposure(Duration, Light, true);
                 }
