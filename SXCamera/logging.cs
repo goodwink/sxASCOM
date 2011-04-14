@@ -62,9 +62,7 @@ namespace Logging
                 catch (System.Exception ex)
                 {
                     m_enabled = false;
-#if DEBUG
                     MessageBox.Show(String.Format("logging: enabled set caught an exception: {0}", ex));
-#endif
                 }
             }
         }
