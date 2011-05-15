@@ -464,7 +464,6 @@ namespace sx
                     progressive = true;
                     break;
                 case CameraModels.MODEL_LX1:
-                    bUntested = true;
                     description = "Lodestar";
                     fullWellCapacity = 50000;
                     electronsPerADU = 0.9;
