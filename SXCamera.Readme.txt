@@ -1,22 +1,20 @@
-Copyright (C) 2010 by Dad Dog Development Ltd.
+Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
-This is release candidate 1 for the sxASCOM driver. I am a little hesitant
-because I have not had a chance to test it under the stars.  Since the current
-Beta version was going to expire I had to at the very least reabuild it.
+This is the README.txt for version 1.5.1, the first non-test version for the ASCOM driver for Starlight Xpress
+cameras.
 
-This version is a Release version, which means that some debugging code
-is not included and by default logging is not enabled.  Please turn 
-logging on before you run tests.
+The driver has been well tested with H9, H9C and M25C, as well as with the SXV and Exview "piggyback" guiders and the
+Lodestar standalone guider, and lightly tested with H16 and H18.  
 
-PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER until 
-you have tried it during the daylight first. 
+It has been tested on Windows XP, Vista and Windows 7 (both 32 and 64 bit versions), and using Images Plus, Nebulosity, PHD
+and Maxim DL, and with ASCOM 5.1 and the 6.0 Beta.
 
+Dispite all the testing done by a number of dedicated volunteers, PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF 
+THE DRIVER until you have tried it during the daylight first. 
 
-Change expired message (2011-04-13 21:42:50 -0600 by Bret McKee <bretm@boneheads.us>)
-Change processor to x86 (2011-04-13 21:35:26 -0600 by Bret McKee <bretm@boneheads.us>)
-Change the hardware timer threshold to 1.1 sec (2011-04-13 21:16:22 -0600 by Bret McKee <bretm@boneheads.us>)
-move code from under #ifdef DEBUG (2011-04-13 21:14:21 -0600 by Bret McKee <bretm@boneheads.us>)
-Updated readme from teh last release (2011-04-13 21:10:50 -0600 by Bret McKee <bretm@boneheads.us>)
-Changes required for version 1.3.12 (2011-03-20 13:59:29 -0600 by Bret McKee <bretm@boneheads.us>)
+If you have problems, please join the sxAscom Yahoo group at http://groups.yahoo.com/group/sx-ascom/join and let me know
+what they are.
 
-16 files changed, 629 insertions(+), 265 deletions(-)
+Thanks to everyone involved and clear skies.
+
+Bret McKee
