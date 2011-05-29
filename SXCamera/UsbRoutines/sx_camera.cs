@@ -539,7 +539,6 @@ namespace sx
                     throw new System.Exception(String.Format("camera model {0} is untested and \"Enable Untested\" is not set", description));
                 }
 
-                description = "(untested) " + description;
             }
         }
 
@@ -1418,6 +1417,7 @@ namespace sx
                 lock (oImageDataLock)
                 {
                     imageDataValid = true;
+                    imageData = null;
                 }
 
                 return;
