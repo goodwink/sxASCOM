@@ -4,7 +4,7 @@
 ;
 
 #define BUILD_TYPE "Release"
-#define APP_VERSION "1.5.1"
+#define APP_VERSION "1.5.2"
 #define ASCOM_VERSION_REQUIRED  "5.5"
 #define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
 
@@ -90,7 +90,7 @@ begin
                P.IsRegistered('ASCOM.SXGuide.Camera')
             then
                 begin
-                    MsgBox('A previous version of this driver was detected. You must uninstall the previous before installation can proceed.', mbInformation, MB_OK);
+                    MsgBox('A previous version of this driver was detected. You must uninstall the previous version (from the control panel) before installation can proceed.', mbInformation, MB_OK);
                 end
             else
                 begin
