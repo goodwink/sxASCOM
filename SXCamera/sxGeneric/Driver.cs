@@ -235,6 +235,11 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
+                    if (value > MaxBinX)
+                    {
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinX set value out of range")), value.ToString(), MaxBinX.ToString());
+                    }
+
                     sxCamera.xBin = (byte)value;
                     Log.Write(String.Format("Generic::BinX set to {0}\n", value));
                 }
@@ -289,6 +294,11 @@ namespace ASCOM.SXGeneric
                 try
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (value > MaxBinY)
+                    {
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinY set value out of range")), value.ToString(), MaxBinY.ToString());
+                    }
 
                     sxCamera.yBin = (byte)value;
                     Log.Write(String.Format("Generic::BinY set to {0}\n", value));
@@ -1136,7 +1146,12 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    short ret = m_config.maxXBin;
+                    short ret = sxCamera.maxXBin;
+                        
+                    if (ret > m_config.maxXBin)
+                    {
+                        ret = m_config.maxXBin;
+                    }
 
                     Log.Write(String.Format("Generic::MaxBinX get returns {0}\n", ret));
 
@@ -1166,7 +1181,12 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    short ret = m_config.maxYBin;
+                    short ret = sxCamera.maxYBin;
+                        
+                    if (ret > m_config.maxYBin)
+                    {
+                        ret = m_config.maxYBin;
+                    }
 
                     Log.Write(String.Format("Generic::MaxBinY get returns {0}\n", ret));
 

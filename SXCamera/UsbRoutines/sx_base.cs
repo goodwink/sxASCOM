@@ -53,7 +53,6 @@ namespace sx
         internal const Byte MAX_X_BIN = MAX_BIN;
         internal const Byte MAX_Y_BIN = MAX_BIN;
 
-
         internal const Byte SXUSB_CAPS_STAR2K       = 0x01;
         internal const Byte SXUSB_CAPS_COMPRESS     = 0x02;
         internal const Byte SXUSB_CAPS_EEPROM       = 0x04;

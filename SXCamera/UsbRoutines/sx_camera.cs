@@ -96,6 +96,8 @@ namespace sx
         MODEL_M25C = 0x59,
         // ------------------ Lodestar --------------------
         MODEL_LX1 = 0x46,
+        // ------------------ CoStar --------------------
+        MODEL_COSTAR = 0x27,
     }
 
     public class Camera
@@ -188,11 +190,15 @@ namespace sx
         {
             get 
             { 
-                UInt16 ret=ccdParms.height; 
+                UInt16 ret;
 
-                if (interlaced)
+                if (progressive)
                 {
-                    ret *= 2;
+                    ret=frameHeight;
+                }
+                else
+                {
+                    ret = (UInt16)(2*frameHeight);
                 }
 
                 return ret;
@@ -313,24 +319,10 @@ namespace sx
             get { return nextExposure.x_bin; }
             set
             {
-                if (value <= 0 || value > MAX_X_BIN)
+                if (value <= 0 || value > maxXBin)
                 {
-                    throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 1<=height<={1}", value, MAX_BIN), "xBin");
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 1<=height<={1}", value, maxXBin), "xBin");
                 }
-#if false
-                if (value == 7)
-                {
-                    throw new ArgumentException(String.Format("sx cameras do not support x binning by 7"));
-                }
-#endif
-#if false
-                // note that this disallows non power of 2 binning values.  The camera hardware can deal with them, but 
-                // there are interactions with bayer matrices that I don't want to deal with now
-                if ((value & (value - 1)) != 0)
-                {
-                    throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
-                }
-#endif
                 nextExposure.x_bin = value;
             }
         }
@@ -340,17 +332,10 @@ namespace sx
             get { return nextExposure.y_bin; }
             set
             {
-                if (value <= 0 || value > MAX_Y_BIN)
+                if (value <= 0 || value > maxYBin)
                 {
-                    throw new ArgumentOutOfRangeException(String.Format("Invalid yBin {0} 1<=height<={1}", value, MAX_BIN), "yBin");
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid yBin {0} 1<=height<={1}", value, maxYBin), "yBin");
                 }
-
-                // note that this disallows non power of 2 binning values.  The camera hardware can deal with them, but 
-                // there are interactions with bayer matrices that I don't want to deal with now
-                //if ((value & (value - 1)) != 0)
-                //{
-                //    throw new ArgumentOutOfRangeException(String.Format("non-power of 2 binning value set: {0}", value), "yBin");
-                //}
 
                 nextExposure.y_bin = value;
             }
@@ -413,6 +398,11 @@ namespace sx
         {
             bool bUntested = false;
 
+            // Some cameras, like the CoStar don't support the "usual" SX binning,
+            // so it is now a per camera property
+            maxXBin = MAX_X_BIN;
+            maxYBin = MAX_Y_BIN;
+
             switch ((CameraModels)cameraModel)
             {
                 case CameraModels.MODEL_H5:
@@ -462,6 +452,15 @@ namespace sx
                     fullWellCapacity = 30000;
                     electronsPerADU = 0.4;
                     progressive = true;
+                    break;
+                case CameraModels.MODEL_COSTAR:
+                    bUntested = true;
+                    description = "CoStar";
+                    fullWellCapacity = 50000;
+                    electronsPerADU = 0.9;
+                    progressive = false;
+                    maxXBin = 1;
+                    maxYBin = 1;
                     break;
                 case CameraModels.MODEL_LX1:
                     description = "Lodestar";
@@ -520,8 +519,8 @@ namespace sx
                 default:
                     bUntested = true;
                     description = String.Format("unknown 0x{0:x}", cameraModel);
-                    fullWellCapacity = 0;
-                    electronsPerADU = 0.0;
+                    fullWellCapacity = 1;
+                    electronsPerADU = 1.0;
                     // This is a guess, but I think I have all the old cameras in the 
                     // switch statement, and I expect most new models will be 
                     // progressive
@@ -571,6 +570,7 @@ namespace sx
             buildReadDelayedBlock(out nextExposure, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
             imageDataValid = false;
             oImageDataLock = new object();
+
             if (hasCoolerControl)
             {
                 SX_COOLER_BLOCK tempBlock;
@@ -584,6 +584,18 @@ namespace sx
                 Log.Write(String.Format("sx.Camera() constructor cooler init.  temp={0} enabled={1}\n", m_coolerBlock.coolerTemp, m_coolerBlock.coolerEnabled));
             }
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
+        }
+
+        internal Byte maxXBin
+        {
+            get;
+            set;
+        }
+
+        internal Byte maxYBin
+        {
+            get;
+            set;
         }
 
         internal void checkParms(bool useFrameHeight, SX_READ_DELAYED_BLOCK exposure)
@@ -1156,7 +1168,6 @@ namespace sx
 
             if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M25C)
             {
-
                 Log.Write("convertCameraDataToImageData(): decoding M25C data\n");
 
                 // to go along with the odd requirement that we must double the width and halve the height 
@@ -1262,6 +1273,33 @@ namespace sx
                     Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing M25C data\n"));
                     Log.Write(String.Format("x = {0} y={1} srcIdx={2} case={3}\n", x, y, srcIdx, saveCase));
                     Log.Write("Exception data was: \n" + ex.ToString() + "\n");
+                    throw ex;
+                }
+            }
+            else if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
+            {
+                int x=-1, y=-1;
+                int srcIdx = 0;
+                Log.Write("convertCameraDataToImageData(): decoding COSTAR data\n");
+                try
+                {
+                    for (y = 0; y < binnedHeight; y++)
+                    {
+                        // the CoStar has 16 black level reference pixels at the beginning of a line.
+                        // If we are requesting any of these pixels, throw them away.
+                        for(x=xOffset; x < 16; x++)
+                        {
+                            srcIdx++;
+                        }
+                        for (x = 0; x < binnedWidth; x++)
+                        {
+                                imageData[x, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing CoStar data at pixel ({0}, {1}) from {2} - {3}\n", x, y, srcIdx, ex.ToString()));
                     throw ex;
                 }
             }
