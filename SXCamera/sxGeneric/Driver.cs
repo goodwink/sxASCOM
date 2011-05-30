@@ -399,7 +399,7 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    int ret = sxCamera.ccdWidth;
+                    int ret = sxCamera.frameWidth;
 
                     Log.Write(String.Format("Generic::CameraXSize get returns m_CameraXSize {0}\n", ret));
 
@@ -428,7 +428,7 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    int ret = sxCamera.ccdHeight;
+                    int ret = sxCamera.frameHeight;
 
                     Log.Write(String.Format("Generic::CameraYSize get returns CameraYSize {0}\n", ret));
 
@@ -635,8 +635,8 @@ namespace ASCOM.SXGeneric
                             // a lot of try/catch blocks in other places
                             BinX = 1;
                             BinY = 1;
-                            NumX = sxCamera.ccdWidth;
-                            NumY = sxCamera.ccdHeight;
+                            NumX = sxCamera.frameWidth;
+                            NumY = sxCamera.frameHeight;
                             StartX = 0;
                             StartY = 0;
                             bHasGuideCamera = sxCamera.hasGuideCamera;

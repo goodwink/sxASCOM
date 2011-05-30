@@ -176,29 +176,42 @@ namespace sx
             get { return ccdParms.hback_porch; }
         }
 
-        public UInt16 frameHeight
-        {
-            get { return ccdParms.height; }
-        }
-
-        public UInt16 ccdWidth
+        // ccdWidth and ccdHeight are the sizes than can be read from the ccd
+        internal UInt16 ccdWidth
         {
             get { return ccdParms.width; }
         }
 
-        public UInt16 ccdHeight
+        internal UInt16 ccdHeight
+        {
+            get { return ccdParms.height; }
+        }
+
+        // frameWidth and frameHeight are the sizes that the caller request
+        public UInt16 frameWidth
         {
             get 
             { 
-                UInt16 ret;
-
-                if (progressive)
+                UInt16 ret = ccdWidth;
+                
+                if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
                 {
-                    ret=frameHeight;
+                    ret -= 16;
                 }
-                else
+
+                return ret;
+            }
+        }
+
+        public UInt16 frameHeight
+        {
+            get 
+            { 
+                UInt16 ret; ret=ccdHeight;
+
+                if (interlaced)
                 {
-                    ret = (UInt16)(2*frameHeight);
+                    ret *= 2;
                 }
 
                 return ret;
@@ -257,14 +270,14 @@ namespace sx
             get { return nextExposure.x_offset; }
             set
             {
-                if (value > ccdWidth)
+                if (value > frameWidth)
                 {
-                    throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0} 0<=xOffset<={1}", value, ccdWidth), "xOffset");
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0} 0<=xOffset<={1}", value, frameWidth), "xOffset");
                 }
 
-                if (value + width > ccdWidth)
+                if (value + width > frameWidth)
                 {
-                    throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", value, width, ccdWidth), "xOffset");
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", value, width, frameWidth), "xOffset");
                 }
 
                 nextExposure.x_offset = value;
@@ -276,13 +289,13 @@ namespace sx
             get { return nextExposure.y_offset; }
             set
             {
-                if (value >= ccdHeight)
+                if (value >= frameHeight)
                 {
-                    throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset {0} 0<=yOffset<={1}", value, ccdHeight), "yOffset");
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset {0} 0<=yOffset<={1}", value, frameHeight), "yOffset");
                 }
-                if (value + height > ccdHeight)
+                if (value + height > frameHeight)
                 {
-                    throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", value, height, ccdHeight), "yOffset");
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset + height: 0 < yOffset {0} + height {1} <= {2}", value, height, frameHeight), "yOffset");
                 }
                 nextExposure.y_offset = value;
             }
@@ -293,9 +306,9 @@ namespace sx
             get { return nextExposure.width; }
             set
             {
-                if (value == 0 || value > ccdWidth)
+                if (value == 0 || value > frameWidth)
                 {
-                    throw new ArgumentOutOfRangeException(String.Format("Invalid width {0} 1<=width<={1}", value, ccdWidth), "width");
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid width {0} 1<=width<={1}", value, frameWidth), "width");
                 }
                 nextExposure.width = value;
             }
@@ -306,9 +319,9 @@ namespace sx
             get { return nextExposure.height; }
             set
             {
-                if (value == 0 || value > ccdHeight)
+                if (value == 0 || value > frameHeight)
                 {
-                    throw new ArgumentOutOfRangeException(String.Format("Invalid height {0} 1<=height<={1}", value, ccdHeight), "height");
+                    throw new ArgumentOutOfRangeException(String.Format("Invalid height {0} 1<=height<={1}", value, frameHeight), "height");
                 }
                 nextExposure.height = value;
             }
@@ -567,7 +580,7 @@ namespace sx
             setInfo(bAllowUntested);
             getParams(ref ccdParms);
             setPixelType();
-            buildReadDelayedBlock(out nextExposure, 0, 0, ccdWidth, ccdHeight, 1, 1, 0);
+            buildReadDelayedBlock(out nextExposure, 0, 0, frameWidth, frameHeight, 1, 1, 0);
             imageDataValid = false;
             oImageDataLock = new object();
 
@@ -598,22 +611,20 @@ namespace sx
             set;
         }
 
-        internal void checkParms(bool useFrameHeight, SX_READ_DELAYED_BLOCK exposure)
+        internal void checkParms(bool useCCDSizes, SX_READ_DELAYED_BLOCK exposure)
         {
-            UInt16 effectiveHeight;
+            UInt16 effectiveHeight = frameHeight;
+            UInt16 effectiveWidth = frameWidth;
 
-            if (useFrameHeight)
-            {
-                effectiveHeight = frameHeight;
-            }
-            else
+            if (useCCDSizes)
             {
                 effectiveHeight = ccdHeight;
+                effectiveWidth = ccdWidth;
             }
 
-            if (exposure.width > ccdWidth)
+            if (exposure.width > effectiveWidth)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid width {0}: 0<=width<={1}", exposure.width, ccdWidth), "width");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid width {0}: 0<=width<={1}", exposure.width, effectiveWidth), "width");
             }
 
             if (exposure.height > effectiveHeight)
@@ -621,9 +632,9 @@ namespace sx
                 throw new ArgumentOutOfRangeException(String.Format("Invalid height {0}: 0<=height<={1}", exposure.height, effectiveHeight), "height");
             }
 
-            if (exposure.x_offset > ccdWidth)
+            if (exposure.x_offset > effectiveWidth)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0}: 0<=width<={1}", exposure.x_offset, ccdWidth), "xOffset");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset {0}: 0<=width<={1}", exposure.x_offset, effectiveWidth), "xOffset");
             }
 
             if (exposure.y_offset > effectiveHeight)
@@ -631,9 +642,9 @@ namespace sx
                 throw new ArgumentOutOfRangeException(String.Format("Invalid yOffset {0}: 0<=yOffset<={1}", exposure.y_offset, effectiveHeight), "yOffset");
             }
 
-            if (exposure.x_offset + exposure.width > ccdWidth)
+            if (exposure.x_offset + exposure.width > effectiveWidth)
             {
-                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", exposure.x_offset, exposure.width, ccdWidth), "width+xOffset");
+                throw new ArgumentOutOfRangeException(String.Format("Invalid xOffset + width: 0 < xOffset {0} + width {1} <= {2}", exposure.x_offset, exposure.width, effectiveWidth), "width+xOffset");
             }
 
             if (exposure.y_offset + exposure.height > effectiveHeight)
@@ -697,7 +708,6 @@ namespace sx
             // is progressive and monochrome
             if (idx == 0)
             {
-
                 // cameras with a Bayer matrix need the offsets to be even so that the subframe returned 
                 // has the same color representation as a full frame.  Since this (at most) offsets 
                 // the image by 1 pixel on each axis, we just do it for all cameras
@@ -773,7 +783,7 @@ namespace sx
 
                     currentExposure.toCameraSecond = currentExposure.toCamera;
 
-                    Log.Write(String.Format("binnedHeightIsOdd = {0}, height={1}, frameHeight={2}\n", binnedHeightIsOdd, currentExposure.userRequested.height, frameHeight));
+                    Log.Write(String.Format("binnedHeightIsOdd = {0}, height={1}, ccdHeight={2}\n", binnedHeightIsOdd, currentExposure.userRequested.height, ccdHeight));
 
                     if (binnedOffsetIsOdd)
                     {
@@ -791,7 +801,7 @@ namespace sx
                     // leaves us capturing only 2 lines.  We add one back if we can without falling off the bottom
                     //
 
-                    if (binnedHeightIsOdd && currentExposure.toCamera.y_offset + currentExposure.toCamera.height + yBin < frameHeight)
+                    if (binnedHeightIsOdd && currentExposure.toCamera.y_offset + currentExposure.toCamera.height + yBin < ccdHeight)
                     {
                         Log.Write(String.Format("adding {0} to first camera height ({1}) for odd height\n", yBin, currentExposure.toCamera.height));
                         currentExposure.toCamera.height += yBin;
@@ -852,7 +862,7 @@ namespace sx
                     }
                 }
 
-                // Make any adjustments required for specific cameras
+                // Make any final adjustments required for specific cameras
 
                 if ((CameraModels)cameraModel == CameraModels.MODEL_M25C)
                 {
@@ -865,7 +875,7 @@ namespace sx
 
                     if (currentExposure.toCamera.height % 2 == 1)
                     {
-                        if (currentExposure.toCamera.height + currentExposure.toCamera.y_bin <= ccdHeight)
+                        if (currentExposure.toCamera.height + currentExposure.toCamera.y_bin <= frameHeight)
                         {
                             currentExposure.toCamera.height += currentExposure.toCamera.y_bin;
                         }
@@ -892,6 +902,30 @@ namespace sx
                     currentExposure.toCamera.y_offset /= 2;
 
                     dumpReadDelayedBlock(currentExposure.toCamera, "after M25C adjustments");
+                }
+                else if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
+                {
+                    Debug.Assert(currentExposure.toCamera.x_bin == 1);
+                    Debug.Assert(currentExposure.toCamera.y_bin == 1);
+
+                    // these two are temporary
+                    Debug.Assert(currentExposure.toCamera.width == frameWidth);
+                    Debug.Assert(currentExposure.toCamera.height == frameHeight);
+
+                    // costar cannot do subimage widths - it always reads out whole lines
+                    currentExposure.toCamera.x_offset = 0;
+                    currentExposure.toCamera.width = ccdWidth;
+
+                    // See if our modified parameters are still legal
+                    try
+                    {
+                        checkParms(true, currentExposure.toCamera);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(String.Format("checkParms after CoStar adjustment generated exception {0}\n", ex));
+                        throw;
+                    }
                 }
             }
 
