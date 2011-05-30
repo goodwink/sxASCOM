@@ -15,5 +15,5 @@ To do a release, be sure to:
 - create a tag
 - create the installer
 - Copy the files to 
-  C:\Users\bretm\Documents\My Web Sites\daddog.com\ascom\sx\driver
+  "C:\Users\bretm\Documents\My Web Sites\daddog.com\ascom\sx\driver"
 - rename the files
