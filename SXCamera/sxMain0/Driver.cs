@@ -347,6 +347,12 @@ namespace ASCOM.SXMain0
 
                     Log.Write(String.Format("Main::SetCCDTemperature set to {0}\n", value));
 
+                    // These two range checks are required by conform, but not by the spec.
+                    if (value >= 100 || value <= -273)
+                    {
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("SetCCDTemperature request for {0} is not reasonable", value)), value.ToString(), "<= 100");
+                    }
+
                     sxCamera.coolerSetPoint = (UInt16) ((value * 10) + 2732);
                 }
                 catch (ASCOM.DriverException ex)
