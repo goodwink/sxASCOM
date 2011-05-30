@@ -37,11 +37,10 @@ namespace sx
         {
             System.Guid Guid = new System.Guid(GUID_STRING);
             Int32 index = 0;
-            Boolean deviceFound = false;
 
             Log.Write(String.Format("USBInterface({0}, {1}, {2}) begins\n", vid, pid, skip));
 
-            do
+            while (true)
             {
                 if (!myDeviceManagement.FindDeviceFromGuid(Guid, out devicePathName, ref index))
                 {
@@ -58,15 +57,20 @@ namespace sx
                     (!skip && foundVid == vid && foundPid == pid) ||
                     (skip && (foundVid != vid || foundPid != pid)))
                 {
+                    Log.Write(String.Format("attepting to get a handle for USB Device {0}\n", devicePathName));
                     if (!FileIO.GetDeviceHandle(devicePathName, out deviceHandle))
                     {
-                        throw new System.IO.IOException(String.Format("Unable to get a device handle for GUID {0} using path {1}", Guid, devicePathName));
+                        Log.Write(String.Format("Unable to get a device handle for GUID {0} using path {1} - skipping", Guid, devicePathName));
                     }
 
-                    deviceFound = true;
                     Log.Write(String.Format("USB deviceHandle={0}\n", deviceHandle));
+                    break;
                 }
-            } while (!deviceFound);
+                else
+                {
+                    Log.Write(String.Format("skipping USB Device {0} because of skip/vid/pid\n", devicePathName));
+                }
+            } 
         }
 
         public USBInterface()

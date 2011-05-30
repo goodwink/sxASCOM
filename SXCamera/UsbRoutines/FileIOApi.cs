@@ -69,10 +69,9 @@ namespace WinUsbDemo
             deviceHandle = FileIO.CreateFile
                 (devicePathName,
                 (FileIO.GENERIC_WRITE | FileIO.GENERIC_READ),
-                FileIO.FILE_SHARE_READ | FileIO.FILE_SHARE_WRITE,
+                0,
                 IntPtr.Zero,
                 FileIO.OPEN_EXISTING,
-                //FileIO.FILE_ATTRIBUTE_NORMAL | FileIO.FILE_FLAG_OVERLAPPED,
                 FileIO.FILE_ATTRIBUTE_NORMAL,
                 0);
 
