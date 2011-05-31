@@ -1327,9 +1327,12 @@ namespace sx
 
                     UInt32 [] bias = new UInt32[2];
 
+                    Log.Write(String.Format("CoStar decode begins: userRequest.x_offset={0}, userReqested.width={1}, userRequested.Height={2}\n",
+                            currentExposure.userRequested.x_offset, currentExposure.userRequested.width, currentExposure.userRequested.height));
+
                     for (y = 0; y < binnedHeight; y++)
                     {
-                        Log.Write(String.Format("CoStar decoding line {}, srcIdx={}\n", y, srcIdx));
+                        Log.Write(String.Format("CoStar decoding line {0}, srcIdx={1}\n", y, srcIdx));
 
                         bias[0] = 0;
                         bias[1] = 0;
@@ -1342,7 +1345,7 @@ namespace sx
                         bias[0] /= 8;
                         bias[1] /= 8;
 
-                        Log.Write(String.Format("CoStar evenBias={} oddBias={}\n", bias[0], bias[1]));
+                        Log.Write(String.Format("CoStar evenBias={0} oddBias={1}\n", bias[0], bias[1]));
 
                         srcIdx += currentExposure.userRequested.x_offset;
 
@@ -1367,8 +1370,10 @@ namespace sx
                                 imageData[x, y] = pixelValue;
                         }
 
-                        srcIdx += (frameWidth - currentExposure.userRequested.width);
+                        srcIdx += frameWidth - (currentExposure.userRequested.width + currentExposure.userRequested.x_offset);
                     }
+
+                    Log.Write(String.Format("Costar covert ends: srcIdx={0}\n", srcIdx));
                 }
                 catch (System.Exception ex)
                 {
