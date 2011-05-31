@@ -471,7 +471,7 @@ namespace sx
                     description = "CoStar";
                     fullWellCapacity = 50000;
                     electronsPerADU = 0.9;
-                    progressive = false;
+                    progressive = true;
                     maxXBin = 1;
                     maxYBin = 1;
                     break;
@@ -838,7 +838,7 @@ namespace sx
                     Log.Write(String.Format("rowDelta={0} startDelta={1}\n", rowDelta, startDelta));
 #endif
 
-                    dumpReadDelayedBlock(currentExposure.toCamera, "first frame after final progressive adjustments");
+                    dumpReadDelayedBlock(currentExposure.toCamera, "first frame after final interlaced adjustments");
                     // See if our modified parameters are still legal
                     try
                     {
@@ -850,7 +850,7 @@ namespace sx
                         throw;
                     }
 
-                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after final progressive adjustments");
+                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after final interlaced adjustments");
                     try
                     {
                         checkParms(true, currentExposure.toCameraSecond);
@@ -911,6 +911,8 @@ namespace sx
                     // costar cannot do subimage widths - it always reads out whole lines
                     currentExposure.toCamera.x_offset = 0;
                     currentExposure.toCamera.width = ccdWidth;
+
+                    dumpReadDelayedBlock(currentExposure.toCamera, "after CoStar adjustments");
 
                     // See if our modified parameters are still legal
                     try
