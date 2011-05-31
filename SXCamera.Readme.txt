@@ -1,19 +1,13 @@
 Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
-This is the README.txt for version 1.5.2, the second non-test version for the 
-ASCOM driver for Starlight Xpress cameras. 
+This is the README.txt for version 1.5.3.
 
-The driver has been well tested with H9, H9C and M25C, as well as with the 
-SXV and Exview "piggyback" guiders and the Lodestar standalone guider, and 
-lightly tested with H16.  
+This is an UNSTABLE release, of the ASCOM driver for Starlight Xpress cameras.  There is a STABLE release available - please use that version if it meets
+your needs.
 
-It has been tested on Windows XP, Vista and Windows 7 (both 32 and 64 bit 
-versions), and using Images Plus, Nebulosity, PHD and Maxim DL, and with 
-ASCOM 5.1 and the 6.0 Beta. (of course, not all combinations are tested)
-
-Dispite all the testing done by a number of dedicated volunteers, 
-PLEASE DO NOT RISK A GOOD IMAGING NIGHT ON THIS VERSION OF THE DRIVER 
-until you have tried it during the daylight first. 
+It contains fixes for a conform temperature problem, initial support for 
+multiple instances of a single camera type, and initial changes for 
+the CoStar camera.
 
 If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know

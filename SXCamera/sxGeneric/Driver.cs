@@ -602,10 +602,10 @@ namespace ASCOM.SXGeneric
                 {
                     if (value)
                     {
-#if EXPIRE
-                        if (DateTime.Now.CompareTo(new DateTime(2011,6,1)) > 0)
+#if DEBUG
+                        if (DateTime.Now.CompareTo(new DateTime(2011,7,15)) > 0)
                         {
-                            MessageBox.Show("This non-production release has expired.  Please update your bits", "Expired");
+                            MessageBox.Show("This debug release has expired.  Please update your bits", "Expired");
                             throw new ASCOM.PropertyNotImplementedException(SetError("connected: non-production release expired"), true);
                         }
 #endif
