@@ -908,10 +908,6 @@ namespace sx
                     Debug.Assert(currentExposure.toCamera.x_bin == 1);
                     Debug.Assert(currentExposure.toCamera.y_bin == 1);
 
-                    // these two are temporary
-                    Debug.Assert(currentExposure.toCamera.width == frameWidth);
-                    Debug.Assert(currentExposure.toCamera.height == frameHeight);
-
                     // costar cannot do subimage widths - it always reads out whole lines
                     currentExposure.toCamera.x_offset = 0;
                     currentExposure.toCamera.width = ccdWidth;
@@ -1314,21 +1310,62 @@ namespace sx
             {
                 int x=-1, y=-1;
                 int srcIdx = 0;
+
                 Log.Write("convertCameraDataToImageData(): decoding COSTAR data\n");
+
+                Debug.Assert(currentExposure.toCamera.x_bin == 1);
+                Debug.Assert(currentExposure.toCamera.y_bin == 1);
+                Debug.Assert(currentExposure.toCamera.width == ccdWidth);
+
                 try
                 {
+                    // The CoStar has 16 black level reference pixels at the beginning of a line.
+                    // We accumlate separate values for odd and even pixels, and then subtract the
+                    // bias from each non-saturated pixel
+
+                    UInt32 [] bias = new UInt32[2];
+
                     for (y = 0; y < binnedHeight; y++)
                     {
-                        // the CoStar has 16 black level reference pixels at the beginning of a line.
-                        // If we are requesting any of these pixels, throw them away.
-                        for(x=xOffset; x < 16; x++)
+                        Log.Write(String.Format("CoStar decoding line {}, srcIdx={}\n", y, srcIdx));
+
+                        bias[0] = 0;
+                        bias[1] = 0;
+
+                        for(x=0; x < 16; x++)
                         {
-                            srcIdx++;
+                            bias[x % 2] += (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
                         }
-                        for (x = 0; x < binnedWidth; x++)
+
+                        bias[0] /= 8;
+                        bias[1] /= 8;
+
+                        Log.Write(String.Format("CoStar evenBias={} oddBias={}\n", bias[0], bias[1]));
+
+                        srcIdx += currentExposure.userRequested.x_offset;
+
+                        for (x = 0; x < currentExposure.userRequested.width; x++)
                         {
-                                imageData[x, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                                UInt16 pixelValue = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+
+                                if (pixelValue < 65535)
+                                {
+                                    UInt16 thisBias = (UInt16)bias[x % 2];
+
+                                    if (pixelValue < thisBias)
+                                    {
+                                        pixelValue = 0;
+                                    }
+                                    else
+                                    {
+                                        pixelValue -= thisBias;
+                                    }
+                                }
+
+                                imageData[x, y] = pixelValue;
                         }
+
+                        srcIdx += (frameWidth - currentExposure.userRequested.width);
                     }
                 }
                 catch (System.Exception ex)
