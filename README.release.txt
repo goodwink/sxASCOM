@@ -13,6 +13,8 @@ To do a release, be sure to:
   git commit -a -m "Changes required for V1.3.10"
 - build
 - create a tag
+- git push
+- git push --tags
 - create the installer
 - Copy the files to 
   "C:\Users\bretm\Documents\My Web Sites\daddog.com\ascom\sx\driver"
