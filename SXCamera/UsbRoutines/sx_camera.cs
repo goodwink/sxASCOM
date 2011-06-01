@@ -1332,7 +1332,7 @@ namespace sx
 
                     for (y = 0; y < binnedHeight; y++)
                     {
-                        Log.Write(String.Format("CoStar decoding line {0}, srcIdx={1}\n", y, srcIdx));
+                        //Log.Write(String.Format("CoStar decoding line {0}, srcIdx={1}\n", y, srcIdx));
 
                         bias[0] = 0;
                         bias[1] = 0;
@@ -1345,7 +1345,7 @@ namespace sx
                         bias[0] /= 8;
                         bias[1] /= 8;
 
-                        Log.Write(String.Format("CoStar evenBias={0} oddBias={1}\n", bias[0], bias[1]));
+                        //Log.Write(String.Format("CoStar evenBias={0} oddBias={1}\n", bias[0], bias[1]));
 
                         srcIdx += currentExposure.userRequested.x_offset;
 
@@ -1373,7 +1373,7 @@ namespace sx
                         srcIdx += frameWidth - (currentExposure.userRequested.width + currentExposure.userRequested.x_offset);
                     }
 
-                    Log.Write(String.Format("Costar covert ends: srcIdx={0}\n", srcIdx));
+                    Debug.Assert(srcIdx == imageRawData.Length);
                 }
                 catch (System.Exception ex)
                 {
