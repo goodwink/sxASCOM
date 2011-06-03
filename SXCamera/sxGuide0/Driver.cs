@@ -23,7 +23,7 @@ using ASCOM.Interface;
 
 using Logging;
 
-namespace ASCOM.SXGuide
+namespace ASCOM.SXGuide0
 {
     //
     // Your driver's ID is ASCOM.SXCamera.Camera
@@ -32,7 +32,7 @@ namespace ASCOM.SXGuide
     // The ClassInterface/None addribute prevents an empty interface called
     // _Camera from being created and used as the [default] interface
     //
-    [Guid("c150cbaa-429d-4bad-84ff-27077b4156aa")]
+    [Guid("c150cbaa-429d-4bad-84ff-27077b4156a4")]
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {

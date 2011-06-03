@@ -117,9 +117,12 @@
     </Compile>
     <Compile Include="SharedResources.cs" />
     <Compile Include="sxGeneric\Driver.cs" />
-    <Compile Include="sxGuide\Driver.cs" />
+    <Compile Include="sxGuide0\Driver.cs" />
+    <Compile Include="sxGuide1\Driver.cs" />
     <Compile Include="sxMain1\Driver.cs" />
     <Compile Include="sxMain0\Driver.cs" />
+    <Compile Include="sxMain2\Driver.cs" />
+    <Compile Include="sxMain3\Driver.cs" />
     <Compile Include="UsbRoutines\Acknowlegements.cs" />
     <Compile Include="UsbRoutines\DeviceManagement.cs" />
     <Compile Include="UsbRoutines\DeviceManagementApi.cs" />

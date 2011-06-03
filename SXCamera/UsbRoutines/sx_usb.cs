@@ -42,6 +42,8 @@ namespace sx
 
             while (true)
             {
+                bool bUseThisDevice = true;
+
                 if (!myDeviceManagement.FindDeviceFromGuid(Guid, out devicePathName, ref index))
                 {
                     throw new System.IO.IOException(String.Format("Unable to locate a USB device with GUID {0}, vid={1}, pid={2}, skip={3}", Guid, vid, pid, skip));
@@ -53,9 +55,27 @@ namespace sx
 
                 DeviceManagement.parsePath(devicePathName, out foundVid, out foundPid);
 
-                if (vid == 0 ||
-                    (!skip && foundVid == vid && foundPid == pid) ||
-                    (skip && (foundVid != vid || foundPid != pid)))
+                if (vid != 0)
+                {
+                    bool bVIDMatch = (foundVid == vid);
+                    bool bPIDMatch = (foundPid == pid);
+
+                    // a pid of 0xffff matches guide cameras
+
+                    if (pid == 0xffff)
+                    {
+                       bPIDMatch = (foundPid == 507)  || (foundPid == 517);
+                    }
+
+                    bUseThisDevice = (bVIDMatch && bPIDMatch);
+
+                    if (skip)
+                    {
+                        bUseThisDevice = !bUseThisDevice;
+                    }
+                }
+
+                if (bUseThisDevice)
                 {
                     Log.Write(String.Format("attepting to get a handle for USB Device {0}\n", devicePathName));
                     if (!FileIO.GetDeviceHandle(devicePathName, out deviceHandle))

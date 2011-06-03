@@ -34,7 +34,7 @@ namespace ASCOM.SXMain0
     // The ClassInterface/None addribute prevents an empty interface called
     // _Camera from being created and used as the [default] interface
     //
-    [Guid("cfa2c985-9251-4b62-9146-99a52bf47701")]
+    [Guid("c150cbaa-429d-4bad-84ff-27077b4156a0")]
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXGeneric.Camera
     {

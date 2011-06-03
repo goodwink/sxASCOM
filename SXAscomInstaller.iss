@@ -59,9 +59,14 @@ Filename: "{app}\ASCOM.SXCamera.exe"; Parameters: "/unregister"
 [CODE]
 // Global Variables
 var
-  LodeStarPage: TInputOptionWizardPage;
-  MainCameraPage: TInputOptionWizardPage;
+  OverviewPage: TInputOptionWizardPage;
+  StandaloneGuiderPage: TInputOptionWizardPage;
+  LodeStarsPage: TInputOptionWizardPage;
+  CoStarsPage: TInputOptionWizardPage;
+  CoStarPage: TInputOptionWizardPage;
+  ImagingCameraPage: TInputOptionWizardPage;
   GuideCameraPage: TInputOptionWizardPage;
+  GuideCamerasPage: TInputOptionWizardPage;
 
 //
 // Before the installer UI appears, verify that the (prerequisite)
@@ -110,42 +115,156 @@ function ShouldSkipPage(PageID: Integer): Boolean;
 begin
     Result := FALSE;
 
-    if PageID = GuideCameraPage.ID then
-        Result := MainCameraPage.Values[1];
+    if (PageID = LodeStarsPage.ID) then
+        Result := StandAloneGuiderPage.Values[0];
+
+    if (PageID = CoStarsPage.ID) then
+        Result := StandAloneGuiderPage.Values[0] or not LodeStarsPage.Values[0];
+
+    if (PageID = CoStarPage.ID) then
+        Result := StandAloneGuiderPage.Values[0] or LodeStarsPage.Values[2] or LodeStarsPage.Values[0];
+
+    if PageID = GuideCamerasPage.ID then
+    begin
+        Result := not ImagingCameraPage.Values[2] or not LodeStarsPage.Values[0] or not CoStarsPage.Values[0];
+    end
+
+    if (PageID = GuideCameraPage.ID) then
+        result := ImagingCameraPage.Values[0] or LodestarsPage.Values[2] or CoStarsPage.Values[2] or (LodestarsPage.Values[1] and (CostarsPage.Values[1] or CostarPage.Values[1])) or (ImagingCameraPage.Values[2] and not (LodestarsPage.Values[1] or CostarsPage.Values[1] or CostarPage.Values[1]))
+end;
+
+function BackButtonClick(CurPageID: Integer): Boolean;
+begin
+    Result := TRUE;
+
+    if (curPageId = LodeStarsPage.ID) then
+    begin
+        LodeStarsPage.Values[0] := True;
+        LodeStarsPage.Values[1] := False;
+        LodeStarsPage.Values[2] := False;
+    end
+
+    if (curPageId = CoStarsPage.ID) then
+    begin
+        CoStarsPage.Values[0] := True;
+        CoStarsPage.Values[1] := False;
+        CoStarsPage.Values[2] := False;
+    end
+
+    if (curPageId = CoStarPage.ID) then
+    begin
+        CoStarPage.Values[0] := True;
+        CoStarPage.Values[1] := False;
+    end
+
+    if curPageId = GuideCamerasPage.ID then
+    begin
+        GuideCamerasPage.Values[0] := True;
+        GuideCamerasPage.Values[1] := False;
+        GuideCamerasPage.Values[2] := False;
+    end
+
+    if (curPageId = GuideCameraPage.ID) then
+    begin
+        GuideCameraPage.Values[0] := True;
+        GuideCameraPage.Values[1] := False;
+    end
 end;
 
 procedure InitializeWizard();
 begin
 
-    LodeStarPage := CreateInputOptionPage(wpLicense,
-      'Lodestar Configuration', 'Do you have a Starlight Xpress LodeStar USB Guide Camera?',
-      'This is a small, eyepiece sized guide camera that connets to your PC via USB.',
+    OverviewPage := CreateInputOptionPage(wpLicense,
+      'Overview', 
+      '',
+      'Starlight Xpress makes a three different types of cameras:'#13#10#13#10'-Standalone Guide Cameras'#13#10'-Imaging Cameras'#13#10'-Autoguider cameras.'#13#10#13#10'This driver supports a total of 4 cameras, a maximum of 2 guide cameras (Standalone or Autoguide) and 2 Imaging Cameras'#13#10#13#10'The next few screens will gather the required information to complete the driver installation',
       True, False);
-    LodeStarPage.Add('Yes');
-    LodeStarPage.Add('No');
 
-    LodeStarPage.Values[0] := False;
-    LodeStarPage.Values[1] := True;
+    StandAloneGuiderPage := CreateInputOptionPage(OverviewPage.ID,
+      'Standalone Guide Camera Configuration', 
+      'Standalone Guide Cameras are small, eyepiece sized guide cameras that connect to your PC via USB.',
+      'Do you have an Starlight Xpress Standalone Guide Cameras?',
+      True, False);
 
-    MainCameraPage := CreateInputOptionPage(LodeStarPage.ID,
-      'Main Camera Configuration', 'Do you have a Starlight Xpress Imaging Camera?',
+    StandAloneGuiderPage.Add('No');
+    StandAloneGuiderPage.Add('Yes');
+
+    StandAloneGuiderPage.Values[0] := True;
+    StandAloneGuiderPage.Values[1] := False;
+
+    LodeStarsPage := CreateInputOptionPage(StandAloneGuiderPage.ID,
+      'Lodestar Configuration', 
+      'Lodestar is a small, eyepiece sized monochrome guide camera that connects to your PC via USB.',
+      'Do you have a Starlight Xpress LodeStar USB Guide Camera?',
+      True, False);
+    LodeStarsPage.Add('No');
+    LodeStarsPage.Add('Yes, I have 1 Lodestar Camera');
+    LodeStarsPage.Add('Yes, I have 2 Lodestar Cameras');
+
+    LodeStarsPage.Values[0] := True;
+    LodeStarsPage.Values[1] := False;
+    LodeStarsPage.Values[2] := False;
+
+    CoStarsPage := CreateInputOptionPage(LodeStarsPage.ID,
+      'CoStar Configuration', 
+      'CoStar is a small, eyepiece sized color guide camera that connects to your PC via USB.',
+      'Do you have a Starlight Xpress CoStar USB Guide Camera?',
+      True, False);
+    CoStarsPage.Add('No');
+    CoStarsPage.Add('Yes, I have 1 CoStar Camera');
+    CoStarsPage.Add('Yes, I have 2 CoStar Cameras');
+
+    CoStarsPage.Values[0] := True;
+    CoStarsPage.Values[1] := False;
+    CoStarsPage.Values[2] := False;
+
+    CoStarPage := CreateInputOptionPage(CoStarsPage.ID,
+      'CoStar Configuration', 
+      'CoStar is a small, eyepiece sized color guide camera that connects to your PC via USB.',
+      'Do you have a Starlight Xpress CoStar USB Guide Camera?',
+      True, False);
+    CoStarPage.Add('No');
+    CoStarPage.Add('Yes, I have a CoStar Camera');
+
+    CoStarPage.Values[0] := True;
+    CoStarPage.Values[1] := False;
+
+    ImagingCameraPage := CreateInputOptionPage(CoStarPage.ID,
+      'Imaging Camera Configuration', 
       'This is a camera which connects to to your PC via USB.',
+      'Do you have a Starlight Xpress Imaging Camera?',
       True, False);
-    MainCameraPage.Add('Yes');
-    MainCameraPage.Add('No');
+    ImagingCameraPage.Add('No');
+    ImagingCameraPage.Add('Yes, I have 1 Imaging Camera');
+    ImagingCameraPage.Add('Yes, I have 2 Imaging Cameras');
 
-    MainCameraPage.Values[0] := False;
-    MainCameraPage.Values[1] := True;
+    ImagingCameraPage.Values[0] := True;
+    ImagingCameraPage.Values[1] := False;
+    ImagingCameraPage.Values[2] := False;
 
-    GuideCameraPage := CreateInputOptionPage(MainCameraPage.ID,
-      'Autoguide Camera Configuration', 'Do you have a Starlight Xpress SXV or ExView Autoguide Camera?',
-      'This is a small, eyepiece sized guide camera that plugs into the back of an imaging camera.',
+    GuideCamerasPage := CreateInputOptionPage(ImagingCameraPage.ID,
+      'Autoguide Camera Configuration', 
+      'This is a small, eyepiece sized guide camera that plugs into the back of an imaging camera (not into your computer).',
+      'Do you have any Starlight Xpress SXV or ExView Autoguide Cameras?',
       True, False);
-    GuideCameraPage.Add('Yes');
+    GuideCamerasPage.Add('No');
+    GuideCamerasPage.Add('Yes, I have 1 Autoguide Camera');
+    GuideCamerasPage.Add('Yes, I have 2 Autoguide Cameras');
+
+    GuideCamerasPage.Values[0] := True;
+    GuideCamerasPage.Values[1] := False;
+    GuideCamerasPage.Values[2] := False;
+
+    GuideCameraPage := CreateInputOptionPage(GuideCamerasPage.ID,
+      'Autoguide Camera Configuration', 
+      'This is a small, eyepiece sized guide camera that plugs into the back of an imaging camera (not into your computer).',
+      'Do you have a Starlight Xpress SXV or ExView Autoguide Camera?',
+      True, False);
     GuideCameraPage.Add('No');
+    GuideCameraPage.Add('Yes');
 
-    GuideCameraPage.Values[0] := False;
-    GuideCameraPage.Values[1] := True;
+    GuideCameraPage.Values[0] := True;
+    GuideCameraPage.Values[1] := False;
 
 end;
 
@@ -153,12 +272,27 @@ function RegistrationArgs(Param : String) : String;
 begin
     Result := '/register';
 
-    if (LodeStarPage.Values[0]) then
-        Result := Result + ' /lodestar';
+    if (LodeStarsPage.Values[1]) then
+        Result := Result + ' /lodestar'
+    else 
+        if (LodeStarsPage.Values[2]) then
+            Result := Result + ' /lodestar2';
 
-    if (MainCameraPage.Values[0]) then
-        Result := Result + ' /main';
+    if (CoStarsPage.Values[1] or CoStarPage.Values[1]) then
+        Result := Result + ' /costar'
+    else 
+        if (CoStarPage.Values[2]) then
+            Result := Result + ' /costar2';
 
-    if (GuideCameraPage.Values[0]) then
-        Result := Result + ' /autoguide ';
+    if (ImagingCameraPage.Values[1]) then
+        Result := Result + ' /main'
+    else
+        if (ImagingCameraPage.Values[2]) then
+            Result := Result + ' /main2'
+
+    if (GuideCameraPage.Values[1] or GuideCamerasPage.Values[1]) then
+        Result := Result + ' /autoguide'
+    else
+        if (GuideCamerasPage.Values[2]) then
+            Result := Result + ' /autoguide2'
 end;

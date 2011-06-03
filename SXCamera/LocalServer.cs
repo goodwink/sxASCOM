@@ -233,7 +233,10 @@ namespace ASCOM.SXCamera
             DirectoryInfo d = new DirectoryInfo(assyPath);
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain0.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain1.Camera"));
-            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXGuide.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain2.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain3.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXGuide0.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXGuide1.Camera"));
 #if False
             foreach (FileInfo fi in d.GetFiles("*.dll"))
             {
@@ -334,9 +337,18 @@ namespace ASCOM.SXCamera
                 return;
             }
 
-            bool registerMain = false;
-            bool registerAutoGuide = false;
-            bool registerLodeStar = false;
+            //
+            // If reached here, we're running elevated
+            //
+
+            bool registerMain0 = false;
+            bool registerMain1 = false;
+            bool registerAutoGuide0 = false;
+            bool registerAutoGuide1 = false;
+            bool registerLodeStar0 = false;
+            bool registerLodeStar1 = false;
+            bool registerCoStar0 = false;
+            bool registerCoStar1 = false;
 
             foreach (string opt in args)
             {
@@ -344,29 +356,55 @@ namespace ASCOM.SXCamera
                 {
                     case "-lodestar":
                     case "/lodestar":
-                        registerLodeStar = true;
+                        registerLodeStar0 = true;
+                        break;
+                    case "-lodestar2":
+                    case "/lodestar2":
+                        registerLodeStar0 = true;
+                        registerLodeStar1 = true;
+                        break;
+                    case "-costar":
+                    case "/costar":
+                        registerCoStar0 = true;
+                        break;
+                    case "-costar2":
+                    case "/costar2":
+                        registerCoStar0 = true;
+                        registerCoStar1 = true;
                         break;
                     case "-main":
                     case "/main":
-                        registerMain = true;
+                        registerMain0 = true;
+                        break;
+                    case "-main2":
+                    case "/main2":
+                        registerMain0 = true;
+                        registerMain1 = true;
                         break;
                     case "-autoguide":
                     case "/autoguide":
-                        registerAutoGuide = true;
+                        registerAutoGuide0 = true;
+                        break;
+                    case "-autoguide2":
+                    case "/autoguide2":
+                        registerAutoGuide0 = true;
+                        registerAutoGuide1 = true;
                         break;
                     default:
                         break;
                 }
             }
 
-            if (registerAutoGuide && !registerMain)
+            if (registerAutoGuide0 && !registerMain0)
             {
-                registerAutoGuide = false;
+                registerAutoGuide0 = false;
             }
 
-            //
-            // If reached here, we're running elevated
-            //
+            if (registerAutoGuide1 && !registerMain1)
+            {
+                registerAutoGuide1 = false;
+            }
+
             Assembly assy = Assembly.GetExecutingAssembly();
             Attribute attr = Attribute.GetCustomAttribute(assy, typeof(AssemblyTitleAttribute));
             string assyTitle = ((AssemblyTitleAttribute)attr).Title;
@@ -413,27 +451,89 @@ namespace ASCOM.SXCamera
             foreach (Type type in m_ComObjectTypes)
             {
                 bool bFail = false;
-                bool registerThisOne = true;
+                bool registerThisOne = false;
                 string ascomName = null;
 
                 switch (type.ToString().ToLower())
                 {
-                    case "ascom.sxguide.camera":
-                        registerThisOne = registerAutoGuide;
-                        ascomName = "Starlight Xpress Autoguide Camera";
-                        break;
                     case "ascom.sxmain0.camera":
-                        registerThisOne = registerMain;
-                        ascomName = "Starlight Xpress Main Camera";
+                        registerThisOne = registerMain0;
+                        if (registerMain1)
+                        {
+                            ascomName = "Starlight Xpress Main Camera #1";
+                        }
+                        else
+                        {
+                            ascomName = "Starlight Xpress Main Camera";
+                        }
                         break;
                     case "ascom.sxmain1.camera":
-                        registerThisOne = registerLodeStar;
-                        ascomName = "Starlight Xpress Lodestar Guider";
+                        registerThisOne = registerMain1;
+                        ascomName = "Starlight Xpress Main Camera #2";
+                        break;
+                    case "ascom.sxmain2.camera":
+                        if (registerLodeStar0)
+                        {
+                            registerThisOne = true;
+                            if (registerLodeStar1)
+                            {
+                                ascomName = "Starlight Xpress Lodestar Guider #1";
+                            }
+                            else
+                            {
+                                ascomName = "Starlight Xpress Lodestar Guider";
+                            }
+                        }
+                        break;
+                    case "ascom.sxmain3.camera":
+                        if (registerLodeStar1)
+                        {
+                            registerThisOne = true;
+                            ascomName = "Starlight Xpress Lodestar Guider #2";
+                        }
+                        break;
+                    case "ascom.sxmain4.camera":
+                        if (registerCoStar0)
+                        {
+                            registerThisOne = true;
+                            if (registerCoStar1)
+                            {
+                                ascomName = "Starlight Xpress CoStar Guider #1";
+                            }
+                            else
+                            {
+                                ascomName = "Starlight Xpress CoStar Guider";
+                            }
+                        }
+                        break;
+                    case "ascom.sxmain5.camera":
+                        if (registerCoStar1)
+                        {
+                            registerThisOne = true;
+                            ascomName = "Starlight Xpress CoStar Guider #2";
+                        }
+                        break;
+                    case "ascom.sxguide0.camera":
+                        registerThisOne = registerAutoGuide0;
+                        if (registerAutoGuide1)
+                        {
+                            ascomName = "Starlight Xpress Autoguide Camera #1";
+                        }
+                        else
+                        {
+                            ascomName = "Starlight Xpress Autoguide Camera";
+                        }
+                        break;
+                    case "ascom.sxguide1.camera":
+                        registerThisOne = registerAutoGuide1;
+                        ascomName = "Starlight Xpress Autoguide Camera #2";
                         break;
                     default:
                         break;
                 }
 
+                MessageBox.Show(String.Format("considering {0}, registerThisOne={1}, ascomName={2}", type.ToString().ToLower(), registerThisOne, ascomName), "SXCamera", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 if (registerThisOne)
                 {
                     try

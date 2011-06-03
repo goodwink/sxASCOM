@@ -37,6 +37,10 @@ namespace ASCOM.SXCamera
             m_mutex = new object();
             controller0 = new sx.Controller(m_mutex);
             controller1 = new sx.Controller(m_mutex);
+            controller2 = new sx.Controller(m_mutex);
+            controller3 = new sx.Controller(m_mutex);
+            controller4 = new sx.Controller(m_mutex);
+            controller5 = new sx.Controller(m_mutex);
 
             Log.Write("SharedResources() returns\n");
         }
@@ -52,6 +56,30 @@ namespace ASCOM.SXCamera
         }
 
         public static sx.Controller controller1
+        {
+            get;
+            private set;
+        }
+
+        public static sx.Controller controller2
+        {
+            get;
+            private set;
+        }
+
+        public static sx.Controller controller3
+        {
+            get;
+            private set;
+        }
+
+        public static sx.Controller controller4
+        {
+            get;
+            private set;
+        }
+
+        public static sx.Controller controller5
         {
             get;
             private set;
