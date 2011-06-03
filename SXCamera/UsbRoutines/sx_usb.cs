@@ -55,10 +55,14 @@ namespace sx
 
                 DeviceManagement.parsePath(devicePathName, out foundVid, out foundPid);
 
+                Log.Write(String.Format("checking VID/PID - foundVID={0} foundPID={1}\n", foundVid, foundPid));
+
                 if (vid != 0)
                 {
                     bool bVIDMatch = (foundVid == vid);
                     bool bPIDMatch = (foundPid == pid);
+
+                    Log.Write(String.Format("initally bVIDMatch={0} bPIDMatch={1}\n", bVIDMatch, bPIDMatch));
 
                     // a pid of 0xffff matches guide cameras
 
@@ -69,10 +73,14 @@ namespace sx
 
                     bUseThisDevice = (bVIDMatch && bPIDMatch);
 
+                    Log.Write(String.Format("pre skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
+
                     if (skip)
                     {
                         bUseThisDevice = !bUseThisDevice;
                     }
+
+                    Log.Write(String.Format("post skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
                 }
 
                 if (bUseThisDevice)
