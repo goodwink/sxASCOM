@@ -332,7 +332,7 @@ namespace sx
             get { return nextExposure.x_bin; }
             set
             {
-                if (value <= 0 || value > maxXBin)
+                if (value <= 0 || value > maxXBin || value == 7)
                 {
                     throw new ArgumentOutOfRangeException(String.Format("Invalid xBin {0} 1<=height<={1}", value, maxXBin), "xBin");
                 }
@@ -345,7 +345,7 @@ namespace sx
             get { return nextExposure.y_bin; }
             set
             {
-                if (value <= 0 || value > maxYBin)
+                if (value <= 0 || value > maxYBin || value == 7)
                 {
                     throw new ArgumentOutOfRangeException(String.Format("Invalid yBin {0} 1<=height<={1}", value, maxYBin), "yBin");
                 }
@@ -398,6 +398,21 @@ namespace sx
 #endif
                     return imageData;
                 }
+            }
+        }
+
+        public bool mustUseDelayedRead
+        {
+            get
+            {
+                bool bReturn = false;
+
+                if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
+                {
+                    bReturn = true;
+                }
+
+                return bReturn;
             }
         }
 
@@ -1507,6 +1522,8 @@ namespace sx
             UInt16 firstExposureFlags = adjustReadDelayedBlock();
             UInt16 secondExposureFlags = (UInt16)((SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD) & ~firstExposureFlags);
 
+            Debug.Assert(currentExposure.toCamera.x_bin != 7 && currentExposure.toCamera.y_bin != 7);
+
             // We invalidate the data here, so that there is no chance we have to wait for someone
             // to download an image later in the routine when the data is ready for download
             lock (oImageDataLock)
@@ -1514,30 +1531,6 @@ namespace sx
                 imageDataValid = false;
             }
 
-            if (currentExposure.toCamera.x_bin == 7 || currentExposure.toCamera.y_bin == 7)
-            {
-                // SX cameras support binning 1-6, and 8, but not 7.  ASCOM only allows you to 
-                // specify a max value.  So in order to all 8, we have to deal with 7, but 7 seems
-                // to crash some cameras sometimes.  So we short circuit it here.
-                //
-                
-                int totalLines = currentExposure.userRequested.height/currentExposure.userRequested.y_bin;
-                int width = currentExposure.toCamera.width/currentExposure.toCamera.x_bin;
-
-                Log.Write(String.Format("creating dummy image for 7X binning. totalLines={0} width={1}\n", totalLines, width));
-
-                imageRawData = System.Array.CreateInstance(pixelType, totalLines * width);
-
-                exposureEnd = DateTimeOffset.Now;
-
-                lock (oImageDataLock)
-                {
-                    imageDataValid = true;
-                    imageData = null;
-                }
-
-                return;
-            }
 
             lock (m_controller.mutex)
             {

@@ -1721,11 +1721,8 @@ namespace ASCOM.SXGeneric
                     }
 
                     CaptureDelegate captureDelegate;
-#if false
-                    Log.Write("Forcing use of software timer\n");
-                    useHardwareTimer = false;
-#endif
-                    if (useHardwareTimer)
+
+                    if (useHardwareTimer || sxCamera.mustUseDelayedRead)
                     {
                         sxCamera.delayMs = (uint)(1000 * Duration);
                         captureDelegate = new CaptureDelegate(hardwareCapture);
