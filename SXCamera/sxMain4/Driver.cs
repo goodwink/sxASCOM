@@ -23,7 +23,7 @@ namespace ASCOM.SXMain4
     {
         private const UInt16 DEFAULT_CONTROLLER_NUMBER = 4;
         private const UInt16 DEFAULT_CAMERA_ID = 0;
-
+            
         public Camera() :
             base(DEFAULT_CONTROLLER_NUMBER, DEFAULT_CAMERA_ID)
         {

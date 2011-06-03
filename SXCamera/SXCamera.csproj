@@ -123,6 +123,8 @@
     <Compile Include="sxMain0\Driver.cs" />
     <Compile Include="sxMain2\Driver.cs" />
     <Compile Include="sxMain3\Driver.cs" />
+    <Compile Include="sxMain4\Driver.cs" />
+    <Compile Include="sxMain5\Driver.cs" />
     <Compile Include="UsbRoutines\Acknowlegements.cs" />
     <Compile Include="UsbRoutines\DeviceManagement.cs" />
     <Compile Include="UsbRoutines\DeviceManagementApi.cs" />

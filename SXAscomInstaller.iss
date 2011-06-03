@@ -91,8 +91,13 @@ begin
             P.DeviceType := 'Camera';
 
             if P.IsRegistered('ASCOM.SXMain0.Camera') or 
-               P.IsRegistered('ASCOM.SXMain1.Camera') or
-               P.IsRegistered('ASCOM.SXGuide.Camera')
+               P.IsRegistered('ASCOM.SXMain1.Camera') or 
+               P.IsRegistered('ASCOM.SXMain2.Camera') or 
+               P.IsRegistered('ASCOM.SXMain3.Camera') or 
+               P.IsRegistered('ASCOM.SXMain4.Camera') or 
+               P.IsRegistered('ASCOM.SXMain5.Camera') or 
+               P.IsRegistered('ASCOM.SXGuide0.Camera') or
+               P.IsRegistered('ASCOM.SXGuide1.Camera')
             then
                 begin
                     MsgBox('A previous version of this driver was detected. You must uninstall the previous version (from the control panel) before installation can proceed.', mbInformation, MB_OK);
@@ -115,72 +120,37 @@ function ShouldSkipPage(PageID: Integer): Boolean;
 begin
     Result := FALSE;
 
-    if (PageID = LodeStarsPage.ID) then
+    if PageID = LodeStarsPage.ID then
         Result := StandAloneGuiderPage.Values[0];
 
-    if (PageID = CoStarsPage.ID) then
-        Result := StandAloneGuiderPage.Values[0] or not LodeStarsPage.Values[0];
-
-    if (PageID = CoStarPage.ID) then
-        Result := StandAloneGuiderPage.Values[0] or LodeStarsPage.Values[2] or LodeStarsPage.Values[0];
+    if PageID = CoStarsPage.ID then
+        Result := StandAloneGuiderPage.Values[0];
 
     if PageID = GuideCamerasPage.ID then
-    begin
-        Result := not ImagingCameraPage.Values[2] or not LodeStarsPage.Values[0] or not CoStarsPage.Values[0];
-    end
+        Result := not ImagingCameraPage.Values[2];
 
-    if (PageID = GuideCameraPage.ID) then
-        result := ImagingCameraPage.Values[0] or LodestarsPage.Values[2] or CoStarsPage.Values[2] or (LodestarsPage.Values[1] and (CostarsPage.Values[1] or CostarPage.Values[1])) or (ImagingCameraPage.Values[2] and not (LodestarsPage.Values[1] or CostarsPage.Values[1] or CostarPage.Values[1]))
+    if PageID = GuideCameraPage.ID then
+        result := not ImagingCameraPage.Values[1];
+
 end;
 
-function BackButtonClick(CurPageID: Integer): Boolean;
+function NextButtonClick(CurPageID: Integer): Boolean;
 begin
     Result := TRUE;
-
-    if (curPageId = LodeStarsPage.ID) then
+    if CurPageID = ImagingCameraPage.ID then
     begin
-        LodeStarsPage.Values[0] := True;
-        LodeStarsPage.Values[1] := False;
-        LodeStarsPage.Values[2] := False;
-    end
-
-    if (curPageId = CoStarsPage.ID) then
-    begin
-        CoStarsPage.Values[0] := True;
-        CoStarsPage.Values[1] := False;
-        CoStarsPage.Values[2] := False;
-    end
-
-    if (curPageId = CoStarPage.ID) then
-    begin
-        CoStarPage.Values[0] := True;
-        CoStarPage.Values[1] := False;
-    end
-
-    if curPageId = GuideCamerasPage.ID then
-    begin
-        GuideCamerasPage.Values[0] := True;
-        GuideCamerasPage.Values[1] := False;
-        GuideCamerasPage.Values[2] := False;
-    end
-
-    if (curPageId = GuideCameraPage.ID) then
-    begin
-        GuideCameraPage.Values[0] := True;
-        GuideCameraPage.Values[1] := False;
-    end
+        if LodeStarsPage.Values[0] and CostarsPage.Values[0] and ImagingCameraPage.Values[0] then
+        begin
+            MsgBox('No cameras specified for Installation, unable to proceed', mbError, MB_OK);
+            Result := FALSE;
+        end
+    end;
 end;
 
 procedure InitializeWizard();
 begin
 
-    OverviewPage := CreateInputOptionPage(wpLicense,
-      'Overview', 
-      '',
-      'Starlight Xpress makes a three different types of cameras:'#13#10#13#10'-Standalone Guide Cameras'#13#10'-Imaging Cameras'#13#10'-Autoguider cameras.'#13#10#13#10'This driver supports a total of 4 cameras, a maximum of 2 guide cameras (Standalone or Autoguide) and 2 Imaging Cameras'#13#10#13#10'The next few screens will gather the required information to complete the driver installation',
-      True, False);
-
-    StandAloneGuiderPage := CreateInputOptionPage(OverviewPage.ID,
+    StandAloneGuiderPage := CreateInputOptionPage(wpLicense,
       'Standalone Guide Camera Configuration', 
       'Standalone Guide Cameras are small, eyepiece sized guide cameras that connect to your PC via USB.',
       'Do you have an Starlight Xpress Standalone Guide Cameras?',
@@ -218,18 +188,7 @@ begin
     CoStarsPage.Values[1] := False;
     CoStarsPage.Values[2] := False;
 
-    CoStarPage := CreateInputOptionPage(CoStarsPage.ID,
-      'CoStar Configuration', 
-      'CoStar is a small, eyepiece sized color guide camera that connects to your PC via USB.',
-      'Do you have a Starlight Xpress CoStar USB Guide Camera?',
-      True, False);
-    CoStarPage.Add('No');
-    CoStarPage.Add('Yes, I have a CoStar Camera');
-
-    CoStarPage.Values[0] := True;
-    CoStarPage.Values[1] := False;
-
-    ImagingCameraPage := CreateInputOptionPage(CoStarPage.ID,
+    ImagingCameraPage := CreateInputOptionPage(CoStarsPage.ID,
       'Imaging Camera Configuration', 
       'This is a camera which connects to to your PC via USB.',
       'Do you have a Starlight Xpress Imaging Camera?',
@@ -272,27 +231,27 @@ function RegistrationArgs(Param : String) : String;
 begin
     Result := '/register';
 
-    if (LodeStarsPage.Values[1]) then
+    if LodeStarsPage.Values[1] then
         Result := Result + ' /lodestar'
     else 
-        if (LodeStarsPage.Values[2]) then
+        if LodeStarsPage.Values[2] then
             Result := Result + ' /lodestar2';
 
-    if (CoStarsPage.Values[1] or CoStarPage.Values[1]) then
+    if CoStarsPage.Values[1] then
         Result := Result + ' /costar'
     else 
-        if (CoStarPage.Values[2]) then
+        if CoStarsPage.Values[2] then
             Result := Result + ' /costar2';
 
-    if (ImagingCameraPage.Values[1]) then
+    if ImagingCameraPage.Values[1] then
         Result := Result + ' /main'
     else
-        if (ImagingCameraPage.Values[2]) then
+        if ImagingCameraPage.Values[2] then
             Result := Result + ' /main2'
 
-    if (GuideCameraPage.Values[1] or GuideCamerasPage.Values[1]) then
+    if GuideCameraPage.Values[1] or GuideCamerasPage.Values[1] then
         Result := Result + ' /autoguide'
     else
-        if (GuideCamerasPage.Values[2]) then
+        if GuideCamerasPage.Values[2] then
             Result := Result + ' /autoguide2'
 end;

@@ -235,6 +235,8 @@ namespace ASCOM.SXCamera
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain1.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain2.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain3.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain4.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain5.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXGuide0.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXGuide1.Camera"));
 #if False
@@ -343,12 +345,15 @@ namespace ASCOM.SXCamera
 
             bool registerMain0 = false;
             bool registerMain1 = false;
-            bool registerAutoGuide0 = false;
-            bool registerAutoGuide1 = false;
+
             bool registerLodeStar0 = false;
             bool registerLodeStar1 = false;
+
             bool registerCoStar0 = false;
             bool registerCoStar1 = false;
+
+            bool registerAutoGuide0 = false;
+            bool registerAutoGuide1 = false;
 
             foreach (string opt in args)
             {
@@ -532,8 +537,6 @@ namespace ASCOM.SXCamera
                         break;
                 }
 
-                MessageBox.Show(String.Format("considering {0}, registerThisOne={1}, ascomName={2}", type.ToString().ToLower(), registerThisOne, ascomName), "SXCamera", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 if (registerThisOne)
                 {
                     try
