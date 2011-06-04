@@ -28,27 +28,26 @@ namespace ASCOM.SXCamera
     public class SharedResources
     {
         private SharedResources() { }							// Prevent creation of instances
-        private static object m_mutex;
-        private static bool bParallelControllers = false;
+        private static object m_mutex = null;
+        private static bool bSerializeControllers = true;
+        public static sx.Controller [] controllers;
+        private const uint maxControllers = 6;
 
         static SharedResources()								// Static initialization
         {
             Log.Write("SharedResources()\n");
 
-            if (bParallelControllers)
-            {
-                m_mutex = null;
-            }
-            else
+            if (bSerializeControllers)
             {
                 m_mutex = new object();
             }
-            controller0 = new sx.Controller(m_mutex);
-            controller1 = new sx.Controller(m_mutex);
-            controller2 = new sx.Controller(m_mutex);
-            controller3 = new sx.Controller(m_mutex);
-            controller4 = new sx.Controller(m_mutex);
-            controller5 = new sx.Controller(m_mutex);
+
+            controllers = new sx.Controller[maxControllers];
+
+            for(int i=0;i<maxControllers;i++)
+            {
+                controllers[i] = new sx.Controller(m_mutex);
+            }
 
             Log.Write(String.Format("SharedResources() returns, m_mutex={0}\n", m_mutex));
         }
@@ -56,42 +55,6 @@ namespace ASCOM.SXCamera
         //
         // Public access to shared resources
         //
-
-        public static sx.Controller controller0
-        {
-            get;
-            private set;
-        }
-
-        public static sx.Controller controller1
-        {
-            get;
-            private set;
-        }
-
-        public static sx.Controller controller2
-        {
-            get;
-            private set;
-        }
-
-        public static sx.Controller controller3
-        {
-            get;
-            private set;
-        }
-
-        public static sx.Controller controller4
-        {
-            get;
-            private set;
-        }
-
-        public static sx.Controller controller5
-        {
-            get;
-            private set;
-        }
 
         public static string versionNumber
         {

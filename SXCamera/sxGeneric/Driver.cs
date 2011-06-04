@@ -88,33 +88,9 @@ namespace ASCOM.SXGeneric
                                 
                 m_cameraId = whichCamera;
                 m_lastLoggedConnected = true;
-
                 m_config = new ASCOM.SXCamera.Configuration(whichController, whichCamera);
-
-                switch (whichController)
-                {
-                    case 0:
-                        m_controller = ASCOM.SXCamera.SharedResources.controller0;
-                        break;
-                    case 1:
-                        m_controller = ASCOM.SXCamera.SharedResources.controller1;
-                        break;
-                    case 2:
-                        m_controller = ASCOM.SXCamera.SharedResources.controller2;
-                        break;
-                    case 3:
-                        m_controller = ASCOM.SXCamera.SharedResources.controller3;
-                        break;
-                    case 4:
-                        m_controller = ASCOM.SXCamera.SharedResources.controller4;
-                        break;
-                    case 5:
-                        m_controller = ASCOM.SXCamera.SharedResources.controller5;
-                        break;
-                    default:
-                        throw new ASCOM.InvalidValueException("SXGeneric constructor error: whichController", whichController.ToString(), "0 <= whichController <= 1");
-                }
-
+                m_controller = ASCOM.SXCamera.SharedResources.controllers[whichController];
+                
                 if (m_config.selectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)
                 {
                     m_vid = m_pid = 0;
