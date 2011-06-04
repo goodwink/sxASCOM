@@ -16,7 +16,7 @@ namespace sx
     /// camera), there is still only one of these devices present.
     ///
     /// Locking:
-    ///    The controller object has a mutex field that is used as the lock.  It is necessary to lock the interface when
+    ///    The controller object has a lock field that is used as the lock.  It is necessary to lock the interface when
     /// a transaction is occuring.  There are three types of transactions:
     /// - simple command writes that return no data
     /// - operations that require a write to begin, and which return data that is collected with read
@@ -95,26 +95,26 @@ namespace sx
             }
         }
 
-        public object mutex
+        public object Lock
         {
             get;
             private set;
         }
 
 
-        public Controller(object mutex)
+        public Controller(object Lock)
         {
             Log.Write(String.Format("Controller() entered\n"));
 
             Connected = false;
             
-            if (mutex == null)
+            if (Lock == null)
             {
-                this.mutex = this;
+                this.Lock = this;
             }
             else
             {
-                this.mutex = mutex;
+                this.Lock = Lock;
             }
 
             Log.Write("Controller(): returns\n");
@@ -153,7 +153,7 @@ namespace sx
 
             // I lock here to prevent the data from two writes from getting interleaved. I doubt windows would actually do that, but 
             // it is easy to prevent it here and then I know I don't have to worry about it.
-            lock (this.mutex)
+            lock (this.Lock)
             {
                 Log.Write("Write has locked\n");
                 m_iface.Write(block, data, out numBytesWritten);
@@ -173,7 +173,7 @@ namespace sx
             verifyConnected(MethodBase.GetCurrentMethod().Name);
 
             // See the comment above the lock in Write() for more information on this lock. 
-            lock (this.mutex)
+            lock (this.Lock)
             {
                 Log.Write("Read has locked\n");
                 oReturn = m_iface.Read(returnType, numBytesToRead, out numBytesRead);
@@ -214,7 +214,7 @@ namespace sx
             Log.Write(String.Format("echo({0}) begins\n", s));
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_ECHO, 0, 0, (UInt16)s.Length);
 
-            lock (this.mutex)
+            lock (this.Lock)
             {
 
                 Write(cmdBlock, s, out numBytesWritten);
@@ -253,7 +253,7 @@ namespace sx
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_FIRMWARE_VERSION, 0, 0, 0);
 
-            lock (this.mutex)
+            lock (this.Lock)
             {
                 Log.Write("getVersion has locked\n");
                 Write(cmdBlock, out numBytesWritten);
@@ -296,7 +296,7 @@ namespace sx
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_GET_TIMER, 0, 0, 0);
 
-            lock (this.mutex)
+            lock (this.Lock)
             {
                 Log.Write("getTimer has locked\n");
                 Write(cmdBlock, out numBytesWritten);
@@ -358,7 +358,7 @@ namespace sx
 
             Log.Write(String.Format("guide({0}, {1}) begins\n", direction, durationMS));
 
-            lock (this.mutex)
+            lock (this.Lock)
             {
                 try
                 {

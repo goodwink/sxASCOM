@@ -19,9 +19,7 @@ namespace sx
 
     internal class USBInterface
     {
-
         // Hardware info
-
         internal const String GUID_STRING = "{606377C1-2270-11d4-BFD8-00207812F5D5}";
 
         // Variables

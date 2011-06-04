@@ -28,7 +28,7 @@ namespace ASCOM.SXCamera
     public class SharedResources
     {
         private SharedResources() { }							// Prevent creation of instances
-        private static object m_mutex = null;
+        private static object m_lock = null;
         private static bool bSerializeControllers = true;
         public static sx.Controller [] controllers;
         private const uint maxControllers = 6;
@@ -39,17 +39,17 @@ namespace ASCOM.SXCamera
 
             if (bSerializeControllers)
             {
-                m_mutex = new object();
+                m_lock = new object();
             }
 
             controllers = new sx.Controller[maxControllers];
 
             for(int i=0;i<maxControllers;i++)
             {
-                controllers[i] = new sx.Controller(m_mutex);
+                controllers[i] = new sx.Controller(m_lock);
             }
 
-            Log.Write(String.Format("SharedResources() returns, m_mutex={0}\n", m_mutex));
+            Log.Write(String.Format("SharedResources() returns, m_lock={0}\n", m_lock));
         }
 
         //
