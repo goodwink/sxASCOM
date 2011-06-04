@@ -77,13 +77,5 @@ namespace WinUsbDemo
 
             return (!(deviceHandle.IsInvalid));
         }
-
-        public int WriteDevice(SafeFileHandle handle, IntPtr data, Int32 numBytesToWrite, out Int32 numBytesWritten)
-        {
-            int r = ReadFile( handle, data, numBytesToWrite, out numBytesWritten, IntPtr.Zero);
-
-            return r;
-        }
     }
-
 }
