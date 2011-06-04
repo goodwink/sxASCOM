@@ -401,19 +401,10 @@ namespace sx
             }
         }
 
-        public bool mustUseDelayedRead
+        public bool mustUseHardwareTimer
         {
-            get
-            {
-                bool bReturn = false;
-
-                if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
-                {
-                    bReturn = true;
-                }
-
-                return bReturn;
-            }
+            get;
+            private set;
         }
 
 
@@ -426,10 +417,13 @@ namespace sx
         {
             bool bUntested = false;
 
-            // Some cameras, like the CoStar don't support the "usual" SX binning,
+            // Some cameras, like the CoStar, don't support the "usual" SX binning,
             // so it is now a per camera property
             maxXBin = MAX_X_BIN;
             maxYBin = MAX_Y_BIN;
+
+            // Some Camers, like the CoStar, don't support software timing
+            mustUseHardwareTimer = false;
 
             switch ((CameraModels)cameraModel)
             {
@@ -482,13 +476,13 @@ namespace sx
                     progressive = true;
                     break;
                 case CameraModels.MODEL_COSTAR:
-                    bUntested = true;
                     description = "CoStar";
-                    fullWellCapacity = 50000;
-                    electronsPerADU = 0.9;
+                    fullWellCapacity = 20000;
+                    electronsPerADU = 0.3;
                     progressive = true;
                     maxXBin = 1;
                     maxYBin = 1;
+                    mustUseHardwareTimer = true;
                     break;
                 case CameraModels.MODEL_LX1:
                     description = "Lodestar";

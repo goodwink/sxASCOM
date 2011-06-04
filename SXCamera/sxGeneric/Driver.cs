@@ -1710,7 +1710,7 @@ namespace ASCOM.SXGeneric
 
                     CaptureDelegate captureDelegate;
 
-                    if (useHardwareTimer || sxCamera.mustUseDelayedRead)
+                    if (useHardwareTimer || sxCamera.mustUseHardwareTimer)
                     {
                         sxCamera.delayMs = (uint)(1000 * Duration);
                         captureDelegate = new CaptureDelegate(hardwareCapture);
