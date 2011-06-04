@@ -85,7 +85,7 @@ namespace sx
 
                 if (bUseThisDevice)
                 {
-                    Log.Write(String.Format("attepting to get a handle for USB Device {0}\n", devicePathName));
+                    Log.Write(String.Format("attempting to get a handle for USB Device {0}\n", devicePathName));
                     if (!FileIO.GetDeviceHandle(devicePathName, out deviceHandle))
                     {
                         Log.Write(String.Format("Unable to get a device handle for GUID {0} using path {1} - skipping", Guid, devicePathName));
