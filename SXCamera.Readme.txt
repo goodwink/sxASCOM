@@ -1,13 +1,15 @@
 Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
-This is the README.txt for version 1.5.6.
+This is the README.txt for version 1.5.7.
 
-This is an UNSTABLE release, of the ASCOM driver for Starlight Xpress cameras.  There is a STABLE release available - please use that version if it meets
+This is an UNSTABLE release of the ASCOM driver for Starlight Xpress cameras,
+which contains untested or lightly tested code and will expire.
+
+There is a STABLE release available - please use that version if it meets
 your needs.
 
-It contains fixes for a conform temperature problem, initial support for 
-multiple instances of a single camera type, and initial changes for 
-the CoStar camera.
+This version contains additional CoStar enhancments, and adds support
+for many more cameras (up to 8, 2xImaging, 2xLodestar, 2xCostar, 2xGuider)
 
 If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know
