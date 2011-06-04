@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
@@ -27,6 +28,9 @@ namespace sx
         internal string devicePathName;
         internal DeviceManagement myDeviceManagement = new WinUsbDemo.DeviceManagement();
 
+        // Mutex
+        internal Mutex m_mutex;
+
         // Look for a device with:
         //  any Vid/Pid if Vid == 0
         //  Vid/Pid as specified if skip = False
@@ -47,20 +51,20 @@ namespace sx
                     throw new System.IO.IOException(String.Format("Unable to locate a USB device with GUID {0}, vid={1}, pid={2}, skip={3}", Guid, vid, pid, skip));
                 }
 
-                Log.Write(String.Format("Considering USB Device {0}\n", devicePathName));
+                Log.Write(String.Format("USBInterface: Considering USB Device {0}\n", devicePathName));
 
                 UInt16 foundVid, foundPid;
 
                 DeviceManagement.parsePath(devicePathName, out foundVid, out foundPid);
 
-                Log.Write(String.Format("checking VID/PID - foundVID={0} foundPID={1}\n", foundVid, foundPid));
+                Log.Write(String.Format("USBInterface: checking VID/PID - foundVID={0} foundPID={1}\n", foundVid, foundPid));
 
                 if (vid != 0)
                 {
                     bool bVIDMatch = (foundVid == vid);
                     bool bPIDMatch = (foundPid == pid);
 
-                    Log.Write(String.Format("initally bVIDMatch={0} bPIDMatch={1}\n", bVIDMatch, bPIDMatch));
+                    Log.Write(String.Format("USBInterface: initally bVIDMatch={0} bPIDMatch={1}\n", bVIDMatch, bPIDMatch));
 
                     // a pid of 0xffff matches guide cameras
 
@@ -71,30 +75,52 @@ namespace sx
 
                     bUseThisDevice = (bVIDMatch && bPIDMatch);
 
-                    Log.Write(String.Format("pre skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
+                    Log.Write(String.Format("USBInterface: pre skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
 
                     if (skip)
                     {
                         bUseThisDevice = !bUseThisDevice;
                     }
 
-                    Log.Write(String.Format("post skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
+                    Log.Write(String.Format("USBInterface: post skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
                 }
 
                 if (bUseThisDevice)
                 {
-                    Log.Write(String.Format("attempting to get a handle for USB Device {0}\n", devicePathName));
+                    Log.Write(String.Format("USBInterface: attempting to get a handle for USB Device {0}\n", devicePathName));
                     if (!FileIO.GetDeviceHandle(devicePathName, out deviceHandle))
                     {
-                        Log.Write(String.Format("Unable to get a device handle for GUID {0} using path {1} - skipping", Guid, devicePathName));
+                        Log.Write(String.Format("USBInterface: Unable to get a device handle for GUID {0} using path {1} - skipping", Guid, devicePathName));
                     }
 
-                    Log.Write(String.Format("USB deviceHandle={0}\n", deviceHandle));
-                    break;
+                    // For reasons I don't undersand, we can get a device handle for a device thatis already open, 
+                    // even though we specify no sharing of the file when we open it.  So, in order to make sure 
+                    // that we don't open the same camera twice we create a mutex that has the same name as 
+                    // the device (execpt that we have to replace "\" with "/" because // mutex names cannot contain "\").
+                    // If we find that the mutex already existed, we assume the device is already in use and keep looking.
+
+                    String mutexName = devicePathName.Replace("\\", "/");
+                    bool createdNew;
+
+                    m_mutex = new Mutex(true, mutexName, out createdNew);
+
+                    Log.Write(String.Format("USBInterface: mutexName={0} createdNew={1}\n", mutexName, createdNew));
+
+                    Log.Write(String.Format("USBInterface: deviceHandle.IsInvalid={0}\n", deviceHandle.IsInvalid));
+
+                    if (createdNew)
+                    {
+                        break;
+                    }
+
+                    Log.Write(String.Format("USBInterface: mutex was already in use - closing handle and continuing search\n"));
+
+                    m_mutex.Close();
+                    FileIO.CloseDeviceHandle(deviceHandle);
                 }
                 else
                 {
-                    Log.Write(String.Format("skipping USB Device {0} because of skip/vid/pid\n", devicePathName));
+                    Log.Write(String.Format("USBInterface: skipping USB Device {0} because of skip/vid/pid\n", devicePathName));
                 }
             } 
         }

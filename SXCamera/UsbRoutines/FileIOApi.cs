@@ -30,8 +30,7 @@ namespace WinUsbDemo
 
         // Free the kernel's file object (close the file).
         [DllImport("kernel32", SetLastError = true)]
-        //[ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
-        internal extern static bool CloseHandle(IntPtr handle);
+        internal extern static bool CloseHandle(SafeFileHandle handle);
 
 
         ///  <summary>
@@ -76,6 +75,11 @@ namespace WinUsbDemo
                 0);
 
             return (!(deviceHandle.IsInvalid));
+        }
+
+        public static Boolean CloseDeviceHandle(SafeFileHandle deviceHandle)
+        {
+            return FileIO.CloseHandle(deviceHandle);
         }
     }
 }
