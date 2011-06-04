@@ -107,7 +107,15 @@ namespace sx
             Log.Write(String.Format("Controller() entered\n"));
 
             Connected = false;
-            this.mutex = mutex;
+            
+            if (mutex == null)
+            {
+                this.mutex = this;
+            }
+            else
+            {
+                this.mutex = mutex;
+            }
 
             Log.Write("Controller(): returns\n");
         }

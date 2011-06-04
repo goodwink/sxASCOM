@@ -29,12 +29,20 @@ namespace ASCOM.SXCamera
     {
         private SharedResources() { }							// Prevent creation of instances
         private static object m_mutex;
+        private static bool bParallelControllers = false;
 
         static SharedResources()								// Static initialization
         {
             Log.Write("SharedResources()\n");
 
-            m_mutex = new object();
+            if (bParallelControllers)
+            {
+                m_mutex = null;
+            }
+            else
+            {
+                m_mutex = new object();
+            }
             controller0 = new sx.Controller(m_mutex);
             controller1 = new sx.Controller(m_mutex);
             controller2 = new sx.Controller(m_mutex);
@@ -42,7 +50,7 @@ namespace ASCOM.SXCamera
             controller4 = new sx.Controller(m_mutex);
             controller5 = new sx.Controller(m_mutex);
 
-            Log.Write("SharedResources() returns\n");
+            Log.Write(String.Format("SharedResources() returns, m_mutex={0}\n", m_mutex));
         }
 
         //
