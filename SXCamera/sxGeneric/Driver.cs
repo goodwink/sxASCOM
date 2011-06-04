@@ -84,7 +84,7 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write(String.Format("Generic::Camera({0}, {1})\n", whichCamera, whichController));
+                Log.Write(String.Format("Generic::Camera({0}, {1})\n", whichController, whichCamera));
                                 
                 m_cameraId = whichCamera;
                 m_lastLoggedConnected = true;
@@ -98,6 +98,18 @@ namespace ASCOM.SXGeneric
                         break;
                     case 1:
                         m_controller = ASCOM.SXCamera.SharedResources.controller1;
+                        break;
+                    case 2:
+                        m_controller = ASCOM.SXCamera.SharedResources.controller2;
+                        break;
+                    case 3:
+                        m_controller = ASCOM.SXCamera.SharedResources.controller3;
+                        break;
+                    case 4:
+                        m_controller = ASCOM.SXCamera.SharedResources.controller4;
+                        break;
+                    case 5:
+                        m_controller = ASCOM.SXCamera.SharedResources.controller5;
                         break;
                     default:
                         throw new ASCOM.InvalidValueException("SXGeneric constructor error: whichController", whichController.ToString(), "0 <= whichController <= 1");
