@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
 using Logging;
@@ -424,6 +425,15 @@ namespace sx
 
             // Some Camers, like the CoStar, don't support software timing
             mustUseHardwareTimer = false;
+
+#if false
+            if ((CameraModels)cameraModel == CameraModels.MODEL_H9C)
+            {
+                MessageBox.Show(String.Format("Turning H9C into Fake CoStar"));
+                Log.Write(String.Format("Turning H9C into Fake CoStar"));
+                cameraModel = (UInt16)CameraModels.MODEL_COSTAR;
+            }
+#endif
 
             switch ((CameraModels)cameraModel)
             {
@@ -1256,7 +1266,6 @@ namespace sx
                 {
                     for (y = 0; y < cameraBinnedHeight; y += 2)
                     {
-
                         // This loop is based on cameraBinnedWidth, not binnedWidth because we have to 
                         // get all the pixels accoss each row every time, even if we don't want them all.
                         // Otherwise we will give the wrong data to next row
@@ -1283,7 +1292,6 @@ namespace sx
                             {
                                 imageData[x, y + 1] = pixel;
                             }
-
 
                             if (x + 1 < cameraBinnedWidth)
                             {
@@ -1320,7 +1328,6 @@ namespace sx
             else if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
             {
                 int x=-1, y=-1;
-                int srcIdx = 0;
 
                 Log.Write("convertCameraDataToImageData(): decoding COSTAR data\n");
 
@@ -1339,28 +1346,27 @@ namespace sx
                     Log.Write(String.Format("CoStar decode begins: userRequest.x_offset={0}, userReqested.width={1}, userRequested.Height={2}\n",
                             currentExposure.userRequested.x_offset, currentExposure.userRequested.width, currentExposure.userRequested.height));
 
+                    UInt16 [] lineBuffer = new UInt16[frameWidth];
+
                     for (y = 0; y < binnedHeight; y++)
                     {
-                        //Log.Write(String.Format("CoStar decoding line {0}, srcIdx={1}\n", y, srcIdx));
+                        Buffer.BlockCopy(imageRawData, y*frameWidth, lineBuffer, 0, frameWidth*2);
 
-                        bias[0] = 0;
-                        bias[1] = 0;
+                        bias[0] = lineBuffer[0];
+                        bias[1] = lineBuffer[1];
 
-                        for(x=0; x < 16; x++)
+                        for(x=2; x < 16; x++)
                         {
-                            bias[x % 2] += (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                            bias[x % 2] += lineBuffer[x];
                         }
 
                         bias[0] /= 8;
                         bias[1] /= 8;
 
-                        //Log.Write(String.Format("CoStar evenBias={0} oddBias={1}\n", bias[0], bias[1]));
-
-                        srcIdx += currentExposure.userRequested.x_offset;
-
-                        for (x = 0; x < currentExposure.userRequested.width; x++)
+                        int destX = 0;
+                        for (x += currentExposure.userRequested.x_offset; x < currentExposure.userRequested.width; x++)
                         {
-                                UInt16 pixelValue = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
+                                UInt16 pixelValue = lineBuffer[x];
 
                                 if (pixelValue < 65535)
                                 {
@@ -1376,49 +1382,87 @@ namespace sx
                                     }
                                 }
 
-                                imageData[x, y] = pixelValue;
+                                imageData[destX++, y] = pixelValue;
                         }
-
-                        srcIdx += frameWidth - (currentExposure.userRequested.width + currentExposure.userRequested.x_offset);
                     }
-
-                    Debug.Assert(srcIdx == imageRawData.Length);
                 }
                 catch (System.Exception ex)
                 {
-                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing CoStar data at pixel ({0}, {1}) from {2} - {3}\n", x, y, srcIdx, ex.ToString()));
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing CoStar data at pixel ({0}, {1}) - {3}\n", x, y, ex.ToString()));
+                    throw ex;
+                }
+            }
+            else if (pixelType == typeof(System.Int16))
+            {
+                int x=-1, y=-1;
+
+                Log.Write("convertCameraDataToImageData() processing 16 bit camera data\n");
+
+                try
+                {
+                    int actualHeight = imageRawData.Length / binnedWidth;
+
+                    // It is possible for interlaced cameras that there might not be as much data read 
+                    // from the camera as might be expected.
+                    // For  example, you would expect a 10x10 sensor binned 3X to give 3 rows.  But
+                    // with an interlaced camera it is actally 2x10x5, and the 5 only gives 1 row for 3X
+                    // binning. 
+                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight -1 )));
+
+                    UInt16 [] lineBuffer = new UInt16[binnedWidth];
+
+                    for (y = 0; y < actualHeight; y++)
+                    {
+                        Buffer.BlockCopy(imageRawData, y*binnedWidth, lineBuffer, 0, binnedWidth*2);
+
+                        for (x = 0; x < binnedWidth; x++)
+                        {
+                                imageData[x, y] = lineBuffer[x];
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing 16bit image data at pixel ({0}, {1}) - {3}\n", x, y, ex.ToString()));
+                    throw ex;
+                }
+            }
+            else if (pixelType == typeof(System.Byte))
+            {
+                int x=-1, y=-1;
+
+                Debug.Assert(pixelType == typeof(System.Byte));
+
+                Log.Write("convertCameraDataToImageData() processing 8 bit camera data\n");
+
+                try
+                {
+                    int actualHeight = imageRawData.Length / binnedWidth;
+
+                    // see comment above
+                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight -1 )));
+
+                    Byte [] lineBuffer = new Byte[binnedWidth];
+
+                    for (y = 0; y < actualHeight; y++)
+                    {
+                        Buffer.BlockCopy(imageRawData, y*binnedWidth, lineBuffer, 0, binnedWidth);
+
+                        for (x = 0; x < binnedWidth; x++)
+                        {
+                                imageData[x, y] = (Int32)lineBuffer[x];
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing 8bit image data at pixel ({0}, {1}) - {3}\n", x, y, ex.ToString()));
                     throw ex;
                 }
             }
             else
             {
-                int srcIdx = 0;
-                int x=-1, y=-1;
-
-                try
-                {
-                    for (y = 0; y < binnedHeight; y++)
-                    {
-                        for (x = 0; x < binnedWidth; x++)
-                        {
-                            if (srcIdx < imageRawData.Length)
-                            {
-                                imageData[x, y] = (UInt16)Convert.ToInt32(imageRawData.GetValue(srcIdx++));
-                            }
-                            else
-                            {
-                                // sometimes with interlaced cameras, there is 1 less row than might be expected (10 rows, 3x3 binning only gives 2 row)
-                                Debug.Assert(interlaced && y == binnedHeight - 1);
-                                imageData[x, y] = 0;
-                            }
-                        }
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing non-M25C data at pixel ({0}, {1}) from {2} - {3}\n", x, y, srcIdx, ex.ToString()));
-                    throw ex;
-                }
+                throw new System.Exception(String.Format("Unable to decode image - unknown camera or pixel type"));
             }
 
             Log.Write("convertCameraDataToImageData(): ends\n");
