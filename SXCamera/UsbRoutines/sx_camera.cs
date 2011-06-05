@@ -1341,7 +1341,7 @@ namespace sx
                     // We accumlate separate values for odd and even pixels, and then subtract the
                     // bias from each non-saturated pixel
 
-                    UInt32 [] bias = new UInt32[2];
+                    Int32 [] bias = new Int32[2];
 
                     Log.Write(String.Format("CoStar decode begins: userRequest.x_offset={0}, userReqested.width={1}, userRequested.Height={2}\n",
                             currentExposure.userRequested.x_offset, currentExposure.userRequested.width, currentExposure.userRequested.height));
@@ -1369,19 +1369,17 @@ namespace sx
 
                         for (x = startingXIndex; x < endingXIndex; x++)
                         {
-                                UInt16 pixelValue = lineBuffer[x];
+                                Int32 pixelValue = lineBuffer[x];
 
                                 if (pixelValue < 65535)
                                 {
-                                    UInt16 thisBias = (UInt16)bias[x % 2];
+                                    Int32 thisBias = bias[x % 2];
 
-                                    if (pixelValue < thisBias)
+                                    pixelValue -= thisBias;
+
+                                    if (pixelValue < 0)
                                     {
                                         pixelValue = 0;
-                                    }
-                                    else
-                                    {
-                                        pixelValue -= thisBias;
                                     }
                                 }
 
@@ -1405,12 +1403,12 @@ namespace sx
                 {
                     int actualHeight = imageRawData.Length / binnedWidth;
 
-                    // It is possible for interlaced cameras that there might not be as much data read 
-                    // from the camera as might be expected.
+                    // It is possible for interlaced cameras to not supply as much data 
+                    // would be expected from just the height and binning mode.
                     // For  example, you would expect a 10x10 sensor binned 3X to give 3 rows.  But
                     // with an interlaced camera it is actally 2x10x5, and the 5 only gives 1 row for 3X
                     // binning. 
-                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight -1 )));
+                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight - 1)));
 
                     UInt16 [] lineBuffer = new UInt16[binnedWidth];
 
@@ -1434,8 +1432,6 @@ namespace sx
             {
                 int x=-1, y=-1;
 
-                Debug.Assert(pixelType == typeof(System.Byte));
-
                 Log.Write("convertCameraDataToImageData() processing 8 bit camera data\n");
 
                 try
@@ -1443,7 +1439,7 @@ namespace sx
                     int actualHeight = imageRawData.Length / binnedWidth;
 
                     // see comment above
-                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight -1 )));
+                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight - 1)));
 
                     Byte [] lineBuffer = new Byte[binnedWidth];
 
