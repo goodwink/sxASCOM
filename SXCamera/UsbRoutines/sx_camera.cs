@@ -1364,7 +1364,10 @@ namespace sx
                         bias[1] /= 8;
 
                         int destX = 0;
-                        for (x += currentExposure.userRequested.x_offset; x < currentExposure.userRequested.width; x++)
+                        int startingXIndex = 16 + currentExposure.userRequested.x_offset;
+                        int endingXIndex = startingXIndex + currentExposure.userRequested.width;
+
+                        for (x = startingXIndex; x < endingXIndex; x++)
                         {
                                 UInt16 pixelValue = lineBuffer[x];
 
