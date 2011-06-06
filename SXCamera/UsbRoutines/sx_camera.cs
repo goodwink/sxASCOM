@@ -1202,6 +1202,8 @@ namespace sx
 
         internal void convertCameraDataToImageData()
         {
+            Int32 cameraBinnedWidth = currentExposure.toCamera.width / currentExposure.toCamera.x_bin;
+            Int32 cameraBinnedHeight = currentExposure.toCamera.height / currentExposure.toCamera.y_bin;
             Int32 binnedWidth  = currentExposure.userRequested.width / currentExposure.userRequested.x_bin;
             Int32 binnedHeight = currentExposure.userRequested.height / currentExposure.userRequested.y_bin;
 
@@ -1235,8 +1237,6 @@ namespace sx
                 // Output Row2: BCFGJK...
                 //
 
-                Int32 cameraBinnedWidth = currentExposure.toCamera.width / currentExposure.toCamera.x_bin;
-                Int32 cameraBinnedHeight = currentExposure.toCamera.height / currentExposure.toCamera.y_bin;
                 int srcIdx = 0;
                 int x = -1, y = -1;
 
@@ -1325,74 +1325,6 @@ namespace sx
                     throw ex;
                 }
             }
-            else if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
-            {
-                int x=-1, y=-1;
-
-                Log.Write("convertCameraDataToImageData(): decoding COSTAR data\n");
-
-                Debug.Assert(currentExposure.toCamera.x_bin == 1);
-                Debug.Assert(currentExposure.toCamera.y_bin == 1);
-                Debug.Assert(currentExposure.toCamera.width == ccdWidth);
-
-                try
-                {
-                    // The CoStar has 16 black level reference pixels at the beginning of a line.
-                    // We accumlate separate values for odd and even pixels, and then subtract the
-                    // bias from each non-saturated pixel
-
-                    Int32 [] bias = new Int32[2];
-
-                    Log.Write(String.Format("CoStar decode begins: userRequest.x_offset={0}, userReqested.width={1}, userRequested.Height={2}\n",
-                            currentExposure.userRequested.x_offset, currentExposure.userRequested.width, currentExposure.userRequested.height));
-
-                    UInt16 [] lineBuffer = new UInt16[frameWidth];
-
-                    for (y = 0; y < binnedHeight; y++)
-                    {
-                        Buffer.BlockCopy(imageRawData, y*frameWidth, lineBuffer, 0, frameWidth*2);
-
-                        bias[0] = lineBuffer[0];
-                        bias[1] = lineBuffer[1];
-
-                        for(x=2; x < 16; x++)
-                        {
-                            bias[x % 2] += lineBuffer[x];
-                        }
-
-                        bias[0] /= 8;
-                        bias[1] /= 8;
-
-                        int destX = 0;
-                        int startingXIndex = 16 + currentExposure.userRequested.x_offset;
-                        int endingXIndex = startingXIndex + currentExposure.userRequested.width;
-
-                        for (x = startingXIndex; x < endingXIndex; x++)
-                        {
-                                Int32 pixelValue = lineBuffer[x];
-
-                                if (pixelValue < 65535)
-                                {
-                                    Int32 thisBias = bias[x % 2];
-
-                                    pixelValue -= thisBias;
-
-                                    if (pixelValue < 0)
-                                    {
-                                        pixelValue = 0;
-                                    }
-                                }
-
-                                imageData[destX++, y] = pixelValue;
-                        }
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing CoStar data at pixel ({0}, {1}) - {3}\n", x, y, ex.ToString()));
-                    throw ex;
-                }
-            }
             else if (pixelType == typeof(System.Int16))
             {
                 int x=-1, y=-1;
@@ -1402,6 +1334,7 @@ namespace sx
                 try
                 {
                     int actualHeight = imageRawData.Length / binnedWidth;
+                    Int32 [] bias = null;
 
                     // It is possible for interlaced cameras to not supply as much data 
                     // would be expected from just the height and binning mode.
@@ -1410,15 +1343,60 @@ namespace sx
                     // binning. 
                     Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight - 1)));
 
-                    UInt16 [] lineBuffer = new UInt16[binnedWidth];
+                    if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
+                    {
+                        Debug.Assert(currentExposure.toCamera.x_bin == 1);
+                        Debug.Assert(currentExposure.toCamera.y_bin == 1);
+                        Debug.Assert(currentExposure.toCamera.width == ccdWidth);
+                        Debug.Assert(idx == 0);
+
+                        bias = new Int32[2];
+
+                        Log.Write(String.Format("CoStar decode begins: userRequest.x_offset={0}, userReqested.width={1}, userRequested.Height={2}\n",
+                                currentExposure.userRequested.x_offset, currentExposure.userRequested.width, currentExposure.userRequested.height));
+                    }
+
+                    UInt16 [] lineBuffer = new UInt16[cameraBinnedWidth];
 
                     for (y = 0; y < actualHeight; y++)
                     {
-                        Buffer.BlockCopy(imageRawData, y*binnedWidth, lineBuffer, 0, binnedWidth*2);
+                        Buffer.BlockCopy(imageRawData, y*cameraBinnedWidth*sizeof(UInt16), lineBuffer, 0, cameraBinnedWidth*sizeof(UInt16));
 
-                        for (x = 0; x < binnedWidth; x++)
+                        if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
                         {
-                                imageData[x, y] = lineBuffer[x];
+                            bias[0] = lineBuffer[0];
+                            bias[1] = lineBuffer[1];
+
+                            for(x=2; x < 16; x++)
+                            {
+                                bias[x % 2] += lineBuffer[x];
+                            }
+
+                            bias[0] /= 8;
+                            bias[1] /= 8;
+
+                            int xIdx = 0;
+                            int startingXIndex = 16 + currentExposure.userRequested.x_offset;
+                            int endingXIndex = startingXIndex + currentExposure.userRequested.width;
+
+                            for (x = startingXIndex; x < endingXIndex; x++)
+                            {
+                                Int32 pixelValue = lineBuffer[x] + 1000 - bias[x % 2];
+
+                                if (pixelValue > 65535)
+                                {
+                                    pixelValue = 65535;
+                                }
+
+                                imageData[xIdx++, y] = pixelValue;
+                            }
+                        }
+                        else
+                        {
+                            for (x = 0; x < binnedWidth; x++)
+                            {
+                                    imageData[x, y] = lineBuffer[x];
+                            }
                         }
                     }
                 }
@@ -1441,11 +1419,11 @@ namespace sx
                     // see comment above
                     Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight - 1)));
 
-                    Byte [] lineBuffer = new Byte[binnedWidth];
+                    Byte [] lineBuffer = new Byte[cameraBinnedWidth];
 
                     for (y = 0; y < actualHeight; y++)
                     {
-                        Buffer.BlockCopy(imageRawData, y*binnedWidth, lineBuffer, 0, binnedWidth);
+                        Buffer.BlockCopy(imageRawData, y*cameraBinnedWidth*sizeof(Byte), lineBuffer, 0, cameraBinnedWidth*sizeof(Byte));
 
                         for (x = 0; x < binnedWidth; x++)
                         {
