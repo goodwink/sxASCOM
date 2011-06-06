@@ -36,6 +36,7 @@ namespace ASCOM.SXCamera
         static SharedResources()								// Static initialization
         {
             Log.Write("SharedResources()\n");
+            Log.Write(String.Format("Driver version = {0}\n", versionNumber));
 
             if (bSerializeControllers)
             {

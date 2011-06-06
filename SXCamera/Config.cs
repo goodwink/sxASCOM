@@ -94,7 +94,7 @@ namespace ASCOM.SXCamera
         
         public Configuration(UInt16 whichController, UInt16 whichCamera)
         {
-            Log.Write(String.Format("Configuration({0}, {1} starts\n", whichController, whichCamera));
+            Log.Write(String.Format("Configuration({0}, {1}) starts\n", whichController, whichCamera));
 
             m_profile = new Profile();
             m_profile.DeviceType = DEVICE_TYPE;

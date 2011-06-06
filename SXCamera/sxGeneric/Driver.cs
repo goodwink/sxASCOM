@@ -84,7 +84,7 @@ namespace ASCOM.SXGeneric
         {
             try
             {
-                Log.Write(String.Format("Generic::Camera({0}, {1})\n", whichController, whichCamera));
+                Log.Write(String.Format("Generic::Camera({0}, {1}) begins\n", whichController, whichCamera));
                                 
                 m_cameraId = whichCamera;
                 m_lastLoggedConnected = true;
