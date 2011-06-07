@@ -427,7 +427,7 @@ namespace sx
             mustUseHardwareTimer = false;
 
 #if false
-            if ((CameraModels)cameraModel == CameraModels.MODEL_H9C)
+            if ((CameraModels)cameraModel == CameraModels.MODEL_LX1)
             {
                 MessageBox.Show(String.Format("Turning H9C into Fake CoStar"));
                 Log.Write(String.Format("Turning H9C into Fake CoStar"));
@@ -1333,7 +1333,7 @@ namespace sx
 
                 try
                 {
-                    int actualHeight = imageRawData.Length / binnedWidth;
+                    int actualHeight = imageRawData.Length / cameraBinnedWidth;
                     Int32 [] bias = null;
 
                     // It is possible for interlaced cameras to not supply as much data 
@@ -1362,47 +1362,52 @@ namespace sx
                     {
                         Buffer.BlockCopy(imageRawData, y*cameraBinnedWidth*sizeof(UInt16), lineBuffer, 0, cameraBinnedWidth*sizeof(UInt16));
 
-                        if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
+                        switch ((CameraModels)cameraModel)
                         {
-                            bias[0] = lineBuffer[0];
-                            bias[1] = lineBuffer[1];
-
-                            for(x=2; x < 16; x++)
+                            case CameraModels.MODEL_COSTAR:
                             {
-                                bias[x % 2] += lineBuffer[x];
-                            }
+                                bias[0] = lineBuffer[0];
+                                bias[1] = lineBuffer[1];
 
-                            bias[0] /= 8;
-                            bias[1] /= 8;
-
-                            int xIdx = 0;
-                            int startingXIndex = 16 + currentExposure.userRequested.x_offset;
-                            int endingXIndex = startingXIndex + currentExposure.userRequested.width;
-
-                            for (x = startingXIndex; x < endingXIndex; x++)
-                            {
-                                Int32 pixelValue = lineBuffer[x] + 1000 - bias[x % 2];
-
-                                if (pixelValue > 65535)
+                                for(x=2; x < 16; x++)
                                 {
-                                    pixelValue = 65535;
+                                    bias[x % 2] += lineBuffer[x];
                                 }
 
-                                imageData[xIdx++, y] = pixelValue;
+                                bias[0] /= 8;
+                                bias[1] /= 8;
+
+                                int xIdx = 0;
+                                int startingXIndex = 16 + currentExposure.userRequested.x_offset;
+                                int endingXIndex = startingXIndex + currentExposure.userRequested.width;
+
+                                for (x = startingXIndex; x < endingXIndex; x++)
+                                {
+                                    Int32 pixelValue = lineBuffer[x] + 1000 - bias[x % 2];
+
+                                    if (pixelValue > 65535)
+                                    {
+                                        pixelValue = 65535;
+                                    }
+
+                                    imageData[xIdx++, y] = pixelValue;
+                                }
+                                break;
                             }
-                        }
-                        else
-                        {
-                            for (x = 0; x < binnedWidth; x++)
+                            default:
                             {
-                                    imageData[x, y] = lineBuffer[x];
+                                for (x = 0; x < binnedWidth; x++)
+                                {
+                                        imageData[x, y] = lineBuffer[x];
+                                }
+                                break;
                             }
                         }
                     }
                 }
                 catch (System.Exception ex)
                 {
-                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing 16bit image data at pixel ({0}, {1}) - {3}\n", x, y, ex.ToString()));
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing 16bit image data at pixel ({0}, {1}) - {2}\n", x, y, ex.ToString()));
                     throw ex;
                 }
             }
@@ -1414,7 +1419,7 @@ namespace sx
 
                 try
                 {
-                    int actualHeight = imageRawData.Length / binnedWidth;
+                    int actualHeight = imageRawData.Length / cameraBinnedWidth;
 
                     // see comment above
                     Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight - 1)));
@@ -1433,7 +1438,7 @@ namespace sx
                 }
                 catch (System.Exception ex)
                 {
-                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing 8bit image data at pixel ({0}, {1}) - {3}\n", x, y, ex.ToString()));
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing 8bit image data at pixel ({0}, {1}) - {2}\n", x, y, ex.ToString()));
                     throw ex;
                 }
             }
