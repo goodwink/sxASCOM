@@ -39,10 +39,18 @@ namespace ASCOM.SXCamera
         private const bool DEFAULT_SYMETRIC_BINNING = true;
 
         private const string KEY_MAX_Y_BIN = "MaxYBin";
+#if DEBUG
+        private const byte DEFAULT_MAX_Y_BIN = 8;
+#else
         private const byte DEFAULT_MAX_Y_BIN = 4;
+#endif
 
         private const string KEY_MAX_X_BIN = "MaxXBin";
+#if DEBUG
+        private const byte DEFAULT_MAX_X_BIN = 8;
+#else
         private const byte DEFAULT_MAX_X_BIN = 4;
+#endif
 
         public enum CAMERA_SELECTION_METHOD
         {
