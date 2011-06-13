@@ -169,10 +169,11 @@ namespace sx
             return size;
         }
 
-        internal void Write(SX_CMD_BLOCK block, Object data, out Int32 numBytesWritten)
+        internal void Write(SX_CMD_BLOCK block, Object data)
         {
             IntPtr unManagedBlockBuffer = IntPtr.Zero;
             Int32 numBytesToWrite = Marshal.SizeOf(block) + ObjectSize(data);
+            Int32 numBytesWritten;
             
             try
             {
@@ -250,16 +251,16 @@ namespace sx
             }
         }
 
-        internal void Write(SX_CMD_BLOCK block, out Int32 numBytesWritten)
+        internal void Write(SX_CMD_BLOCK block)
         {
-            Write(block, null, out numBytesWritten);
+            Write(block, null);
         }
 
-        internal object Read(Type returnType, Int32 numBytesToRead, out Int32 numBytesRead)
+        internal object Read(Type returnType, Int32 numBytesToRead)
         {
             IntPtr unManagedBuffer = IntPtr.Zero;
             Object obj = null;
-            numBytesRead = 0;
+            Int32 numBytesRead = 0;
 
             Log.Write(String.Format("interface Read({0}, {1}) begins\n", returnType, numBytesToRead));
             try

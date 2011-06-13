@@ -905,9 +905,14 @@ namespace ASCOM.SXGeneric
                     }
 
                     Int32[,] data = (Int32[,])ImageArray;
+
+                    Log.Write(String.Format("got data value {0}\n", data));
+
                     Int32 width = data.GetLength(0);
                     Int32 height = data.GetLength(1);
                     object[,] oReturn = new object[width, height];
+
+                    Log.Write(String.Format("Generic::ImageArrayVariant get: width={0} height={1}\n", width, height));
 
                     for (int x = 0; x < width; x++)
                     {
@@ -926,7 +931,7 @@ namespace ASCOM.SXGeneric
                 catch (System.Exception ex)
                 {
                     SetError(ex.ToString());
-                    throw new ASCOM.ValueNotSetException(MethodBase.GetCurrentMethod().Name, ex);
+                    throw new ASCOM.DriverException(String.Format("Caught an exception in {0}", MethodBase.GetCurrentMethod().Name), ex);
                 }
             }
         }

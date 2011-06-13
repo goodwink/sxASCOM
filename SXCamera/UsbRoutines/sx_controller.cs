@@ -147,7 +147,7 @@ namespace sx
             Log.Write(String.Format("buildCommandBlock(): type=0x{0:x2} cmd=0x{1:x2} cmd_value=0x{2:x4} index=0x{3:x4} cmd_length=0x{4:x4}\n", cmd_type, cmd, cmd_value, index, cmd_length));
         }
 
-        internal void Write(SX_CMD_BLOCK block, Object data, out Int32 numBytesWritten)
+        internal void Write(SX_CMD_BLOCK block, Object data)
         {
             verifyConnected(MethodBase.GetCurrentMethod().Name);
 
@@ -156,17 +156,17 @@ namespace sx
             lock (this.Lock)
             {
                 Log.Write("Write has locked\n");
-                m_iface.Write(block, data, out numBytesWritten);
+                m_iface.Write(block, data);
             }
             Log.Write("Write has unlocked\n");
         }
            
-        internal void Write(SX_CMD_BLOCK block, out Int32 numBytesWritten)
+        internal void Write(SX_CMD_BLOCK block)
         {
-            Write(block, null, out numBytesWritten);
+            Write(block, null);
         }
 
-        internal object Read(Type returnType, Int32 numBytesToRead, out Int32 numBytesRead)
+        internal object Read(Type returnType, Int32 numBytesToRead)
         {
             object oReturn;
             
@@ -176,37 +176,36 @@ namespace sx
             lock (this.Lock)
             {
                 Log.Write("Read has locked\n");
-                oReturn = m_iface.Read(returnType, numBytesToRead, out numBytesRead);
+                oReturn = m_iface.Read(returnType, numBytesToRead);
             }
             Log.Write("Read has unlocked\n"); 
             return oReturn;
         }
 
-        internal Array ReadArray(Type elementType, Int32 numElements, out Int32 numBytesRead)
+        internal Array ReadArray(Type elementType, Int32 numElements)
         {
             Log.Write(String.Format("ReadArry begins, reading {0} elements of type {1}\n", numElements, elementType));
-            return (Array)Read(System.Array.CreateInstance(elementType, 0).GetType(), numElements * Marshal.SizeOf(elementType), out numBytesRead);
+            return (Array)Read(System.Array.CreateInstance(elementType, 0).GetType(), numElements * Marshal.SizeOf(elementType));
         }
 
-        internal byte[] ReadBytes(Int32 numBytes, out Int32 numBytesRead)
+        internal byte[] ReadBytes(Int32 numBytes)
         {
-            return (byte[])Read(typeof(byte[]), numBytes, out numBytesRead);
+            return (byte[])Read(typeof(byte[]), numBytes);
         }
 
-        internal string ReadString(Int32 numCharsToRead, out Int32 numBytesRead)
+        internal string ReadString(Int32 numCharsToRead)
         {
-            return (string)Read(typeof(System.String), numCharsToRead, out numBytesRead);
+            return (string)Read(typeof(System.String), numCharsToRead);
         }
 
-        internal object ReadObject(Type returnType, out Int32 numBytesRead)
+        internal object ReadObject(Type returnType)
         {
-            return Read(returnType, Marshal.SizeOf(returnType), out numBytesRead);
+            return Read(returnType, Marshal.SizeOf(returnType));
         }
 
         public void echo(string s)
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten, numBytesRead;
             string s2;
 
             verifyConnected(MethodBase.GetCurrentMethod().Name);
@@ -217,9 +216,9 @@ namespace sx
             lock (this.Lock)
             {
 
-                Write(cmdBlock, s, out numBytesWritten);
+                Write(cmdBlock, s);
 
-                s2 = ReadString(s.Length, out numBytesRead);
+                s2 = ReadString(s.Length);
             }
 
             if (s2 != s)
@@ -232,20 +231,18 @@ namespace sx
         public void reset()
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten;
 
             verifyConnected(MethodBase.GetCurrentMethod().Name);
 
             Log.Write("resetting()\n");
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_RESET, 0, 0, 0);
-            Write(cmdBlock, out numBytesWritten);
+            Write(cmdBlock);
         }
 
         public uint getVersion()
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten, numBytesRead;
             byte[] bytes;
             UInt32 ver = 0;
 
@@ -256,9 +253,9 @@ namespace sx
             lock (this.Lock)
             {
                 Log.Write("getVersion has locked\n");
-                Write(cmdBlock, out numBytesWritten);
+                Write(cmdBlock);
 
-                bytes = ReadBytes(Marshal.SizeOf(ver), out numBytesRead);
+                bytes = ReadBytes(Marshal.SizeOf(ver));
             }
             Log.Write("getVersion has unlocked\n");
 
@@ -272,7 +269,6 @@ namespace sx
         void getParams(ref SX_CCD_PARAMS parms)
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten, numBytesRead;
 
             verifyConnected(MethodBase.GetCurrentMethod().Name);
 
@@ -280,15 +276,14 @@ namespace sx
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_GET_CCD_PARMS, 0, 0, 0);
 
-            Write(cmdBlock, out numBytesWritten);
+            Write(cmdBlock);
 
-            parms = (SX_CCD_PARAMS)ReadObject(typeof(SX_CCD_PARAMS), out numBytesRead);
+            parms = (SX_CCD_PARAMS)ReadObject(typeof(SX_CCD_PARAMS));
         }
 
         public int getTimer()
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten, numBytesRead;
             byte[] bytes;
             Int32 ms = 0;
 
@@ -299,9 +294,9 @@ namespace sx
             lock (this.Lock)
             {
                 Log.Write("getTimer has locked\n");
-                Write(cmdBlock, out numBytesWritten);
+                Write(cmdBlock);
 
-                bytes = ReadBytes(Marshal.SizeOf(ms), out numBytesRead);
+                bytes = ReadBytes(Marshal.SizeOf(ms));
             }
             Log.Write("getTimer has unlocked\n");
 
@@ -315,12 +310,11 @@ namespace sx
         public void setTimer(UInt32 ms)
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten;
 
             verifyConnected(MethodBase.GetCurrentMethod().Name);
 
             buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_TIMER, 0, 0, (UInt16)Marshal.SizeOf(ms));
-            Write(cmdBlock, ms, out numBytesWritten);
+            Write(cmdBlock, ms);
         }
 
         public Boolean hasGuideCamera
@@ -344,7 +338,6 @@ namespace sx
         public void guide(UInt16 direction, int durationMS)
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten;
             DateTime guideStart = DateTime.Now;
             
             verifyConnected(MethodBase.GetCurrentMethod().Name);
@@ -365,7 +358,7 @@ namespace sx
                     TimeSpan desiredGuideDuration = TimeSpan.FromMilliseconds(durationMS);
                     DateTime guideEnd = guideStart + desiredGuideDuration;
 
-                    Write(cmdBlock, out numBytesWritten);
+                    Write(cmdBlock);
 
                     // We sleep for most of the guide time, then spin for the last little bit
                     // because this helps us end closer to the right time
@@ -387,7 +380,7 @@ namespace sx
                 finally
                 {
                     buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SET_STAR2K, SX_STAR2K_STOP, 0, 0);
-                    Write(cmdBlock, out numBytesWritten);
+                    Write(cmdBlock);
                 }
             }
 

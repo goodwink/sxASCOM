@@ -1,4 +1,4 @@
-//#define INTERLACED_DEBUG
+#define INTERLACED_DEBUG
 
 using System;
 using System.IO;
@@ -109,7 +109,8 @@ namespace sx
         private SX_CCD_PARAMS ccdParms;
         private SX_READ_DELAYED_BLOCK nextExposure;
         private EXPOSURE_INFO currentExposure;
-        private byte [] imageRawData;
+        private byte [] rawFrame1;
+        private byte [] rawFrame2;
         private Int32[,] imageData;
         private bool imageDataValid;
         private object oImageDataLock;
@@ -269,6 +270,41 @@ namespace sx
         public UInt16 colorMatrix
         {
             get { return ccdParms.color_matrix; }
+        }
+
+        private Boolean hasBiasData
+        {
+            get 
+            {
+                Boolean bReturn = false;
+                
+                if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
+                {
+                    bReturn = true;
+                }
+
+                return bReturn;
+            }
+        }
+
+        private UInt32 numBiasPixels
+        {
+            get
+            {
+                UInt32 ret = 0;
+
+                if (!hasBiasData)
+                {
+                    throw new System.Exception("numBiasPixels() called when hasBiasData == false");
+                }
+
+                if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
+                {
+                    ret = 16;
+                }
+
+                return ret;
+            }
         }
 
         public UInt16 xOffset
@@ -989,7 +1025,6 @@ namespace sx
         internal void clear(Byte Flags)
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten;
 
             if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME | SX_CCD_FLAGS_CLEAR_VERT)) != 0)
             {
@@ -999,7 +1034,7 @@ namespace sx
             m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
 
             Log.Write("clear about to Write\n");
-            m_controller.Write(cmdBlock, out numBytesWritten);
+            m_controller.Write(cmdBlock);
             echo("done"); // the clear takes a long time - when the echo returns we know it is done
             Log.Write("clear about to return\n");
         }
@@ -1030,7 +1065,6 @@ namespace sx
         public UInt16 getModel()
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten, numBytesRead;
             byte[] bytes = new byte[2];
             UInt16 model = 0;
 
@@ -1039,9 +1073,9 @@ namespace sx
             lock (m_controller.Lock)
             {
                 Log.Write("getModel has locked\n");
-                m_controller.Write(cmdBlock, out numBytesWritten);
+                m_controller.Write(cmdBlock);
 
-                bytes = m_controller.ReadBytes(Marshal.SizeOf(model), out numBytesRead);
+                bytes = m_controller.ReadBytes(Marshal.SizeOf(model));
             }
             Log.Write("getModel has unlocked\n");
 
@@ -1053,7 +1087,6 @@ namespace sx
         internal void setCoolerInfo(ref SX_COOLER_BLOCK inBlock, out SX_COOLER_BLOCK outBlock)
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten, numBytesRead;
             byte[] bytes = new byte[Marshal.SizeOf(inBlock)];
 
             Log.Write(String.Format("setCoolerInfo inBlock temp={0} enabled={1}\n", inBlock.coolerTemp, inBlock.coolerEnabled));
@@ -1062,9 +1095,9 @@ namespace sx
             lock (m_controller.Lock)
             {
                 Log.Write("setCooler has locked\n");
-                m_controller.Write(cmdBlock, out numBytesWritten);
+                m_controller.Write(cmdBlock);
 
-                bytes = m_controller.ReadBytes(Marshal.SizeOf(inBlock), out numBytesRead);
+                bytes = m_controller.ReadBytes(Marshal.SizeOf(inBlock));
             }
             Log.Write("setCooler has unlocked\n");
 
@@ -1175,16 +1208,15 @@ namespace sx
         void getParams(ref SX_CCD_PARAMS parms)
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten, numBytesRead;
 
             m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_GET_CCD_PARMS, 0, idx, 0);
 
             lock (m_controller.Lock)
             {
                 Log.Write("getParams has locked\n");
-                m_controller.Write(cmdBlock, out numBytesWritten);
+                m_controller.Write(cmdBlock);
 
-                parms = (SX_CCD_PARAMS)m_controller.ReadObject(typeof(SX_CCD_PARAMS), out numBytesRead);
+                parms = (SX_CCD_PARAMS)m_controller.ReadObject(typeof(SX_CCD_PARAMS));
             }
 
             Log.Write("getParams has unlocked\n");
@@ -1194,106 +1226,57 @@ namespace sx
 
         internal void convertCameraDataToImageData()
         {
-            Int32 cameraBinnedWidth = currentExposure.toCamera.width / currentExposure.toCamera.x_bin;
-            Int32 cameraBinnedHeight = currentExposure.toCamera.height / currentExposure.toCamera.y_bin;
-            Int32 binnedWidth  = currentExposure.userRequested.width / currentExposure.userRequested.x_bin;
-            Int32 binnedHeight = currentExposure.userRequested.height / currentExposure.userRequested.y_bin;
+            UInt32 cameraBinnedWidth  = (UInt32)(currentExposure.toCamera.width / currentExposure.toCamera.x_bin);
+            UInt32 cameraBinnedHeight = (UInt32)(currentExposure.toCamera.height / currentExposure.toCamera.y_bin);
+            UInt32 binnedWidth        = (UInt32)(currentExposure.userRequested.width / currentExposure.userRequested.x_bin);
+            UInt32 binnedHeight       = (UInt32)(currentExposure.userRequested.height / currentExposure.userRequested.y_bin);
 
-            if (bitsPerPixel != 16 && bitsPerPixel != 8)
-            {
-                throw new ArgumentOutOfRangeException("downloadPixels(): bitsPerPixel != 16 && bitPerPixel !=8", "bitsPerPixel");
-            }
+            Log.Write(String.Format("convertCameraDataToImageData(): x_bin = {0} binnedWidth={1} binnedHeight={2}\n", currentExposure.toCamera.x_bin, binnedWidth, binnedHeight));
 
             imageData = new Int32[binnedWidth, binnedHeight];
 
-            // Copy the bytes read from the camera into a UInt32 array.
-            // There must be a better way to do this, but I don't know what it is. 
-
-            Log.Write(String.Format("convertCameraDataToImageData(): x_bin = {0} binnedWidth={1} binnedHeight={2}\n", currentExposure.toCamera.x_bin, binnedWidth, binnedHeight));
+            // Decode the bytes from the camera and store them in the Int32 imageData
 
             if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M25C)
             {
                 Log.Write("convertCameraDataToImageData(): decoding M25C data\n");
 
-                // to go along with the odd requirement that we must double the width and halve the height 
-                // to read the data from MX25C, we have to unscramble the data here
-                //
-                // Before we took the picture, we adjusted the parameters we sent to the camera so that:
-                // - The subimage starts on an even pixel if it is unbinned
-                // - The width and height are even multiples of the respective binning factors
-                // 
-                // A single row of the returned data is unpacked into 2 image rows like this:
-                //
-                // Input row:   ABCDEFGHIJKL...
-                // Output Row1: ADEHIL...
-                // Output Row2: BCFGJK...
-                //
-
-                int x = -1, y = -1;
-
-                // get the binned height and width from the camera. We may not have quite enough data
+                // We use the binned height and width from the camera. We may not have quite enough data
                 // from the camera to fill the output array, so there could be zeros on the right or on the
-                // bottom
-                // Consider
+                // bottom.
+                // Consider:
                 //    sensor: 16x16, binning: 5
                 //    height x width = 3x3 (9 pixels), but the swizzle will get us 6x1 (6 pixels)
                 // The adjustment below would then get us 3x2, and we would put those 6 pixels into the
                 // "upper left" of the output array, leaving zeros in the "lower right"
                 //
-                // In the adustment code, we try to bump the number height if we can, so the only time this 
-                // will actually happen is if we are full height and binning in a way that gets us an odd
-                // number of rows (2016 binned 5, gives 403 rows. The swizzle will leave us with 403/2 
+                // In the adustment code, we try to bump the height (if we can) to avoid this,
+                // so the only time this will actually happen is if we are within the binning of 
+                // full height and binning in a way that gets us an odd number of rows. 
+                // For example, 2016 binned 5, gives 403 rows. The swizzle will leave us with 403/2 
                 // 201 rows that becomes 402 rows when we unswizzle it here, so the last row will be 0
 
                 Log.Write(String.Format("convertCameraDataToImageData(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
-                Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixes={1}, len={2}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, imageRawData.Length));
+                Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixes={1}, len={2}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length));
 
                 Debug.Assert((cameraBinnedHeight * 2 == binnedHeight) || (cameraBinnedHeight * 2 + 1 == binnedHeight));
-                int srcIdx=-1;
 
                 try
                 {
-                    UInt16 [] lineBuffer = new UInt16[cameraBinnedWidth];
-
-                    for (y = 0; y < cameraBinnedHeight; y++)
+                    for (UInt32 y = 0; y < cameraBinnedHeight; y++)
                     {
-                        Buffer.BlockCopy(imageRawData, y*cameraBinnedWidth*bytesPerPixel, lineBuffer, 0, cameraBinnedWidth*bytesPerPixel);
                         Debug.Assert(y < 2*binnedHeight);
-                        srcIdx = 0;
 
-                        for(int z=0;z<1;z++)
+                        for(Byte z=0;z<1;z++)
                         {
-                            int xIdx = 0;
-                            int yIdx = 2*y + z;
-                            int pixelsRemaining = binnedWidth;
+                            UInt32 yIdx = 2U*y + z;
 
                             if (yIdx < binnedHeight)
                             {
-                                if (z == 0)
-                                {
-                                    imageData[xIdx++,yIdx] = lineBuffer[srcIdx++];
-                                    pixelsRemaining--;
-                                    srcIdx += 2;
-                                }
-                                else
-                                {
-                                    srcIdx = 1;
-                                }
-
-                                while(pixelsRemaining > 1)
-                                {
-                                    imageData[xIdx++, yIdx] = lineBuffer[srcIdx++];
-                                    imageData[xIdx++,yIdx] = lineBuffer[srcIdx++];
-                                    pixelsRemaining -= 2;
-                                    srcIdx += 2;
-                                }
-
-                                if (pixelsRemaining > 0)
-                                {
-                                    imageData[xIdx++,yIdx] = lineBuffer[srcIdx++];
-                                    //pixelsRemaining--;
-                                    //srcIdx += 2;
-                                }
+                                copyM25CPixels(rawFrame1, y*cameraBinnedWidth*bytesPerPixel, 
+                                                imageData, yIdx * binnedWidth,
+                                                z == 0,
+                                                cameraBinnedHeight, binnedWidth);
                             }
                         }
                     }
@@ -1301,28 +1284,60 @@ namespace sx
                 catch (System.Exception ex)
                 {
                     Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing M25C data\n"));
-                    Log.Write(String.Format("x = {0} y={1} srcIdx={2}\n", x, y, srcIdx));
                     Log.Write("Exception data was: \n" + ex.ToString() + "\n");
                     throw ex;
                 }
             }
-            else if (bytesPerPixel == 2)
+            else if (bytesPerPixel == 1 || bytesPerPixel == 2)
             {
-                int x=-1, y=-1;
+                Log.Write(String.Format("convertCameraDataToImageData() processing {0} bit {1} camera data\n", bitsPerPixel, interlaced?"interlaced":"progressive"));
 
-                Log.Write("convertCameraDataToImageData() processing 16 bit camera data\n");
+#if INTERLACED_DEBUG
+                if (rawFrame2 != null)
+                {
+                    Int64 frame1=0;
+                    Int64 frame2=0;
+
+                    for(Int32 i = 0; i <rawFrame1.Length/2; i++)
+                    {
+                        frame1 += BitConverter.ToUInt16(rawFrame1, 2*i);
+                    }
+
+                    for(Int32 i = 0; i <rawFrame2.Length/2; i++)
+                    {
+                        frame2 += BitConverter.ToUInt16(rawFrame2, 2 * i);
+                    }
+
+                    Log.Write(String.Format("stats: frame1 + frame2 = {0:N0}\n", frame1 + frame2));
+                    Log.Write(String.Format("stats: frame1 = {0:N0}, ave={1}\n", frame1, frame1/(rawFrame1.LongLength/2)));
+                    Log.Write(String.Format("stats: frame2 = {0:N0}, ave={1}\n", frame2, frame2/(rawFrame2.LongLength/2)));
+                }
+#endif
+
+                UInt32 y = 0xffffffff;
 
                 try
                 {
-                    int actualHeight = imageRawData.Length / bytesPerPixel / cameraBinnedWidth;
+                    UInt32 actualHeight = (UInt32)(rawFrame1.Length / bytesPerPixel / cameraBinnedWidth);
+
+                    UInt32 startingXIndex = 0;
                     Int32 [] bias = null;
+                    Int32 firstBias = 0;
+                    Int32 secondBias = 0;
 
                     // It is possible for interlaced cameras to not supply as much data 
                     // would be expected from just the height and binning mode.
                     // For  example, you would expect a 10x10 sensor binned 3X to give 3 rows.  But
                     // with an interlaced camera it is actally 2x10x5, and the 5 only gives 1 row for 3X
                     // binning. 
-                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == 2*binnedHeight - 1)));
+                    if (interlaced)
+                    {
+                        actualHeight += (UInt32)(rawFrame2.Length / bytesPerPixel / cameraBinnedWidth);
+                    }
+
+                    Log.Write(String.Format("actualHeight={0}\n", actualHeight));
+
+                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight - 1)));
 
                     if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
                     {
@@ -1330,97 +1345,73 @@ namespace sx
                         Debug.Assert(currentExposure.toCamera.y_bin == 1);
                         Debug.Assert(currentExposure.toCamera.width == ccdWidth);
                         Debug.Assert(idx == 0);
-
-                        bias = new Int32[2];
+                        Debug.Assert(hasBiasData);
 
                         Log.Write(String.Format("CoStar decode begins: userRequest.x_offset={0}, userReqested.width={1}, userRequested.Height={2}\n",
                                 currentExposure.userRequested.x_offset, currentExposure.userRequested.width, currentExposure.userRequested.height));
                     }
 
-                    UInt16 [] lineBuffer = new UInt16[cameraBinnedWidth];
+                    if (hasBiasData)
+                    {
+                        bias = new Int32[2];
+                        Debug.Assert(progressive); // no current interlaced cameras have bias, and the loop code below cannot be tested
+                    }
 
                     for (y = 0; y < actualHeight; y++)
                     {
-                        Buffer.BlockCopy(imageRawData, y*cameraBinnedWidth*bytesPerPixel, lineBuffer, 0, cameraBinnedWidth*bytesPerPixel);
+                        UInt32 yOffset =  y;
+                        byte [] rawFrame = rawFrame1;
 
-                        switch ((CameraModels)cameraModel)
+                        if (interlaced)
                         {
-                            case CameraModels.MODEL_COSTAR:
+                            if (y % 2 == 1)
                             {
-                                bias[0] = lineBuffer[0];
-                                bias[1] = lineBuffer[1];
-
-                                for(x=2; x < 16; x++)
-                                {
-                                    bias[x & 1] += lineBuffer[x];
-                                }
-
-                                bias[0] /= 8;
-                                bias[1] /= 8;
-
-                                int startingXIndex = 16 + currentExposure.userRequested.x_offset;
-                                int endingXIndex = startingXIndex + currentExposure.userRequested.width;
-                                int xIdx = 0;
-
-                                for (x = startingXIndex; x < endingXIndex; x++)
-                                {
-                                    Int32 pixelValue = lineBuffer[x] + 1000 - bias[x & 1];
-
-                                    if (pixelValue > 65535)
-                                    {
-                                        pixelValue = 65535;
-                                    }
-
-                                    imageData[xIdx++, y] = pixelValue;
-                                }
-                                break;
+                                rawFrame = rawFrame2;
                             }
-                            default:
+
+                            yOffset /= 2;
+                        }
+                        UInt32 destOffset = y;
+#if false && INTERLACED_DEBUG
+                        if (interlaced)
+                        {
+                                destOffset = yOffset + (y % 2) * binnedHeight/2;
+                        }
+#endif
+
+                        if (hasBiasData)
+                        {
+                            computeBias(rawFrame, yOffset*cameraBinnedWidth, bias);
+
+                            startingXIndex = numBiasPixels;
+
+                            if  ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
                             {
-                                for (x = 0; x < binnedWidth; x++)
+                                Int32 biasOffset = 1000;
+
+                                if (currentExposure.userRequested.x_offset % 2 == 0)
                                 {
-                                        imageData[x, y] = lineBuffer[x];
+                                    firstBias  = biasOffset - bias[0];
+                                    secondBias = biasOffset - bias[1];
                                 }
-                                break;
+                                else
+                                {
+                                    firstBias  = biasOffset - bias[1];
+                                    secondBias = biasOffset - bias[0];
+                                }
+
+                                startingXIndex += currentExposure.userRequested.x_offset;
                             }
                         }
+
+                        //Log.Write(String.Format("calling CopyPixels(rawFrame={0}, yOffset={1}, destOffset={2}\n", rawFrame, yOffset, destOffset));
+                        copyPixels(rawFrame, yOffset*(cameraBinnedWidth+startingXIndex), imageData, destOffset, firstBias, secondBias, binnedHeight, binnedWidth);
                     }
-                    Log.Write(String.Format("Processed {0} lines, {1} pixels/line\n", y, x));
+                    Log.Write(String.Format("Processed {0} lines, {1} pixels/line\n", actualHeight, binnedWidth));
                 }
                 catch (System.Exception ex)
                 {
-                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing 16bit image data at pixel ({0}, {1}) - {2}\n", x, y, ex.ToString()));
-                    throw ex;
-                }
-            }
-            else if (bytesPerPixel == 1)
-            {
-                int x=-1, y=-1;
-
-                Log.Write("convertCameraDataToImageData() processing 8 bit camera data\n");
-
-                try
-                {
-                    int actualHeight = imageRawData.Length / cameraBinnedWidth;
-
-                    // see comment above
-                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight - 1)));
-
-                    Byte [] lineBuffer = new Byte[cameraBinnedWidth];
-
-                    for (y = 0; y < actualHeight; y++)
-                    {
-                        Buffer.BlockCopy(imageRawData, y*cameraBinnedWidth*bytesPerPixel, lineBuffer, 0, cameraBinnedWidth*bytesPerPixel);
-
-                        for (x = 0; x < binnedWidth; x++)
-                        {
-                                imageData[x, y] = (Int32)lineBuffer[x];
-                        }
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing 8bit image data at pixel ({0}, {1}) - {2}\n", x, y, ex.ToString()));
+                    Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing image data at row {0} - {1}\n", y, ex.ToString()));
                     throw ex;
                 }
             }
@@ -1428,14 +1419,48 @@ namespace sx
             {
                 throw new System.Exception(String.Format("Unable to decode image - unknown camera or pixel type"));
             }
+#if INTERLACED_DEBUG
+            {
+                Int64 frameFinal=0;
+                Int64 frameFinalEven=0;
+                Int64 frameFinalOdd=0;
+
+                for(UInt32 y=0;y<binnedHeight;y++)
+                {
+                    for(UInt32 x=0;x<binnedWidth;x++)
+                    {
+                        frameFinal += imageData[x,y];
+                        if (y % 2 == 0)
+                        {
+                            frameFinalEven += imageData[x,y];
+                        }
+                        else
+                        {
+                            frameFinalOdd += imageData[x,y];
+                        }
+                    }
+                }
+                Log.Write(String.Format("stats: frameFinal = {0:N0}, even+odd={1:N0}\n", frameFinal, frameFinalEven+frameFinalOdd));
+                Log.Write(String.Format("stats: frameFinal = {0:N0}, ave={1}\n", frameFinal, frameFinal/imageData.LongLength));
+                Log.Write(String.Format("stats: frameFinalEven = {0:N0}, ave={1}\n", frameFinalEven, frameFinalEven/(imageData.LongLength/2)));
+                Log.Write(String.Format("stats: frameFinalOdd = {0:N0}, ave={1}\n", frameFinalOdd, frameFinalOdd/(imageData.LongLength/2)));
+            }
+#endif
+
+            if (interlaced)
+            {
+                adjustInterlaced();
+            }
 
             Log.Write("convertCameraDataToImageData(): ends\n");
+
+
         }
 
         internal void setPixelSize()
         {
 
-            // there are better ways to do this (like divide by 8), but I wanted to throw the exception
+            // there are better ways to do this (like bitsPerPixle divided by 8), but I wanted to throw the exception
             // in the default case and looked as good as any
 
             switch (bitsPerPixel)
@@ -1447,122 +1472,428 @@ namespace sx
                         bytesPerPixel = 2;
                         break;
                 default:
-                       throw new System.Exception(String.Format("copyPixels: unhandled pixel size {0}\n", bytesPerPixel));
+                       throw new System.Exception(String.Format("setPixelSize: unhandled pixel size {0}\n", bytesPerPixel));
             }
 
             Log.Write(String.Format("setPixelSize: bytesPerPixel=\n", bytesPerPixel));
         }
 
-        internal void downloadPixels(bool setValid, SX_READ_DELAYED_BLOCK exposure)
+        internal byte [] downloadPixels(bool setValid, SX_READ_DELAYED_BLOCK exposure)
         {
-            Int32 numBytesRead;
             Int32 binnedWidth = exposure.width / exposure.x_bin;
             Int32 binnedHeight = exposure.height / exposure.y_bin;
             Int32 imagePixels = binnedWidth * binnedHeight;
+            byte [] ret;
 
             Log.Write(String.Format("downloadPixels(): requesting {0} pixels, {1} bytes each ({2} bytes)\n", imagePixels, bytesPerPixel, imagePixels * bytesPerPixel));
 
-            imageRawData = m_controller.ReadBytes(imagePixels * bytesPerPixel, out numBytesRead);
+            ret = m_controller.ReadBytes(imagePixels * bytesPerPixel);
 
-            lock (oImageDataLock)
-            {
-                if (setValid)
-                {
-                    imageDataValid = true;
-                    imageData = null;
-                }
-                else
-                {
-                    Debug.Assert(imageDataValid == false);
-                }
-            }
-
-            Log.Write("downloadPixels(): read completed, numBytesRead=" + numBytesRead + "\n");
+            Log.Write("downloadPixels(): read completed\n");
 
 #if false
             using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.raw", FileMode.Create)))
             {
-                binWriter.Write(imageRawData);
+                binWriter.Write(ret);
             }
 #endif
+            return ret;
         }
 
-#if false
-        unsafe internal void copyPixels(byte [] src, uint srcOffset, 
-                                        Int32 [,] dest, uint dstOffset, 
-                                        uint biasOffset, uint evenBiasValue, uint oddBiasValue, 
-                                        uint count)
+        // to go along with the odd requirement that we must double the width and halve the height 
+        // to read the data from MX25C, we have to unscramble the data here
+        //
+        // Before we took the picture, we adjusted the parameters we sent to the camera so that:
+        // - The subimage starts on an even pixel if it is unbinned
+        // - The width and height are even multiples of the respective binning factors
+        // 
+        // A single row of the returned data is unpacked into 2 image rows like this:
+        //
+        // Input row:   ABCDEFGHIJKL...
+        // Output Row1: ADEHIL...
+        // Output Row2: BCFGJK...
+        //
+        // Notice that execpt for the beginning and ending, we copy 2 pixels from input to 
+        // output and them skip 2 pixels. For the first output row we have to copy 1 pixel
+        // first, then move ahead 2 before we get into that state, and for the second we 
+        // simply skip the first pixel.
+
+        unsafe internal void copyM25CPixels(byte [] src, UInt32 srcOffset, 
+                                        Int32 [,] dest, UInt32 destOffset, 
+                                        bool isEvenRow,
+                                        UInt32 height, UInt32 width)
         {
-            int evenBias = biasOffset - evenBiasValue;
-            int oddBias  = biasOffset - oddBiasValue;
 
-            Debug.Assert(src.Length >= srcOffset + count);
-            Debug.Assert(dest.Length >= destOffset + count);
+            UInt32 stride = height;
+            UInt32 count = width;
 
-            if (count > 0)
+            Debug.Assert(count > 0);
+            Debug.Assert(src.Length > srcOffset + count);
+            Debug.Assert(dest.Length >= destOffset + stride*(count-1));
+
+            fixed(byte *pSrcBase = src)
             {
-                fixed(Int32 *pDest = dest + destOffset)
+                fixed(Int32 *pDestBase = dest)
                 {
-                    fixed(byte *pSrcBytes = src + srcOffset)
+                    UInt16 *pSrc = ((UInt16 *)pSrcBase) + srcOffset;
+                    Int32 *pDest = pDestBase + destOffset;
+
+                    // Deal with the first pixel...
+                    if (isEvenRow)
+                    {
+                        // by storing it and skipping two for the first row
+                        *pDest = *pSrc++;
+                        pDest += stride;
+                        count--;
+                        pSrc += 2;
+                    }
+                    else
+                    {
+                        // by skipping it for the second row
+                        pSrc++;
+                    }
+
+                    // we are now aligned for using 2 then skipping two
+                    while(count > 1)
+                    {
+                        *pDest = *pSrc++;
+                        pDest += stride;
+                        *pDest = *pSrc++;
+                        pDest += stride;
+
+                        count -= 2;
+                        pSrc += 2;
+                    }
+
+                    // there is at most 1 pixel still needed.  Copy it if needed
+                    if (count > 0)
+                    {
+                        *pDest = *pSrc++;
+                        pDest += stride;
+                        count--;
+                        pSrc += 2;
+                    }
+                }
+            }
+        }
+
+        unsafe internal void computeBias(byte [] src, UInt32 srcOffset, Int32 [] bias)
+        {
+
+            if ((CameraModels)cameraModel != CameraModels.MODEL_COSTAR)
+            {
+                throw new System.Exception("combuteBias called for Non-CoStar camera");
+            }
+
+            fixed(byte *pSrcBase = src)
+            {
+                UInt16 *pSrc = ((UInt16 *)pSrcBase) + srcOffset;
+                Int32 divisor = (Int32)numBiasPixels / 2;
+
+                Debug.Assert(bias.Length == 2);
+                Debug.Assert(numBiasPixels % 2 == 0);
+
+                // offset 0
+                bias[0] = *pSrc++;
+                bias[1] = *pSrc++;
+
+                for(UInt32 i=2;i<numBiasPixels;i++)
+                {
+                    bias[i % 2] = *pSrc++;
+                }
+
+                bias[0] /= divisor;
+                bias[1] /= divisor;
+            }
+        }
+
+        /* 
+         * It seems like it would be better to have one routine for cameras that
+         * provide bias data and different one for those that don't, since only 
+         * one camera has bias data, but my performance measurements show no
+         * measureable difference between the version with and without 
+         * (i.e. over several runs neither was consistently faster)
+         * Since peformance is a wash, I just have a single routine, especially
+         * since it is a complex routine and two copies would mean twice
+         * the potential for bugs.
+         */
+
+        unsafe internal void copyPixels(byte [] src, UInt32 srcOffset, 
+                                        Int32 [,] dest, UInt32 destOffset, 
+                                        Int32 evenBias, Int32 oddBias, 
+                                        UInt32 height, UInt32 width)
+        {
+            UInt32 stride = height;
+            UInt32 count = width;
+
+            Debug.Assert(dest.Length/count == stride);
+            Debug.Assert(count > 0);
+            Debug.Assert(src.Length >= srcOffset + count);
+            Debug.Assert(dest.Length >= destOffset + stride*(count-1));
+
+            //Log.Write(String.Format("copyPixels() - srcOffset={0} destOffset={1} height={2} width={3} count={4} stride={5}\n", srcOffset, destOffset, height, width, count, stride));
+
+            fixed(byte *pSrcBase = src)
+            {
+                fixed(Int32 *pDestBase = dest)
+                {
+                    byte *pSrcBytes = pSrcBase + srcOffset*bytesPerPixel;
+                    Int32 *pDest = pDestBase + destOffset;
+
+                    try
                     {
                         switch(bytesPerPixel)
                         {
                             case 1:
                                     {
-                                        byte *pSrc = pSrcbytes;
+                                        byte *pSrc = pSrcBytes;
 
-                                        if (srcOffset %2 == 1)
+                                        if (srcOffset % 2 == 1)
                                         {
-                                            *pDest++ = *pSrc++ + oddBias;
+                                            Int32 value;
+
+                                            value = *pSrc++ + oddBias;
+                                            if (value > Byte.MaxValue)
+                                            {
+                                                value = Byte.MaxValue;
+                                            }
+                                            *pDest = value;
+                                            pDest += stride;
+
                                             count--;
                                         }
 
-                                        for(;count > 1; count -= 2)
+                                        while (count > 1)
                                         {
-                                            *pDest++ = *pSrc++ + evenBias;
-                                            *pDest++ = *pSrc++ + oddBias;
+                                            Int32 value;
+                                            
+                                            value = *pSrc++ + evenBias;
+                                            if (value > Byte.MaxValue)
+                                            {
+                                                value = Byte.MaxValue;
+                                            }
+                                            *pDest = value;
+                                            pDest += stride;
+
+                                            value = *pSrc++ + oddBias;
+                                            if (value > Byte.MaxValue)
+                                            {
+                                                value = Byte.MaxValue;
+                                            }
+                                            *pDest = value;
+                                            pDest += stride;
+
+                                            count -= 2;
                                         }
 
                                         if (count != 0)
                                         {
-                                            *pDest++ = *pSrc++ + evenBias;
+                                            Int32 value;
+
+                                            value = *pSrc++ + evenBias;
+                                            if (value > Byte.MaxValue)
+                                            {
+                                                value = Byte.MaxValue;
+                                            }
+                                            *pDest = value;
+                                            pDest += stride;
+
                                             count--;
                                         }
+                                        Debug.Assert(pSrc - pSrcBytes - 1 < src.Length);
                                     }
                                     break;
                             case 2:
                                     {
-                                        UInt16 *pSrc = (UInt16 *)pSrc;
+                                        UInt16 *pSrc = (UInt16 *)pSrcBytes;
 
-                                        if (srcOffset %2 == 1)
+                                        if (srcOffset % 2 == 1)
                                         {
-                                            *pDest++ = *pSrc++ + oddBias;
+                                            Int32 value;
+
+                                            value = *pSrc++ + oddBias;
+                                            if (value > UInt16.MaxValue)
+                                            {
+                                                value = UInt16.MaxValue;
+                                            }
+                                            *pDest = value;
+                                            pDest += stride;
+
                                             count--;
                                         }
 
-                                        for(;count > 1; count -= 2)
+                                        while(count > 1)
                                         {
-                                            *pDest++ = *pSrc++ + evenBias;
-                                            *pDest++ = *pSrc++ + oddBias;
+                                            Int32 value;
+                                            
+                                            value = *pSrc++ + evenBias;
+                                            if (value > UInt16.MaxValue)
+                                            {
+                                                value = UInt16.MaxValue;
+                                            }
+                                            *pDest = value;
+                                            pDest += stride;
+
+                                            value = *pSrc++ + oddBias;
+                                            if (value > UInt16.MaxValue)
+                                            {
+                                                value = UInt16.MaxValue;
+                                            }
+                                            *pDest = value;
+                                            pDest += stride;
+
+                                            count -= 2;
                                         }
-                                        
+
                                         if (count != 0)
                                         {
-                                            *pDest++ = *pSrc++ + evenBias;
+                                            Int32 value;
+
+                                            value = *pSrc++ + evenBias;
+                                            if (value > UInt16.MaxValue)
+                                            {
+                                                value = UInt16.MaxValue;
+                                            }
+                                            *pDest = value;
+                                            pDest += stride;
+
                                             count--;
                                         }
+
+                                        Debug.Assert((Byte *)pSrc - pSrcBytes - bytesPerPixel < src.Length);
                                     }
                                     break;
                             default:
                                     throw new System.Exception(String.Format("copyPixels: unhandled pixel size {0}\n", bytesPerPixel));
                         }
+
+                        Debug.Assert(pDest - (pDestBase + destOffset) - stride < src.Length);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Log.Write(String.Format("copyPixels() caught an exception {0}\n", ex.ToString()));
+                        throw ex;
+                    }
+                }
+            }
+            Debug.Assert(count == 0);
+        }
+
+        unsafe internal void adjustInterlaced()
+        {
+            Int64 evenTotal=0;
+            Int64 oddTotal=0;
+
+            Log.Write("adjustProgressive() begins\n");
+
+            // compute the values
+            for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
+            {
+                fixed(Int32 *pImageData = &imageData[x,0])
+                {
+                    Int32 count=imageData.GetUpperBound(1)+1;
+                    Int32 *p = pImageData;
+
+                    while(count > 1)
+                    {
+                        evenTotal += *p++;
+                        oddTotal  += *p++;
+                        count-=2;
+                    }
+
+                    if (count != 0)
+                    {
+                        evenTotal += *p++;
                     }
                 }
             }
 
-            Debug.Asset(count == 0);
+            Log.Write(String.Format("evenTotal={0:N0} oddTotal={1:N0} evenTotal+oddTotal={2:N0}\n", evenTotal, oddTotal, evenTotal+oddTotal));
+
+            if (evenTotal < oddTotal)
+            {
+                double ratio = evenTotal/(double)oddTotal;
+
+                Log.Write(String.Format("adjusting even pixels, ratio={0}\n", ratio));
+
+                // adjust the odd rows
+                for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
+                {
+                    fixed(Int32 *pImageData = &imageData[x,1])
+                    {
+                        Int32 count=imageData.GetUpperBound(1);
+                        Int32 *p = pImageData;
+
+                        while(count > 1)
+                        {
+                            Int32 value = (Int32)(*p * ratio);
+
+                            if (value > Int16.MaxValue)
+                            {
+                                value = Int16.MaxValue;
+                            }
+                            *p = value;
+                            p += 2;
+                            count-=2;
+                        }
+
+                        if (count != 0)
+                        {
+                            Int32 value = (Int32)(*p * ratio);
+
+                            if (value > Int16.MaxValue)
+                            {
+                                value = Int16.MaxValue;
+                            }
+                            *p = value;
+                            p += 2;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                double ratio = oddTotal/(double)evenTotal;
+
+                Log.Write(String.Format("adjusting even pixels, ratio={0}\n", ratio));
+
+                // adjust the even rows
+                for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
+                {
+                    fixed(Int32 *pImageData = &imageData[x,0])
+                    {
+                        Int32 count=imageData.GetUpperBound(1)+1;
+                        Int32 *p = pImageData;
+
+                        while(count > 1)
+                        {
+                            Int32 value = (Int32)(*p * ratio);
+
+                            if (value > Int16.MaxValue)
+                            {
+                                value = Int16.MaxValue;
+                            }
+                            *p = value;
+                            p += 2;
+                            count-=2;
+                        }
+
+                        if (count != 0)
+                        {
+                            Int32 value = (Int32)(*p * ratio);
+
+                            if (value > Int16.MaxValue)
+                            {
+                                value = Int16.MaxValue;
+                            }
+                            *p = value;
+                            p += 2;
+                        }
+                    }
+                }
+            }
+            Log.Write("adjustProgressive() ends\n");
         }
-#endif
 
         public void guideNorth(int durationMS)
         {
@@ -1587,7 +1918,6 @@ namespace sx
         public void recordPixels(bool bDelayed, out DateTimeOffset exposureEnd)
         {
             SX_CMD_BLOCK cmdBlock;
-            Int32 numBytesWritten;
 
             Log.Write(String.Format("recordPixels entered - bDelayed = {0}\n", bDelayed));
             UInt16 firstExposureFlags = adjustReadDelayedBlock();
@@ -1614,7 +1944,7 @@ namespace sx
                                                     firstExposureFlags,
                                                     idx,
                                                     (UInt16)Marshal.SizeOf(currentExposure.toCamera));
-                    m_controller.Write(cmdBlock, currentExposure.toCamera, out numBytesWritten);
+                    m_controller.Write(cmdBlock, currentExposure.toCamera);
                 }
                 else
                 {
@@ -1627,7 +1957,7 @@ namespace sx
                                                     firstExposureFlags,
                                                     idx,
                                                     (UInt16)Marshal.SizeOf(readBlock));
-                    m_controller.Write(cmdBlock, readBlock, out numBytesWritten);
+                    m_controller.Write(cmdBlock, readBlock);
                 }
 
                 Log.Write(String.Format("recordPixels() requested read, flags = {0}\n", firstExposureFlags)); 
@@ -1635,13 +1965,12 @@ namespace sx
             
                 
                 Log.Write("recordPixelsDelayed requesting download\n");
-                downloadPixels(progressive, currentExposure.toCamera);
+                rawFrame1 = downloadPixels(progressive, currentExposure.toCamera);
                 Log.Write("recordPixels() download completed\n");
 
-                if (interlaced && idx == 0)
+                if (idx == 0 && interlaced)
                 {
                     SX_READ_BLOCK readBlock;
-                    byte [] firstFrame = imageRawData;
                     Log.Write("recordPixels() preparing for second frame download\n");
 
                     Debug.Assert(secondExposureFlags != 0);
@@ -1656,96 +1985,22 @@ namespace sx
                                                     (UInt16)Marshal.SizeOf(readBlock));
 
                     Log.Write(String.Format("recordPixels() second frame requesting read, flags = {0}\n", secondExposureFlags));
-                    m_controller.Write(cmdBlock, readBlock, out numBytesWritten);
+                    m_controller.Write(cmdBlock, readBlock);
 
                     exposureEnd = DateTimeOffset.Now;
                     Log.Write("recordPixels() second frame requesting download\n");
-                    downloadPixels(false, currentExposure.toCameraSecond);
+                    rawFrame2 = downloadPixels(false, currentExposure.toCameraSecond);
                     Log.Write("recordPixels() second frame download completed\n");
-                    try
-                    {
-                        stitchImages(firstFrame, imageRawData);
-                    }
-                    catch (System.Exception ex)
-                    {
-                        Log.Write(String.Format("stitch caught an exception: {0}\n", ex.ToString()));
-                    }
-                }
-            }
-            Log.Write("recordPixels() has unlocked\n");
-        }
-
-        internal void stitchImages(byte [] firstFrame, byte [] secondFrame)
-        {
-
-            int totalLines = currentExposure.toCamera.height/currentExposure.toCamera.y_bin + currentExposure.toCameraSecond.height/currentExposure.toCameraSecond.y_bin;
-            int width = currentExposure.toCamera.width/currentExposure.toCamera.x_bin;
-
-            Log.Write(String.Format("stitching interlaced images. totalLines={0} width={1}\n", totalLines, width));
-
-            imageRawData = new Byte[totalLines * bytesPerPixel * width]; 
-
-            Log.Write(String.Format("firstFrame:   typeof()={0} rank={1} length={2}\n", firstFrame.GetType().ToString(), firstFrame.Rank, firstFrame.LongLength));
-            Log.Write(String.Format("secondFrame:  typeof()={0} rank={1} length={2}\n", secondFrame.GetType().ToString(), secondFrame.Rank, secondFrame.LongLength));
-            Log.Write(String.Format("imageRawData: typeof()={0} rank={1} length={2}\n", imageRawData.GetType().ToString(), imageRawData.Rank, imageRawData.LongLength));
-
-            for (int line=0;line < totalLines/2; line++)
-            {
-                // copy line from the first image
-#if INTERLACED_DEBUG
-                Log.Write(String.Format("Array.Copy(firstframe, {0}, imageRawData, {1}, {2}\n", line*width, (2*line)*width, width));
-#endif
-                try
-                {
-                    Buffer.BlockCopy(secondFrame, line*width*bytesPerPixel, imageRawData, 
-#if INTERLACED_DEBUG
-                                     (line)*width * bytesPerPixel,
-#else
-                                     (2*line) * width * bytesPerPixel,                                      
-#endif
-                                     width*bytesPerPixel);
-                }
-                catch
-                {
-                    Log.Write(String.Format("stitch exception in line={0} first Copy(secondFrame,   {1}, {2}, imageRawData, {2}, {3})\n", line, line/2*width, line*width, width));
-                    throw;
-                }
-
-                // if we have an odd number of lines in the requested exposure,
-                // the first frame can have 1 more line that the second, so we have
-                // to check to make sure that there is a line in the second image
-                if (line < currentExposure.toCameraSecond.height/currentExposure.toCameraSecond.y_bin)
-                {
-#if INTERLACED_DEBUG
-                    Log.Write(String.Format("Array.Copy(secondframe, {0}, imageRawData, {1}, {2}\n", line*width, (2*line+1)*width, width));
-#endif
-                    // copy second line
-                    try
-                    {
-                        Buffer.BlockCopy(secondFrame, line*width*bytesPerPixel, imageRawData, 
-#if INTERLACED_DEBUG
-                                         (line + totalLines/2)*width * bytesPerPixel,
-#else
-                                         (2*line + 1) * width * bytesPerPixel,                                      
-#endif
-                                         width*bytesPerPixel);
-                    }
-                    catch
-                    {
-                        Log.Write(String.Format("stitch exception in line={0} second Copy(secondframe, {0}, imageRawData, {1}, {2}\n", line*width, (2*line+1)*width, width));
-                        throw;
-                    }
                 }
             }
 
-            // now that we have built the requested image, mark it as valid
             lock (oImageDataLock)
             {
-                imageDataValid = true;
                 imageData = null;
+                imageDataValid = true;
             }
-            Log.Write("stitched interlaced images, set imageDataValid = true\n");
+
+            Log.Write("recordPixels() returns\n");
         }
     }
 }
-
