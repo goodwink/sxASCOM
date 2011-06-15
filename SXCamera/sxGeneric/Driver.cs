@@ -950,6 +950,14 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
+                    lock (oCameraStateLock)
+                    {
+                        if (state == CameraStates.cameraError)
+                        {
+                                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request due to previous error\n", MethodBase.GetCurrentMethod().Name)));
+                        }
+                    }
+
                     Log.Write(String.Format("Generic::ImageReady get returns {0}\n", bImageValid));
 
                     return bImageValid;
@@ -1492,13 +1500,20 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
+                lock (oCameraStateLock)
+                {
+                    state = CameraStates.cameraError;
+                }
                 throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
             finally
             {
                 lock (oCameraStateLock)
                 {
-                    state = CameraStates.cameraIdle;
+                    if (state != CameraStates.cameraError)
+                    {
+                        state = CameraStates.cameraIdle;
+                    }
                 }
             }
         }
@@ -1593,13 +1608,20 @@ namespace ASCOM.SXGeneric
             }
             catch (System.Exception ex)
             {
+                lock (oCameraStateLock)
+                {
+                    state = CameraStates.cameraError;
+                }
                 throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
             }
             finally
             {
                 lock (oCameraStateLock)
                 {
-                    state = CameraStates.cameraIdle;
+                    if (state != CameraStates.cameraError)
+                    {
+                        state = CameraStates.cameraIdle;
+                    }
                 }
             }
         }
@@ -1740,7 +1762,10 @@ namespace ASCOM.SXGeneric
                 {
                     lock (oCameraStateLock)
                     {
-                        state = CameraStates.cameraIdle;
+                        if (state != CameraStates.cameraError)
+                        {
+                            state = CameraStates.cameraIdle;
+                        }
                     }
                     throw ex;
                 }
