@@ -1,4 +1,4 @@
-#define INTERLACED_DEBUG
+//#define INTERLACED_DEBUG
 
 using System;
 using System.IO;
@@ -415,10 +415,7 @@ namespace sx
                         throw new ArgumentException("ImageArray not valid");
                     }
 
-                    if (imageData == null)
-                    {
-                        convertCameraDataToImageData();
-                    }
+                    Debug.Assert(imageData != null);
 #if false
                     using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.cooked", FileMode.Create)))
                     {
@@ -454,8 +451,8 @@ namespace sx
             // Some Camers, like the CoStar, don't support software timing
             mustUseHardwareTimer = false;
 
-#if false
-            if ((CameraModels)cameraModel == CameraModels.MODEL_LX1)
+#if true
+            if ((CameraModels)cameraModel == CameraModels.MODEL_H9C)
             {
                 MessageBox.Show(String.Format("Turning H9C into Fake CoStar"));
                 Log.Write(String.Format("Turning H9C into Fake CoStar"));
@@ -1233,7 +1230,11 @@ namespace sx
 
             Log.Write(String.Format("convertCameraDataToImageData(): x_bin = {0} binnedWidth={1} binnedHeight={2}\n", currentExposure.toCamera.x_bin, binnedWidth, binnedHeight));
 
-            imageData = new Int32[binnedWidth, binnedHeight];
+            if (imageData == null || imageData.GetUpperBound(0) + 1 != binnedWidth || imageData.GetUpperBound(1) + 1 != binnedHeight)
+            {
+                Log.Write(String.Format("reusing imageData\n"));
+                imageData = new Int32[binnedWidth, binnedHeight];
+            }
 
             // Decode the bytes from the camera and store them in the Int32 imageData
 
@@ -1267,16 +1268,16 @@ namespace sx
                     {
                         Debug.Assert(y < 2*binnedHeight);
 
-                        for(Byte z=0;z<1;z++)
+                        for(Byte z=0;z<2;z++)
                         {
                             UInt32 yIdx = 2U*y + z;
 
                             if (yIdx < binnedHeight)
                             {
-                                copyM25CPixels(rawFrame1, y*cameraBinnedWidth*bytesPerPixel, 
-                                                imageData, yIdx * binnedWidth,
+                                copyM25CPixels(rawFrame1, y*cameraBinnedWidth, 
+                                                imageData, yIdx,
                                                 z == 0,
-                                                cameraBinnedHeight, binnedWidth);
+                                                binnedHeight, binnedWidth);
                             }
                         }
                     }
@@ -1405,7 +1406,7 @@ namespace sx
                         }
 
                         //Log.Write(String.Format("calling CopyPixels(rawFrame={0}, yOffset={1}, destOffset={2}\n", rawFrame, yOffset, destOffset));
-                        copyPixels(rawFrame, yOffset*(cameraBinnedWidth+startingXIndex), imageData, destOffset, firstBias, secondBias, binnedHeight, binnedWidth);
+                        copyPixels(rawFrame, yOffset*cameraBinnedWidth+startingXIndex, imageData, destOffset, firstBias, secondBias, binnedHeight, binnedWidth);
                     }
                     Log.Write(String.Format("Processed {0} lines, {1} pixels/line\n", actualHeight, binnedWidth));
                 }
@@ -1419,37 +1420,9 @@ namespace sx
             {
                 throw new System.Exception(String.Format("Unable to decode image - unknown camera or pixel type"));
             }
-#if INTERLACED_DEBUG
-            {
-                Int64 frameFinal=0;
-                Int64 frameFinalEven=0;
-                Int64 frameFinalOdd=0;
-
-                for(UInt32 y=0;y<binnedHeight;y++)
-                {
-                    for(UInt32 x=0;x<binnedWidth;x++)
-                    {
-                        frameFinal += imageData[x,y];
-                        if (y % 2 == 0)
-                        {
-                            frameFinalEven += imageData[x,y];
-                        }
-                        else
-                        {
-                            frameFinalOdd += imageData[x,y];
-                        }
-                    }
-                }
-                Log.Write(String.Format("stats: frameFinal = {0:N0}, even+odd={1:N0}\n", frameFinal, frameFinalEven+frameFinalOdd));
-                Log.Write(String.Format("stats: frameFinal = {0:N0}, ave={1}\n", frameFinal, frameFinal/imageData.LongLength));
-                Log.Write(String.Format("stats: frameFinalEven = {0:N0}, ave={1}\n", frameFinalEven, frameFinalEven/(imageData.LongLength/2)));
-                Log.Write(String.Format("stats: frameFinalOdd = {0:N0}, ave={1}\n", frameFinalOdd, frameFinalOdd/(imageData.LongLength/2)));
-            }
-#endif
-
             if (interlaced)
             {
-                adjustInterlaced();
+                //adjustInterlaced();
             }
 
             Log.Write("convertCameraDataToImageData(): ends\n");
@@ -1531,6 +1504,8 @@ namespace sx
             Debug.Assert(src.Length > srcOffset + count);
             Debug.Assert(dest.Length >= destOffset + stride*(count-1));
 
+            //Log.Write(String.Format("copyM25CPixels: srcOffset={0} destOffset={1} isEvenRow={2} height={3} width={4}\n", srcOffset, destOffset, isEvenRow, height, width));
+
             fixed(byte *pSrcBase = src)
             {
                 fixed(Int32 *pDestBase = dest)
@@ -1538,40 +1513,49 @@ namespace sx
                     UInt16 *pSrc = ((UInt16 *)pSrcBase) + srcOffset;
                     Int32 *pDest = pDestBase + destOffset;
 
-                    // Deal with the first pixel...
-                    if (isEvenRow)
+                    try
                     {
-                        // by storing it and skipping two for the first row
-                        *pDest = *pSrc++;
-                        pDest += stride;
-                        count--;
-                        pSrc += 2;
-                    }
-                    else
-                    {
-                        // by skipping it for the second row
-                        pSrc++;
-                    }
 
-                    // we are now aligned for using 2 then skipping two
-                    while(count > 1)
-                    {
-                        *pDest = *pSrc++;
-                        pDest += stride;
-                        *pDest = *pSrc++;
-                        pDest += stride;
+                        // Deal with the first pixel...
+                        if (isEvenRow)
+                        {
+                            // by storing it and skipping two for the first row
+                            *pDest = *pSrc++;
+                            pDest += stride;
+                            count--;
+                            pSrc += 2;
+                        }
+                        else
+                        {
+                            // by skipping it for the second row
+                            pSrc++;
+                        }
 
-                        count -= 2;
-                        pSrc += 2;
+                        // we are now aligned for using 2 then skipping two
+                        while(count > 1)
+                        {
+                            *pDest = *pSrc++;
+                            pDest += stride;
+                            *pDest = *pSrc++;
+                            pDest += stride;
+
+                            count -= 2;
+                            pSrc += 2;
+                        }
+
+                        // there is at most 1 pixel still needed.  Copy it if needed
+                        if (count > 0)
+                        {
+                            *pDest = *pSrc++;
+                            pDest += stride;
+                            count--;
+                            pSrc += 2;
+                        }
                     }
-
-                    // there is at most 1 pixel still needed.  Copy it if needed
-                    if (count > 0)
+                    catch (System.Exception ex)
                     {
-                        *pDest = *pSrc++;
-                        pDest += stride;
-                        count--;
-                        pSrc += 2;
+                        Log.Write(String.Format("copyM25CPixels() caught an exception {0}\n", ex.ToString()));
+                        throw ex;
                     }
                 }
             }
@@ -1631,7 +1615,7 @@ namespace sx
             Debug.Assert(src.Length >= srcOffset + count);
             Debug.Assert(dest.Length >= destOffset + stride*(count-1));
 
-            //Log.Write(String.Format("copyPixels() - srcOffset={0} destOffset={1} height={2} width={3} count={4} stride={5}\n", srcOffset, destOffset, height, width, count, stride));
+            Log.Write(String.Format("copyPixels() - srcOffset={0} destOffset={1} height={2} width={3} count={4} stride={5}\n", srcOffset, destOffset, height, width, count, stride));
 
             fixed(byte *pSrcBase = src)
             {
@@ -1767,7 +1751,7 @@ namespace sx
                                     throw new System.Exception(String.Format("copyPixels: unhandled pixel size {0}\n", bytesPerPixel));
                         }
 
-                        Debug.Assert(pDest - (pDestBase + destOffset) - stride < src.Length);
+                        Debug.Assert(pDest - (pDestBase + destOffset) - stride < dest.Length);
                     }
                     catch (System.Exception ex)
                     {
@@ -1785,6 +1769,34 @@ namespace sx
             Int64 oddTotal=0;
 
             Log.Write("adjustProgressive() begins\n");
+#if INTERLACED_DEBUG
+            {
+                Int64 frameFinal=0;
+                Int64 frameFinalEven=0;
+                Int64 frameFinalOdd=0;
+
+                for(UInt32 y=0;y<imageData.GetUpperBound(1) + 1;y++)
+                {
+                    for(UInt32 x=0;x<imageData.GetUpperBound(0) + 1;x++)
+                    {
+                        frameFinal += imageData[x,y];
+                        if (y % 2 == 0)
+                        {
+                            frameFinalEven += imageData[x,y];
+                        }
+                        else
+                        {
+                            frameFinalOdd += imageData[x,y];
+                        }
+                    }
+                }
+                Log.Write(String.Format("before stats: frameFinal = {0:N0}, even+odd={1:N0}\n", frameFinal, frameFinalEven+frameFinalOdd));
+                Log.Write(String.Format("stats: frameFinal = {0:N0}, ave={1}\n", frameFinal, frameFinal/imageData.LongLength));
+                Log.Write(String.Format("stats: frameFinalEven = {0:N0}, ave={1}\n", frameFinalEven, frameFinalEven/(imageData.LongLength/2)));
+                Log.Write(String.Format("stats: frameFinalOdd = {0:N0}, ave={1}\n", frameFinalOdd, frameFinalOdd/(imageData.LongLength/2)));
+            }
+#endif
+
 
             // compute the values
             for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
@@ -1813,6 +1825,46 @@ namespace sx
             if (evenTotal < oddTotal)
             {
                 double ratio = evenTotal/(double)oddTotal;
+                Log.Write(String.Format("adjusting even pixels, ratio={0}\n", ratio));
+
+                // adjust the even rows
+                for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
+                {
+                    fixed(Int32 *pImageData = &imageData[x,0])
+                    {
+                        Int32 count=imageData.GetUpperBound(1)+1;
+                        Int32 *p = pImageData;
+
+                        while(count > 1)
+                        {
+                            Int32 value = (Int32)(*p * ratio);
+
+                            if (value > UInt16.MaxValue)
+                            {
+                                value = UInt16.MaxValue;
+                            }
+                            *p = value;
+                            p += 2;
+                            count-=2;
+                        }
+
+                        if (count != 0)
+                        {
+                            Int32 value = (Int32)(*p * ratio);
+
+                            if (value > UInt16.MaxValue)
+                            {
+                                value = UInt16.MaxValue;
+                            }
+                            *p = value;
+                            p += 2;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                double ratio = oddTotal/(double)evenTotal;
 
                 Log.Write(String.Format("adjusting even pixels, ratio={0}\n", ratio));
 
@@ -1828,9 +1880,9 @@ namespace sx
                         {
                             Int32 value = (Int32)(*p * ratio);
 
-                            if (value > Int16.MaxValue)
+                            if (value > UInt16.MaxValue)
                             {
-                                value = Int16.MaxValue;
+                                value = UInt16.MaxValue;
                             }
                             *p = value;
                             p += 2;
@@ -1841,9 +1893,9 @@ namespace sx
                         {
                             Int32 value = (Int32)(*p * ratio);
 
-                            if (value > Int16.MaxValue)
+                            if (value > UInt16.MaxValue)
                             {
-                                value = Int16.MaxValue;
+                                value = UInt16.MaxValue;
                             }
                             *p = value;
                             p += 2;
@@ -1851,47 +1903,33 @@ namespace sx
                     }
                 }
             }
-            else
+#if INTERLACED_DEBUG
             {
-                double ratio = oddTotal/(double)evenTotal;
+                Int64 frameFinal=0;
+                Int64 frameFinalEven=0;
+                Int64 frameFinalOdd=0;
 
-                Log.Write(String.Format("adjusting even pixels, ratio={0}\n", ratio));
-
-                // adjust the even rows
-                for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
+                for(UInt32 y=0;y<imageData.GetUpperBound(1) + 1;y++)
                 {
-                    fixed(Int32 *pImageData = &imageData[x,0])
+                    for(UInt32 x=0;x<imageData.GetUpperBound(0) + 1;x++)
                     {
-                        Int32 count=imageData.GetUpperBound(1)+1;
-                        Int32 *p = pImageData;
-
-                        while(count > 1)
+                        frameFinal += imageData[x,y];
+                        if (y % 2 == 0)
                         {
-                            Int32 value = (Int32)(*p * ratio);
-
-                            if (value > Int16.MaxValue)
-                            {
-                                value = Int16.MaxValue;
-                            }
-                            *p = value;
-                            p += 2;
-                            count-=2;
+                            frameFinalEven += imageData[x,y];
                         }
-
-                        if (count != 0)
+                        else
                         {
-                            Int32 value = (Int32)(*p * ratio);
-
-                            if (value > Int16.MaxValue)
-                            {
-                                value = Int16.MaxValue;
-                            }
-                            *p = value;
-                            p += 2;
+                            frameFinalOdd += imageData[x,y];
                         }
                     }
                 }
+                Log.Write(String.Format("after stats: frameFinal = {0:N0}, even+odd={1:N0}\n", frameFinal, frameFinalEven+frameFinalOdd));
+                Log.Write(String.Format("stats: frameFinal = {0:N0}, ave={1}\n", frameFinal, frameFinal/imageData.LongLength));
+                Log.Write(String.Format("stats: frameFinalEven = {0:N0}, ave={1}\n", frameFinalEven, frameFinalEven/(imageData.LongLength/2)));
+                Log.Write(String.Format("stats: frameFinalOdd = {0:N0}, ave={1}\n", frameFinalOdd, frameFinalOdd/(imageData.LongLength/2)));
             }
+#endif
             Log.Write("adjustProgressive() ends\n");
         }
 
@@ -1994,9 +2032,10 @@ namespace sx
                 }
             }
 
+            convertCameraDataToImageData();
+
             lock (oImageDataLock)
             {
-                imageData = null;
                 imageDataValid = true;
             }
 
