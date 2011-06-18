@@ -66,6 +66,7 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ASCOM.Exceptions, Version=1.1.0.0, Culture=neutral, PublicKeyToken=565de7938946fba7, processorArchitecture=MSIL">
@@ -128,6 +129,7 @@
     <Compile Include="sxMain4\Driver.cs" />
     <Compile Include="sxMain5\Driver.cs" />
     <Compile Include="UsbRoutines\Acknowlegements.cs" />
+    <Compile Include="UsbRoutines\sx_dump.cs" />
     <Compile Include="UsbRoutines\DeviceManagement.cs" />
     <Compile Include="UsbRoutines\DeviceManagementApi.cs" />
     <Compile Include="UsbRoutines\FileIOApi.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="UsbRoutines\sx_camera.cs" />
     <Compile Include="UsbRoutines\sx_controller.cs" />
     <Compile Include="UsbRoutines\sx_usb.cs" />
+    <Compile Include="UsbRoutines\sx_useDumped.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ASCOM.png" />
