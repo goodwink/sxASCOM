@@ -1,4 +1,5 @@
 //#define INTERLACED_DEBUG
+//#define USE_DUMPED_DATA
 
 using System;
 using System.IO;
@@ -101,7 +102,7 @@ namespace sx
         MODEL_COSTAR = 0x27,
     }
 
-    public class Camera
+    public partial class Camera
         : sxBase
     {
         // Variables
@@ -116,6 +117,8 @@ namespace sx
         private object oImageDataLock;
         private UInt16 idx;
         private SX_COOLER_BLOCK m_coolerBlock;
+        private bool m_dump = true;
+        private bool m_useDumped = false;
 
         // Properties
 
@@ -254,12 +257,12 @@ namespace sx
 
         public Boolean hasGuideCamera
         {
-            get { return m_controller.hasGuideCamera; }
+            get { return !m_useDumped && m_controller.hasGuideCamera; }
         }
 
         public Boolean hasGuidePort
         {
-            get { return m_controller.hasGuidePort; }
+            get { return !m_useDumped && m_controller.hasGuidePort; }
         }
 
         private Byte extraCapabilities
@@ -274,17 +277,8 @@ namespace sx
 
         private Boolean hasBiasData
         {
-            get 
-            {
-                Boolean bReturn = false;
-                
-                if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
-                {
-                    bReturn = true;
-                }
-
-                return bReturn;
-            }
+            get;
+            set;
         }
 
         private UInt32 numBiasPixels
@@ -416,12 +410,6 @@ namespace sx
                     }
 
                     Debug.Assert(imageData != null);
-#if false
-                    using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.cooked", FileMode.Create)))
-                    {
-                        binWriter.Write(imageData);
-                    }
-#endif
                     return imageData;
                 }
             }
@@ -443,22 +431,18 @@ namespace sx
         {
             bool bUntested = false;
 
-            // Some cameras, like the CoStar, don't support the "usual" SX binning,
-            // so it is now a per camera property
+            // compute the pixel size
+            setPixelBytes();
+
+            // Most cameras don't have any bias restrictions
             maxXBin = MAX_X_BIN;
             maxYBin = MAX_Y_BIN;
 
-            // Some Camers, like the CoStar, don't support software timing
-            mustUseHardwareTimer = false;
+            // Most cameras don't have bias data, so default is false
+            hasBiasData = false;
 
-#if true
-            if ((CameraModels)cameraModel == CameraModels.MODEL_H9C)
-            {
-                MessageBox.Show(String.Format("Turning H9C into Fake CoStar"));
-                Log.Write(String.Format("Turning H9C into Fake CoStar"));
-                cameraModel = (UInt16)CameraModels.MODEL_COSTAR;
-            }
-#endif
+            // Most cameras can use software timing, so default is false
+            mustUseHardwareTimer = false;
 
             switch ((CameraModels)cameraModel)
             {
@@ -518,6 +502,7 @@ namespace sx
                     maxXBin = 1;
                     maxYBin = 1;
                     mustUseHardwareTimer = true;
+                    hasBiasData = true;
                     break;
                 case CameraModels.MODEL_LX1:
                     description = "Lodestar";
@@ -594,8 +579,7 @@ namespace sx
                 {
                     throw new System.Exception(String.Format("camera model {0} is untested and \"Enable Untested\" is not set", description));
                 }
-
-            }
+             }
         }
 
         public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested)
@@ -605,6 +589,11 @@ namespace sx
             idx = cameraIdx;
 
             m_controller = controller;
+
+            if (m_useDumped)
+            {
+                m_controller = null;
+            }
 
             if (cameraIdx > 0)
             {
@@ -620,12 +609,15 @@ namespace sx
                 }
             }
 
-            cameraModel = getModel();
+            getModel();
+            getCCDParams();
+
             setInfo(bAllowUntested);
-            getParams(ref ccdParms);
-            setPixelSize();
+
             buildReadDelayedBlock(out nextExposure, 0, 0, frameWidth, frameHeight, 1, 1, 0);
+
             imageDataValid = false;
+
             oImageDataLock = new object();
 
             if (hasCoolerControl)
@@ -1059,26 +1051,42 @@ namespace sx
 #endif
         }
 
-        public UInt16 getModel()
+        public void getModel()
+        {
+            if (m_useDumped)
+            {
+                getModelDumped();
+            }
+            else
+            {
+                getModelUSB();
+            }
+
+            Log.Write(String.Format("cameraModel={0}\n", cameraModel));
+        }
+
+        public void getModelUSB()
         {
             SX_CMD_BLOCK cmdBlock;
-            byte[] bytes = new byte[2];
-            UInt16 model = 0;
+            byte[] bytes = new byte[Marshal.SizeOf(cameraModel)];
 
-            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (UInt16)Marshal.SizeOf(model));
+            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (UInt16)bytes.Length);
 
             lock (m_controller.Lock)
             {
                 Log.Write("getModel has locked\n");
                 m_controller.Write(cmdBlock);
 
-                bytes = m_controller.ReadBytes(Marshal.SizeOf(model));
+                bytes = m_controller.ReadBytes(bytes.Length);
             }
             Log.Write("getModel has unlocked\n");
 
-            model = System.BitConverter.ToUInt16(bytes, 0);
+            cameraModel = System.BitConverter.ToUInt16(bytes, 0);
 
-            return model;
+            if (m_dump)
+            {
+                dumpModel();
+            }
         }
 
         internal void setCoolerInfo(ref SX_COOLER_BLOCK inBlock, out SX_COOLER_BLOCK outBlock)
@@ -1188,21 +1196,36 @@ namespace sx
 
         public bool hasCoolerControl
         {
-            get { return (ccdParms.extra_capabilities & SXUSB_CAPS_COOLER) == SXUSB_CAPS_COOLER; }
+            get { return !m_useDumped && ((ccdParms.extra_capabilities & SXUSB_CAPS_COOLER) == SXUSB_CAPS_COOLER); }
         }
 
-        void dumpParams(SX_CCD_PARAMS parms)
+        void printCCDParams()
         {
             Log.Write(String.Format("params:\n"));
-            Log.Write(String.Format("\thfront_porch={0:d}, hback_porch={1:d}\n", parms.hfront_porch, parms.hback_porch));
-            Log.Write(String.Format("\tvfront_porch={0:d}, vback_porch={1:d}\n", parms.vfront_porch, parms.vback_porch));
-            Log.Write(String.Format("\twidth={0:d}, height={1:d}\n", parms.width, parms.height));
-            Log.Write(String.Format("\tpixel_uwidth={0:d}, pixel_uheight={1:d}\n", parms.pixel_uwidth, parms.pixel_uheight));
-            Log.Write(String.Format("\tbits_per_pixel={0:d}, num_serial_ports={1:d}\n", parms.bits_per_pixel, parms.num_serial_ports));
-            Log.Write(String.Format("\tcolor_matrix=0x{0:x}, extra_capabilitites=0x{1:x}\n", parms.color_matrix, parms.extra_capabilities));
+            Log.Write(String.Format("\thfront_porch={0:d}, hback_porch={1:d}\n", ccdParms.hfront_porch, ccdParms.hback_porch));
+            Log.Write(String.Format("\tvfront_porch={0:d}, vback_porch={1:d}\n", ccdParms.vfront_porch, ccdParms.vback_porch));
+            Log.Write(String.Format("\twidth={0:d}, height={1:d}\n", ccdParms.width, ccdParms.height));
+            Log.Write(String.Format("\tpixel_uwidth={0:d}, pixel_uheight={1:d}\n", ccdParms.pixel_uwidth, ccdParms.pixel_uheight));
+            Log.Write(String.Format("\tbits_per_pixel={0:d}, num_serial_ports={1:d}\n", ccdParms.bits_per_pixel, ccdParms.num_serial_ports));
+            Log.Write(String.Format("\tcolor_matrix=0x{0:x}, extra_capabilitites=0x{1:x}\n", ccdParms.color_matrix, ccdParms.extra_capabilities));
         }
 
-        void getParams(ref SX_CCD_PARAMS parms)
+        void getCCDParams()
+        {
+            if (m_useDumped)
+            {
+                getCCDParamsDumped();
+            }
+            else
+            {
+                getCCDParamsUSB();
+            }
+
+            printCCDParams();
+
+        }
+
+        void getCCDParamsUSB()
         {
             SX_CMD_BLOCK cmdBlock;
 
@@ -1210,15 +1233,18 @@ namespace sx
 
             lock (m_controller.Lock)
             {
-                Log.Write("getParams has locked\n");
+                Log.Write("getCCDParams has locked\n");
                 m_controller.Write(cmdBlock);
 
-                parms = (SX_CCD_PARAMS)m_controller.ReadObject(typeof(SX_CCD_PARAMS));
+                ccdParms = (SX_CCD_PARAMS)m_controller.ReadObject(typeof(SX_CCD_PARAMS));
             }
 
-            Log.Write("getParams has unlocked\n");
+            Log.Write("getCCDParams has unlocked\n");
 
-            dumpParams(parms);
+            if (m_dump)
+            {
+                dumpCCDParams();
+            }
         }
 
         internal void convertCameraDataToImageData()
@@ -1229,11 +1255,14 @@ namespace sx
             UInt32 binnedHeight       = (UInt32)(currentExposure.userRequested.height / currentExposure.userRequested.y_bin);
 
             Log.Write(String.Format("convertCameraDataToImageData(): x_bin = {0} binnedWidth={1} binnedHeight={2}\n", currentExposure.toCamera.x_bin, binnedWidth, binnedHeight));
-
             if (imageData == null || imageData.GetUpperBound(0) + 1 != binnedWidth || imageData.GetUpperBound(1) + 1 != binnedHeight)
             {
-                Log.Write(String.Format("reusing imageData\n"));
+                Log.Write(String.Format("allocating imageData\n"));
                 imageData = new Int32[binnedWidth, binnedHeight];
+            }
+            else
+            {
+                Log.Write(String.Format("reusing imageData\n"));
             }
 
             // Decode the bytes from the camera and store them in the Int32 imageData
@@ -1426,11 +1455,9 @@ namespace sx
             }
 
             Log.Write("convertCameraDataToImageData(): ends\n");
-
-
         }
 
-        internal void setPixelSize()
+        internal void setPixelBytes()
         {
 
             // there are better ways to do this (like bitsPerPixle divided by 8), but I wanted to throw the exception
@@ -1464,12 +1491,6 @@ namespace sx
 
             Log.Write("downloadPixels(): read completed\n");
 
-#if false
-            using (BinaryWriter binWriter = new BinaryWriter(File.Open("c:\\temp\\sx-ascom\\image.raw", FileMode.Create)))
-            {
-                binWriter.Write(ret);
-            }
-#endif
             return ret;
         }
 
@@ -1577,13 +1598,12 @@ namespace sx
                 Debug.Assert(bias.Length == 2);
                 Debug.Assert(numBiasPixels % 2 == 0);
 
-                // offset 0
                 bias[0] = *pSrc++;
                 bias[1] = *pSrc++;
 
                 for(UInt32 i=2;i<numBiasPixels;i++)
                 {
-                    bias[i % 2] = *pSrc++;
+                    bias[i % 2] += *pSrc++;
                 }
 
                 bias[0] /= divisor;
@@ -1609,13 +1629,15 @@ namespace sx
         {
             UInt32 stride = height;
             UInt32 count = width;
+            Int64 oddPixelTotal = 0;
+            Int64 evenPixelTotal = 0;
 
             Debug.Assert(dest.Length/count == stride);
             Debug.Assert(count > 0);
             Debug.Assert(src.Length >= srcOffset + count);
             Debug.Assert(dest.Length >= destOffset + stride*(count-1));
 
-            Log.Write(String.Format("copyPixels() - srcOffset={0} destOffset={1} height={2} width={3} count={4} stride={5}\n", srcOffset, destOffset, height, width, count, stride));
+            //Log.Write(String.Format("copyPixels() - srcOffset={0} destOffset={1} evenBias={2} oddBias={3} height={4} width={5} count={6} stride={6}\n", srcOffset, destOffset, evenBias, oddBias, height, width, count, stride));
 
             fixed(byte *pSrcBase = src)
             {
@@ -1636,6 +1658,7 @@ namespace sx
                                         {
                                             Int32 value;
 
+                                            oddPixelTotal += *pSrc;
                                             value = *pSrc++ + oddBias;
                                             if (value > Byte.MaxValue)
                                             {
@@ -1651,6 +1674,7 @@ namespace sx
                                         {
                                             Int32 value;
                                             
+                                            evenPixelTotal += *pSrc;
                                             value = *pSrc++ + evenBias;
                                             if (value > Byte.MaxValue)
                                             {
@@ -1659,6 +1683,7 @@ namespace sx
                                             *pDest = value;
                                             pDest += stride;
 
+                                            oddPixelTotal += *pSrc;
                                             value = *pSrc++ + oddBias;
                                             if (value > Byte.MaxValue)
                                             {
@@ -1674,6 +1699,7 @@ namespace sx
                                         {
                                             Int32 value;
 
+                                            evenPixelTotal += *pSrc;
                                             value = *pSrc++ + evenBias;
                                             if (value > Byte.MaxValue)
                                             {
@@ -1695,6 +1721,7 @@ namespace sx
                                         {
                                             Int32 value;
 
+                                            oddPixelTotal += *pSrc;
                                             value = *pSrc++ + oddBias;
                                             if (value > UInt16.MaxValue)
                                             {
@@ -1709,7 +1736,8 @@ namespace sx
                                         while(count > 1)
                                         {
                                             Int32 value;
-                                            
+
+                                            evenPixelTotal += *pSrc;
                                             value = *pSrc++ + evenBias;
                                             if (value > UInt16.MaxValue)
                                             {
@@ -1718,6 +1746,7 @@ namespace sx
                                             *pDest = value;
                                             pDest += stride;
 
+                                            oddPixelTotal += *pSrc;
                                             value = *pSrc++ + oddBias;
                                             if (value > UInt16.MaxValue)
                                             {
@@ -1733,6 +1762,7 @@ namespace sx
                                         {
                                             Int32 value;
 
+                                            evenPixelTotal += *pSrc;
                                             value = *pSrc++ + evenBias;
                                             if (value > UInt16.MaxValue)
                                             {
@@ -1760,6 +1790,7 @@ namespace sx
                     }
                 }
             }
+            //Log.Write(String.Format("copyPixels(): evenPixelTotal={0} (ave={1}) oddPixelTotal={2} (ave={3})\n", evenPixelTotal, evenPixelTotal / (width / 2), oddPixelTotal, oddPixelTotal / (width / 2)));
             Debug.Assert(count == 0);
         }
 
@@ -1955,6 +1986,18 @@ namespace sx
 
         public void recordPixels(bool bDelayed, out DateTimeOffset exposureEnd)
         {
+            if (m_useDumped)
+            {
+                recordPixelsDumped(bDelayed, out exposureEnd);
+            }
+            else
+            {
+                recordPixelsUSB(bDelayed, out exposureEnd);
+            }
+        }
+
+        public void recordPixelsUSB(bool bDelayed, out DateTimeOffset exposureEnd)
+        {
             SX_CMD_BLOCK cmdBlock;
 
             Log.Write(String.Format("recordPixels entered - bDelayed = {0}\n", bDelayed));
@@ -1963,6 +2006,11 @@ namespace sx
 
             Debug.Assert(currentExposure.toCamera.x_bin != 7 && currentExposure.toCamera.y_bin != 7);
 
+            if (m_dump)
+            {
+                dumpCurrentExposure();
+            }
+
             // We invalidate the data here, so that there is no chance we have to wait for someone
             // to download an image later in the routine when the data is ready for download
             lock (oImageDataLock)
@@ -1970,11 +2018,9 @@ namespace sx
                 imageDataValid = false;
             }
 
-
             lock (m_controller.Lock)
             {
                 Log.Write("recordPixels() has locked\n");
-
                 if (bDelayed)
                 {
                     m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
@@ -2030,6 +2076,11 @@ namespace sx
                     rawFrame2 = downloadPixels(false, currentExposure.toCameraSecond);
                     Log.Write("recordPixels() second frame download completed\n");
                 }
+            }
+
+            if (m_dump)
+            {
+                dumpFrame();
             }
 
             convertCameraDataToImageData();
