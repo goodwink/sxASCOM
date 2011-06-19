@@ -4,7 +4,7 @@
 ;
 
 #define BUILD_TYPE "Debug"
-#define APP_VERSION "1.5.9.5"
+#define APP_VERSION "2.1.1.1"
 #define ASCOM_VERSION_REQUIRED  "5.5"
 #define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
 
