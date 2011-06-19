@@ -117,7 +117,7 @@ namespace sx
         private object oImageDataLock;
         private UInt16 idx;
         private SX_COOLER_BLOCK m_coolerBlock;
-        private bool m_dump = true;
+        private bool m_dump = false;
         private bool m_useDumped = false;
 
         // Properties
@@ -1351,9 +1351,6 @@ namespace sx
                     UInt32 actualHeight = (UInt32)(rawFrame1.Length / bytesPerPixel / cameraBinnedWidth);
 
                     UInt32 startingXIndex = 0;
-                    Int32 [] bias = null;
-                    Int32 firstBias = 0;
-                    Int32 secondBias = 0;
 
                     // It is possible for interlaced cameras to not supply as much data 
                     // would be expected from just the height and binning mode.
@@ -1381,11 +1378,6 @@ namespace sx
                                 currentExposure.userRequested.x_offset, currentExposure.userRequested.width, currentExposure.userRequested.height));
                     }
 
-                    if (hasBiasData)
-                    {
-                        bias = new Int32[2];
-                        Debug.Assert(progressive); // no current interlaced cameras have bias, and the loop code below cannot be tested
-                    }
 
                     for (y = 0; y < actualHeight; y++)
                     {
@@ -1409,8 +1401,18 @@ namespace sx
                         }
 #endif
 
-                        if (hasBiasData)
+                        if (!hasBiasData)
                         {
+                            copyPixels(rawFrame, yOffset*cameraBinnedWidth+startingXIndex, imageData, destOffset, binnedHeight, binnedWidth);
+                        }
+                        else
+                        {
+                            Int32 firstBias = 0;
+                            Int32 secondBias = 0;
+                            Int32 [] bias = new Int32[2];
+
+                            Debug.Assert(progressive); // no current interlaced cameras have bias, and the loop code below cannot be tested
+
                             computeBias(rawFrame, yOffset*cameraBinnedWidth, bias);
 
                             startingXIndex = numBiasPixels;
@@ -1431,11 +1433,10 @@ namespace sx
                                 }
 
                                 startingXIndex += currentExposure.userRequested.x_offset;
+                                copyPixelsWithBias(rawFrame, yOffset*cameraBinnedWidth+startingXIndex, imageData, destOffset, firstBias, secondBias, binnedHeight, binnedWidth);
                             }
                         }
 
-                        //Log.Write(String.Format("calling CopyPixels(rawFrame={0}, yOffset={1}, destOffset={2}\n", rawFrame, yOffset, destOffset));
-                        copyPixels(rawFrame, yOffset*cameraBinnedWidth+startingXIndex, imageData, destOffset, firstBias, secondBias, binnedHeight, binnedWidth);
                     }
                     Log.Write(String.Format("Processed {0} lines, {1} pixels/line\n", actualHeight, binnedWidth));
                 }
@@ -1582,6 +1583,115 @@ namespace sx
             }
         }
 
+        unsafe internal void copyPixels(byte [] src, UInt32 srcOffset, 
+                                        Int32 [,] dest, UInt32 destOffset, 
+                                        UInt32 height, UInt32 width)
+        {
+            UInt32 stride = height;
+            UInt32 count = width;
+
+            Debug.Assert(dest.Length/count == stride);
+            Debug.Assert(count > 0);
+            Debug.Assert(src.Length >= srcOffset + count);
+            Debug.Assert(dest.Length >= destOffset + stride*(count-1));
+
+            //Log.Write(String.Format("copyPixels() - srcOffset={0} destOffset={1} height={2} width={3} count={4} stride={5}\n", srcOffset, destOffset, height, width, count, stride));
+
+            fixed(byte *pSrcBase = src)
+            {
+                fixed(Int32 *pDestBase = dest)
+                {
+                    byte *pSrcBytes = pSrcBase + srcOffset*bytesPerPixel;
+                    Int32 *pDest = pDestBase + destOffset;
+
+                    try
+                    {
+                        switch(bytesPerPixel)
+                        {
+                            case 1:
+                                    {
+                                        byte *pSrc = pSrcBytes;
+
+                                        if (srcOffset % 2 == 1)
+                                        {
+
+                                            *pDest = *pSrc++;
+                                            pDest += stride;
+
+                                            count--;
+                                        }
+
+                                        while (count > 1)
+                                        {
+                                            *pDest = *pSrc++;
+                                            pDest += stride;
+
+                                            *pDest = *pSrc++;
+                                            pDest += stride;
+
+                                            count -= 2;
+                                        }
+
+                                        if (count != 0)
+                                        {
+                                            *pDest = *pSrc++;
+                                            pDest += stride;
+
+                                            count--;
+                                        }
+                                        Debug.Assert(pSrc - pSrcBytes - 1 < src.Length);
+                                    }
+                                    break;
+                            case 2:
+                                    {
+                                        UInt16 *pSrc = (UInt16 *)pSrcBytes;
+
+                                        if (srcOffset % 2 == 1)
+                                        {
+                                            *pDest = *pSrc++;
+                                            pDest += stride;
+
+                                            count--;
+                                        }
+
+                                        while(count > 1)
+                                        {
+                                            *pDest = *pSrc++;
+                                            pDest += stride;
+
+                                            *pDest = *pSrc++;
+                                            pDest += stride;
+
+                                            count -= 2;
+                                        }
+
+                                        if (count != 0)
+                                        {
+                                            *pDest = *pSrc++;
+                                            pDest += stride;
+
+                                            count--;
+                                        }
+
+                                        Debug.Assert((Byte *)pSrc - pSrcBytes - bytesPerPixel < src.Length);
+                                    }
+                                    break;
+                            default:
+                                    throw new System.Exception(String.Format("copyPixels: unhandled pixel size {0}\n", bytesPerPixel));
+                        }
+
+                        Debug.Assert(pDest - (pDestBase + destOffset) - stride < dest.Length);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Log.Write(String.Format("copyPixels() caught an exception {0}\n", ex.ToString()));
+                        throw ex;
+                    }
+                }
+            }
+            Debug.Assert(count == 0);
+        }
+
         unsafe internal void computeBias(byte [] src, UInt32 srcOffset, Int32 [] bias)
         {
 
@@ -1611,33 +1721,25 @@ namespace sx
             }
         }
 
-        /* 
-         * It seems like it would be better to have one routine for cameras that
-         * provide bias data and different one for those that don't, since only 
-         * one camera has bias data, but my performance measurements show no
-         * measureable difference between the version with and without 
-         * (i.e. over several runs neither was consistently faster)
-         * Since peformance is a wash, I just have a single routine, especially
-         * since it is a complex routine and two copies would mean twice
-         * the potential for bugs.
-         */
 
-        unsafe internal void copyPixels(byte [] src, UInt32 srcOffset, 
+        unsafe internal void copyPixelsWithBias(byte [] src, UInt32 srcOffset, 
                                         Int32 [,] dest, UInt32 destOffset, 
                                         Int32 evenBias, Int32 oddBias, 
                                         UInt32 height, UInt32 width)
         {
             UInt32 stride = height;
             UInt32 count = width;
+#if DEBUG
             Int64 oddPixelTotal = 0;
             Int64 evenPixelTotal = 0;
+#endif
 
             Debug.Assert(dest.Length/count == stride);
             Debug.Assert(count > 0);
             Debug.Assert(src.Length >= srcOffset + count);
             Debug.Assert(dest.Length >= destOffset + stride*(count-1));
 
-            //Log.Write(String.Format("copyPixels() - srcOffset={0} destOffset={1} evenBias={2} oddBias={3} height={4} width={5} count={6} stride={6}\n", srcOffset, destOffset, evenBias, oddBias, height, width, count, stride));
+            //Log.Write(String.Format("copyPixelsWithBias() - srcOffset={0} destOffset={1} evenBias={2} oddBias={3} height={4} width={5} count={6} stride={6}\n", srcOffset, destOffset, evenBias, oddBias, height, width, count, stride));
 
             fixed(byte *pSrcBase = src)
             {
@@ -1658,7 +1760,9 @@ namespace sx
                                         {
                                             Int32 value;
 
+#if DEBUG
                                             oddPixelTotal += *pSrc;
+#endif
                                             value = *pSrc++ + oddBias;
                                             if (value > Byte.MaxValue)
                                             {
@@ -1674,7 +1778,9 @@ namespace sx
                                         {
                                             Int32 value;
                                             
+#if DEBUG
                                             evenPixelTotal += *pSrc;
+#endif
                                             value = *pSrc++ + evenBias;
                                             if (value > Byte.MaxValue)
                                             {
@@ -1683,7 +1789,9 @@ namespace sx
                                             *pDest = value;
                                             pDest += stride;
 
+#if DEBUG
                                             oddPixelTotal += *pSrc;
+#endif
                                             value = *pSrc++ + oddBias;
                                             if (value > Byte.MaxValue)
                                             {
@@ -1699,7 +1807,9 @@ namespace sx
                                         {
                                             Int32 value;
 
+#if DEBUG
                                             evenPixelTotal += *pSrc;
+#endif
                                             value = *pSrc++ + evenBias;
                                             if (value > Byte.MaxValue)
                                             {
@@ -1721,7 +1831,9 @@ namespace sx
                                         {
                                             Int32 value;
 
+#if DEBUG
                                             oddPixelTotal += *pSrc;
+#endif
                                             value = *pSrc++ + oddBias;
                                             if (value > UInt16.MaxValue)
                                             {
@@ -1737,7 +1849,9 @@ namespace sx
                                         {
                                             Int32 value;
 
+#if DEBUG
                                             evenPixelTotal += *pSrc;
+#endif
                                             value = *pSrc++ + evenBias;
                                             if (value > UInt16.MaxValue)
                                             {
@@ -1746,7 +1860,9 @@ namespace sx
                                             *pDest = value;
                                             pDest += stride;
 
+#if DEBUG
                                             oddPixelTotal += *pSrc;
+#endif
                                             value = *pSrc++ + oddBias;
                                             if (value > UInt16.MaxValue)
                                             {
@@ -1762,7 +1878,9 @@ namespace sx
                                         {
                                             Int32 value;
 
+#if DEBUG
                                             evenPixelTotal += *pSrc;
+#endif
                                             value = *pSrc++ + evenBias;
                                             if (value > UInt16.MaxValue)
                                             {
@@ -1778,19 +1896,19 @@ namespace sx
                                     }
                                     break;
                             default:
-                                    throw new System.Exception(String.Format("copyPixels: unhandled pixel size {0}\n", bytesPerPixel));
+                                    throw new System.Exception(String.Format("copyPixelsWithBias: unhandled pixel size {0}\n", bytesPerPixel));
                         }
 
                         Debug.Assert(pDest - (pDestBase + destOffset) - stride < dest.Length);
                     }
                     catch (System.Exception ex)
                     {
-                        Log.Write(String.Format("copyPixels() caught an exception {0}\n", ex.ToString()));
+                        Log.Write(String.Format("copyPixelsWithBias() caught an exception {0}\n", ex.ToString()));
                         throw ex;
                     }
                 }
             }
-            //Log.Write(String.Format("copyPixels(): evenPixelTotal={0} (ave={1}) oddPixelTotal={2} (ave={3})\n", evenPixelTotal, evenPixelTotal / (width / 2), oddPixelTotal, oddPixelTotal / (width / 2)));
+            //Log.Write(String.Format("copyPixelsWithBias(): evenPixelTotal={0} (ave={1}) oddPixelTotal={2} (ave={3})\n", evenPixelTotal, evenPixelTotal / (width / 2), oddPixelTotal, oddPixelTotal / (width / 2)));
             Debug.Assert(count == 0);
         }
 
