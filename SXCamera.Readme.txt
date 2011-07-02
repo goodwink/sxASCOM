@@ -1,9 +1,9 @@
 Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
-This is the README.txt for version 2.1.1.1
+This is the README.txt for version 2.1.1.2
 
 This is an UNSTABLE release of the ASCOM driver for Starlight Xpress cameras,
-which contains untested or lightly tested code and will expire.
+which contains new, untested or lightly tested code and will expire.
 
 There is a STABLE release available - please use that version if it meets
 your needs.
