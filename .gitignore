@@ -1,8 +1,11 @@
 SXCameraServedClasses
 bin
 obj
-*.exe
+*.exe*
 *.suo
 *.user
 *.swp
 *~
+logs
+changelog.full.txt
+changelog.txt
