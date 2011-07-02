@@ -1,0 +1,676 @@
+    0.000   0.000 Logging begins at 18/06/2011 18:55:44
+    0.000   0.000 Generic::Camera(4, 0) begins
+    0.016   0.016 Configuration(4, 0) starts
+    0.063   0.047 Configuration() computes driverId=ASCOM.SXMain4.Camera
+    0.063   0.000 SharedResources()
+    0.063   0.000 Driver version = 1.5.9.5
+    0.063   0.000 Controller() entered
+    0.063   0.000 Controller(): returns
+    0.063   0.000 Controller() entered
+    0.063   0.000 Controller(): returns
+    0.063   0.000 Controller() entered
+    0.063   0.000 Controller(): returns
+    0.063   0.000 Controller() entered
+    0.063   0.000 Controller(): returns
+    0.063   0.000 Controller() entered
+    0.063   0.000 Controller(): returns
+    0.063   0.000 Controller() entered
+    0.063   0.000 Controller(): returns
+    0.063   0.000 SharedResources() returns, m_lock=System.Object
+    0.078   0.016 GetString(Selection, CAMERA_SELECTION_EXACT_MODEL) ret = [CAMERA_SELECTION_EXACT_MODEL]
+    0.094   0.016 GetString(Selection, CAMERA_SELECTION_EXACT_MODEL) ret = [CAMERA_SELECTION_EXACT_MODEL]
+    0.094   0.000 Generic::Camera() ends for vid=1278 pid=517 skip=False
+    0.094   0.000 Main::Camera(0, 4) executing
+    0.094   0.000 Main4::Camera() executing
+    0.109   0.016 Generic::Connected set: Current Value is False, requested value is True
+    0.109   0.000 m_controller.Connected=False
+    0.109   0.000 controller.connect(1278, 517, False)
+    0.109   0.000 USBInterface(1278, 517, False) begins
+    0.141   0.031 USBInterface: Considering USB Device \\?\usb#vid_1278&pid_0517#5&1153f663&0&2#{606377c1-2270-11d4-bfd8-00207812f5d5}
+    0.141   0.000 USBInterface: checking VID/PID - foundVID=1278 foundPID=517
+    0.141   0.000 USBInterface: initally bVIDMatch=True bPIDMatch=True
+    0.141   0.000 USBInterface: pre skip check bVIDMatch=True bPIDMatch=True bUseThisDevice=True
+    0.141   0.000 USBInterface: post skip check bVIDMatch=True bPIDMatch=True bUseThisDevice=True
+    0.141   0.000 USBInterface: mutexName=//?/usb#vid_1278&pid_0517#5&1153f663&0&2#{606377c1-2270-11d4-bfd8-00207812f5d5} createdNew=True
+    0.141   0.000 USBInterface: attempting to get a handle for USB Device \\?\usb#vid_1278&pid_0517#5&1153f663&0&2#{606377c1-2270-11d4-bfd8-00207812f5d5}
+    0.141   0.000 USBInterface: deviceHandle.IsInvalid=False
+    0.141   0.000 resetting()
+    0.141   0.000 buildCommandBlock(): type=0x40 cmd=0x06 cmd_value=0x0000 index=0x0000 cmd_length=0x0000
+    0.141   0.000 Write has locked
+    0.141   0.000 usbWrite(): unManagedBlockBuffer=0x00000000002582a8 numBytesToWrite=8
+    0.141   0.000 Header: 40 06 00 00 00 00 00 00 
+    0.141   0.000 Write has unlocked
+    0.141   0.000 buildCommandBlock(): type=0x40 cmd=0xff cmd_value=0x0000 index=0x0000 cmd_length=0x0000
+    0.141   0.000 getVersion has locked
+    0.141   0.000 Write has locked
+    0.141   0.000 usbWrite(): unManagedBlockBuffer=0x00000000002582a8 numBytesToWrite=8
+    0.141   0.000 Header: 40 ff 00 00 00 00 00 00 
+    0.141   0.000 Write has unlocked
+    0.141   0.000 Read has locked
+    0.141   0.000 interface Read(System.Byte[], 4) begins
+    0.141   0.000 usbRead: buf=0x00000000002582a8 numBytesToRead=       4 numBytesRead=       0 readSize=       4
+    0.141   0.000 ReadFile: after loop numBytesRead=4
+    0.141   0.000 Read has unlocked
+    0.141   0.000 getVersion has unlocked
+    0.141   0.000 getVersion() returns 65536
+    0.156   0.016 gettings params
+    0.156   0.000 buildCommandBlock(): type=0xc0 cmd=0x08 cmd_value=0x0000 index=0x0000 cmd_length=0x0000
+    0.156   0.000 Write has locked
+    0.156   0.000 usbWrite(): unManagedBlockBuffer=0x00000000002582a8 numBytesToWrite=8
+    0.156   0.000 Header: c0 08 00 00 00 00 00 00 
+    0.156   0.000 Write has unlocked
+    0.156   0.000 Read has locked
+    0.156   0.000 interface Read(sx.SX_CCD_PARAMS, 17) begins
+    0.156   0.000 usbRead: buf=0x00000000002558c0 numBytesToRead=      17 numBytesRead=       0 readSize=      17
+    0.156   0.000 ReadFile: after loop numBytesRead=17
+    0.156   0.000 Read has unlocked
+    0.156   0.000 controller.connect(): returns
+    0.156   0.000 sx.Camera() constructor: controller=sx.Controller cameraIdx=0
+    0.156   0.000 buildCommandBlock(): type=0xc0 cmd=0x0e cmd_value=0x0000 index=0x0000 cmd_length=0x0002
+    0.156   0.000 getModel has locked
+    0.156   0.000 Write has locked
+    0.156   0.000 usbWrite(): unManagedBlockBuffer=0x00000000002582a8 numBytesToWrite=8
+    0.156   0.000 Header: c0 0e 00 00 00 00 02 00 
+    0.156   0.000 Write has unlocked
+    0.156   0.000 Read has locked
+    0.156   0.000 interface Read(System.Byte[], 2) begins
+    0.156   0.000 usbRead: buf=0x00000000002582a8 numBytesToRead=       2 numBytesRead=       0 readSize=       2
+    0.156   0.000 ReadFile: after loop numBytesRead=2
+    0.156   0.000 Read has unlocked
+    0.156   0.000 getModel has unlocked
+    0.156   0.000 cameraModel=39
+    0.156   0.000 buildCommandBlock(): type=0xc0 cmd=0x08 cmd_value=0x0000 index=0x0000 cmd_length=0x0000
+    0.156   0.000 getCCDParams has locked
+    0.156   0.000 Write has locked
+    0.156   0.000 usbWrite(): unManagedBlockBuffer=0x00000000002582a8 numBytesToWrite=8
+    0.156   0.000 Header: c0 08 00 00 00 00 00 00 
+    0.156   0.000 Write has unlocked
+    0.156   0.000 Read has locked
+    0.156   0.000 interface Read(sx.SX_CCD_PARAMS, 17) begins
+    0.156   0.000 usbRead: buf=0x00000000002558c0 numBytesToRead=      17 numBytesRead=       0 readSize=      17
+    0.156   0.000 ReadFile: after loop numBytesRead=17
+    0.156   0.000 Read has unlocked
+    0.156   0.000 getCCDParams has unlocked
+    0.172   0.016 params:
+    0.172   0.000 	hfront_porch=0, hback_porch=7
+    0.172   0.000 	vfront_porch=8, vback_porch=7
+    0.172   0.000 	width=1304, height=1032
+    0.172   0.000 	pixel_uwidth=1331, pixel_uheight=1331
+    0.172   0.000 	bits_per_pixel=16, num_serial_ports=0
+    0.172   0.000 	color_matrix=0xfff, extra_capabilitites=0x5
+    0.172   0.000 setPixelSize: bytesPerPixel=
+    0.172   0.000 setInfo(): description=CoStar fullWellCapacity=20000 electronsPerADU=0.3 progressive=True bUntested=False
+    0.172   0.000 initReadBlock() x_off=0 y_off=0 width=1288 height=1032 x_bin=1 y_bin=1
+    0.172   0.000 Read Delayed Block:buildReadDelayedBlock
+    0.172   0.000 	x_offset=0, y_offset=0
+    0.172   0.000 	width=1288, height=1032
+    0.172   0.000 	x_bin=1, y_bin=1
+    0.172   0.000 	delay=0
+    0.172   0.000 sx.Camera() constructor returns
+    0.172   0.000 Generic::MaxBinX get returns 1
+    0.172   0.000 Generic::BinX set to 1
+    0.188   0.016 Generic::MaxBinY get returns 1
+    0.188   0.000 Generic::BinY set to 1
+    0.188   0.000 Generic::NumX set to 1288
+    0.188   0.000 Generic::NumY set to 1032
+    0.188   0.000 Generic::StartX set to 0
+    0.188   0.000 Generic::StartY set to 0
+    0.188   0.000 Generic::conneted set ends
+    0.188   0.000 Generic::Connected get returning True
+    0.188   0.000 Generic::CameraXSize get returns m_CameraXSize 1288
+    0.188   0.000 Generic::CameraYSize get returns CameraYSize 1032
+    0.188   0.000 Generic::MaxBinX get returns 1
+    0.203   0.016 Generic::MaxBinY get returns 1
+    0.203   0.000 Generic::PixelSizeX get returns 5.19921875
+    0.203   0.000 Generic::PixelSizeY get returns 5.19921875
+    0.203   0.000 Generic::CanAbortExposure get returns true
+    0.203   0.000 Generic::CanAsymetricBin get returns False
+    0.203   0.000 Main::CanGetCoolerPower get returns false
+    0.203   0.000 Main::CanPulseGuide get returns True
+    0.203   0.000 Main::CanSetCCDTemperature get returns False
+    0.203   0.000 Generic::CanStopExposure get returns true
+    0.219   0.016 Generic::Description get returns CoStar
+    0.219   0.000 Generic::ElectronsPerADU get returns 0.3
+    0.219   0.000 Generic::MaxADU get returns 20000
+    0.219   0.000 Generic::ElectronsPerADU get returns 0.3
+    0.219   0.000 Generic::BinX get returns 1
+    0.219   0.000 Generic::BinY get returns 1
+    0.219   0.000 Generic::FullWellCapacity get returns 6000
+    0.219   0.000 Generic::HasShutter get returns hard coded false
+    0.219   0.000 Generic::MaxADU get returns 20000
+    0.219   0.000 Generic::HasShutter get returns hard coded false
+    0.219   0.000 Generic::HasShutter get returns hard coded false
+    0.219   0.000 Generic::HasShutter get returns hard coded false
+    0.219   0.000 Main::CanSetCCDTemperature get returns False
+    0.219   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+    0.313   0.094 Main::HeatSinkTemperature will throw exception
+    0.313   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+    0.328   0.016 Generic::HasShutter get returns hard coded false
+    0.328   0.000 Generic::HasShutter get returns hard coded false
+    0.328   0.000 Generic::HasShutter get returns hard coded false
+    0.328   0.000 Generic::HasShutter get returns hard coded false
+    0.328   0.000 Generic::CameraState() called from state cameraIdle
+    1.719   1.391 Main::CanSetCCDTemperature get returns False
+    1.719   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+    1.719   0.000 Main::HeatSinkTemperature will throw exception
+    1.719   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+    4.141   2.422 Generic::HasShutter get returns hard coded false
+    4.156   0.016 Generic::HasShutter get returns hard coded false
+    4.156   0.000 Generic::MaxBinX get returns 1
+    4.156   0.000 Generic::BinX set to 1
+    4.156   0.000 Generic::MaxBinY get returns 1
+    4.156   0.000 Generic::BinY set to 1
+    4.156   0.000 Generic::StartX set to 0
+    4.156   0.000 Generic::StartY set to 0
+    4.156   0.000 Generic::NumX set to 1288
+    4.156   0.000 Generic::NumY set to 1032
+    4.156   0.000 Generic::StartExposure(0.00600000005215406, True) begins
+    4.172   0.016 Generic::StartExposure(0.00600000005215406, True, True) begins
+    4.172   0.000 Generic::NumX get returns 1288
+    4.172   0.000 Generic::BinX get returns 1
+    4.172   0.000 Generic::NumY get returns 1032
+    4.172   0.000 Generic::BinY get returns 1
+    4.172   0.000 Generic::StartX get returns 0
+    4.172   0.000 Generic::BinX get returns 1
+    4.172   0.000 Generic::StartY get returns 0
+    4.172   0.000 Generic::BinY get returns 1
+    4.172   0.000 initReadBlock() x_off=0 y_off=0 width=1288 height=1032 x_bin=1 y_bin=1
+    4.172   0.000 Read Delayed Block:freezing parameters
+    4.172   0.000 	x_offset=0, y_offset=0
+    4.172   0.000 	width=1288, height=1032
+    4.172   0.000 	x_bin=1, y_bin=1
+    4.172   0.000 	delay=6
+    4.172   0.000 StartExposure() before captureDelegate.BeginInvode()
+    4.172   0.000 StartExposure() after captureDelegate.BeginInvode()
+    4.172   0.000 Generic::CameraState() called from state cameraExposing
+    4.172   0.000 Generic::ImageReady get returns False
+    4.172   0.000 Generic::hardwareCapture(0.00600000005215406, True): begins
+    4.172   0.000 recordPixels entered - bDelayed = True
+    4.188   0.016 initReadBlock() x_off=0 y_off=0 width=1288 height=1032 x_bin=1 y_bin=1
+    4.188   0.000 Read Delayed Block:exposure as requested - before any adjustments
+    4.188   0.000 	x_offset=0, y_offset=0
+    4.188   0.000 	width=1288, height=1032
+    4.188   0.000 	x_bin=1, y_bin=1
+    4.188   0.000 	delay=6
+    4.188   0.000 initReadBlock() x_off=0 y_off=0 width=1288 height=1032 x_bin=1 y_bin=1
+    4.188   0.000 Read Delayed Block:after bayer adjustments
+    4.188   0.000 	x_offset=0, y_offset=0
+    4.188   0.000 	width=1288, height=1032
+    4.188   0.000 	x_bin=1, y_bin=1
+    4.188   0.000 	delay=6
+    4.188   0.000 initReadBlock() x_off=0 y_off=0 width=1304 height=1032 x_bin=1 y_bin=1
+    4.188   0.000 Read Delayed Block:after CoStar adjustments
+    4.188   0.000 	x_offset=0, y_offset=0
+    4.188   0.000 	width=1304, height=1032
+    4.188   0.000 	x_bin=1, y_bin=1
+    4.188   0.000 	delay=6
+    4.188   0.000 recordPixels() has locked
+    4.188   0.000 buildCommandBlock(): type=0x40 cmd=0x02 cmd_value=0x0003 index=0x0000 cmd_length=0x000e
+    4.188   0.000 Write has locked
+    4.188   0.000 usbWrite(): unManagedBlockBuffer=0x0000000003f7cee8 numBytesToWrite=22
+    4.188   0.000 Header: 40 02 03 00 00 00 0e 00 
+    4.188   0.000 Data: 00 00 00 00 18 05 08 04 01 01 06 00 00 00 
+    4.188   0.000 Write has unlocked
+    4.188   0.000 recordPixels() requested read, flags = 3
+    4.188   0.000 recordPixelsDelayed requesting download
+    4.188   0.000 downloadPixels(): requesting 1345728 pixels, 2 bytes each (2691456 bytes)
+    4.188   0.000 Read has locked
+    4.188   0.000 interface Read(System.Byte[], 2691456) begins
+    4.188   0.000 usbRead: buf=0x0000000004700020 numBytesToRead= 2691456 numBytesRead=       0 readSize= 2691456
+    4.219   0.031 Generic::ImageReady get returns False
+    4.219   0.000 Generic::ImageReady get returns False
+    4.219   0.000 Main::CanSetCCDTemperature get returns False
+    4.219   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+    4.219   0.000 Main::HeatSinkTemperature will throw exception
+    4.219   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+    4.281   0.063 Generic::ImageReady get returns False
+    4.281   0.000 Generic::ImageReady get returns False
+    4.344   0.063 Generic::ImageReady get returns False
+    4.344   0.000 Generic::ImageReady get returns False
+    4.359   0.016 ReadFile: after loop numBytesRead=2691456
+    4.359   0.000 Read has unlocked
+    4.359   0.000 downloadPixels(): read completed
+    4.359   0.000 recordPixels() download completed
+    4.375   0.016 convertCameraDataToImageData(): x_bin = 1 binnedWidth=1288 binnedHeight=1032
+    4.375   0.000 allocating imageData
+    4.375   0.000 convertCameraDataToImageData() processing 16 bit progressive camera data
+    4.375   0.000 actualHeight=1032
+    4.375   0.000 CoStar decode begins: userRequest.x_offset=0, userReqested.width=1288, userRequested.Height=1032
+    4.406   0.031 Processed 1032 lines, 1288 pixels/line
+    4.406   0.000 convertCameraDataToImageData(): ends
+    4.406   0.000 recordPixels() returns
+    4.406   0.000 hardwareCapture(): exposure + download took 0.234375, requested 0.00600000005215406
+    4.406   0.000 Generic::hardwareCapture(): ends successfully
+    4.406   0.000 Generic::ImageReady get returns True
+    4.406   0.000 Generic::CameraState() called from state cameraIdle
+    4.469   0.063 Generic::ImageArray get
+    4.469   0.000 ImageArray entered: imageDataValid=True
+    4.516   0.047 Generic::HasShutter get returns hard coded false
+    4.578   0.063 Generic::HasShutter get returns hard coded false
+    4.594   0.016 Generic::ElectronsPerADU get returns 0.3
+    7.094   2.500 Main::CanSetCCDTemperature get returns False
+    7.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+    7.094   0.000 Main::HeatSinkTemperature will throw exception
+    7.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+    9.594   2.500 Main::CanSetCCDTemperature get returns False
+    9.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+    9.594   0.000 Main::HeatSinkTemperature will throw exception
+    9.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   12.094   2.500 Main::CanSetCCDTemperature get returns False
+   12.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   12.094   0.000 Main::HeatSinkTemperature will throw exception
+   12.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   14.594   2.500 Main::CanSetCCDTemperature get returns False
+   14.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   14.594   0.000 Main::HeatSinkTemperature will throw exception
+   14.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   17.094   2.500 Main::CanSetCCDTemperature get returns False
+   17.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   17.094   0.000 Main::HeatSinkTemperature will throw exception
+   17.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   19.594   2.500 Main::CanSetCCDTemperature get returns False
+   19.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   19.594   0.000 Main::HeatSinkTemperature will throw exception
+   19.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   22.094   2.500 Main::CanSetCCDTemperature get returns False
+   22.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   22.094   0.000 Main::HeatSinkTemperature will throw exception
+   22.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   24.594   2.500 Main::CanSetCCDTemperature get returns False
+   24.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   24.594   0.000 Main::HeatSinkTemperature will throw exception
+   24.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   27.094   2.500 Main::CanSetCCDTemperature get returns False
+   27.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   27.094   0.000 Main::HeatSinkTemperature will throw exception
+   27.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   29.594   2.500 Main::CanSetCCDTemperature get returns False
+   29.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   29.594   0.000 Main::HeatSinkTemperature will throw exception
+   29.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   32.094   2.500 Main::CanSetCCDTemperature get returns False
+   32.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   32.094   0.000 Main::HeatSinkTemperature will throw exception
+   32.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   34.594   2.500 Main::CanSetCCDTemperature get returns False
+   34.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   34.594   0.000 Main::HeatSinkTemperature will throw exception
+   34.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   37.094   2.500 Main::CanSetCCDTemperature get returns False
+   37.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   37.094   0.000 Main::HeatSinkTemperature will throw exception
+   37.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   39.594   2.500 Main::CanSetCCDTemperature get returns False
+   39.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   39.594   0.000 Main::HeatSinkTemperature will throw exception
+   39.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   42.094   2.500 Main::CanSetCCDTemperature get returns False
+   42.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   42.094   0.000 Main::HeatSinkTemperature will throw exception
+   42.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   44.594   2.500 Main::CanSetCCDTemperature get returns False
+   44.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   44.594   0.000 Main::HeatSinkTemperature will throw exception
+   44.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   47.094   2.500 Main::CanSetCCDTemperature get returns False
+   47.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   47.094   0.000 Main::HeatSinkTemperature will throw exception
+   47.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   49.594   2.500 Main::CanSetCCDTemperature get returns False
+   49.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   49.594   0.000 Main::HeatSinkTemperature will throw exception
+   49.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   52.094   2.500 Main::CanSetCCDTemperature get returns False
+   52.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   52.094   0.000 Main::HeatSinkTemperature will throw exception
+   52.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   54.594   2.500 Main::CanSetCCDTemperature get returns False
+   54.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   54.594   0.000 Main::HeatSinkTemperature will throw exception
+   54.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   57.094   2.500 Main::CanSetCCDTemperature get returns False
+   57.094   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   57.094   0.000 Main::HeatSinkTemperature will throw exception
+   57.094   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   59.594   2.500 Main::CanSetCCDTemperature get returns False
+   59.594   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   59.594   0.000 Main::HeatSinkTemperature will throw exception
+   59.594   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   62.281   2.688 Main::CanSetCCDTemperature get returns False
+   62.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   62.281   0.000 Main::HeatSinkTemperature will throw exception
+   62.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   64.781   2.500 Main::CanSetCCDTemperature get returns False
+   64.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   64.781   0.000 Main::HeatSinkTemperature will throw exception
+   64.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   67.281   2.500 Main::CanSetCCDTemperature get returns False
+   67.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   67.281   0.000 Main::HeatSinkTemperature will throw exception
+   67.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   69.781   2.500 Main::CanSetCCDTemperature get returns False
+   69.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   69.781   0.000 Main::HeatSinkTemperature will throw exception
+   69.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   72.281   2.500 Main::CanSetCCDTemperature get returns False
+   72.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   72.281   0.000 Main::HeatSinkTemperature will throw exception
+   72.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   74.781   2.500 Main::CanSetCCDTemperature get returns False
+   74.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   74.781   0.000 Main::HeatSinkTemperature will throw exception
+   74.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   77.281   2.500 Main::CanSetCCDTemperature get returns False
+   77.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   77.281   0.000 Main::HeatSinkTemperature will throw exception
+   77.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   79.781   2.500 Main::CanSetCCDTemperature get returns False
+   79.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   79.781   0.000 Main::HeatSinkTemperature will throw exception
+   79.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   82.281   2.500 Main::CanSetCCDTemperature get returns False
+   82.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   82.281   0.000 Main::HeatSinkTemperature will throw exception
+   82.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   84.781   2.500 Main::CanSetCCDTemperature get returns False
+   84.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   84.781   0.000 Main::HeatSinkTemperature will throw exception
+   84.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   87.281   2.500 Main::CanSetCCDTemperature get returns False
+   87.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   87.281   0.000 Main::HeatSinkTemperature will throw exception
+   87.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   89.781   2.500 Main::CanSetCCDTemperature get returns False
+   89.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   89.781   0.000 Main::HeatSinkTemperature will throw exception
+   89.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   92.906   3.125 Main::CanSetCCDTemperature get returns False
+   92.906   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   92.906   0.000 Main::HeatSinkTemperature will throw exception
+   92.906   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   95.406   2.500 Main::CanSetCCDTemperature get returns False
+   95.406   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   95.406   0.000 Main::HeatSinkTemperature will throw exception
+   95.406   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+   97.906   2.500 Main::CanSetCCDTemperature get returns False
+   97.906   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+   97.906   0.000 Main::HeatSinkTemperature will throw exception
+   97.906   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  100.406   2.500 Main::CanSetCCDTemperature get returns False
+  100.406   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  100.406   0.000 Main::HeatSinkTemperature will throw exception
+  100.406   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  102.906   2.500 Main::CanSetCCDTemperature get returns False
+  102.906   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  102.906   0.000 Main::HeatSinkTemperature will throw exception
+  102.906   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  105.406   2.500 Main::CanSetCCDTemperature get returns False
+  105.406   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  105.406   0.000 Main::HeatSinkTemperature will throw exception
+  105.406   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  107.906   2.500 Main::CanSetCCDTemperature get returns False
+  107.906   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  107.906   0.000 Main::HeatSinkTemperature will throw exception
+  107.906   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  110.406   2.500 Main::CanSetCCDTemperature get returns False
+  110.406   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  110.406   0.000 Main::HeatSinkTemperature will throw exception
+  110.406   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  112.906   2.500 Main::CanSetCCDTemperature get returns False
+  112.906   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  112.906   0.000 Main::HeatSinkTemperature will throw exception
+  112.906   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  114.469   1.563 Generic::HasShutter get returns hard coded false
+  114.531   0.063 Generic::HasShutter get returns hard coded false
+  114.531   0.000 Generic::MaxBinX get returns 1
+  114.531   0.000 Generic::BinX set to 1
+  114.531   0.000 Generic::MaxBinY get returns 1
+  114.531   0.000 Generic::BinY set to 1
+  114.531   0.000 Generic::StartX set to 0
+  114.531   0.000 Generic::StartY set to 0
+  114.547   0.016 Generic::NumX set to 1288
+  114.547   0.000 Generic::NumY set to 1032
+  114.547   0.000 Generic::StartExposure(0.00600000005215406, True) begins
+  114.547   0.000 Generic::StartExposure(0.00600000005215406, True, True) begins
+  114.547   0.000 Generic::NumX get returns 1288
+  114.547   0.000 Generic::BinX get returns 1
+  114.547   0.000 Generic::NumY get returns 1032
+  114.547   0.000 Generic::BinY get returns 1
+  114.547   0.000 Generic::StartX get returns 0
+  114.547   0.000 Generic::BinX get returns 1
+  114.547   0.000 Generic::StartY get returns 0
+  114.547   0.000 Generic::BinY get returns 1
+  114.547   0.000 initReadBlock() x_off=0 y_off=0 width=1288 height=1032 x_bin=1 y_bin=1
+  114.547   0.000 Read Delayed Block:freezing parameters
+  114.547   0.000 	x_offset=0, y_offset=0
+  114.547   0.000 	width=1288, height=1032
+  114.547   0.000 	x_bin=1, y_bin=1
+  114.547   0.000 	delay=6
+  114.547   0.000 StartExposure() before captureDelegate.BeginInvode()
+  114.547   0.000 Generic::hardwareCapture(0.00600000005215406, True): begins
+  114.547   0.000 recordPixels entered - bDelayed = True
+  114.547   0.000 initReadBlock() x_off=0 y_off=0 width=1288 height=1032 x_bin=1 y_bin=1
+  114.547   0.000 Read Delayed Block:exposure as requested - before any adjustments
+  114.547   0.000 	x_offset=0, y_offset=0
+  114.547   0.000 	width=1288, height=1032
+  114.547   0.000 	x_bin=1, y_bin=1
+  114.547   0.000 	delay=6
+  114.547   0.000 StartExposure() after captureDelegate.BeginInvode()
+  114.547   0.000 initReadBlock() x_off=0 y_off=0 width=1288 height=1032 x_bin=1 y_bin=1
+  114.547   0.000 Read Delayed Block:after bayer adjustments
+  114.547   0.000 	x_offset=0, y_offset=0
+  114.547   0.000 	width=1288, height=1032
+  114.547   0.000 	x_bin=1, y_bin=1
+  114.547   0.000 	delay=6
+  114.547   0.000 initReadBlock() x_off=0 y_off=0 width=1304 height=1032 x_bin=1 y_bin=1
+  114.547   0.000 Read Delayed Block:after CoStar adjustments
+  114.547   0.000 	x_offset=0, y_offset=0
+  114.547   0.000 	width=1304, height=1032
+  114.547   0.000 	x_bin=1, y_bin=1
+  114.547   0.000 	delay=6
+  114.547   0.000 Generic::CameraState() called from state cameraExposing
+  114.547   0.000 Generic::ImageReady get returns False
+  114.547   0.000 recordPixels() has locked
+  114.547   0.000 buildCommandBlock(): type=0x40 cmd=0x02 cmd_value=0x0003 index=0x0000 cmd_length=0x000e
+  114.547   0.000 Write has locked
+  114.547   0.000 usbWrite(): unManagedBlockBuffer=0x000000000025ffb8 numBytesToWrite=22
+  114.547   0.000 Header: 40 02 03 00 00 00 0e 00 
+  114.547   0.000 Data: 00 00 00 00 18 05 08 04 01 01 06 00 00 00 
+  114.547   0.000 Write has unlocked
+  114.547   0.000 recordPixels() requested read, flags = 3
+  114.547   0.000 recordPixelsDelayed requesting download
+  114.547   0.000 downloadPixels(): requesting 1345728 pixels, 2 bytes each (2691456 bytes)
+  114.547   0.000 Read has locked
+  114.547   0.000 interface Read(System.Byte[], 2691456) begins
+  114.547   0.000 usbRead: buf=0x0000000004810020 numBytesToRead= 2691456 numBytesRead=       0 readSize= 2691456
+  114.594   0.047 Generic::ImageReady get returns False
+  114.594   0.000 Generic::ImageReady get returns False
+  114.656   0.063 Generic::ImageReady get returns False
+  114.656   0.000 Generic::ImageReady get returns False
+  114.719   0.063 Generic::ImageReady get returns False
+  114.719   0.000 Generic::ImageReady get returns False
+  114.719   0.000 ReadFile: after loop numBytesRead=2691456
+  114.719   0.000 Read has unlocked
+  114.719   0.000 downloadPixels(): read completed
+  114.719   0.000 recordPixels() download completed
+  114.734   0.016 convertCameraDataToImageData(): x_bin = 1 binnedWidth=1288 binnedHeight=1032
+  114.734   0.000 reusing imageData
+  114.734   0.000 convertCameraDataToImageData() processing 16 bit progressive camera data
+  114.734   0.000 actualHeight=1032
+  114.734   0.000 CoStar decode begins: userRequest.x_offset=0, userReqested.width=1288, userRequested.Height=1032
+  114.766   0.031 Processed 1032 lines, 1288 pixels/line
+  114.766   0.000 convertCameraDataToImageData(): ends
+  114.766   0.000 recordPixels() returns
+  114.766   0.000 hardwareCapture(): exposure + download took 0.21875, requested 0.00600000005215406
+  114.766   0.000 Generic::hardwareCapture(): ends successfully
+  114.781   0.016 Generic::CameraState() called from state cameraIdle
+  114.781   0.000 Generic::ImageReady get returns True
+  114.844   0.063 Generic::ImageArray get
+  114.844   0.000 ImageArray entered: imageDataValid=True
+  114.891   0.047 Generic::HasShutter get returns hard coded false
+  114.953   0.063 Generic::HasShutter get returns hard coded false
+  114.969   0.016 Generic::ElectronsPerADU get returns 0.3
+  115.469   0.500 Main::CanSetCCDTemperature get returns False
+  115.469   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  115.469   0.000 Main::HeatSinkTemperature will throw exception
+  115.469   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  117.969   2.500 Main::CanSetCCDTemperature get returns False
+  117.969   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  117.969   0.000 Main::HeatSinkTemperature will throw exception
+  117.969   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  120.781   2.813 Main::CanSetCCDTemperature get returns False
+  120.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  120.781   0.000 Main::HeatSinkTemperature will throw exception
+  120.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  123.281   2.500 Main::CanSetCCDTemperature get returns False
+  123.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  123.281   0.000 Main::HeatSinkTemperature will throw exception
+  123.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  125.781   2.500 Main::CanSetCCDTemperature get returns False
+  125.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  125.781   0.000 Main::HeatSinkTemperature will throw exception
+  125.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  128.781   3.000 Main::CanSetCCDTemperature get returns False
+  128.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  128.781   0.000 Main::HeatSinkTemperature will throw exception
+  128.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  131.281   2.500 Main::CanSetCCDTemperature get returns False
+  131.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  131.281   0.000 Main::HeatSinkTemperature will throw exception
+  131.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  133.781   2.500 Main::CanSetCCDTemperature get returns False
+  133.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  133.781   0.000 Main::HeatSinkTemperature will throw exception
+  133.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  136.281   2.500 Main::CanSetCCDTemperature get returns False
+  136.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  136.281   0.000 Main::HeatSinkTemperature will throw exception
+  136.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  138.781   2.500 Main::CanSetCCDTemperature get returns False
+  138.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  138.781   0.000 Main::HeatSinkTemperature will throw exception
+  138.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  141.281   2.500 Main::CanSetCCDTemperature get returns False
+  141.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  141.281   0.000 Main::HeatSinkTemperature will throw exception
+  141.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  143.781   2.500 Main::CanSetCCDTemperature get returns False
+  143.781   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  143.781   0.000 Main::HeatSinkTemperature will throw exception
+  143.781   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  146.281   2.500 Main::CanSetCCDTemperature get returns False
+  146.281   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  146.281   0.000 Main::HeatSinkTemperature will throw exception
+  146.281   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  149.016   2.734 Main::CanSetCCDTemperature get returns False
+  149.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  149.016   0.000 Main::HeatSinkTemperature will throw exception
+  149.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  151.516   2.500 Main::CanSetCCDTemperature get returns False
+  151.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  151.516   0.000 Main::HeatSinkTemperature will throw exception
+  151.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  154.016   2.500 Main::CanSetCCDTemperature get returns False
+  154.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  154.016   0.000 Main::HeatSinkTemperature will throw exception
+  154.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  156.516   2.500 Main::CanSetCCDTemperature get returns False
+  156.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  156.516   0.000 Main::HeatSinkTemperature will throw exception
+  156.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  159.016   2.500 Main::CanSetCCDTemperature get returns False
+  159.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  159.016   0.000 Main::HeatSinkTemperature will throw exception
+  159.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  161.516   2.500 Main::CanSetCCDTemperature get returns False
+  161.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  161.516   0.000 Main::HeatSinkTemperature will throw exception
+  161.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  164.016   2.500 Main::CanSetCCDTemperature get returns False
+  164.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  164.016   0.000 Main::HeatSinkTemperature will throw exception
+  164.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  166.516   2.500 Main::CanSetCCDTemperature get returns False
+  166.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  166.516   0.000 Main::HeatSinkTemperature will throw exception
+  166.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  169.016   2.500 Main::CanSetCCDTemperature get returns False
+  169.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  169.016   0.000 Main::HeatSinkTemperature will throw exception
+  169.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  171.516   2.500 Main::CanSetCCDTemperature get returns False
+  171.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  171.516   0.000 Main::HeatSinkTemperature will throw exception
+  171.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  174.016   2.500 Main::CanSetCCDTemperature get returns False
+  174.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  174.016   0.000 Main::HeatSinkTemperature will throw exception
+  174.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  176.516   2.500 Main::CanSetCCDTemperature get returns False
+  176.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  176.516   0.000 Main::HeatSinkTemperature will throw exception
+  176.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  179.016   2.500 Main::CanSetCCDTemperature get returns False
+  179.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  179.016   0.000 Main::HeatSinkTemperature will throw exception
+  179.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  181.516   2.500 Main::CanSetCCDTemperature get returns False
+  181.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  181.516   0.000 Main::HeatSinkTemperature will throw exception
+  181.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  184.016   2.500 Main::CanSetCCDTemperature get returns False
+  184.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  184.016   0.000 Main::HeatSinkTemperature will throw exception
+  184.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  186.516   2.500 Main::CanSetCCDTemperature get returns False
+  186.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  186.516   0.000 Main::HeatSinkTemperature will throw exception
+  186.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  189.016   2.500 Main::CanSetCCDTemperature get returns False
+  189.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  189.016   0.000 Main::HeatSinkTemperature will throw exception
+  189.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  191.516   2.500 Main::CanSetCCDTemperature get returns False
+  191.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  191.516   0.000 Main::HeatSinkTemperature will throw exception
+  191.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  194.016   2.500 Main::CanSetCCDTemperature get returns False
+  194.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  194.016   0.000 Main::HeatSinkTemperature will throw exception
+  194.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  196.516   2.500 Main::CanSetCCDTemperature get returns False
+  196.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  196.516   0.000 Main::HeatSinkTemperature will throw exception
+  196.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  199.016   2.500 Main::CanSetCCDTemperature get returns False
+  199.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  199.016   0.000 Main::HeatSinkTemperature will throw exception
+  199.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  201.516   2.500 Main::CanSetCCDTemperature get returns False
+  201.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  201.516   0.000 Main::HeatSinkTemperature will throw exception
+  201.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  204.016   2.500 Main::CanSetCCDTemperature get returns False
+  204.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  204.016   0.000 Main::HeatSinkTemperature will throw exception
+  204.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  206.516   2.500 Main::CanSetCCDTemperature get returns False
+  206.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  206.516   0.000 Main::HeatSinkTemperature will throw exception
+  206.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  209.016   2.500 Main::CanSetCCDTemperature get returns False
+  209.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  209.016   0.000 Main::HeatSinkTemperature will throw exception
+  209.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  211.516   2.500 Main::CanSetCCDTemperature get returns False
+  211.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  211.516   0.000 Main::HeatSinkTemperature will throw exception
+  211.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  214.016   2.500 Main::CanSetCCDTemperature get returns False
+  214.016   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  214.016   0.000 Main::HeatSinkTemperature will throw exception
+  214.016   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+  216.516   2.500 Main::CanSetCCDTemperature get returns False
+  216.516   0.000 Generic::SetError(CCDTemperature get: must throw exception if data unavailable)
+  216.516   0.000 Main::HeatSinkTemperature will throw exception
+  216.516   0.000 Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
