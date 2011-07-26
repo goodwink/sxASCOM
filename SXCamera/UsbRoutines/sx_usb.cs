@@ -3,6 +3,7 @@ using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
+using System.Diagnostics;
 
 using Logging;
 
@@ -256,6 +257,62 @@ namespace sx
             Write(block, null);
         }
 
+        private unsafe void readBytes(byte *buf, Int32 numBytesToRead)
+        {
+            int error = 0;
+            Log.Write(String.Format("readBytes(): begins for {0} bytes\n", numBytesToRead));
+
+            while (numBytesToRead > 0)
+            {
+                Int32 bytesRead;
+
+                if (FileIO.ReadFile(deviceHandle, buf, numBytesToRead, &bytesRead, 0))
+                {
+                    buf += bytesRead;
+                    numBytesToRead -= bytesRead;
+                    Log.Write(String.Format("readBytes(): ReadFile() read {0} bytes - numBytesToRead={1}\n", bytesRead, numBytesToRead));
+                }
+                else
+                {
+                    error = Marshal.GetLastWin32Error();
+                    System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception(error);
+                    string errMsg = ex.Message;
+
+                    Log.Write(String.Format("ReadFile: error={0} ({1}) numBytesToRead={2}\n", error, errMsg, numBytesToRead));
+
+                    throw new System.IO.IOException(String.Format("ReadFile: error={0} ({1}) numBytesToRead={2}\n", error, errMsg, numBytesToRead));
+                }
+            }
+
+            Log.Write("Read bytes(): ends\n");
+        }
+
+        internal unsafe void Read(byte [] buffer, Int32 numElementsToRead)
+        {
+            fixed (byte *buf = buffer)
+            {
+                readBytes(buf, numElementsToRead * sizeof(byte));
+            }
+        }
+
+        internal void Read(byte [] buffer)
+        {
+            Read(buffer, buffer.Length * sizeof(byte));
+        }
+
+        internal unsafe void Read(UInt16 [] buffer, Int32 numElementsToRead)
+        {
+            fixed (UInt16 *buf = buffer)
+            {
+                readBytes((byte *)buf, numElementsToRead*sizeof(UInt16));
+            }
+        }
+
+        internal void Read(UInt16 [] buffer)
+        {
+            Read(buffer, buffer.Length);
+        }
+
         internal object Read(Type returnType, Int32 numBytesToRead)
         {
             IntPtr unManagedBuffer = IntPtr.Zero;
@@ -266,9 +323,8 @@ namespace sx
             try
             {
                 unManagedBuffer = Marshal.AllocHGlobal(numBytesToRead);
-                int error = 0;
 
-                while (error == 0 && numBytesToRead > numBytesRead)
+                while (numBytesToRead > numBytesRead)
                 {
                     Int32 thisRead = 0;
                     IntPtr buf = new IntPtr(unManagedBuffer.ToInt64() + numBytesRead);
@@ -278,54 +334,23 @@ namespace sx
 
                     int ret = FileIO.ReadFile(deviceHandle, buf, readSize, out thisRead, IntPtr.Zero);
 
-                    if (ret == 0)
-                    {
-                        error = Marshal.GetLastWin32Error();
-                    }
-                    else
+                    if (FileIO.ReadFile(deviceHandle, buf, readSize, out thisRead, IntPtr.Zero) > 0)
                     {
                         numBytesRead += thisRead;
                     }
-                }
-
-                if (false && error == 0 && numBytesToRead > 1024 * 1024 * 10)
-                {
-                    Log.Write(String.Format("about to try an extra read after a {0} read", numBytesToRead));
-
-                    IntPtr dummyUnManagedBuffer = Marshal.AllocHGlobal(1);
-
-                    int thisRead;
-                    int dummyRet;
-
-                    do
+                    else
                     {
-                        dummyRet = FileIO.ReadFile(deviceHandle, dummyUnManagedBuffer, 1, out thisRead, IntPtr.Zero);
-                        if (dummyRet == 0)
-                        {
-                            Log.Write(String.Format("extra read returns 0\n"));
-                        }
-                        else
-                        {
-                            Log.Write(String.Format("extra read returns {0} data was {1}\n", dummyRet, Marshal.ReadByte(dummyUnManagedBuffer)));
-                        }
-                    } while (dummyRet > 0);
-                }
+                        int error = Marshal.GetLastWin32Error();
 
-                if (error != 0)
-                {
-                    System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception();
-                    string errMsg = ex.Message;
+                        System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception();
+                        string errMsg = ex.Message;
 
-                    Log.Write("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead + "\n");
-                    throw new System.IO.IOException("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead);
+                        Log.Write("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead + "\n");
+                        throw new System.IO.IOException("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead);
+                    }
+               }
 
-                }
-
-                if (numBytesRead != numBytesToRead)
-                {
-                    Log.Write("ReadFile: short read numBytesToRead=" + numBytesToRead + " numBytesRead=" + numBytesRead + "\n");
-                    throw new System.IO.IOException("ReadFile: short read numBytesToRead=" + numBytesToRead + " numBytesRead=" + numBytesRead);
-                }
+                Debug.Assert(numBytesRead == numBytesToRead);
 
                 Log.Write("ReadFile: after loop numBytesRead=" + numBytesRead + "\n");
 

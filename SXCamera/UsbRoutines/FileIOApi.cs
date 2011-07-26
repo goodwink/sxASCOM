@@ -25,6 +25,17 @@ namespace WinUsbDemo
         [DllImport("kernel32", SetLastError = true)]
         internal extern static int ReadFile(SafeFileHandle handle, IntPtr lpBuffer, Int32 numBytesToRead, out Int32 numBytesRead, IntPtr overlapped_MustBeZero);
 
+        [System.Runtime.InteropServices.DllImport("kernel32", SetLastError = true)]
+        internal extern static unsafe bool ReadFile
+        (
+            SafeFileHandle hFile,     // handle to file
+            void* pBuffer,            // data buffer
+            int NumberOfBytesToRead,  // number of bytes to read
+            int *pNumberOfBytesRead,  // number of bytes read
+            int Overlapped            // overlapped buffer
+        );
+
+
         [DllImport("kernel32", SetLastError = true)]
         internal extern static int WriteFile(SafeFileHandle handle, IntPtr lpBuffer, Int32 numBytesToWrite, out Int32 numBytesWritten, IntPtr overlapped_MustBeZero);
 

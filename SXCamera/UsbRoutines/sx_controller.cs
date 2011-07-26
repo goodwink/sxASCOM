@@ -188,14 +188,41 @@ namespace sx
             return (Array)Read(System.Array.CreateInstance(elementType, 0).GetType(), numElements * Marshal.SizeOf(elementType));
         }
 
+        internal void ReadBytes(byte [] buf)
+        {
+            lock (this.Lock)
+            {
+                m_iface.Read(buf);
+            }
+        }
+
         internal byte[] ReadBytes(Int32 numBytes)
         {
-            return (byte[])Read(typeof(byte[]), numBytes);
+            byte [] bytes = new byte[numBytes];
+            ReadBytes(bytes);
+
+            return bytes;
         }
 
         internal string ReadString(Int32 numCharsToRead)
         {
             return (string)Read(typeof(System.String), numCharsToRead);
+        }
+
+        internal Int32 ReadInt32()
+        {
+            byte[] bytes = new byte[sizeof(Int32)];
+
+            ReadBytes(bytes);
+            return System.BitConverter.ToInt32(bytes, 0);
+        }
+
+        internal UInt32 ReadUInt32()
+        {
+            byte[] bytes = new byte[sizeof(UInt32)];
+
+            ReadBytes(bytes);
+            return System.BitConverter.ToUInt32(bytes, 0);
         }
 
         internal object ReadObject(Type returnType)
@@ -243,7 +270,6 @@ namespace sx
         public uint getVersion()
         {
             SX_CMD_BLOCK cmdBlock;
-            byte[] bytes;
             UInt32 ver = 0;
 
             verifyConnected(MethodBase.GetCurrentMethod().Name);
@@ -255,11 +281,9 @@ namespace sx
                 Log.Write("getVersion has locked\n");
                 Write(cmdBlock);
 
-                bytes = ReadBytes(Marshal.SizeOf(ver));
+                ver = ReadUInt32();
             }
             Log.Write("getVersion has unlocked\n");
-
-            ver = System.BitConverter.ToUInt32(bytes, 0);
 
             Log.Write(String.Format("getVersion() returns {0}\n", ver));
 
@@ -284,7 +308,6 @@ namespace sx
         public int getTimer()
         {
             SX_CMD_BLOCK cmdBlock;
-            byte[] bytes;
             Int32 ms = 0;
 
             verifyConnected(MethodBase.GetCurrentMethod().Name);
@@ -296,11 +319,9 @@ namespace sx
                 Log.Write("getTimer has locked\n");
                 Write(cmdBlock);
 
-                bytes = ReadBytes(Marshal.SizeOf(ms));
+                ms = ReadInt32();
             }
             Log.Write("getTimer has unlocked\n");
-
-            ms = System.BitConverter.ToInt32(bytes, 0);
 
             Log.Write("Timer = " + ms + "\n");
 
