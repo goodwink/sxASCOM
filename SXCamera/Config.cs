@@ -822,3 +822,4 @@ namespace ASCOM.SXCamera
         }
     }
 }
+

@@ -828,7 +828,7 @@ namespace sx
              }
         }
 
-        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested):
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested) :
             this(controller, cameraIdx, bAllowUntested, false, null)
         {
         }

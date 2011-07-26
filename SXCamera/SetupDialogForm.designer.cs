@@ -48,15 +48,22 @@ namespace ASCOM.SXCamera
             this.usbGroup = new System.Windows.Forms.GroupBox();
             this.advancedUSBParmsEnabled = new System.Windows.Forms.CheckBox();
             this.binGroup = new System.Windows.Forms.GroupBox();
+<<<<<<< HEAD
             this.label2 = new System.Windows.Forms.Label();
             this.fixedBin = new System.Windows.Forms.NumericUpDown();
             this.fixedBinning = new System.Windows.Forms.CheckBox();
             this.asymetricBinning = new System.Windows.Forms.CheckBox();
             this.maxYBin = new System.Windows.Forms.NumericUpDown();
+=======
+            this.maxYBin = new System.Windows.Forms.NumericUpDown();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.symetricBinning = new System.Windows.Forms.RadioButton();
+>>>>>>> Setup dialog changes
             this.xBinLabel = new System.Windows.Forms.Label();
             this.maxXBin = new System.Windows.Forms.NumericUpDown();
             this.binLabel = new System.Windows.Forms.Label();
             this.dumpDataEnabled = new System.Windows.Forms.CheckBox();
+<<<<<<< HEAD
             this.useDumpedData = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.squareLodestarPixels = new System.Windows.Forms.CheckBox();
@@ -82,6 +89,13 @@ namespace ASCOM.SXCamera
             ((System.ComponentModel.ISupportInitialize)(this.doubleExposureThreshold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gaussianBlurRadius)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.hardwareExposureThreshold)).BeginInit();
+=======
+            ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
+            this.usbGroup.SuspendLayout();
+            this.binGroup.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.maxYBin)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.maxXBin)).BeginInit();
+>>>>>>> Setup dialog changes
             this.SuspendLayout();
             // 
             // cmdOK
@@ -252,7 +266,12 @@ namespace ASCOM.SXCamera
             this.usbGroup.Controls.Add(this.selectionExactModel);
             this.usbGroup.Controls.Add(this.VID);
             this.usbGroup.Controls.Add(this.selectionExcludeModel);
+<<<<<<< HEAD
             this.usbGroup.Location = new System.Drawing.Point(383, 292);
+=======
+            this.usbGroup.Location = new System.Drawing.Point(20, 292);
+            this.usbGroup.Margin = new System.Windows.Forms.Padding(4);
+>>>>>>> Setup dialog changes
             this.usbGroup.Name = "usbGroup";
             this.usbGroup.Size = new System.Drawing.Size(161, 168);
             this.usbGroup.TabIndex = 4;
@@ -262,7 +281,12 @@ namespace ASCOM.SXCamera
             // advancedUSBParmsEnabled
             // 
             this.advancedUSBParmsEnabled.AutoSize = true;
+<<<<<<< HEAD
             this.advancedUSBParmsEnabled.Location = new System.Drawing.Point(15, 215);
+=======
+            this.advancedUSBParmsEnabled.Location = new System.Drawing.Point(20, 265);
+            this.advancedUSBParmsEnabled.Margin = new System.Windows.Forms.Padding(4);
+>>>>>>> Setup dialog changes
             this.advancedUSBParmsEnabled.Name = "advancedUSBParmsEnabled";
             this.advancedUSBParmsEnabled.Size = new System.Drawing.Size(192, 17);
             this.advancedUSBParmsEnabled.TabIndex = 104;
@@ -272,6 +296,7 @@ namespace ASCOM.SXCamera
             // 
             // binGroup
             // 
+<<<<<<< HEAD
             this.binGroup.Controls.Add(this.colorBinning);
             this.binGroup.Controls.Add(this.label2);
             this.binGroup.Controls.Add(this.fixedBin);
@@ -286,10 +311,22 @@ namespace ASCOM.SXCamera
             this.binGroup.Name = "binGroup";
             this.binGroup.Padding = new System.Windows.Forms.Padding(2);
             this.binGroup.Size = new System.Drawing.Size(171, 169);
+=======
+            this.binGroup.Controls.Add(this.maxYBin);
+            this.binGroup.Controls.Add(this.radioButton2);
+            this.binGroup.Controls.Add(this.symetricBinning);
+            this.binGroup.Controls.Add(this.xBinLabel);
+            this.binGroup.Controls.Add(this.maxXBin);
+            this.binGroup.Controls.Add(this.binLabel);
+            this.binGroup.Location = new System.Drawing.Point(223, 292);
+            this.binGroup.Name = "binGroup";
+            this.binGroup.Size = new System.Drawing.Size(204, 187);
+>>>>>>> Setup dialog changes
             this.binGroup.TabIndex = 105;
             this.binGroup.TabStop = false;
             this.binGroup.Text = "Binning Control";
             // 
+<<<<<<< HEAD
             // label2
             // 
             this.label2.AutoSize = true;
@@ -348,6 +385,11 @@ namespace ASCOM.SXCamera
             // 
             this.maxYBin.Location = new System.Drawing.Point(68, 69);
             this.maxYBin.Margin = new System.Windows.Forms.Padding(2);
+=======
+            // maxYBin
+            // 
+            this.maxYBin.Location = new System.Drawing.Point(82, 86);
+>>>>>>> Setup dialog changes
             this.maxYBin.Maximum = new decimal(new int[] {
             8,
             0,
@@ -359,7 +401,11 @@ namespace ASCOM.SXCamera
             0,
             0});
             this.maxYBin.Name = "maxYBin";
+<<<<<<< HEAD
             this.maxYBin.Size = new System.Drawing.Size(51, 20);
+=======
+            this.maxYBin.Size = new System.Drawing.Size(68, 22);
+>>>>>>> Setup dialog changes
             this.maxYBin.TabIndex = 7;
             this.maxYBin.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.maxYBin.Value = new decimal(new int[] {
@@ -367,6 +413,32 @@ namespace ASCOM.SXCamera
             0,
             0,
             0});
+<<<<<<< HEAD
+=======
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Location = new System.Drawing.Point(9, 49);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(141, 21);
+            this.radioButton2.TabIndex = 6;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "Asymetric Binning";
+            this.radioButton2.UseVisualStyleBackColor = true;
+            // 
+            // symetricBinning
+            // 
+            this.symetricBinning.AutoSize = true;
+            this.symetricBinning.Location = new System.Drawing.Point(9, 21);
+            this.symetricBinning.Name = "symetricBinning";
+            this.symetricBinning.Size = new System.Drawing.Size(134, 21);
+            this.symetricBinning.TabIndex = 5;
+            this.symetricBinning.TabStop = true;
+            this.symetricBinning.Text = "Symetric Binning";
+            this.symetricBinning.UseVisualStyleBackColor = true;
+            this.symetricBinning.CheckedChanged += new System.EventHandler(this.symetricBinning_CheckedChanged);
+>>>>>>> Setup dialog changes
             // 
             // xBinLabel
             // 
@@ -415,6 +487,7 @@ namespace ASCOM.SXCamera
             // dumpDataEnabled
             // 
             this.dumpDataEnabled.AutoSize = true;
+<<<<<<< HEAD
             this.dumpDataEnabled.Location = new System.Drawing.Point(15, 170);
             this.dumpDataEnabled.Name = "dumpDataEnabled";
             this.dumpDataEnabled.Size = new System.Drawing.Size(207, 17);
@@ -593,17 +666,29 @@ namespace ASCOM.SXCamera
             this.colorBinning.TabIndex = 12;
             this.colorBinning.Text = "M26C 2x2 color binning";
             this.colorBinning.UseVisualStyleBackColor = true;
+=======
+            this.dumpDataEnabled.Location = new System.Drawing.Point(20, 237);
+            this.dumpDataEnabled.Name = "dumpDataEnabled";
+            this.dumpDataEnabled.Size = new System.Drawing.Size(275, 21);
+            this.dumpDataEnabled.TabIndex = 106;
+            this.dumpDataEnabled.Text = "Dump Data to File (for debugging only)";
+            this.dumpDataEnabled.UseVisualStyleBackColor = true;
+>>>>>>> Setup dialog changes
             // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+<<<<<<< HEAD
             this.ClientSize = new System.Drawing.Size(569, 472);
             this.Controls.Add(this.hardwareExposureThreshold);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.waitForCooldown);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.useDumpedData);
+=======
+            this.ClientSize = new System.Drawing.Size(449, 496);
+>>>>>>> Setup dialog changes
             this.Controls.Add(this.dumpDataEnabled);
             this.Controls.Add(this.binGroup);
             this.Controls.Add(this.advancedUSBParmsEnabled);
@@ -628,6 +713,7 @@ namespace ASCOM.SXCamera
             this.usbGroup.PerformLayout();
             this.binGroup.ResumeLayout(false);
             this.binGroup.PerformLayout();
+<<<<<<< HEAD
             ((System.ComponentModel.ISupportInitialize)(this.fixedBin)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.maxYBin)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.maxXBin)).EndInit();
@@ -636,6 +722,10 @@ namespace ASCOM.SXCamera
             ((System.ComponentModel.ISupportInitialize)(this.doubleExposureThreshold)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gaussianBlurRadius)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.hardwareExposureThreshold)).EndInit();
+=======
+            ((System.ComponentModel.ISupportInitialize)(this.maxYBin)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.maxXBin)).EndInit();
+>>>>>>> Setup dialog changes
             this.ResumeLayout(false);
             this.PerformLayout();
 
