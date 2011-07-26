@@ -582,7 +582,7 @@ namespace sx
              }
         }
 
-        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested)
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, bool bDump)
         {
             Log.Write(String.Format("sx.Camera() constructor: controller={0} cameraIdx={1}\n", controller, cameraIdx));
 

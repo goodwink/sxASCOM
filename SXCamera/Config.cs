@@ -52,6 +52,9 @@ namespace ASCOM.SXCamera
         private const byte DEFAULT_MAX_X_BIN = 4;
 #endif
 
+        private const String KEY_DUMP_DATA_ENABLED = "DumpDataEnabled";
+        private const bool DEFAULT_DUMP_DATA_ENABLED = false;
+
         public enum CAMERA_SELECTION_METHOD
         {
             CAMERA_SELECTION_ANY,
@@ -64,15 +67,16 @@ namespace ASCOM.SXCamera
             public bool enableUntested;
             public bool enableLogging;
             public bool secondsAreMilliseconds;
+            public bool dumpDataEnabled;
             public string selectionMethod;
             public UInt16 VID;
             public UInt16 PID;
             public bool symetricBinning;
             public byte maxXBin;
             public byte maxYBin;
+            
 
-
-            internal CAMERA_VALUES(bool enableUntested, bool enableLogging, bool secondsAreMilliseconds, string selectionMethod, UInt16 VID, UInt16 PID, bool symetricBinning, byte maxXBin, byte maxYBin)
+            internal CAMERA_VALUES(bool enableUntested, bool enableLogging, bool secondsAreMilliseconds, string selectionMethod, UInt16 VID, UInt16 PID, bool symetricBinning, byte maxXBin, byte maxYBin, bool dumpDataEnabled)
             {
                 this.enableUntested = enableUntested;
                 this.enableLogging = enableLogging;
@@ -83,16 +87,17 @@ namespace ASCOM.SXCamera
                 this.symetricBinning = symetricBinning;
                 this.maxXBin = maxXBin;
                 this.maxYBin = maxYBin;
+                this.dumpDataEnabled = dumpDataEnabled;
             }
         };
 
         internal CAMERA_VALUES[] DEFAULT_VALUES = {
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517, DEFAULT_SYMETRIC_BINNING, 1, 1, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517, DEFAULT_SYMETRIC_BINNING, 1, 1, DEFAULT_DUMP_DATA_ENABLED),
         };
 
         private Profile m_profile;
@@ -247,6 +252,12 @@ namespace ASCOM.SXCamera
             set { SetString(KEY_SECONDS_ARE_MILLISECONDS, value.ToString()); }
         }
 
+        public bool dumpDataEnabled
+        {
+            get { return GetBool(KEY_DUMP_DATA_ENABLED, DEFAULT_VALUES[m_whichController].dumpDataEnabled); }
+            set { SetString(KEY_DUMP_DATA_ENABLED, value.ToString()); }
+        }
+
         public string logFileName
         {
             get { return GetString(KEY_LOG_FILE_NAME, DEFAULT_LOG_FILE_NAME); }
@@ -303,6 +314,8 @@ namespace ASCOM.SXCamera
         }
 
 
+
+
         /// <summary>
         /// Launches a configuration dialog box for the driver.  The call will not return
         /// until the user clicks OK or cancel manually.
@@ -339,6 +352,7 @@ namespace ASCOM.SXCamera
                 F.EnableLoggingCheckBox.Checked = enableLogging;
                 F.EnableUntestedCheckBox.Checked = enableUntested;
                 F.secondsAreMiliseconds.Checked = secondsAreMilliseconds;
+                F.dumpDataEnabled.Checked = dumpDataEnabled;
                 F.Version.Text = String.Format("Version: {0}", SharedResources.versionNumber);
 
                 F.selectionAllowAny.Checked = false;
@@ -392,6 +406,13 @@ namespace ASCOM.SXCamera
                 F.maxXBin.Value  = maxXBin;
                 F.maxYBin.Value  = maxYBin;
 
+                // some cameras cannot bin.  Don't allow the binning to be
+                // selected.
+                if (DEFAULT_VALUES[m_whichController].maxXBin == 1)
+                {
+                    F.binGroup.Enabled = false;
+                }
+
                 if (F.ShowDialog() == DialogResult.OK)
                 {
                     Log.Write("ShowDialog returned OK - saving parameters\n");
@@ -399,6 +420,7 @@ namespace ASCOM.SXCamera
                     enableLogging = F.EnableLoggingCheckBox.Checked;
                     enableUntested = F.EnableUntestedCheckBox.Checked;
                     secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
+                    dumpDataEnabled = F.dumpDataEnabled.Checked;
 
                     if (F.selectionAllowAny.Checked)
                     {

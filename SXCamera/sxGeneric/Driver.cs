@@ -617,7 +617,7 @@ namespace ASCOM.SXGeneric
                                     throw new ASCOM.DriverException(SetError(String.Format("SharedResources().controllerConnect(): caught an exception {0}\n", ex.ToString())), ex);
                                 }
                             }
-                            sxCamera = new sx.Camera(m_controller, m_cameraId, m_config.enableUntested);
+                            sxCamera = new sx.Camera(m_controller, m_cameraId, m_config.enableUntested, m_config.dumpDataEnabled);
                             m_Connected = true;
                             // set properties to defaults. These all talk to the camera, and having them here saves
                             // a lot of try/catch blocks in other places
