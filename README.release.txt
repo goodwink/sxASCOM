@@ -20,5 +20,5 @@ To do a release, be sure to:
 - git push --tags
 - create the installer
 - Copy the files to 
-  "C:\Users\bretm\Documents\My Web Sites\daddog.com\ascom\sx\driver"
+  start explorer "C:\Users\bretm\Documents\My Web Sites\daddog.com\ascom\sx\driver"
 - rename the files
