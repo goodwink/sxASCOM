@@ -1,6 +1,6 @@
 Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
-This is the README.txt for version 2.1.1.2
+This is the README.txt for version 2.2.0.0
 
 This is an UNSTABLE release of the ASCOM driver for Starlight Xpress cameras,
 which contains new, untested or lightly tested code and will expire.
@@ -9,12 +9,9 @@ There is a STABLE release available - please use that version if it meets
 your needs.
 
 This version adds:
-    - support for CoStar
-    - support for up to 8 cameras 
-        (2xImaging, 2xLodestar, 2xCostar, 2xGuider)
-    - a complete rewrite of the pixel processing code, resulting in measured
-        speedups of up to 30X (on my machine lodestar processing dropped
-        from 120ms/frame to 4ms/frame)
+    - a configuratino option for dumping camera data for offline analysis
+    - use of the ASCOM logging facility to write log files
+    - minor performance changes
 
 If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know
