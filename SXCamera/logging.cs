@@ -8,8 +8,7 @@ namespace Logging
 {
     public class Log
     {
-        private static string m_logPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + "ascom-sx-camera-log.txt";
-        private static FileStream m_logFS = null;
+        private static ASCOM.Utilities.TraceLogger m_logger;
         private static DateTime m_lastWriteTime;
         private static DateTime m_startTime;
         private static bool m_enabled;
@@ -40,7 +39,8 @@ namespace Logging
                     {
                         if (value)
                         {
-                            m_logFS = new FileStream(m_logPath, FileMode.Create, FileAccess.Write, FileShare.Read, 1);
+                            m_logger = new ASCOM.Utilities.TraceLogger(null, "SXCamera");
+                            m_logger.Enabled = true;
                             m_lastWriteTime = DateTime.Now;
                             m_startTime = m_lastWriteTime;
                             m_enabled = true;
@@ -50,13 +50,7 @@ namespace Logging
                         else
                         {
                             m_enabled = false;
-                            if (m_logFS != null)
-                            {
-                                m_logFS.Close();
-                                m_logFS = null;
-                            }
                         }
-                        
                     }
                 }
                 catch (System.Exception ex)
@@ -71,15 +65,21 @@ namespace Logging
         {
             if (enabled)
             {
-                lock (m_logPath)
+                // the original logger required a newline, but the ASCOM logging 
+                // doesn't need newlines.  Remove trailing newlines
+                
+                if (logMsg[logMsg.Length-1] == '\n')
+                {
+                    logMsg = logMsg.Remove(logMsg.Length-1);
+                }
+
+                lock (m_logger)
                 {
                     DateTime currentTime = DateTime.Now;
                     TimeSpan elapsed = currentTime - m_startTime;
                     TimeSpan delta = currentTime - m_lastWriteTime;
 
-                    string message = String.Format("{0,9:####0.000} {1,7:##0.000} {2}", elapsed.TotalSeconds, delta.TotalSeconds, logMsg);
-                    byte[] info = new UTF8Encoding(true).GetBytes(message);
-                    m_logFS.Write(info, 0, info.Length);
+                    m_logger.LogMessage(String.Format("{0,12:####0.000000} {1,10:##0.000000}", elapsed.TotalSeconds, delta.TotalSeconds), logMsg);
                     m_lastWriteTime = currentTime;
                 }
             }
