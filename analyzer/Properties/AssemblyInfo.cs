@@ -1,4 +1,26 @@
-﻿using System.Reflection;
+﻿// tabs=4
+// Copyright 2010-2010 by Dad Dog Development, Ltd
+//
+// This work is licensed under the Creative Commons Attribution-No Derivative 
+// Works 3.0 License. 
+//
+// A copy of the license should have been included with this software. If
+// not, you can also view a copy of this license, at:
+//
+// http://creativecommons.org/licenses/by-nd/3.0/ or 
+// send a letter to:
+//
+// Creative Commons
+// 171 Second Street
+// Suite 300
+// San Francisco, California, 94105, USA.
+// 
+// If this license is not suitable for your purposes, it is possible to 
+// obtain it under a different license. 
+//
+// For more information please contact bretm@daddog.com
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,7 +32,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
 [assembly: AssemblyProduct("analyzer")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2010")]
+[assembly: AssemblyCopyright("Copyright © Dad Dog Development Ltd 2010-2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
