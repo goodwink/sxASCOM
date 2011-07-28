@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // tabs=4
 // Copyright 2010-2010 by Dad Dog Development, Ltd
 //
@@ -822,4 +823,3 @@ namespace ASCOM.SXCamera
         }
     }
 }
-
