@@ -1,4 +1,6 @@
-﻿// Lots of code was taken from winusb.cs by Jan Axelson.  The copyright from that code looked like:
+﻿// tabs=4
+// Lots of code was taken from winusb.cs by Jan Axelson.  The copyright from that code looked like:
+
 /// ***********************************************************************
 /// Software License Agreement
 ///
