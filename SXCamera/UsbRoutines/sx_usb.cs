@@ -401,7 +401,6 @@ namespace sx
                     Int32 readSize = numBytesToRead - numBytesRead;
 
                     Log.Write(String.Format("usbRead: buf=0x{0:x16} numBytesToRead={1,8} numBytesRead={2,8} readSize={3,8}\n", buf.ToInt64(), numBytesToRead, numBytesRead, readSize));
-
                     if (FileIO.ReadFile(deviceHandle, buf, readSize, out thisRead, IntPtr.Zero) > 0)
                     {
                         numBytesRead += thisRead;
