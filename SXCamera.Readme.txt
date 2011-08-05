@@ -2,8 +2,9 @@ Copyright (C) 2010-2013 Dad Dog Development Ltd.
 
 This is the README.txt for version 6.0.0.0
 
-I have changed my version numbering scheme - this is the the versino that 
-would have been 2.3 before.  The first two numbers now indicate the miniumum
+
+I have changed my version numbering scheme - this is the the version that 
+would have been 3.0 before.  The first two numbers now indicate the miniumum
 version of ASCOM that must be installed.
 
 This is a Release build of the ASCOM driver for Starlight Xpress cameras.
