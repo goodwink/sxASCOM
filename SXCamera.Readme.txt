@@ -1,6 +1,6 @@
 Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
-This is the README.txt for version 2.2.0.0
+This is the README.txt for version 2.2.0.1
 
 This is an UNSTABLE release of the ASCOM driver for Starlight Xpress cameras,
 which contains new, untested or lightly tested code and will expire.
@@ -12,6 +12,7 @@ This version adds:
     - a configuratino option for dumping camera data for offline analysis
     - use of the ASCOM logging facility to write log files
     - minor performance changes
+    - fixes a problem introduced in 2.2.0.0
 
 If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know
