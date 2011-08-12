@@ -118,6 +118,8 @@ namespace sx
         MODEL_MX9 = 0x49,
         // ------------------ M25C --------------------
         MODEL_M25C = 0x59,
+        // ------------------ M26C --------------------
+        MODEL_M26C = 0x5A,
         // ------------------ Lodestar --------------------
         MODEL_LX1 = 0x46,
         // ------------------ CoStar --------------------
@@ -233,7 +235,7 @@ namespace sx
         {
             get 
             { 
-                UInt16 ret; ret=ccdHeight;
+                UInt16 ret=ccdHeight;
 
                 if (interlaced)
                 {
@@ -537,6 +539,13 @@ namespace sx
                     fullWellCapacity = 25000;
                     electronsPerADU = 0.40;
                     progressive = true;
+                    break;
+                case CameraModels.MODEL_M26C:
+                    bUntested = true;
+                    description = "M26C";
+                    fullWellCapacity = 25000;
+                    electronsPerADU = 0.30;
+                    progressive = false;
                     break;
                 case CameraModels.MODEL_MX5:
                     bUntested = true;
