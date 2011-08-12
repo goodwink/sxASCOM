@@ -4,7 +4,7 @@ To do a release, be sure to:
 - change the expiration date (if enabled) in SXAscomInstaller.iss
 - edit SXCamera.Readme
 - bump the version number 
-  - bump_version.py
+- bump_version.py
   - commit changes using printed git commands
   - create a tag using the printed git commands
 - create a change log with:
@@ -12,7 +12,6 @@ To do a release, be sure to:
   echo >> changelog.txt
   git diff -b --shortstat origin/releases/2.2/master..HEAD >> changelog.txt
   git log --pretty=format:"%s (%ai by %aN <%aE>)" --no-merges > changelog.full.txt
-- build
 - git push
 - git push --tags
 - create the installer
