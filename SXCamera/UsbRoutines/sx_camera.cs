@@ -625,6 +625,10 @@ namespace sx
             {
                 m_controller = null;
             }
+            else 
+            {
+                m_dump = bDump;
+            }
 
             if (cameraIdx > 0)
             {
