@@ -1,0 +1,88 @@
+
+Public Sub ReceiveOddBlock2()   'Downloads an odd lines image field using external exposure timing
+
+'LSheight& = 158: MSheight& = 7: LSwidth& = 56: MSwidth& = 10
+If Bin% = 2 Then Readcount& = 10202400: BinH& = 1: BinV& = 1
+If Bin% = 0 Then Readcount& = 2550600: BinH& = 4: BinV& = 1
+If Bin% = 4 Then Readcount& = 637650: BinH& = 8: BinV& = 2 
+'command block
+CommandBlock(0) = 64
+CommandBlock(1) = 3         'read camera data (external exposure timing)
+CommandBlock(2) = 1         'odd
+CommandBlock(3) = 0
+CommandBlock(4) = 0         'select main camera
+CommandBlock(5) = 0
+CommandBlock(6) = 10        'parameter block length
+CommandBlock(7) = 0
+                        
+'parameter block
+CommandBlock(8) = xoffset_L
+CommandBlock(9) = xoffset_H
+CommandBlock(10) = yoffset_L
+CommandBlock(11) = yoffset_H
+CommandBlock(12) = LSwidth&
+CommandBlock(13) = MSwidth&
+CommandBlock(14) = LSheight&
+CommandBlock(15) = MSheight&
+CommandBlock(16) = BinH&
+CommandBlock(17) = BinV&
+
+ByteCount& = 18             'command block + parameter block size 18
+
+cmt = camtype%
+
+Success = WriteFile(BlockIOHandle&, AddressFor(CommandBlock(0)), ByteCount&, BytesWritten&, 0)
+If (Success = 0) Then ErrorExit ("Could not write a BlockIO Output Report - Try re-booting USB device")
+MainMenu.Countdowntxt.Text = "Field1"
+DoEvents
+
+ByteCount& = Readcount&
+
+Success = ReadFile(BlockIOHandle&, AddressFor(ReportBuffer1(0)), ByteCount&, BytesReturned&, 0)
+If (Success = 0) Then ErrorExit ("Could not get a BlockIO Input Report - Try re-booting USB device")
+
+End Sub
+
+Public Sub ReceiveEvenBlock2()   'Downloads an even lines image field using external exposure timing
+
+'LSheight& = 232: MSheight& = 3: LSwidth& = 184: MSwidth& = 11
+If Bin% = 2 Then Readcount& = 10202400: BinH& = 1: BinV& = 1
+If Bin% = 0 Then Readcount& = 2550600: BinH& = 4: BinV& = 1
+If Bin% = 4 Then Readcount& = 637650: BinH& = 8: BinV& = 2
+'command block
+CommandBlock(0) = 64
+CommandBlock(1) = 3         'read camera data (external exposure timing)
+CommandBlock(2) = 2         'even
+CommandBlock(3) = 0
+CommandBlock(4) = 0         'select main camera
+CommandBlock(5) = 0
+CommandBlock(6) = 10        'parameter block length
+CommandBlock(7) = 0
+                        
+'parameter block
+CommandBlock(8) = xoffset_L
+CommandBlock(9) = xoffset_H
+CommandBlock(10) = yoffset_L
+CommandBlock(11) = yoffset_H
+CommandBlock(12) = LSwidth&
+CommandBlock(13) = MSwidth&
+CommandBlock(14) = LSheight&
+CommandBlock(15) = MSheight&
+CommandBlock(16) = BinH&
+CommandBlock(17) = BinV&
+
+ByteCount& = 18             'command block + parameter block size 18
+
+Success = WriteFile(BlockIOHandle&, AddressFor(CommandBlock(0)), ByteCount&, BytesWritten&, 0)
+If (Success = 0) Then ErrorExit ("Could not write a BlockIO Output Report - Try re-booting USB device")
+MainMenu.Countdowntxt.Text = "Field2"
+DoEvents
+
+ByteCount& = Readcount&
+
+Success = ReadFile(BlockIOHandle&, AddressFor(ReportBuffer2(0)), ByteCount&, BytesReturned&, 0)
+If (Success = 0) Then ErrorExit ("Could not get a BlockIO Input Report - Try re-booting USB device")
+MainMenu.Countdowntxt.Text = "Finished"
+DoEvents
+
+End Sub

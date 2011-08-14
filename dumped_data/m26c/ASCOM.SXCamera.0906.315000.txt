@@ -1,0 +1,1641 @@
+09:06:31.500     0.000000   0.000000   Logging begins at 14/08/2011 09:06:31
+09:06:31.500     0.015625   0.015625   Generic::Camera(0, 0) begins
+09:06:31.515     0.031250   0.015625   Configuration(0, 0) starts
+09:06:31.546     0.062500   0.031250   Configuration() computes driverId=ASCOM.SXMain0.Camera
+09:06:31.562     0.078125   0.015625   SharedResources()
+09:06:31.562     0.078125   0.000000   Driver version = 2.2.0.3
+09:06:31.562     0.078125   0.000000   Controller() entered
+09:06:31.562     0.078125   0.000000   Controller(): returns
+09:06:31.562     0.078125   0.000000   Controller() entered
+09:06:31.562     0.078125   0.000000   Controller(): returns
+09:06:31.562     0.078125   0.000000   Controller() entered
+09:06:31.562     0.078125   0.000000   Controller(): returns
+09:06:31.562     0.078125   0.000000   Controller() entered
+09:06:31.562     0.078125   0.000000   Controller(): returns
+09:06:31.562     0.078125   0.000000   Controller() entered
+09:06:31.562     0.078125   0.000000   Controller(): returns
+09:06:31.562     0.078125   0.000000   Controller() entered
+09:06:31.562     0.078125   0.000000   Controller(): returns
+09:06:31.562     0.078125   0.000000   SharedResources() returns, m_lock=System.Object
+09:06:31.578     0.093750   0.015625   GetString(Selection, CAMERA_SELECTION_EXCLUDE_MODEL) ret = [CAMERA_SELECTION_ANY]
+09:06:31.578     0.093750   0.000000   GetString(Selection, CAMERA_SELECTION_EXCLUDE_MODEL) ret = [CAMERA_SELECTION_ANY]
+09:06:31.578     0.093750   0.000000   Generic::Camera() ends for vid=0 pid=0 skip=False
+09:06:31.578     0.093750   0.000000   Main::Camera(0, 0) executing
+09:06:31.578     0.093750   0.000000   Main::Camera() executing
+09:06:31.593     0.109375   0.015625   Generic::Connected set: Current Value is False, requested value is True
+09:06:31.593     0.109375   0.000000   m_controller.Connected=False
+09:06:31.593     0.109375   0.000000   controller.connect(0, 0, False)
+09:06:31.593     0.109375   0.000000   USBInterface(0, 0, False) begins
+09:06:31.625     0.140625   0.031250   USBInterface: Considering USB Device \\?\usb#vid_1278&pid_0326#5&8e70af1&0&3#{606377c1-2270-11d4-bfd8-00207812f5d5}
+09:06:31.625     0.140625   0.000000   USBInterface: checking VID/PID - foundVID=1278 foundPID=326
+09:06:31.625     0.140625   0.000000   USBInterface: mutexName=//?/usb#vid_1278&pid_0326#5&8e70af1&0&3#{606377c1-2270-11d4-bfd8-00207812f5d5} createdNew=True
+09:06:31.625     0.140625   0.000000   USBInterface: attempting to get a handle for USB Device \\?\usb#vid_1278&pid_0326#5&8e70af1&0&3#{606377c1-2270-11d4-bfd8-00207812f5d5}
+09:06:31.625     0.140625   0.000000   USBInterface: deviceHandle.IsInvalid=False
+09:06:31.625     0.140625   0.000000   resetting()
+09:06:31.625     0.140625   0.000000   buildCommandBlock(): type=0x40 cmd=0x06 cmd_value=0x0000 index=0x0000 cmd_length=0x0000
+09:06:31.625     0.140625   0.000000   Write has locked
+09:06:31.625     0.140625   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a058 numBytesToWrite=8
+09:06:31.625     0.140625   0.000000   Header: 40 06 00 00 00 00 00 00 
+09:06:31.625     0.140625   0.000000   Write has unlocked
+09:06:31.625     0.140625   0.000000   buildCommandBlock(): type=0x40 cmd=0xff cmd_value=0x0000 index=0x0000 cmd_length=0x0000
+09:06:31.625     0.140625   0.000000   getVersion has locked
+09:06:31.625     0.140625   0.000000   Write has locked
+09:06:31.625     0.140625   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a058 numBytesToWrite=8
+09:06:31.625     0.140625   0.000000   Header: 40 ff 00 00 00 00 00 00 
+09:06:32.265     0.781250   0.640625   Write has unlocked
+09:06:32.265     0.781250   0.000000   readBytes(): begins for 4 bytes
+09:06:32.265     0.781250   0.000000   readBytes(): ReadFile() read 4 bytes - numBytesToRead=0
+09:06:32.265     0.781250   0.000000   Read bytes(): ends
+09:06:32.265     0.781250   0.000000   getVersion has unlocked
+09:06:32.265     0.781250   0.000000   getVersion() returns 65553
+09:06:32.265     0.781250   0.000000   gettings params
+09:06:32.265     0.781250   0.000000   buildCommandBlock(): type=0xc0 cmd=0x08 cmd_value=0x0000 index=0x0000 cmd_length=0x0000
+09:06:32.265     0.781250   0.000000   Write has locked
+09:06:32.265     0.781250   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a058 numBytesToWrite=8
+09:06:32.281     0.796875   0.015625   Header: c0 08 00 00 00 00 00 00 
+09:06:32.281     0.796875   0.000000   Write has unlocked
+09:06:32.281     0.796875   0.000000   Read has locked
+09:06:32.281     0.796875   0.000000   interface Read(sx.SX_CCD_PARAMS, 17) begins
+09:06:32.281     0.796875   0.000000   usbRead: buf=0x000000000025afb0 numBytesToRead=      17 numBytesRead=       0 readSize=      17
+09:06:32.281     0.796875   0.000000   ReadFile: after loop numBytesRead=17
+09:06:32.281     0.796875   0.000000   Read has unlocked
+09:06:32.281     0.796875   0.000000   controller.connect(): returns
+09:06:32.281     0.796875   0.000000   sx.Camera() constructor: controller=sx.Controller cameraIdx=0
+09:06:32.296     0.812500   0.015625   buildCommandBlock(): type=0xc0 cmd=0x0e cmd_value=0x0000 index=0x0000 cmd_length=0x0002
+09:06:32.296     0.812500   0.000000   getModel has locked
+09:06:32.296     0.812500   0.000000   Write has locked
+09:06:32.296     0.812500   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a058 numBytesToWrite=8
+09:06:32.296     0.812500   0.000000   Header: c0 0e 00 00 00 00 02 00 
+09:06:32.296     0.812500   0.000000   Write has unlocked
+09:06:32.296     0.812500   0.000000   readBytes(): begins for 2 bytes
+09:06:32.296     0.812500   0.000000   readBytes(): ReadFile() read 2 bytes - numBytesToRead=0
+09:06:32.296     0.812500   0.000000   Read bytes(): ends
+09:06:32.296     0.812500   0.000000   getModel has unlocked
+09:06:32.296     0.812500   0.000000   cameraModel=90
+09:06:32.296     0.812500   0.000000   buildCommandBlock(): type=0xc0 cmd=0x08 cmd_value=0x0000 index=0x0000 cmd_length=0x0000
+09:06:32.296     0.812500   0.000000   getCCDParams has locked
+09:06:32.296     0.812500   0.000000   Write has locked
+09:06:32.296     0.812500   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a058 numBytesToWrite=8
+09:06:32.296     0.812500   0.000000   Header: c0 08 00 00 00 00 00 00 
+09:06:32.296     0.812500   0.000000   Write has unlocked
+09:06:32.296     0.812500   0.000000   Read has locked
+09:06:32.296     0.812500   0.000000   interface Read(sx.SX_CCD_PARAMS, 17) begins
+09:06:32.296     0.812500   0.000000   usbRead: buf=0x000000000025afb0 numBytesToRead=      17 numBytesRead=       0 readSize=      17
+09:06:32.296     0.812500   0.000000   ReadFile: after loop numBytesRead=17
+09:06:32.296     0.812500   0.000000   Read has unlocked
+09:06:32.296     0.812500   0.000000   getCCDParams has unlocked
+09:06:32.312     0.828125   0.015625   params:
+09:06:32.312     0.828125   0.000000   [09]hfront_porch=45, hback_porch=10
+09:06:32.312     0.828125   0.000000   [09]vfront_porch=8, vback_porch=8
+09:06:32.312     0.828125   0.000000   [09]width=3900, height=1308
+09:06:32.312     0.828125   0.000000   [09]pixel_uwidth=1548, pixel_uheight=1548
+09:06:32.312     0.828125   0.000000   [09]bits_per_pixel=16, num_serial_ports=2
+09:06:32.312     0.828125   0.000000   [09]color_matrix=0xfff, extra_capabilitites=0x15
+09:06:32.312     0.828125   0.000000   setPixelSize: bytesPerPixel=
+09:06:32.312     0.828125   0.000000   setInfo(): description=M26C fullWellCapacity=25000 electronsPerADU=0.3 progressive=False bUntested=True
+09:06:32.312     0.828125   0.000000   initReadBlock() x_off=0 y_off=0 width=3900 height=2616 x_bin=1 y_bin=1
+09:06:32.312     0.828125   0.000000   Read Delayed Block:buildReadDelayedBlock
+09:06:32.312     0.828125   0.000000   [09]x_offset=0, y_offset=0
+09:06:32.312     0.828125   0.000000   [09]width=3900, height=2616
+09:06:32.312     0.828125   0.000000   [09]x_bin=1, y_bin=1
+09:06:32.312     0.828125   0.000000   [09]delay=0
+09:06:32.312     0.828125   0.000000   setCoolerInfo inBlock temp=0 enabled=0
+09:06:32.312     0.828125   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0000 index=0x0000 cmd_length=0x0000
+09:06:32.312     0.828125   0.000000   setCooler has locked
+09:06:32.312     0.828125   0.000000   Write has locked
+09:06:32.312     0.828125   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a058 numBytesToWrite=8
+09:06:32.312     0.828125   0.000000   Header: c0 1e 00 00 00 00 00 00 
+09:06:32.312     0.828125   0.000000   Write has unlocked
+09:06:32.312     0.828125   0.000000   readBytes(): begins for 3 bytes
+09:06:32.312     0.828125   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:32.312     0.828125   0.000000   Read bytes(): ends
+09:06:32.312     0.828125   0.000000   setCooler has unlocked
+09:06:32.312     0.828125   0.000000   setCoolerInfo outBlock temp=2630 enabled=0
+09:06:32.312     0.828125   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:32.312     0.828125   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:32.312     0.828125   0.000000   setCooler has locked
+09:06:32.312     0.828125   0.000000   Write has locked
+09:06:32.312     0.828125   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a058 numBytesToWrite=8
+09:06:32.312     0.828125   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:32.312     0.828125   0.000000   Write has unlocked
+09:06:32.312     0.828125   0.000000   readBytes(): begins for 3 bytes
+09:06:32.312     0.828125   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:32.328     0.843750   0.015625   Read bytes(): ends
+09:06:32.328     0.843750   0.000000   setCooler has unlocked
+09:06:32.328     0.843750   0.000000   setCoolerInfo outBlock temp=2630 enabled=0
+09:06:32.328     0.843750   0.000000   sx.Camera() constructor cooler init.  temp=2630 enabled=0
+09:06:32.328     0.843750   0.000000   sx.Camera() constructor returns
+09:06:32.328     0.843750   0.000000   Generic::MaxBinX get returns 8
+09:06:32.328     0.843750   0.000000   Generic::BinX set to 1
+09:06:32.328     0.843750   0.000000   Generic::MaxBinY get returns 8
+09:06:32.328     0.843750   0.000000   Generic::BinY set to 1
+09:06:32.328     0.843750   0.000000   Generic::NumX set to 3900
+09:06:32.328     0.843750   0.000000   Generic::NumY set to 2616
+09:06:32.343     0.859375   0.015625   Generic::StartX set to 0
+09:06:32.343     0.859375   0.000000   Generic::StartY set to 0
+09:06:32.343     0.859375   0.000000   Generic::conneted set ends
+09:06:32.343     0.859375   0.000000   Generic::Connected get returning True
+09:06:32.343     0.859375   0.000000   Generic::CameraXSize get returns m_CameraXSize 3900
+09:06:32.343     0.859375   0.000000   Generic::CameraYSize get returns CameraYSize 2616
+09:06:32.343     0.859375   0.000000   Generic::MaxBinX get returns 8
+09:06:32.343     0.859375   0.000000   Generic::MaxBinY get returns 8
+09:06:32.359     0.875000   0.015625   Generic::PixelSizeX get returns 6.046875
+09:06:32.359     0.875000   0.000000   Generic::PixelSizeY get returns 3.0234375
+09:06:32.359     0.875000   0.000000   Generic::CanAbortExposure get returns true
+09:06:32.359     0.875000   0.000000   Generic::CanAsymetricBin get returns False
+09:06:32.359     0.875000   0.000000   Main::CanGetCoolerPower get returns false
+09:06:32.359     0.875000   0.000000   Main::CanPulseGuide get returns True
+09:06:32.359     0.875000   0.000000   Main::CanSetCCDTemperature get returns True
+09:06:32.359     0.875000   0.000000   Generic::CanStopExposure get returns true
+09:06:32.359     0.875000   0.000000   Generic::Description get returns M26C
+09:06:32.359     0.875000   0.000000   Generic::ElectronsPerADU get returns 0.3
+09:06:32.359     0.875000   0.000000   Generic::MaxADU get returns 25000
+09:06:32.359     0.875000   0.000000   Generic::ElectronsPerADU get returns 0.3
+09:06:32.359     0.875000   0.000000   Generic::BinX get returns 1
+09:06:32.359     0.875000   0.000000   Generic::BinY get returns 1
+09:06:32.359     0.875000   0.000000   Generic::FullWellCapacity get returns 7500
+09:06:32.359     0.875000   0.000000   Generic::HasShutter get returns hard coded false
+09:06:32.359     0.875000   0.000000   Generic::MaxADU get returns 25000
+09:06:32.359     0.875000   0.000000   Generic::HasShutter get returns hard coded false
+09:06:32.359     0.875000   0.000000   Generic::HasShutter get returns hard coded false
+09:06:32.375     0.890625   0.015625   Generic::HasShutter get returns hard coded false
+09:06:32.375     0.890625   0.000000   Main::CanSetCCDTemperature get returns True
+09:06:32.375     0.890625   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:32.375     0.890625   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:32.375     0.890625   0.000000   setCooler has locked
+09:06:32.375     0.890625   0.000000   Write has locked
+09:06:32.375     0.890625   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025b870 numBytesToWrite=8
+09:06:32.375     0.890625   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:32.375     0.890625   0.000000   Write has unlocked
+09:06:32.375     0.890625   0.000000   readBytes(): begins for 3 bytes
+09:06:32.375     0.890625   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:32.375     0.890625   0.000000   Read bytes(): ends
+09:06:32.375     0.890625   0.000000   setCooler has unlocked
+09:06:32.375     0.890625   0.000000   setCoolerInfo outBlock temp=2630 enabled=0
+09:06:32.375     0.890625   0.000000   coolerTemp returning 2630
+09:06:32.375     0.890625   0.000000   Main::CCDTemperature get returns -10.2
+09:06:32.375     0.890625   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:32.375     0.890625   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:32.390     0.906250   0.015625   Generic::HasShutter get returns hard coded false
+09:06:32.390     0.906250   0.000000   Generic::HasShutter get returns hard coded false
+09:06:32.390     0.906250   0.000000   Generic::HasShutter get returns hard coded false
+09:06:32.390     0.906250   0.000000   Generic::HasShutter get returns hard coded false
+09:06:32.406     0.921875   0.015625   Generic::CameraState() called from state cameraIdle
+09:06:33.093     1.609375   0.687500   Main::CanSetCCDTemperature get returns True
+09:06:33.093     1.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:33.093     1.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:33.093     1.609375   0.000000   setCooler has locked
+09:06:33.093     1.609375   0.000000   Write has locked
+09:06:33.093     1.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025c610 numBytesToWrite=8
+09:06:33.093     1.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:33.093     1.609375   0.000000   Write has unlocked
+09:06:33.093     1.609375   0.000000   readBytes(): begins for 3 bytes
+09:06:33.093     1.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:33.093     1.609375   0.000000   Read bytes(): ends
+09:06:33.093     1.609375   0.000000   setCooler has unlocked
+09:06:33.093     1.609375   0.000000   setCoolerInfo outBlock temp=2634 enabled=0
+09:06:33.093     1.609375   0.000000   coolerTemp returning 2634
+09:06:33.093     1.609375   0.000000   Main::CCDTemperature get returns -9.8
+09:06:33.093     1.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:33.093     1.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:35.593     4.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:06:35.593     4.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:35.593     4.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:35.593     4.109375   0.000000   setCooler has locked
+09:06:35.593     4.109375   0.000000   Write has locked
+09:06:35.593     4.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x0000000000250db0 numBytesToWrite=8
+09:06:35.593     4.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:35.593     4.109375   0.000000   Write has unlocked
+09:06:35.593     4.109375   0.000000   readBytes(): begins for 3 bytes
+09:06:35.593     4.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:35.593     4.109375   0.000000   Read bytes(): ends
+09:06:35.593     4.109375   0.000000   setCooler has unlocked
+09:06:35.593     4.109375   0.000000   setCoolerInfo outBlock temp=2664 enabled=0
+09:06:35.593     4.109375   0.000000   coolerTemp returning 2664
+09:06:35.593     4.109375   0.000000   Main::CCDTemperature get returns -6.8
+09:06:35.593     4.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:35.593     4.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:38.093     6.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:06:38.093     6.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:38.093     6.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:38.093     6.609375   0.000000   setCooler has locked
+09:06:38.093     6.609375   0.000000   Write has locked
+09:06:38.093     6.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x0000000000250db0 numBytesToWrite=8
+09:06:38.093     6.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:38.093     6.609375   0.000000   Write has unlocked
+09:06:38.093     6.609375   0.000000   readBytes(): begins for 3 bytes
+09:06:38.093     6.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:38.093     6.609375   0.000000   Read bytes(): ends
+09:06:38.093     6.609375   0.000000   setCooler has unlocked
+09:06:38.093     6.609375   0.000000   setCoolerInfo outBlock temp=2697 enabled=0
+09:06:38.093     6.609375   0.000000   coolerTemp returning 2697
+09:06:38.093     6.609375   0.000000   Main::CCDTemperature get returns -3.5
+09:06:38.093     6.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:38.093     6.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:38.765     7.281250   0.671875   Generic::HasShutter get returns hard coded false
+09:06:38.781     7.296875   0.015625   Generic::HasShutter get returns hard coded false
+09:06:38.781     7.296875   0.000000   Generic::MaxBinX get returns 8
+09:06:38.781     7.296875   0.000000   Generic::BinX set to 1
+09:06:38.781     7.296875   0.000000   Generic::MaxBinY get returns 8
+09:06:38.781     7.296875   0.000000   Generic::BinY set to 1
+09:06:38.781     7.296875   0.000000   Generic::StartX set to 0
+09:06:38.781     7.296875   0.000000   Generic::StartY set to 0
+09:06:38.781     7.296875   0.000000   Generic::NumX set to 3900
+09:06:38.796     7.312500   0.015625   Generic::NumY set to 2616
+09:06:38.796     7.312500   0.000000   Generic::StartExposure(0.300000011920929, True) begins
+09:06:38.796     7.312500   0.000000   Generic::StartExposure(0.300000011920929, True, True) begins
+09:06:38.796     7.312500   0.000000   Generic::NumX get returns 3900
+09:06:38.796     7.312500   0.000000   Generic::BinX get returns 1
+09:06:38.796     7.312500   0.000000   Generic::NumY get returns 2616
+09:06:38.796     7.312500   0.000000   Generic::BinY get returns 1
+09:06:38.796     7.312500   0.000000   Generic::StartX get returns 0
+09:06:38.796     7.312500   0.000000   Generic::BinX get returns 1
+09:06:38.796     7.312500   0.000000   Generic::StartY get returns 0
+09:06:38.796     7.312500   0.000000   Generic::BinY get returns 1
+09:06:38.796     7.312500   0.000000   initReadBlock() x_off=0 y_off=0 width=3900 height=2616 x_bin=1 y_bin=1
+09:06:38.796     7.312500   0.000000   Read Delayed Block:freezing parameters
+09:06:38.796     7.312500   0.000000   [09]x_offset=0, y_offset=0
+09:06:38.796     7.312500   0.000000   [09]width=3900, height=2616
+09:06:38.796     7.312500   0.000000   [09]x_bin=1, y_bin=1
+09:06:38.796     7.312500   0.000000   [09]delay=300
+09:06:38.796     7.312500   0.000000   StartExposure() before captureDelegate.BeginInvode()
+09:06:38.796     7.312500   0.000000   StartExposure() after captureDelegate.BeginInvode()
+09:06:38.796     7.312500   0.000000   Generic::CameraState() called from state cameraExposing
+09:06:38.796     7.312500   0.000000   Generic::ImageReady get returns False
+09:06:38.812     7.328125   0.015625   Generic::hardwareCapture(0.300000011920929, True): begins
+09:06:38.812     7.328125   0.000000   recordPixels entered - bDelayed = True
+09:06:38.812     7.328125   0.000000   initReadBlock() x_off=0 y_off=0 width=3900 height=2616 x_bin=1 y_bin=1
+09:06:38.812     7.328125   0.000000   Read Delayed Block:exposure as requested - before any adjustments
+09:06:38.812     7.328125   0.000000   [09]x_offset=0, y_offset=0
+09:06:38.812     7.328125   0.000000   [09]width=3900, height=2616
+09:06:38.812     7.328125   0.000000   [09]x_bin=1, y_bin=1
+09:06:38.812     7.328125   0.000000   [09]delay=300
+09:06:38.812     7.328125   0.000000   initReadBlock() x_off=0 y_off=0 width=3900 height=2616 x_bin=1 y_bin=1
+09:06:38.812     7.328125   0.000000   Read Delayed Block:after bayer adjustments
+09:06:38.812     7.328125   0.000000   [09]x_offset=0, y_offset=0
+09:06:38.812     7.328125   0.000000   [09]width=3900, height=2616
+09:06:38.812     7.328125   0.000000   [09]x_bin=1, y_bin=1
+09:06:38.812     7.328125   0.000000   [09]delay=300
+09:06:38.812     7.328125   0.000000   initReadBlock() x_off=0 y_off=0 width=3900 height=1308 x_bin=1 y_bin=1
+09:06:38.812     7.328125   0.000000   Read Delayed Block:after initial progressive adjustments
+09:06:38.812     7.328125   0.000000   [09]x_offset=0, y_offset=0
+09:06:38.812     7.328125   0.000000   [09]width=3900, height=1308
+09:06:38.812     7.328125   0.000000   [09]x_bin=1, y_bin=1
+09:06:38.812     7.328125   0.000000   [09]delay=300
+09:06:38.812     7.328125   0.000000   making final interlaced adjustments, binnedOffsetIsOdd=False, binnedHeightIsOdd=False
+09:06:38.812     7.328125   0.000000   binnedHeightIsOdd = False, height=2616, ccdHeight=1308
+09:06:38.812     7.328125   0.000000   rowDelta=0 startDelta=0
+09:06:38.812     7.328125   0.000000   initReadBlock() x_off=0 y_off=0 width=3900 height=1308 x_bin=1 y_bin=1
+09:06:38.812     7.328125   0.000000   Read Delayed Block:first frame after final interlaced adjustments
+09:06:38.812     7.328125   0.000000   [09]x_offset=0, y_offset=0
+09:06:38.812     7.328125   0.000000   [09]width=3900, height=1308
+09:06:38.812     7.328125   0.000000   [09]x_bin=1, y_bin=1
+09:06:38.812     7.328125   0.000000   [09]delay=300
+09:06:38.812     7.328125   0.000000   initReadBlock() x_off=0 y_off=0 width=3900 height=1308 x_bin=1 y_bin=1
+09:06:38.812     7.328125   0.000000   Read Delayed Block:second frame after final interlaced adjustments
+09:06:38.812     7.328125   0.000000   [09]x_offset=0, y_offset=0
+09:06:38.812     7.328125   0.000000   [09]width=3900, height=1308
+09:06:38.812     7.328125   0.000000   [09]x_bin=1, y_bin=1
+09:06:38.812     7.328125   0.000000   [09]delay=300
+09:06:38.843     7.359375   0.031250   Generic::ImageReady get returns False
+09:06:38.843     7.359375   0.000000   Generic::ImageReady get returns False
+09:06:38.843     7.359375   0.000000   recordPixels() has locked
+09:06:38.843     7.359375   0.000000   buildCommandBlock(): type=0x40 cmd=0x02 cmd_value=0x0002 index=0x0000 cmd_length=0x000e
+09:06:38.859     7.375000   0.015625   Write has locked
+09:06:38.859     7.375000   0.000000   usbWrite(): unManagedBlockBuffer=0x0000000003fa6748 numBytesToWrite=22
+09:06:38.859     7.375000   0.000000   Header: 40 02 02 00 00 00 0e 00 
+09:06:38.859     7.375000   0.000000   Data: 00 00 00 00 3c 0f 1c 05 01 01 2c 01 00 00 
+09:06:38.859     7.375000   0.000000   Write has unlocked
+09:06:38.859     7.375000   0.000000   recordPixels() requested read, flags = 2
+09:06:38.859     7.375000   0.000000   recordPixelsDelayed requesting download
+09:06:38.859     7.375000   0.000000   downloadPixels(): requesting 5101200 pixels, 2 bytes each (10202400 bytes)
+09:06:38.859     7.375000   0.000000   readBytes(): begins for 10202400 bytes
+09:06:38.906     7.421875   0.046875   Generic::ImageReady get returns False
+09:06:38.906     7.421875   0.000000   Generic::ImageReady get returns False
+09:06:38.968     7.484375   0.062500   Generic::ImageReady get returns False
+09:06:38.968     7.484375   0.000000   Generic::ImageReady get returns False
+09:06:39.031     7.546875   0.062500   Generic::ImageReady get returns False
+09:06:39.031     7.546875   0.000000   Generic::ImageReady get returns False
+09:06:39.093     7.609375   0.062500   Generic::ImageReady get returns False
+09:06:39.093     7.609375   0.000000   Generic::ImageReady get returns False
+09:06:39.156     7.671875   0.062500   Generic::ImageReady get returns False
+09:06:39.156     7.671875   0.000000   Generic::ImageReady get returns False
+09:06:39.218     7.734375   0.062500   Generic::ImageReady get returns False
+09:06:39.218     7.734375   0.000000   Generic::ImageReady get returns False
+09:06:39.281     7.796875   0.062500   Generic::ImageReady get returns False
+09:06:39.281     7.796875   0.000000   Generic::ImageReady get returns False
+09:06:39.343     7.859375   0.062500   Generic::ImageReady get returns False
+09:06:39.343     7.859375   0.000000   Generic::ImageReady get returns False
+09:06:39.406     7.921875   0.062500   Generic::ImageReady get returns False
+09:06:39.406     7.921875   0.000000   Generic::ImageReady get returns False
+09:06:39.468     7.984375   0.062500   Generic::ImageReady get returns False
+09:06:39.468     7.984375   0.000000   Generic::ImageReady get returns False
+09:06:39.531     8.046875   0.062500   Generic::ImageReady get returns False
+09:06:39.531     8.046875   0.000000   Generic::ImageReady get returns False
+09:06:39.593     8.109375   0.062500   Generic::ImageReady get returns False
+09:06:39.593     8.109375   0.000000   Generic::ImageReady get returns False
+09:06:39.656     8.171875   0.062500   Generic::ImageReady get returns False
+09:06:39.656     8.171875   0.000000   Generic::ImageReady get returns False
+09:06:39.718     8.234375   0.062500   Generic::ImageReady get returns False
+09:06:39.718     8.234375   0.000000   Generic::ImageReady get returns False
+09:06:39.781     8.296875   0.062500   Generic::ImageReady get returns False
+09:06:39.781     8.296875   0.000000   Generic::ImageReady get returns False
+09:06:39.843     8.359375   0.062500   Generic::ImageReady get returns False
+09:06:39.843     8.359375   0.000000   Generic::ImageReady get returns False
+09:06:39.906     8.421875   0.062500   Generic::ImageReady get returns False
+09:06:39.906     8.421875   0.000000   Generic::ImageReady get returns False
+09:06:39.968     8.484375   0.062500   Generic::ImageReady get returns False
+09:06:39.968     8.484375   0.000000   Generic::ImageReady get returns False
+09:06:40.031     8.546875   0.062500   Generic::ImageReady get returns False
+09:06:40.031     8.546875   0.000000   Generic::ImageReady get returns False
+09:06:40.093     8.609375   0.062500   Generic::ImageReady get returns False
+09:06:40.093     8.609375   0.000000   Generic::ImageReady get returns False
+09:06:40.156     8.671875   0.062500   Generic::ImageReady get returns False
+09:06:40.156     8.671875   0.000000   Generic::ImageReady get returns False
+09:06:40.218     8.734375   0.062500   Generic::ImageReady get returns False
+09:06:40.218     8.734375   0.000000   Generic::ImageReady get returns False
+09:06:40.281     8.796875   0.062500   Generic::ImageReady get returns False
+09:06:40.281     8.796875   0.000000   Generic::ImageReady get returns False
+09:06:40.343     8.859375   0.062500   Generic::ImageReady get returns False
+09:06:40.343     8.859375   0.000000   Generic::ImageReady get returns False
+09:06:40.406     8.921875   0.062500   Generic::ImageReady get returns False
+09:06:40.406     8.921875   0.000000   Generic::ImageReady get returns False
+09:06:40.468     8.984375   0.062500   Generic::ImageReady get returns False
+09:06:40.468     8.984375   0.000000   Generic::ImageReady get returns False
+09:06:40.531     9.046875   0.062500   Generic::ImageReady get returns False
+09:06:40.531     9.046875   0.000000   Generic::ImageReady get returns False
+09:06:40.593     9.109375   0.062500   Generic::ImageReady get returns False
+09:06:40.593     9.109375   0.000000   Generic::ImageReady get returns False
+09:06:40.593     9.109375   0.000000   Main::CanSetCCDTemperature get returns True
+09:06:40.593     9.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:40.593     9.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:42.484    11.000000   1.890625   readBytes(): ReadFile() read 10202400 bytes - numBytesToRead=0
+09:06:42.484    11.000000   0.000000   Read bytes(): ends
+09:06:42.484    11.000000   0.000000   downloadPixels(): read completed
+09:06:42.484    11.000000   0.000000   recordPixels() download completed
+09:06:42.484    11.000000   0.000000   recordPixels() preparing for second frame download
+09:06:42.484    11.000000   0.000000   clearAllRegisters() entered
+09:06:42.484    11.000000   0.000000   buildCommandBlock(): type=0x40 cmd=0x01 cmd_value=0x0008 index=0x0000 cmd_length=0x0000
+09:06:42.484    11.000000   0.000000   clear about to Write
+09:06:42.484    11.000000   0.000000   Write has locked
+09:06:42.484    11.000000   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:06:42.484    11.000000   0.000000   Header: 40 01 08 00 00 00 00 00 
+09:06:42.484    11.000000   0.000000   Write has unlocked
+09:06:42.484    11.000000   0.000000   echo(done) begins
+09:06:42.484    11.000000   0.000000   buildCommandBlock(): type=0x40 cmd=0x00 cmd_value=0x0000 index=0x0000 cmd_length=0x0004
+09:06:42.484    11.000000   0.000000   Write has locked
+09:06:42.484    11.000000   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025ab78 numBytesToWrite=12
+09:06:42.484    11.000000   0.000000   Header: 40 00 00 00 00 00 04 00 
+09:06:42.484    11.000000   0.000000   Data: 64 6f 6e 65 
+09:06:43.125    11.640625   0.640625   Write has unlocked
+09:06:43.125    11.640625   0.000000   Read has locked
+09:06:43.125    11.640625   0.000000   interface Read(System.String, 4) begins
+09:06:43.125    11.640625   0.000000   usbRead: buf=0x000000000025a118 numBytesToRead=       4 numBytesRead=       0 readSize=       4
+09:06:43.125    11.640625   0.000000   ReadFile: after loop numBytesRead=4
+09:06:43.125    11.640625   0.000000   Read has unlocked
+09:06:43.125    11.640625   0.000000   echo() completed successfully
+09:06:43.125    11.640625   0.000000   clear about to return
+09:06:43.125    11.640625   0.000000   clearAllRegisters() returns
+09:06:43.125    11.640625   0.000000   initReadBlock() x_off=0 y_off=0 width=3900 height=1308 x_bin=1 y_bin=1
+09:06:43.125    11.640625   0.000000   buildCommandBlock(): type=0x40 cmd=0x03 cmd_value=0x0001 index=0x0000 cmd_length=0x000a
+09:06:43.125    11.640625   0.000000   recordPixels() second frame requesting read, flags = 1
+09:06:43.125    11.640625   0.000000   Write has locked
+09:06:43.125    11.640625   0.000000   usbWrite(): unManagedBlockBuffer=0x0000000003fa6748 numBytesToWrite=18
+09:06:43.125    11.640625   0.000000   Header: 40 03 01 00 00 00 0a 00 
+09:06:43.125    11.640625   0.000000   Data: 00 00 00 00 3c 0f 1c 05 01 01 
+09:06:43.125    11.640625   0.000000   Write has unlocked
+09:06:43.125    11.640625   0.000000   recordPixels() second frame requesting download
+09:06:43.125    11.640625   0.000000   downloadPixels(): requesting 5101200 pixels, 2 bytes each (10202400 bytes)
+09:06:43.125    11.640625   0.000000   readBytes(): begins for 10202400 bytes
+09:06:45.828    14.343750   2.703125   readBytes(): ReadFile() read 10202400 bytes - numBytesToRead=0
+09:06:45.828    14.343750   0.000000   Read bytes(): ends
+09:06:45.828    14.343750   0.000000   downloadPixels(): read completed
+09:06:45.828    14.343750   0.000000   recordPixels() second frame download completed
+09:06:45.828    14.343750   0.000000   setCooler has locked
+09:06:45.828    14.343750   0.000000   Write has locked
+09:06:45.828    14.343750   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:06:45.828    14.343750   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:45.828    14.343750   0.000000   Write has unlocked
+09:06:45.828    14.343750   0.000000   readBytes(): begins for 3 bytes
+09:06:45.828    14.343750   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:45.828    14.343750   0.000000   Read bytes(): ends
+09:06:45.828    14.343750   0.000000   setCooler has unlocked
+09:06:45.828    14.343750   0.000000   setCoolerInfo outBlock temp=2779 enabled=0
+09:06:45.828    14.343750   0.000000   coolerTemp returning 2779
+09:06:45.828    14.343750   0.000000   Main::CCDTemperature get returns 4.7
+09:06:45.828    14.343750   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:45.828    14.343750   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.828    14.343750   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.015625   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.843    14.359375   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.015625   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.859    14.375000   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.015625   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.875    14.390625   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.015625   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.890    14.406250   0.000000   Main::CanSetCCDTemperature get returns True
+09:06:45.890    14.406250   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:45.890    14.406250   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:45.890    14.406250   0.000000   setCooler has locked
+09:06:45.890    14.406250   0.000000   Write has locked
+09:06:45.890    14.406250   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:06:45.890    14.406250   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:45.890    14.406250   0.000000   Write has unlocked
+09:06:45.890    14.406250   0.000000   readBytes(): begins for 3 bytes
+09:06:45.890    14.406250   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:45.890    14.406250   0.000000   Read bytes(): ends
+09:06:45.890    14.406250   0.000000   setCooler has unlocked
+09:06:45.890    14.406250   0.000000   setCoolerInfo outBlock temp=2779 enabled=0
+09:06:45.890    14.406250   0.000000   coolerTemp returning 2779
+09:06:45.890    14.406250   0.000000   Main::CCDTemperature get returns 4.7
+09:06:45.890    14.406250   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:45.890    14.406250   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:45.890    14.406250   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.015625   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.906    14.421875   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.015625   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.921    14.437500   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.015625   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.937    14.453125   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.015625   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.953    14.468750   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.015625   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Main::CanSetCCDTemperature get returns True
+09:06:45.968    14.484375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:45.968    14.484375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:45.968    14.484375   0.000000   setCooler has locked
+09:06:45.968    14.484375   0.000000   Write has locked
+09:06:45.968    14.484375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:06:45.968    14.484375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:45.968    14.484375   0.000000   Write has unlocked
+09:06:45.968    14.484375   0.000000   readBytes(): begins for 3 bytes
+09:06:45.968    14.484375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:45.968    14.484375   0.000000   Read bytes(): ends
+09:06:45.968    14.484375   0.000000   setCooler has unlocked
+09:06:45.968    14.484375   0.000000   setCoolerInfo outBlock temp=2780 enabled=0
+09:06:45.968    14.484375   0.000000   coolerTemp returning 2780
+09:06:45.968    14.484375   0.000000   Main::CCDTemperature get returns 4.8
+09:06:45.968    14.484375   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:45.968    14.484375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:45.968    14.484375   0.000000   Generic::ImageReady get returns False
+09:06:46.000    14.515625   0.031250   convertCameraDataToImageData(): x_bin = 1 binnedWidth=3900 binnedHeight=2616
+09:06:46.000    14.515625   0.000000   allocating imageData
+09:06:46.000    14.515625   0.000000   convertCameraDataToImageData() processing 16 bit interlaced camera data
+09:06:46.000    14.515625   0.000000   actualHeight=2616
+09:06:46.031    14.546875   0.031250   Generic::ImageReady get returns False
+09:06:46.031    14.546875   0.000000   Generic::ImageReady get returns False
+09:06:46.093    14.609375   0.062500   Generic::ImageReady get returns False
+09:06:46.093    14.609375   0.000000   Generic::ImageReady get returns False
+09:06:46.156    14.671875   0.062500   Generic::ImageReady get returns False
+09:06:46.156    14.671875   0.000000   Generic::ImageReady get returns False
+09:06:46.218    14.734375   0.062500   Generic::ImageReady get returns False
+09:06:46.218    14.734375   0.000000   Generic::ImageReady get returns False
+09:06:46.218    14.734375   0.000000   Processed 2616 lines, 3900 pixels/line
+09:06:46.218    14.734375   0.000000   convertCameraDataToImageData(): ends
+09:06:46.218    14.734375   0.000000   recordPixels() returns
+09:06:46.218    14.734375   0.000000   hardwareCapture(): exposure + download took 7.40625, requested 0.300000011920929
+09:06:46.218    14.734375   0.000000   Generic::hardwareCapture(): ends successfully
+09:06:46.281    14.796875   0.062500   Generic::CameraState() called from state cameraIdle
+09:06:46.281    14.796875   0.000000   Generic::ImageReady get returns True
+09:06:46.343    14.859375   0.062500   Generic::ImageArray get
+09:06:46.343    14.859375   0.000000   ImageArray entered: imageDataValid=True
+09:06:46.703    15.218750   0.359375   Generic::HasShutter get returns hard coded false
+09:06:47.031    15.546875   0.328125   Generic::HasShutter get returns hard coded false
+09:06:47.171    15.687500   0.140625   Generic::ElectronsPerADU get returns 0.3
+09:06:49.031    17.546875   1.859375   Main::CanSetCCDTemperature get returns True
+09:06:49.031    17.546875   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:49.031    17.546875   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:49.031    17.546875   0.000000   setCooler has locked
+09:06:49.031    17.546875   0.000000   Write has locked
+09:06:49.031    17.546875   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:06:49.031    17.546875   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:49.031    17.546875   0.000000   Write has unlocked
+09:06:49.031    17.546875   0.000000   readBytes(): begins for 3 bytes
+09:06:49.031    17.546875   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:49.031    17.546875   0.000000   Read bytes(): ends
+09:06:49.031    17.546875   0.000000   setCooler has unlocked
+09:06:49.031    17.546875   0.000000   setCoolerInfo outBlock temp=2813 enabled=0
+09:06:49.031    17.546875   0.000000   coolerTemp returning 2813
+09:06:49.031    17.546875   0.000000   Main::CCDTemperature get returns 8.1
+09:06:49.031    17.546875   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:49.031    17.546875   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:51.531    20.046875   2.500000   Main::CanSetCCDTemperature get returns True
+09:06:51.531    20.046875   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:51.531    20.046875   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:51.531    20.046875   0.000000   setCooler has locked
+09:06:51.531    20.046875   0.000000   Write has locked
+09:06:51.531    20.046875   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:06:51.531    20.046875   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:51.531    20.046875   0.000000   Write has unlocked
+09:06:51.531    20.046875   0.000000   readBytes(): begins for 3 bytes
+09:06:51.531    20.046875   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:51.531    20.046875   0.000000   Read bytes(): ends
+09:06:51.531    20.046875   0.000000   setCooler has unlocked
+09:06:51.531    20.046875   0.000000   setCoolerInfo outBlock temp=2835 enabled=0
+09:06:51.531    20.046875   0.000000   coolerTemp returning 2835
+09:06:51.531    20.046875   0.000000   Main::CCDTemperature get returns 10.3
+09:06:51.531    20.046875   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:51.531    20.046875   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:55.093    23.609375   3.562500   Main::CanSetCCDTemperature get returns True
+09:06:55.093    23.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:55.093    23.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:55.093    23.609375   0.000000   setCooler has locked
+09:06:55.093    23.609375   0.000000   Write has locked
+09:06:55.093    23.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:06:55.093    23.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:55.093    23.609375   0.000000   Write has unlocked
+09:06:55.093    23.609375   0.000000   readBytes(): begins for 3 bytes
+09:06:55.093    23.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:55.093    23.609375   0.000000   Read bytes(): ends
+09:06:55.093    23.609375   0.000000   setCooler has unlocked
+09:06:55.093    23.609375   0.000000   setCoolerInfo outBlock temp=2859 enabled=0
+09:06:55.093    23.609375   0.000000   coolerTemp returning 2859
+09:06:55.093    23.609375   0.000000   Main::CCDTemperature get returns 12.7
+09:06:55.093    23.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:55.093    23.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:06:57.593    26.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:06:57.593    26.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:06:57.593    26.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:06:57.593    26.109375   0.000000   setCooler has locked
+09:06:57.593    26.109375   0.000000   Write has locked
+09:06:57.593    26.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:06:57.593    26.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:06:57.593    26.109375   0.000000   Write has unlocked
+09:06:57.593    26.109375   0.000000   readBytes(): begins for 3 bytes
+09:06:57.593    26.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:06:57.593    26.109375   0.000000   Read bytes(): ends
+09:06:57.593    26.109375   0.000000   setCooler has unlocked
+09:06:57.593    26.109375   0.000000   setCoolerInfo outBlock temp=2873 enabled=0
+09:06:57.593    26.109375   0.000000   coolerTemp returning 2873
+09:06:57.593    26.109375   0.000000   Main::CCDTemperature get returns 14.1
+09:06:57.593    26.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:06:57.593    26.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:00.093    28.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:00.093    28.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:00.093    28.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:00.093    28.609375   0.000000   setCooler has locked
+09:07:00.093    28.609375   0.000000   Write has locked
+09:07:00.093    28.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:00.093    28.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:00.093    28.609375   0.000000   Write has unlocked
+09:07:00.093    28.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:00.093    28.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:00.093    28.609375   0.000000   Read bytes(): ends
+09:07:00.093    28.609375   0.000000   setCooler has unlocked
+09:07:00.093    28.609375   0.000000   setCoolerInfo outBlock temp=2884 enabled=0
+09:07:00.093    28.609375   0.000000   coolerTemp returning 2884
+09:07:00.093    28.609375   0.000000   Main::CCDTemperature get returns 15.2
+09:07:00.093    28.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:00.093    28.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:02.593    31.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:02.593    31.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:02.593    31.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:02.593    31.109375   0.000000   setCooler has locked
+09:07:02.593    31.109375   0.000000   Write has locked
+09:07:02.593    31.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:02.593    31.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:02.593    31.109375   0.000000   Write has unlocked
+09:07:02.593    31.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:02.593    31.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:02.593    31.109375   0.000000   Read bytes(): ends
+09:07:02.593    31.109375   0.000000   setCooler has unlocked
+09:07:02.593    31.109375   0.000000   setCoolerInfo outBlock temp=2893 enabled=0
+09:07:02.593    31.109375   0.000000   coolerTemp returning 2893
+09:07:02.593    31.109375   0.000000   Main::CCDTemperature get returns 16.1
+09:07:02.593    31.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:02.593    31.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:05.093    33.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:05.093    33.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:05.093    33.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:05.093    33.609375   0.000000   setCooler has locked
+09:07:05.093    33.609375   0.000000   Write has locked
+09:07:05.093    33.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:05.093    33.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:05.093    33.609375   0.000000   Write has unlocked
+09:07:05.093    33.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:05.093    33.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:05.093    33.609375   0.000000   Read bytes(): ends
+09:07:05.093    33.609375   0.000000   setCooler has unlocked
+09:07:05.093    33.609375   0.000000   setCoolerInfo outBlock temp=2902 enabled=0
+09:07:05.093    33.609375   0.000000   coolerTemp returning 2902
+09:07:05.093    33.609375   0.000000   Main::CCDTemperature get returns 17
+09:07:05.093    33.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:05.093    33.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:07.593    36.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:07.593    36.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:07.593    36.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:07.593    36.109375   0.000000   setCooler has locked
+09:07:07.593    36.109375   0.000000   Write has locked
+09:07:07.593    36.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:07.593    36.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:07.593    36.109375   0.000000   Write has unlocked
+09:07:07.593    36.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:07.593    36.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:07.593    36.109375   0.000000   Read bytes(): ends
+09:07:07.593    36.109375   0.000000   setCooler has unlocked
+09:07:07.593    36.109375   0.000000   setCoolerInfo outBlock temp=2910 enabled=0
+09:07:07.593    36.109375   0.000000   coolerTemp returning 2910
+09:07:07.593    36.109375   0.000000   Main::CCDTemperature get returns 17.8
+09:07:07.593    36.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:07.593    36.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:10.093    38.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:10.093    38.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:10.093    38.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:10.093    38.609375   0.000000   setCooler has locked
+09:07:10.093    38.609375   0.000000   Write has locked
+09:07:10.093    38.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:10.093    38.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:10.093    38.609375   0.000000   Write has unlocked
+09:07:10.093    38.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:10.093    38.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:10.093    38.609375   0.000000   Read bytes(): ends
+09:07:10.093    38.609375   0.000000   setCooler has unlocked
+09:07:10.093    38.609375   0.000000   setCoolerInfo outBlock temp=2916 enabled=0
+09:07:10.093    38.609375   0.000000   coolerTemp returning 2916
+09:07:10.093    38.609375   0.000000   Main::CCDTemperature get returns 18.4
+09:07:10.093    38.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:10.093    38.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:12.593    41.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:12.593    41.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:12.593    41.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:12.593    41.109375   0.000000   setCooler has locked
+09:07:12.593    41.109375   0.000000   Write has locked
+09:07:12.593    41.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:12.593    41.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:12.593    41.109375   0.000000   Write has unlocked
+09:07:12.593    41.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:12.593    41.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:12.593    41.109375   0.000000   Read bytes(): ends
+09:07:12.593    41.109375   0.000000   setCooler has unlocked
+09:07:12.593    41.109375   0.000000   setCoolerInfo outBlock temp=2922 enabled=0
+09:07:12.593    41.109375   0.000000   coolerTemp returning 2922
+09:07:12.593    41.109375   0.000000   Main::CCDTemperature get returns 19
+09:07:12.593    41.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:12.593    41.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:15.093    43.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:15.093    43.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:15.093    43.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:15.093    43.609375   0.000000   setCooler has locked
+09:07:15.093    43.609375   0.000000   Write has locked
+09:07:15.093    43.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:15.093    43.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:15.093    43.609375   0.000000   Write has unlocked
+09:07:15.093    43.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:15.093    43.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:15.093    43.609375   0.000000   Read bytes(): ends
+09:07:15.093    43.609375   0.000000   setCooler has unlocked
+09:07:15.093    43.609375   0.000000   setCoolerInfo outBlock temp=2927 enabled=0
+09:07:15.093    43.609375   0.000000   coolerTemp returning 2927
+09:07:15.093    43.609375   0.000000   Main::CCDTemperature get returns 19.5
+09:07:15.093    43.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:15.093    43.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:17.593    46.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:17.593    46.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:17.593    46.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:17.593    46.109375   0.000000   setCooler has locked
+09:07:17.593    46.109375   0.000000   Write has locked
+09:07:17.593    46.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:17.593    46.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:17.593    46.109375   0.000000   Write has unlocked
+09:07:17.593    46.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:17.593    46.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:17.593    46.109375   0.000000   Read bytes(): ends
+09:07:17.593    46.109375   0.000000   setCooler has unlocked
+09:07:17.593    46.109375   0.000000   setCoolerInfo outBlock temp=2932 enabled=0
+09:07:17.593    46.109375   0.000000   coolerTemp returning 2932
+09:07:17.593    46.109375   0.000000   Main::CCDTemperature get returns 20
+09:07:17.593    46.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:17.593    46.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:20.093    48.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:20.093    48.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:20.093    48.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:20.093    48.609375   0.000000   setCooler has locked
+09:07:20.093    48.609375   0.000000   Write has locked
+09:07:20.093    48.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:20.093    48.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:20.093    48.609375   0.000000   Write has unlocked
+09:07:20.093    48.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:20.093    48.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:20.093    48.609375   0.000000   Read bytes(): ends
+09:07:20.093    48.609375   0.000000   setCooler has unlocked
+09:07:20.093    48.609375   0.000000   setCoolerInfo outBlock temp=2937 enabled=0
+09:07:20.093    48.609375   0.000000   coolerTemp returning 2937
+09:07:20.093    48.609375   0.000000   Main::CCDTemperature get returns 20.5
+09:07:20.093    48.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:20.093    48.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:22.593    51.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:22.593    51.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:22.593    51.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:22.593    51.109375   0.000000   setCooler has locked
+09:07:22.593    51.109375   0.000000   Write has locked
+09:07:22.593    51.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:22.593    51.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:22.593    51.109375   0.000000   Write has unlocked
+09:07:22.593    51.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:22.593    51.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:22.593    51.109375   0.000000   Read bytes(): ends
+09:07:22.593    51.109375   0.000000   setCooler has unlocked
+09:07:22.593    51.109375   0.000000   setCoolerInfo outBlock temp=2941 enabled=0
+09:07:22.593    51.109375   0.000000   coolerTemp returning 2941
+09:07:22.593    51.109375   0.000000   Main::CCDTemperature get returns 20.9
+09:07:22.593    51.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:22.593    51.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:25.093    53.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:25.093    53.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:25.093    53.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:25.093    53.609375   0.000000   setCooler has locked
+09:07:25.093    53.609375   0.000000   Write has locked
+09:07:25.093    53.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:25.093    53.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:25.093    53.609375   0.000000   Write has unlocked
+09:07:25.093    53.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:25.093    53.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:25.093    53.609375   0.000000   Read bytes(): ends
+09:07:25.093    53.609375   0.000000   setCooler has unlocked
+09:07:25.093    53.609375   0.000000   setCoolerInfo outBlock temp=2944 enabled=0
+09:07:25.093    53.609375   0.000000   coolerTemp returning 2944
+09:07:25.093    53.609375   0.000000   Main::CCDTemperature get returns 21.2
+09:07:25.093    53.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:25.093    53.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:27.593    56.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:27.593    56.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:27.593    56.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:27.593    56.109375   0.000000   setCooler has locked
+09:07:27.593    56.109375   0.000000   Write has locked
+09:07:27.593    56.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:27.593    56.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:27.593    56.109375   0.000000   Write has unlocked
+09:07:27.593    56.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:27.593    56.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:27.593    56.109375   0.000000   Read bytes(): ends
+09:07:27.593    56.109375   0.000000   setCooler has unlocked
+09:07:27.593    56.109375   0.000000   setCoolerInfo outBlock temp=2948 enabled=0
+09:07:27.593    56.109375   0.000000   coolerTemp returning 2948
+09:07:27.593    56.109375   0.000000   Main::CCDTemperature get returns 21.6
+09:07:27.593    56.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:27.593    56.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:30.093    58.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:30.093    58.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:30.093    58.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:30.093    58.609375   0.000000   setCooler has locked
+09:07:30.093    58.609375   0.000000   Write has locked
+09:07:30.093    58.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:30.093    58.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:30.093    58.609375   0.000000   Write has unlocked
+09:07:30.093    58.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:30.093    58.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:30.093    58.609375   0.000000   Read bytes(): ends
+09:07:30.093    58.609375   0.000000   setCooler has unlocked
+09:07:30.093    58.609375   0.000000   setCoolerInfo outBlock temp=2951 enabled=0
+09:07:30.093    58.609375   0.000000   coolerTemp returning 2951
+09:07:30.093    58.609375   0.000000   Main::CCDTemperature get returns 21.9
+09:07:30.093    58.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:30.093    58.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:32.593    61.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:32.593    61.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:32.593    61.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:32.593    61.109375   0.000000   setCooler has locked
+09:07:32.593    61.109375   0.000000   Write has locked
+09:07:32.593    61.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:32.593    61.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:32.593    61.109375   0.000000   Write has unlocked
+09:07:32.593    61.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:32.593    61.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:32.593    61.109375   0.000000   Read bytes(): ends
+09:07:32.593    61.109375   0.000000   setCooler has unlocked
+09:07:32.593    61.109375   0.000000   setCoolerInfo outBlock temp=2954 enabled=0
+09:07:32.593    61.109375   0.000000   coolerTemp returning 2954
+09:07:32.593    61.109375   0.000000   Main::CCDTemperature get returns 22.2
+09:07:32.593    61.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:32.593    61.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:35.093    63.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:35.093    63.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:35.093    63.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:35.093    63.609375   0.000000   setCooler has locked
+09:07:35.093    63.609375   0.000000   Write has locked
+09:07:35.093    63.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:35.093    63.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:35.093    63.609375   0.000000   Write has unlocked
+09:07:35.093    63.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:35.093    63.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:35.093    63.609375   0.000000   Read bytes(): ends
+09:07:35.093    63.609375   0.000000   setCooler has unlocked
+09:07:35.093    63.609375   0.000000   setCoolerInfo outBlock temp=2955 enabled=0
+09:07:35.093    63.609375   0.000000   coolerTemp returning 2955
+09:07:35.093    63.609375   0.000000   Main::CCDTemperature get returns 22.3
+09:07:35.093    63.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:35.093    63.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:37.593    66.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:37.593    66.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:37.593    66.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:37.593    66.109375   0.000000   setCooler has locked
+09:07:37.593    66.109375   0.000000   Write has locked
+09:07:37.593    66.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:37.593    66.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:37.593    66.109375   0.000000   Write has unlocked
+09:07:37.593    66.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:37.593    66.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:37.593    66.109375   0.000000   Read bytes(): ends
+09:07:37.593    66.109375   0.000000   setCooler has unlocked
+09:07:37.593    66.109375   0.000000   setCoolerInfo outBlock temp=2958 enabled=0
+09:07:37.593    66.109375   0.000000   coolerTemp returning 2958
+09:07:37.593    66.109375   0.000000   Main::CCDTemperature get returns 22.6
+09:07:37.593    66.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:37.593    66.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:40.093    68.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:40.093    68.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:40.093    68.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:40.093    68.609375   0.000000   setCooler has locked
+09:07:40.093    68.609375   0.000000   Write has locked
+09:07:40.093    68.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:40.093    68.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:40.093    68.609375   0.000000   Write has unlocked
+09:07:40.093    68.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:40.093    68.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:40.093    68.609375   0.000000   Read bytes(): ends
+09:07:40.093    68.609375   0.000000   setCooler has unlocked
+09:07:40.093    68.609375   0.000000   setCoolerInfo outBlock temp=2961 enabled=0
+09:07:40.093    68.609375   0.000000   coolerTemp returning 2961
+09:07:40.093    68.609375   0.000000   Main::CCDTemperature get returns 22.9
+09:07:40.093    68.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:40.093    68.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:42.593    71.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:42.593    71.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:42.593    71.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:42.593    71.109375   0.000000   setCooler has locked
+09:07:42.593    71.109375   0.000000   Write has locked
+09:07:42.593    71.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:42.593    71.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:42.593    71.109375   0.000000   Write has unlocked
+09:07:42.593    71.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:42.593    71.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:42.593    71.109375   0.000000   Read bytes(): ends
+09:07:42.593    71.109375   0.000000   setCooler has unlocked
+09:07:42.593    71.109375   0.000000   setCoolerInfo outBlock temp=2962 enabled=0
+09:07:42.593    71.109375   0.000000   coolerTemp returning 2962
+09:07:42.593    71.109375   0.000000   Main::CCDTemperature get returns 23
+09:07:42.593    71.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:42.593    71.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:45.093    73.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:45.093    73.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:45.093    73.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:45.093    73.609375   0.000000   setCooler has locked
+09:07:45.093    73.609375   0.000000   Write has locked
+09:07:45.093    73.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:45.093    73.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:45.093    73.609375   0.000000   Write has unlocked
+09:07:45.093    73.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:45.093    73.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:45.093    73.609375   0.000000   Read bytes(): ends
+09:07:45.093    73.609375   0.000000   setCooler has unlocked
+09:07:45.093    73.609375   0.000000   setCoolerInfo outBlock temp=2964 enabled=0
+09:07:45.093    73.609375   0.000000   coolerTemp returning 2964
+09:07:45.093    73.609375   0.000000   Main::CCDTemperature get returns 23.2
+09:07:45.093    73.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:45.093    73.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:47.593    76.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:47.593    76.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:47.593    76.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:47.593    76.109375   0.000000   setCooler has locked
+09:07:47.593    76.109375   0.000000   Write has locked
+09:07:47.593    76.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:47.593    76.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:47.593    76.109375   0.000000   Write has unlocked
+09:07:47.593    76.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:47.593    76.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:47.593    76.109375   0.000000   Read bytes(): ends
+09:07:47.593    76.109375   0.000000   setCooler has unlocked
+09:07:47.593    76.109375   0.000000   setCoolerInfo outBlock temp=2965 enabled=0
+09:07:47.593    76.109375   0.000000   coolerTemp returning 2965
+09:07:47.593    76.109375   0.000000   Main::CCDTemperature get returns 23.3
+09:07:47.593    76.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:47.593    76.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:50.093    78.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:50.093    78.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:50.093    78.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:50.093    78.609375   0.000000   setCooler has locked
+09:07:50.093    78.609375   0.000000   Write has locked
+09:07:50.093    78.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:50.093    78.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:50.093    78.609375   0.000000   Write has unlocked
+09:07:50.093    78.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:50.093    78.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:50.093    78.609375   0.000000   Read bytes(): ends
+09:07:50.093    78.609375   0.000000   setCooler has unlocked
+09:07:50.093    78.609375   0.000000   setCoolerInfo outBlock temp=2966 enabled=0
+09:07:50.093    78.609375   0.000000   coolerTemp returning 2966
+09:07:50.093    78.609375   0.000000   Main::CCDTemperature get returns 23.4
+09:07:50.093    78.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:50.093    78.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:52.593    81.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:52.593    81.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:52.593    81.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:52.593    81.109375   0.000000   setCooler has locked
+09:07:52.593    81.109375   0.000000   Write has locked
+09:07:52.593    81.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:52.593    81.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:52.593    81.109375   0.000000   Write has unlocked
+09:07:52.593    81.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:52.593    81.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:52.593    81.109375   0.000000   Read bytes(): ends
+09:07:52.593    81.109375   0.000000   setCooler has unlocked
+09:07:52.593    81.109375   0.000000   setCoolerInfo outBlock temp=2968 enabled=0
+09:07:52.593    81.109375   0.000000   coolerTemp returning 2968
+09:07:52.593    81.109375   0.000000   Main::CCDTemperature get returns 23.6
+09:07:52.593    81.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:52.593    81.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:55.093    83.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:55.093    83.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:55.093    83.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:55.093    83.609375   0.000000   setCooler has locked
+09:07:55.093    83.609375   0.000000   Write has locked
+09:07:55.093    83.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:55.093    83.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:55.093    83.609375   0.000000   Write has unlocked
+09:07:55.093    83.609375   0.000000   readBytes(): begins for 3 bytes
+09:07:55.093    83.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:55.093    83.609375   0.000000   Read bytes(): ends
+09:07:55.093    83.609375   0.000000   setCooler has unlocked
+09:07:55.093    83.609375   0.000000   setCoolerInfo outBlock temp=2969 enabled=0
+09:07:55.093    83.609375   0.000000   coolerTemp returning 2969
+09:07:55.093    83.609375   0.000000   Main::CCDTemperature get returns 23.7
+09:07:55.093    83.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:55.093    83.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:07:57.593    86.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:07:57.593    86.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:07:57.593    86.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:07:57.593    86.109375   0.000000   setCooler has locked
+09:07:57.593    86.109375   0.000000   Write has locked
+09:07:57.593    86.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:07:57.593    86.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:07:57.593    86.109375   0.000000   Write has unlocked
+09:07:57.593    86.109375   0.000000   readBytes(): begins for 3 bytes
+09:07:57.593    86.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:07:57.593    86.109375   0.000000   Read bytes(): ends
+09:07:57.593    86.109375   0.000000   setCooler has unlocked
+09:07:57.593    86.109375   0.000000   setCoolerInfo outBlock temp=2971 enabled=0
+09:07:57.593    86.109375   0.000000   coolerTemp returning 2971
+09:07:57.593    86.109375   0.000000   Main::CCDTemperature get returns 23.9
+09:07:57.593    86.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:07:57.593    86.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:00.093    88.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:00.093    88.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:00.093    88.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:00.093    88.609375   0.000000   setCooler has locked
+09:08:00.093    88.609375   0.000000   Write has locked
+09:08:00.093    88.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000025a118 numBytesToWrite=8
+09:08:00.093    88.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:00.093    88.609375   0.000000   Write has unlocked
+09:08:00.093    88.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:00.093    88.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:00.093    88.609375   0.000000   Read bytes(): ends
+09:08:00.093    88.609375   0.000000   setCooler has unlocked
+09:08:00.093    88.609375   0.000000   setCoolerInfo outBlock temp=2971 enabled=0
+09:08:00.093    88.609375   0.000000   coolerTemp returning 2971
+09:08:00.093    88.609375   0.000000   Main::CCDTemperature get returns 23.9
+09:08:00.093    88.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:00.093    88.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:02.593    91.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:02.593    91.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:02.593    91.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:02.593    91.109375   0.000000   setCooler has locked
+09:08:02.593    91.109375   0.000000   Write has locked
+09:08:02.593    91.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:02.593    91.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:02.593    91.109375   0.000000   Write has unlocked
+09:08:02.593    91.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:02.593    91.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:02.593    91.109375   0.000000   Read bytes(): ends
+09:08:02.593    91.109375   0.000000   setCooler has unlocked
+09:08:02.593    91.109375   0.000000   setCoolerInfo outBlock temp=2972 enabled=0
+09:08:02.593    91.109375   0.000000   coolerTemp returning 2972
+09:08:02.593    91.109375   0.000000   Main::CCDTemperature get returns 24
+09:08:02.593    91.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:02.593    91.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:05.093    93.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:05.093    93.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:05.093    93.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:05.093    93.609375   0.000000   setCooler has locked
+09:08:05.093    93.609375   0.000000   Write has locked
+09:08:05.093    93.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:05.093    93.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:05.093    93.609375   0.000000   Write has unlocked
+09:08:05.093    93.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:05.093    93.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:05.093    93.609375   0.000000   Read bytes(): ends
+09:08:05.093    93.609375   0.000000   setCooler has unlocked
+09:08:05.093    93.609375   0.000000   setCoolerInfo outBlock temp=2973 enabled=0
+09:08:05.093    93.609375   0.000000   coolerTemp returning 2973
+09:08:05.093    93.609375   0.000000   Main::CCDTemperature get returns 24.1
+09:08:05.093    93.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:05.093    93.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:07.593    96.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:07.593    96.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:07.593    96.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:07.593    96.109375   0.000000   setCooler has locked
+09:08:07.593    96.109375   0.000000   Write has locked
+09:08:07.593    96.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:07.593    96.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:07.593    96.109375   0.000000   Write has unlocked
+09:08:07.593    96.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:07.593    96.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:07.593    96.109375   0.000000   Read bytes(): ends
+09:08:07.593    96.109375   0.000000   setCooler has unlocked
+09:08:07.593    96.109375   0.000000   setCoolerInfo outBlock temp=2973 enabled=0
+09:08:07.593    96.109375   0.000000   coolerTemp returning 2973
+09:08:07.593    96.109375   0.000000   Main::CCDTemperature get returns 24.1
+09:08:07.593    96.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:07.593    96.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:10.093    98.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:10.093    98.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:10.093    98.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:10.093    98.609375   0.000000   setCooler has locked
+09:08:10.093    98.609375   0.000000   Write has locked
+09:08:10.093    98.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:10.093    98.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:10.093    98.609375   0.000000   Write has unlocked
+09:08:10.093    98.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:10.093    98.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:10.093    98.609375   0.000000   Read bytes(): ends
+09:08:10.093    98.609375   0.000000   setCooler has unlocked
+09:08:10.093    98.609375   0.000000   setCoolerInfo outBlock temp=2975 enabled=0
+09:08:10.093    98.609375   0.000000   coolerTemp returning 2975
+09:08:10.093    98.609375   0.000000   Main::CCDTemperature get returns 24.3
+09:08:10.093    98.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:10.093    98.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:12.593   101.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:12.593   101.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:12.593   101.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:12.593   101.109375   0.000000   setCooler has locked
+09:08:12.593   101.109375   0.000000   Write has locked
+09:08:12.593   101.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:12.593   101.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:12.593   101.109375   0.000000   Write has unlocked
+09:08:12.593   101.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:12.593   101.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:12.593   101.109375   0.000000   Read bytes(): ends
+09:08:12.593   101.109375   0.000000   setCooler has unlocked
+09:08:12.593   101.109375   0.000000   setCoolerInfo outBlock temp=2975 enabled=0
+09:08:12.593   101.109375   0.000000   coolerTemp returning 2975
+09:08:12.593   101.109375   0.000000   Main::CCDTemperature get returns 24.3
+09:08:12.593   101.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:12.593   101.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:15.093   103.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:15.093   103.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:15.093   103.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:15.093   103.609375   0.000000   setCooler has locked
+09:08:15.093   103.609375   0.000000   Write has locked
+09:08:15.093   103.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:15.093   103.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:15.093   103.609375   0.000000   Write has unlocked
+09:08:15.093   103.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:15.093   103.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:15.093   103.609375   0.000000   Read bytes(): ends
+09:08:15.093   103.609375   0.000000   setCooler has unlocked
+09:08:15.093   103.609375   0.000000   setCoolerInfo outBlock temp=2976 enabled=0
+09:08:15.093   103.609375   0.000000   coolerTemp returning 2976
+09:08:15.093   103.609375   0.000000   Main::CCDTemperature get returns 24.4
+09:08:15.093   103.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:15.093   103.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:17.593   106.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:17.593   106.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:17.593   106.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:17.593   106.109375   0.000000   setCooler has locked
+09:08:17.593   106.109375   0.000000   Write has locked
+09:08:17.593   106.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:17.593   106.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:17.593   106.109375   0.000000   Write has unlocked
+09:08:17.593   106.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:17.593   106.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:17.593   106.109375   0.000000   Read bytes(): ends
+09:08:17.593   106.109375   0.000000   setCooler has unlocked
+09:08:17.593   106.109375   0.000000   setCoolerInfo outBlock temp=2976 enabled=0
+09:08:17.593   106.109375   0.000000   coolerTemp returning 2976
+09:08:17.593   106.109375   0.000000   Main::CCDTemperature get returns 24.4
+09:08:17.593   106.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:17.593   106.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:20.093   108.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:20.093   108.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:20.093   108.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:20.093   108.609375   0.000000   setCooler has locked
+09:08:20.093   108.609375   0.000000   Write has locked
+09:08:20.093   108.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:20.093   108.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:20.093   108.609375   0.000000   Write has unlocked
+09:08:20.093   108.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:20.093   108.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:20.093   108.609375   0.000000   Read bytes(): ends
+09:08:20.093   108.609375   0.000000   setCooler has unlocked
+09:08:20.093   108.609375   0.000000   setCoolerInfo outBlock temp=2978 enabled=0
+09:08:20.093   108.609375   0.000000   coolerTemp returning 2978
+09:08:20.093   108.609375   0.000000   Main::CCDTemperature get returns 24.6
+09:08:20.093   108.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:20.093   108.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:22.593   111.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:22.593   111.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:22.593   111.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:22.593   111.109375   0.000000   setCooler has locked
+09:08:22.593   111.109375   0.000000   Write has locked
+09:08:22.593   111.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:22.593   111.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:22.593   111.109375   0.000000   Write has unlocked
+09:08:22.593   111.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:22.593   111.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:22.593   111.109375   0.000000   Read bytes(): ends
+09:08:22.593   111.109375   0.000000   setCooler has unlocked
+09:08:22.593   111.109375   0.000000   setCoolerInfo outBlock temp=2978 enabled=0
+09:08:22.593   111.109375   0.000000   coolerTemp returning 2978
+09:08:22.593   111.109375   0.000000   Main::CCDTemperature get returns 24.6
+09:08:22.593   111.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:22.593   111.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:25.093   113.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:25.093   113.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:25.093   113.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:25.093   113.609375   0.000000   setCooler has locked
+09:08:25.093   113.609375   0.000000   Write has locked
+09:08:25.093   113.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:25.093   113.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:25.093   113.609375   0.000000   Write has unlocked
+09:08:25.093   113.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:25.093   113.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:25.093   113.609375   0.000000   Read bytes(): ends
+09:08:25.093   113.609375   0.000000   setCooler has unlocked
+09:08:25.093   113.609375   0.000000   setCoolerInfo outBlock temp=2978 enabled=0
+09:08:25.093   113.609375   0.000000   coolerTemp returning 2978
+09:08:25.093   113.609375   0.000000   Main::CCDTemperature get returns 24.6
+09:08:25.093   113.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:25.093   113.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:27.593   116.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:27.593   116.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:27.593   116.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:27.593   116.109375   0.000000   setCooler has locked
+09:08:27.593   116.109375   0.000000   Write has locked
+09:08:27.593   116.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:27.593   116.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:27.593   116.109375   0.000000   Write has unlocked
+09:08:27.593   116.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:27.593   116.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:27.593   116.109375   0.000000   Read bytes(): ends
+09:08:27.593   116.109375   0.000000   setCooler has unlocked
+09:08:27.593   116.109375   0.000000   setCoolerInfo outBlock temp=2979 enabled=0
+09:08:27.593   116.109375   0.000000   coolerTemp returning 2979
+09:08:27.593   116.109375   0.000000   Main::CCDTemperature get returns 24.7
+09:08:27.593   116.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:27.593   116.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:30.093   118.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:30.093   118.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:30.093   118.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:30.093   118.609375   0.000000   setCooler has locked
+09:08:30.093   118.609375   0.000000   Write has locked
+09:08:30.093   118.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:30.093   118.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:30.093   118.609375   0.000000   Write has unlocked
+09:08:30.093   118.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:30.093   118.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:30.093   118.609375   0.000000   Read bytes(): ends
+09:08:30.093   118.609375   0.000000   setCooler has unlocked
+09:08:30.093   118.609375   0.000000   setCoolerInfo outBlock temp=2979 enabled=0
+09:08:30.093   118.609375   0.000000   coolerTemp returning 2979
+09:08:30.093   118.609375   0.000000   Main::CCDTemperature get returns 24.7
+09:08:30.093   118.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:30.093   118.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:32.593   121.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:32.593   121.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:32.593   121.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:32.593   121.109375   0.000000   setCooler has locked
+09:08:32.593   121.109375   0.000000   Write has locked
+09:08:32.593   121.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:32.593   121.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:32.593   121.109375   0.000000   Write has unlocked
+09:08:32.593   121.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:32.593   121.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:32.593   121.109375   0.000000   Read bytes(): ends
+09:08:32.593   121.109375   0.000000   setCooler has unlocked
+09:08:32.593   121.109375   0.000000   setCoolerInfo outBlock temp=2979 enabled=0
+09:08:32.593   121.109375   0.000000   coolerTemp returning 2979
+09:08:32.593   121.109375   0.000000   Main::CCDTemperature get returns 24.7
+09:08:32.593   121.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:32.593   121.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:35.093   123.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:35.093   123.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:35.093   123.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:35.093   123.609375   0.000000   setCooler has locked
+09:08:35.093   123.609375   0.000000   Write has locked
+09:08:35.093   123.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:35.093   123.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:35.093   123.609375   0.000000   Write has unlocked
+09:08:35.093   123.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:35.093   123.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:35.093   123.609375   0.000000   Read bytes(): ends
+09:08:35.093   123.609375   0.000000   setCooler has unlocked
+09:08:35.093   123.609375   0.000000   setCoolerInfo outBlock temp=2979 enabled=0
+09:08:35.093   123.609375   0.000000   coolerTemp returning 2979
+09:08:35.093   123.609375   0.000000   Main::CCDTemperature get returns 24.7
+09:08:35.093   123.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:35.093   123.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:37.593   126.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:37.593   126.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:37.593   126.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:37.593   126.109375   0.000000   setCooler has locked
+09:08:37.593   126.109375   0.000000   Write has locked
+09:08:37.593   126.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:37.593   126.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:37.593   126.109375   0.000000   Write has unlocked
+09:08:37.593   126.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:37.593   126.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:37.593   126.109375   0.000000   Read bytes(): ends
+09:08:37.593   126.109375   0.000000   setCooler has unlocked
+09:08:37.593   126.109375   0.000000   setCoolerInfo outBlock temp=2980 enabled=0
+09:08:37.593   126.109375   0.000000   coolerTemp returning 2980
+09:08:37.593   126.109375   0.000000   Main::CCDTemperature get returns 24.8
+09:08:37.593   126.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:37.593   126.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:40.093   128.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:40.093   128.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:40.093   128.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:40.093   128.609375   0.000000   setCooler has locked
+09:08:40.093   128.609375   0.000000   Write has locked
+09:08:40.093   128.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:40.093   128.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:40.093   128.609375   0.000000   Write has unlocked
+09:08:40.093   128.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:40.093   128.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:40.093   128.609375   0.000000   Read bytes(): ends
+09:08:40.093   128.609375   0.000000   setCooler has unlocked
+09:08:40.093   128.609375   0.000000   setCoolerInfo outBlock temp=2980 enabled=0
+09:08:40.093   128.609375   0.000000   coolerTemp returning 2980
+09:08:40.093   128.609375   0.000000   Main::CCDTemperature get returns 24.8
+09:08:40.093   128.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:40.093   128.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:42.593   131.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:42.593   131.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:42.593   131.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:42.593   131.109375   0.000000   setCooler has locked
+09:08:42.593   131.109375   0.000000   Write has locked
+09:08:42.593   131.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:42.593   131.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:42.593   131.109375   0.000000   Write has unlocked
+09:08:42.593   131.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:42.593   131.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:42.593   131.109375   0.000000   Read bytes(): ends
+09:08:42.593   131.109375   0.000000   setCooler has unlocked
+09:08:42.593   131.109375   0.000000   setCoolerInfo outBlock temp=2980 enabled=0
+09:08:42.593   131.109375   0.000000   coolerTemp returning 2980
+09:08:42.593   131.109375   0.000000   Main::CCDTemperature get returns 24.8
+09:08:42.593   131.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:42.593   131.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:45.093   133.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:45.093   133.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:45.093   133.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:45.093   133.609375   0.000000   setCooler has locked
+09:08:45.093   133.609375   0.000000   Write has locked
+09:08:45.093   133.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:45.093   133.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:45.093   133.609375   0.000000   Write has unlocked
+09:08:45.093   133.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:45.093   133.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:45.093   133.609375   0.000000   Read bytes(): ends
+09:08:45.093   133.609375   0.000000   setCooler has unlocked
+09:08:45.093   133.609375   0.000000   setCoolerInfo outBlock temp=2982 enabled=0
+09:08:45.093   133.609375   0.000000   coolerTemp returning 2982
+09:08:45.093   133.609375   0.000000   Main::CCDTemperature get returns 25
+09:08:45.093   133.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:45.093   133.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:47.593   136.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:47.593   136.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:47.593   136.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:47.593   136.109375   0.000000   setCooler has locked
+09:08:47.593   136.109375   0.000000   Write has locked
+09:08:47.593   136.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:47.593   136.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:47.593   136.109375   0.000000   Write has unlocked
+09:08:47.593   136.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:47.593   136.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:47.593   136.109375   0.000000   Read bytes(): ends
+09:08:47.593   136.109375   0.000000   setCooler has unlocked
+09:08:47.593   136.109375   0.000000   setCoolerInfo outBlock temp=2982 enabled=0
+09:08:47.593   136.109375   0.000000   coolerTemp returning 2982
+09:08:47.593   136.109375   0.000000   Main::CCDTemperature get returns 25
+09:08:47.593   136.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:47.593   136.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:50.093   138.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:50.093   138.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:50.093   138.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:50.093   138.609375   0.000000   setCooler has locked
+09:08:50.093   138.609375   0.000000   Write has locked
+09:08:50.093   138.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:50.093   138.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:50.093   138.609375   0.000000   Write has unlocked
+09:08:50.093   138.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:50.093   138.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:50.093   138.609375   0.000000   Read bytes(): ends
+09:08:50.093   138.609375   0.000000   setCooler has unlocked
+09:08:50.093   138.609375   0.000000   setCoolerInfo outBlock temp=2982 enabled=0
+09:08:50.093   138.609375   0.000000   coolerTemp returning 2982
+09:08:50.093   138.609375   0.000000   Main::CCDTemperature get returns 25
+09:08:50.093   138.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:50.093   138.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:52.593   141.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:52.593   141.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:52.593   141.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:52.593   141.109375   0.000000   setCooler has locked
+09:08:52.593   141.109375   0.000000   Write has locked
+09:08:52.593   141.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:52.593   141.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:52.593   141.109375   0.000000   Write has unlocked
+09:08:52.593   141.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:52.593   141.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:52.593   141.109375   0.000000   Read bytes(): ends
+09:08:52.593   141.109375   0.000000   setCooler has unlocked
+09:08:52.593   141.109375   0.000000   setCoolerInfo outBlock temp=2982 enabled=0
+09:08:52.593   141.109375   0.000000   coolerTemp returning 2982
+09:08:52.593   141.109375   0.000000   Main::CCDTemperature get returns 25
+09:08:52.593   141.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:52.593   141.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:55.093   143.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:55.093   143.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:55.093   143.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:55.093   143.609375   0.000000   setCooler has locked
+09:08:55.093   143.609375   0.000000   Write has locked
+09:08:55.093   143.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:55.093   143.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:55.093   143.609375   0.000000   Write has unlocked
+09:08:55.093   143.609375   0.000000   readBytes(): begins for 3 bytes
+09:08:55.093   143.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:55.093   143.609375   0.000000   Read bytes(): ends
+09:08:55.093   143.609375   0.000000   setCooler has unlocked
+09:08:55.093   143.609375   0.000000   setCoolerInfo outBlock temp=2982 enabled=0
+09:08:55.093   143.609375   0.000000   coolerTemp returning 2982
+09:08:55.093   143.609375   0.000000   Main::CCDTemperature get returns 25
+09:08:55.093   143.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:55.093   143.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:08:57.593   146.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:08:57.593   146.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:08:57.593   146.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:08:57.593   146.109375   0.000000   setCooler has locked
+09:08:57.593   146.109375   0.000000   Write has locked
+09:08:57.593   146.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:08:57.593   146.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:08:57.593   146.109375   0.000000   Write has unlocked
+09:08:57.593   146.109375   0.000000   readBytes(): begins for 3 bytes
+09:08:57.593   146.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:08:57.593   146.109375   0.000000   Read bytes(): ends
+09:08:57.593   146.109375   0.000000   setCooler has unlocked
+09:08:57.593   146.109375   0.000000   setCoolerInfo outBlock temp=2983 enabled=0
+09:08:57.593   146.109375   0.000000   coolerTemp returning 2983
+09:08:57.593   146.109375   0.000000   Main::CCDTemperature get returns 25.1
+09:08:57.593   146.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:08:57.593   146.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:09:00.093   148.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:09:00.093   148.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:09:00.093   148.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:09:00.093   148.609375   0.000000   setCooler has locked
+09:09:00.093   148.609375   0.000000   Write has locked
+09:09:00.093   148.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:09:00.093   148.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:09:00.093   148.609375   0.000000   Write has unlocked
+09:09:00.093   148.609375   0.000000   readBytes(): begins for 3 bytes
+09:09:00.093   148.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:09:00.093   148.609375   0.000000   Read bytes(): ends
+09:09:00.093   148.609375   0.000000   setCooler has unlocked
+09:09:00.093   148.609375   0.000000   setCoolerInfo outBlock temp=2983 enabled=0
+09:09:00.093   148.609375   0.000000   coolerTemp returning 2983
+09:09:00.093   148.609375   0.000000   Main::CCDTemperature get returns 25.1
+09:09:00.093   148.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:09:00.093   148.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:09:02.593   151.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:09:02.593   151.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:09:02.593   151.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:09:02.593   151.109375   0.000000   setCooler has locked
+09:09:02.593   151.109375   0.000000   Write has locked
+09:09:02.593   151.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:09:02.593   151.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:09:02.593   151.109375   0.000000   Write has unlocked
+09:09:02.593   151.109375   0.000000   readBytes(): begins for 3 bytes
+09:09:02.593   151.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:09:02.593   151.109375   0.000000   Read bytes(): ends
+09:09:02.593   151.109375   0.000000   setCooler has unlocked
+09:09:02.593   151.109375   0.000000   setCoolerInfo outBlock temp=2983 enabled=0
+09:09:02.593   151.109375   0.000000   coolerTemp returning 2983
+09:09:02.593   151.109375   0.000000   Main::CCDTemperature get returns 25.1
+09:09:02.593   151.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:09:02.593   151.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:09:05.093   153.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:09:05.093   153.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:09:05.093   153.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:09:05.093   153.609375   0.000000   setCooler has locked
+09:09:05.093   153.609375   0.000000   Write has locked
+09:09:05.093   153.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:09:05.093   153.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:09:05.093   153.609375   0.000000   Write has unlocked
+09:09:05.093   153.609375   0.000000   readBytes(): begins for 3 bytes
+09:09:05.093   153.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:09:05.093   153.609375   0.000000   Read bytes(): ends
+09:09:05.093   153.609375   0.000000   setCooler has unlocked
+09:09:05.093   153.609375   0.000000   setCoolerInfo outBlock temp=2983 enabled=0
+09:09:05.093   153.609375   0.000000   coolerTemp returning 2983
+09:09:05.093   153.609375   0.000000   Main::CCDTemperature get returns 25.1
+09:09:05.093   153.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:09:05.093   153.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:09:07.593   156.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:09:07.593   156.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:09:07.593   156.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:09:07.593   156.109375   0.000000   setCooler has locked
+09:09:07.593   156.109375   0.000000   Write has locked
+09:09:07.593   156.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:09:07.593   156.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:09:07.593   156.109375   0.000000   Write has unlocked
+09:09:07.593   156.109375   0.000000   readBytes(): begins for 3 bytes
+09:09:07.593   156.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:09:07.593   156.109375   0.000000   Read bytes(): ends
+09:09:07.593   156.109375   0.000000   setCooler has unlocked
+09:09:07.593   156.109375   0.000000   setCoolerInfo outBlock temp=2983 enabled=0
+09:09:07.593   156.109375   0.000000   coolerTemp returning 2983
+09:09:07.593   156.109375   0.000000   Main::CCDTemperature get returns 25.1
+09:09:07.593   156.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:09:07.593   156.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:09:10.093   158.609375   2.500000   Main::CanSetCCDTemperature get returns True
+09:09:10.093   158.609375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:09:10.093   158.609375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:09:10.093   158.609375   0.000000   setCooler has locked
+09:09:10.093   158.609375   0.000000   Write has locked
+09:09:10.093   158.609375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:09:10.093   158.609375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:09:10.093   158.609375   0.000000   Write has unlocked
+09:09:10.093   158.609375   0.000000   readBytes(): begins for 3 bytes
+09:09:10.093   158.609375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:09:10.093   158.609375   0.000000   Read bytes(): ends
+09:09:10.093   158.609375   0.000000   setCooler has unlocked
+09:09:10.093   158.609375   0.000000   setCoolerInfo outBlock temp=2983 enabled=0
+09:09:10.093   158.609375   0.000000   coolerTemp returning 2983
+09:09:10.093   158.609375   0.000000   Main::CCDTemperature get returns 25.1
+09:09:10.093   158.609375   0.000000   Main::HeatSinkTemperature will throw exception
+09:09:10.093   158.609375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)
+09:09:12.593   161.109375   2.500000   Main::CanSetCCDTemperature get returns True
+09:09:12.593   161.109375   0.000000   setCoolerInfo inBlock temp=2630 enabled=0
+09:09:12.593   161.109375   0.000000   buildCommandBlock(): type=0xc0 cmd=0x1e cmd_value=0x0a46 index=0x0000 cmd_length=0x0000
+09:09:12.593   161.109375   0.000000   setCooler has locked
+09:09:12.593   161.109375   0.000000   Write has locked
+09:09:12.593   161.109375   0.000000   usbWrite(): unManagedBlockBuffer=0x000000000024c190 numBytesToWrite=8
+09:09:12.593   161.109375   0.000000   Header: c0 1e 46 0a 00 00 00 00 
+09:09:12.593   161.109375   0.000000   Write has unlocked
+09:09:12.593   161.109375   0.000000   readBytes(): begins for 3 bytes
+09:09:12.593   161.109375   0.000000   readBytes(): ReadFile() read 3 bytes - numBytesToRead=0
+09:09:12.593   161.109375   0.000000   Read bytes(): ends
+09:09:12.593   161.109375   0.000000   setCooler has unlocked
+09:09:12.593   161.109375   0.000000   setCoolerInfo outBlock temp=2985 enabled=0
+09:09:12.593   161.109375   0.000000   coolerTemp returning 2985
+09:09:12.593   161.109375   0.000000   Main::CCDTemperature get returns 25.3
+09:09:12.593   161.109375   0.000000   Main::HeatSinkTemperature will throw exception
+09:09:12.593   161.109375   0.000000   Generic::SetError(HeatSinkTemperature must throw exception if data unavailable)

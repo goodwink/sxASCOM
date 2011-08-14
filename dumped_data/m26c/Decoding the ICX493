@@ -1,0 +1,207 @@
+
+ 'This routine takes the raw unbinned data starting at Imptr2& and Imptr3&, and rearranges it into the array at Imptr4&
+
+SUB Arrayswap2 (BYVAL Imptr1&, BYVAL Imptr2&, BYVAL Imptr3&, BYVAL Imptr4&, BYVAL Linelength&, BYVAL Linecount&) EXPORT
+DIM Impt1 AS INTEGER PTR
+DIM Impt2 AS INTEGER PTR
+DIM Impt3 AS INTEGER PTR
+DIM Impt4 AS INTEGER PTR
+DIM Impt5 AS INTEGER PTR
+DIM Impt6 AS INTEGER PTR
+DIM Impt7 AS INTEGER PTR
+DIM Impt8 AS INTEGER PTR
+
+'Linelength&=2616
+Linebytes&=Linelength& * 2
+Lbx3&=Linebytes&*3
+Lbx5&=Linebytes&*5
+'Linecount&=3900
+Linecount_4&=Linecount&/4
+Linelengthx2&=Linelength&*2
+Linelengthx4&=Linelength&*4
+Linelengthx8&=Linelength&*8
+
+Imptr4& = Imptr4&  + 10464
+Impt1=Imptr4& + Linebytes&                        'OUTPUT ARRAY START
+Impt2=Imptr4& + (Linecount& * Linebytes&) - Linelengthx8& + 4
+Impt3=Imptr4& + Linebytes& + Linelengthx4& - 4
+Impt4=Imptr4& + (Linecount& * Linebytes&) - Linelengthx4& + 4
+
+Impt5=Imptr2&                                 'INPUT BUFFER START
+Impt6=Imptr2&+2
+Impt7=Imptr2&+4
+Impt8=Imptr2&+6
+
+
+FOR y&=1 TO Linecount_4&                   'IMAGE HEIGHT / 4
+FOR z&=1 TO Linelength& STEP 2
+    @Impt1=@Impt7                          'Green pixels
+    @Impt2=@Impt8                           'Blue pixels
+    @Impt3=@Impt5                           'Green pixels
+    @Impt4=@Impt6                           'Blue pixels
+
+    Impt1=Impt1+4                           'shift along by 2 pixels
+    Impt2=Impt2+4
+    Impt3=Impt3+4
+    Impt4=Impt4+4
+    Impt5=Impt5+8                           'shift along by 4 pixels
+    Impt6=Impt6+8
+    Impt7=Impt7+8
+    Impt8=Impt8+8
+NEXT Z&
+    Impt1=Impt1+Lbx3&                      'move output up by 4 rows
+    Impt2=Impt2-Lbx5&
+    Impt3=Impt3+Lbx3&
+    Impt4=Impt4-Lbx5&
+    Impt5=Impt5
+    Impt6=Impt6
+    Impt7=Impt7
+    Impt8=Impt8
+NEXT y&
+
+field2:
+Imptr4&=Imptr4& + Linelengthx2&
+
+Impt1=Imptr4& + Linebytes& + 2 -10464                            'Green pixels - OK       'OUTPUT ARRAY START
+Impt2=Imptr4& + (Linecount& * Linebytes&) - Linelengthx8& + 2    'Red pixels - OK
+Impt3=Imptr4& + Linebytes& + Linelengthx4& - 2 - 10464           'Green pixels - OK
+Impt4=Imptr4& + (Linecount& * Linebytes&) - Linelengthx4& + 2    'Red pixels - OK
+
+Impt5=Imptr3&                                 'INPUT BUFFER START
+Impt6=Imptr3&+2
+Impt7=Imptr3&+4
+Impt8=Imptr3&+6
+
+FOR y&=1 TO Linecount_4&                     'IMAGE HEIGHT / 4
+FOR z&=1 TO Linelength& STEP 2
+    @Impt1=@Impt7
+    @Impt2=@Impt8
+    @Impt3=@Impt5
+    @Impt4=@Impt6
+
+    Impt1=Impt1+4                           'shift along by 2 pixels
+    Impt2=Impt2+4
+    Impt3=Impt3+4
+    Impt4=Impt4+4
+    Impt5=Impt5+8                           'shift along by 4 pixels
+    Impt6=Impt6+8
+    Impt7=Impt7+8
+    Impt8=Impt8+8
+NEXT Z&
+    Impt1=Impt1+Lbx3&                      'move output up by 4 rows
+    Impt2=Impt2-Lbx5&
+    Impt3=Impt3+Lbx3&
+    Impt4=Impt4-Lbx5&
+    Impt5=Impt5
+    Impt6=Impt6
+    Impt7=Impt7
+    Impt8=Impt8
+NEXT y&
+
+ 'This section rotates the data at Imptr4& and creates a geometrically correct 1x1 image
+
+derotate:
+
+Impt1=Imptr1&+7802
+Impt2=Imptr4&+5230      'start at end of line and work backwards
+
+FOR z&=1 TO 2616
+FOR y&=1 TO 3900
+    @Impt1=@Impt2
+    Impt1=Impt1+2
+    Impt2=Impt2+5232    'move down 1 line
+NEXT y&
+Impt2=Impt2-20404800-2
+NEXT z&
+END SUB
+
+' This routine does the same for a binned 2x2 image.
+
+SUB Arrayswap3 (BYVAL Imptr1&, BYVAL Imptr2&, BYVAL Imptr3&, BYVAL Imptr4&, BYVAL Linelength&, BYVAL Linecount&) EXPORT
+DIM Impt1 AS INTEGER PTR
+DIM Impt2 AS INTEGER PTR
+DIM Impt3 AS INTEGER PTR
+DIM Impt4 AS INTEGER PTR
+DIM Impt5 AS INTEGER PTR
+DIM Impt6 AS INTEGER PTR
+DIM Impt7 AS INTEGER PTR
+DIM Impt8 AS INTEGER PTR
+
+'Linelength&=1308
+Linebytes&=Linelength& * 2
+Lbx3&=Linebytes&*3
+Lbx5&=Linebytes&*5
+'Linecount&=1950
+Linecount_2&=Linecount&/2
+Linecount_4&=Linecount&/4
+Linelengthx2&=Linelength&*2
+Linelengthx4&=Linelength&*4
+Linelengthx8&=Linelength&*8
+
+Imptr4&=Imptr4& + Linebytes& +4                    'horizontal G/B offset
+
+Impt1=Imptr4&                                   'OUTPUT ARRAY START
+Impt2=Imptr4& + (Linecount& * Linebytes&) + 2 - Linelengthx4&
+
+Impt5=Imptr2&                                   'INPUT BUFFER START
+Impt6=Imptr2&+2                                 'pixel 2 in buffer
+
+'goto field2a
+FOR y&=1 TO Linecount_2&                        'IMAGE HEIGHT / 2
+FOR z&=1 TO Linelength& STEP 2
+    @Impt1=@Impt5                               'Green pixels
+    @Impt2=@Impt6                               'Blue pixels
+
+    Impt1=Impt1+4                               'shift along output image by 2 pixels
+    Impt2=Impt2+4
+
+    Impt5=Impt5+4                               'shift along input buffer by 2 pixels
+    Impt6=Impt6+4
+
+NEXT Z&
+    Impt1=Impt1+Linebytes&                      'move output up by 2 rows
+    Impt2=Impt2-Lbx3&                           'move output down by 2 rows
+
+NEXT y&
+
+
+field2a:
+Imptr4&=Imptr4& - Linebytes&                     'horizontal R/G offset
+
+Impt1=Imptr4&  + Linebytes& *2                   'Green pixels - OK       'OUTPUT ARRAY START
+Impt2=Imptr4& + (Linecount& * Linebytes&)        'Red pixels - OK
+
+Impt5=Imptr3&                                 'INPUT BUFFER START
+Impt6=Imptr3&+2
+
+FOR y&=1 TO Linecount_2&                     'IMAGE HEIGHT / 4
+FOR z&=1 TO Linelength& STEP 2
+    @Impt1=@Impt5
+    @Impt2=@Impt6
+
+    Impt1=Impt1+4                           'shift along by 2 pixels
+    Impt2=Impt2+4
+
+    Impt5=Impt5+4                           'shift along by 4 pixels
+    Impt6=Impt6+4
+
+NEXT Z&
+    Impt1=Impt1+Linebytes&                      'move output up by 4 rows
+    Impt2=Impt2-Lbx3&
+NEXT y&
+
+derotate2:
+
+Impt1=Imptr1&+3902
+Impt2=Imptr4&+2614      'start at end of line and work backwards
+
+FOR z&=1 TO 1308
+FOR y&=1 TO 1950
+    @Impt1=@Impt2
+    Impt1=Impt1+2
+    Impt2=Impt2+2616    'move down 1 line
+NEXT y&
+Impt2=Impt2-5101200-2
+NEXT z&
+norotate2:
+END SUB
