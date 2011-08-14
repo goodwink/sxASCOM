@@ -628,6 +628,10 @@ namespace sx
             else 
             {
                 m_dump = bDump;
+                if (m_dump)
+                {
+                    Log.Write("sx.Camera(): enabling data dump\n");
+                }
             }
 
             if (cameraIdx > 0)
