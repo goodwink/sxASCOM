@@ -20,5 +20,5 @@ To do a release, be sure to:
   c:\progra~1\winzip\wzzip <release>.zip <release.exe>
 
 - Copy the files to 
-  start explorer "C:\Users\bretm\Documents\My Web Sites\daddog.com\ascom\sx\driver"
+  start explorer "C:\Users\bretm\Documents\MyWebSites\daddog.com\ascom\sx\driver"
 - rename the files
