@@ -627,7 +627,7 @@ namespace ASCOM.SXGeneric
                         try
                         {
                             Log.Write(String.Format("m_controller.Connected={0}\n", m_controller.Connected));
-                            if (!m_controller.Connected)
+                            if (!m_controller.Connected && !sx.Camera.m_useDumped)
                             {
                                 try
                                 {

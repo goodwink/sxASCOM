@@ -142,7 +142,7 @@ namespace sx
         private UInt16 idx;
         private SX_COOLER_BLOCK m_coolerBlock;
         private bool m_dump = false;
-        private bool m_useDumped = false;
+        public static bool m_useDumped = true;
 
         // Properties
 
@@ -553,6 +553,8 @@ namespace sx
                     fullWellCapacity = 60000;
                     electronsPerADU = 1.0;
                     progressive = false;
+                    maxXBin = 1;
+                    maxYBin = 1;
                     break;
                 case CameraModels.MODEL_MX5C:
                     bUntested = true;
@@ -616,13 +618,14 @@ namespace sx
         public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, bool bDump)
         {
             Log.Write(String.Format("sx.Camera() constructor: controller={0} cameraIdx={1}\n", controller, cameraIdx));
-
+            Log.Write(String.Format("m_useDumped=", m_useDumped));
             idx = cameraIdx;
 
             m_controller = controller;
 
             if (m_useDumped)
             {
+                Log.Write("Using Dumped Data");
                 m_controller = null;
             }
             else 
@@ -1325,7 +1328,7 @@ namespace sx
                 // 201 rows that becomes 402 rows when we unswizzle it here, so the last row will be 0
 
                 Log.Write(String.Format("convertCameraDataToImageData(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
-                Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixes={1}, len={2}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length));
+                Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixels={1}, len={2}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length));
 
                 Debug.Assert((cameraBinnedHeight * 2 == binnedHeight) || (cameraBinnedHeight * 2 + 1 == binnedHeight) || (cameraBinnedHeight * 2 - 1 == binnedHeight));
 
@@ -1354,6 +1357,266 @@ namespace sx
                     Log.Write(String.Format("convertCameraDataToImageData(): Caught an exception processing M25C data\n"));
                     Log.Write("Exception data was: \n" + ex.ToString() + "\n");
                     throw ex;
+                }
+            }
+            else if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M26C)
+            {
+                Log.Write("convertCameraDataToImageData(): decoding M26C data\n");
+                Log.Write(String.Format("convertCameraDataToImageData(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
+                Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixels={1}, rawFrame1.Length={2} rawFrame2.Length=={3}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length, rawFrame2.Length));
+
+                Debug.Assert(currentExposure.toCamera.width == ccdWidth);
+                Debug.Assert(currentExposure.toCamera.height == ccdHeight);
+                Debug.Assert(currentExposure.toCamera.x_bin == 1);
+                Debug.Assert(currentExposure.toCamera.y_bin == 1);
+                Debug.Assert(bytesPerPixel == 2);
+
+                UInt32 bytesPerLine = cameraBinnedWidth*bytesPerPixel;
+
+                unsafe
+                {
+                    UInt16 [] outputData = new UInt16[(2616+1)*(3900+1)];
+                    UInt16 [] scratchData = new UInt16[(2616+2)*(3900+2)];
+                    fixed(UInt16 *pImptr1=outputData, pImptr4 = scratchData)
+                    {
+                        UInt16 *Imptr1 = pImptr1;
+                        UInt16 *Imptr4 = pImptr4;
+                        fixed(byte *pImptr2 = rawFrame1, pImptr3 = rawFrame2)
+                        {
+                            UInt16 *Imptr2 = (UInt16 *)pImptr2;
+                            UInt16 *Imptr3 = (UInt16 *)pImptr3;
+// 'This routine takes the raw unbinned data starting at Imptr2& and Imptr3&, and rearranges it into the array at Imptr4&
+
+//SUB Arrayswap2 (BYVAL Imptr1&, BYVAL Imptr2&, BYVAL Imptr3&, BYVAL Imptr4&, BYVAL Linelength&, BYVAL Linecount&) EXPORT
+//DIM Impt1 AS INTEGER PTR
+                            UInt16 *Impt1;
+//DIM Impt2 AS INTEGER PTR
+                            UInt16 *Impt2;
+//DIM Impt3 AS INTEGER PTR
+                            UInt16 *Impt3;
+//DIM Impt4 AS INTEGER PTR
+                            UInt16 *Impt4;
+//DIM Impt5 AS INTEGER PTR
+                            UInt16 *Impt5;
+//DIM Impt6 AS INTEGER PTR
+                            UInt16 *Impt6;
+//DIM Impt7 AS INTEGER PTR
+                            UInt16 *Impt7;
+//DIM Impt8 AS INTEGER PTR
+                            UInt16 *Impt8;
+
+//'Linelength&=2616
+                            UInt32 Linelength = 2616;
+//LineBytes&=Linelength& * 2
+                            UInt32 LineBytes = Linelength*2;
+//Lbx3&=LineBytes&*3
+                            UInt32 lbx3 = LineBytes * 3;
+//Lbx5&=LineBytes&*5
+                            UInt32 lbx5 = LineBytes * 5;
+//'Linecount&=3900
+                            UInt32 Linecount = 3900;
+//Linecount_4&=Linecount&/4
+                            UInt32 Linecount_4 = Linecount/4;
+//Linelengthx2&=Linelength&*2
+                            UInt32 Linelengthx2 = Linecount*2;
+//Linelengthx4&=Linelength&*4
+                            UInt32 Linelengthx4 = Linecount*4;
+//Linelengthx8&=Linelength&*8
+                            UInt32 Linelengthx8 = Linecount*8;
+
+//Imptr4& = Imptr4&  + 10464
+                            Imptr4 = Imptr4 + (10464)/2;
+//Impt1=Imptr4& + LineBytes&                        'OUTPUT ARRAY START
+                            Impt1=Imptr4 + (LineBytes)/2;
+//Impt2=Imptr4& + (Linecount& * LineBytes&) - Linelengthx8& + 4
+                            Impt2=Imptr4 + ((Linecount * LineBytes) - Linelengthx8 + 4)/2;
+//Impt3=Imptr4& + LineBytes& + Linelengthx4& - 4
+                            Impt3=Imptr4 + (LineBytes + Linelengthx4 - 4)/2;
+//Impt4=Imptr4& + (Linecount& * LineBytes&) - Linelengthx4& + 4
+                            Impt4=Imptr4 + ((Linecount * LineBytes) - Linelengthx4 + 4)/2;
+
+//Impt5=Imptr2&                                 'INPUT BUFFER START
+                            Impt5=Imptr2;
+//Impt6=Imptr2&+2
+                            Impt6=Imptr2+(2)/2;
+//Impt7=Imptr2&+4
+                            Impt7=Imptr2+(4)/2;
+//Impt8=Imptr2&+6
+                            Impt8=Imptr2+(6)/2;
+
+
+//FOR y&=1 TO Linecount_4&                   'IMAGE HEIGHT / 4
+                            for (int y=1;y<Linecount_4;y++)
+                            {
+//FOR z&=1 TO Linelength& STEP 2
+                                for(int z=1;z<Linelength;z+=2)
+                                {
+//  @Impt1=@Impt7                          'Green pixels
+                                    Debug.Assert(Impt1 >= pImptr4 && Impt1 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt7 >= pImptr2 && Impt7 < pImptr2 + rawFrame1.Length);
+                                    *Impt1=*Impt7;
+//     @Impt2=@Impt8                           'Blue pixels
+                                    Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt8 >= pImptr2 && Impt8 < pImptr2 + rawFrame1.Length);
+                                    *Impt2=*Impt8;
+//     @Impt3=@Impt5                           'Green pixels
+                                    Debug.Assert(Impt3 >= pImptr4 && Impt3 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt5 >= pImptr2 && Impt5 < pImptr2 + rawFrame1.Length);
+                                    *Impt3=*Impt5;
+//     @Impt4=@Impt6                           'Blue pixels
+                                    Debug.Assert(Impt4 >= pImptr4 && Impt4 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt6 >= pImptr2 && Impt6 < pImptr2 + rawFrame1.Length);
+                                    *Impt4=*Impt6;
+
+//     Impt1=Impt1+4                           'shift along by 2 pixels
+                                    Impt1=Impt1+(4)/2;
+//     Impt2=Impt2+4
+                                    Impt2=Impt2+(4)/2;
+//     Impt3=Impt3+4
+                                    Impt3=Impt3+(4)/2;
+//     Impt4=Impt4+4
+                                    Impt4=Impt4+(4)/2;
+//     Impt5=Impt5+8                           'shift along by 4 pixels
+                                    Impt5=Impt5+(8)/2;
+//     Impt6=Impt6+8
+                                    Impt6=Impt6+(8)/2;
+//     Impt7=Impt7+8
+                                    Impt7=Impt7+(8)/2;
+//     Impt8=Impt8+8
+                                    Impt8=Impt8+(8)/2;
+//    NEXT Z&
+                                }
+    
+//     Impt1=Impt1+Lbx3&                      'move output up by 4 rows
+                                Impt1=Impt1+(lbx3)/2;
+//     Impt2=Impt2-Lbx5&
+                                Impt2=Impt2-(lbx5)/2;
+//     Impt3=Impt3+Lbx3&
+                                Impt3=Impt3+(lbx3)/2;
+//     Impt4=Impt4-Lbx5&
+                                Impt4=Impt4-(lbx5)/2;
+//     Impt5=Impt5
+//     Impt6=Impt6
+//     Impt7=Impt7
+//     Impt8=Impt8
+// NEXT y&
+                            }
+// field2:
+//    Imptr4&=Imptr4& + Linelengthx2&
+                            Imptr4=Imptr4 + (Linelengthx2)/2;
+//    Impt1=Imptr4& + LineBytes& + 2 -10464                            'Green pixels - OK       'OUTPUT ARRAY START
+                            Impt1=Imptr4 + (LineBytes + 2 -10464)/2;
+//    Impt2=Imptr4& + (Linecount& * LineBytes&) - Linelengthx8& + 2    'Red pixels - OK
+                            Impt2=Imptr4 + ((Linecount * LineBytes) - Linelengthx8 + 2)/2;
+//    Impt3=Imptr4& + LineBytes& + Linelengthx4& - 2 - 10464           'Green pixels - OK
+                            Impt3=Imptr4 + (LineBytes + Linelengthx4 - 2 - 10464)/2;
+//    Impt4=Imptr4& + (Linecount& * LineBytes&) - Linelengthx4& + 2    'Red pixels - OK
+                            Impt4=Imptr4 + ((Linecount * LineBytes) - Linelengthx4 + 2)/2;
+
+//    Impt5=Imptr3&                                 'INPUT BUFFER START
+                            Impt5=Imptr3;
+//    Impt6=Imptr3&+2
+                            Impt6=Imptr3+(2)/2;
+//    Impt7=Imptr3&+4
+                            Impt7=Imptr3+(4)/2;
+//    Impt8=Imptr3&+6
+                            Impt8=Imptr3+(6)/2;
+
+//    FOR y&=1 TO Linecount_4&                     'IMAGE HEIGHT / 4
+                            for (int y=1;y<Linecount_4;y++)
+                            {
+//    FOR z&=1 TO Linelength& STEP 2
+                                for(int z=1;z<Linelength;z+=2)
+                                {
+//        @Impt1=@Impt7
+                                    Debug.Assert(Impt1 >= pImptr4 && Impt1 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt7 >= pImptr3 && Impt7 < pImptr3 + rawFrame1.Length);
+                                    *Impt1=*Impt7;
+//        @Impt2=@Impt8
+                                    Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt8 >= pImptr3 && Impt8 < pImptr3 + rawFrame1.Length);
+                                    *Impt2=*Impt8;
+//        @Impt3=@Impt5
+                                    Debug.Assert(Impt3 >= pImptr4 && Impt3 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt5 >= pImptr3 && Impt5 < pImptr3 + rawFrame1.Length);
+                                    *Impt3=*Impt5;
+//        @Impt4=@Impt6
+                                    Debug.Assert(Impt4 >= pImptr4 && Impt4 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt6 >= pImptr3 && Impt6 < pImptr3 + rawFrame1.Length);
+                                    *Impt4=*Impt6;
+
+//        Impt1=Impt1+4                           'shift along by 2 pixels
+                                    Impt1=Impt1+(4)/2;
+//        Impt2=Impt2+4
+                                    Impt2=Impt2+(4)/2;
+//        Impt3=Impt3+4
+                                    Impt3=Impt3+(4)/2;
+//        Impt4=Impt4+4
+                                    Impt4=Impt4+(4)/2;
+//        Impt5=Impt5+8                           'shift along by 4 pixels
+                                    Impt5=Impt5+(8)/2;
+//        Impt6=Impt6+8
+                                    Impt6=Impt6+(8)/2;
+//        Impt7=Impt7+8
+                                    Impt7=Impt7+(8)/2;
+//        Impt8=Impt8+8
+                                    Impt8=Impt8+(8)/2;
+//    NEXT Z&
+                                }
+//        Impt1=Impt1+Lbx3&                      'move output up by 4 rows
+                                Impt1=Impt1+(lbx3)/2;
+//        Impt2=Impt2-Lbx5&
+                                Impt2=Impt2-(lbx5)/2;
+//        Impt3=Impt3+Lbx3&
+                                Impt3=Impt3+(lbx3)/2;
+//        Impt4=Impt4-Lbx5&
+                                Impt4=Impt4-(lbx5)/2;
+//        Impt5=Impt5
+//        Impt6=Impt6
+//        Impt7=Impt7
+//        Impt8=Impt8
+//    NEXT y&
+
+                            }
+//     'This section rotates the data at Imptr4& and creates a geometrically correct 1x1 image
+
+//    derotate:
+
+//    Impt1=Imptr1&+7802
+                            Impt1=Imptr1+(7802)/2;
+//    Impt2=Imptr4&+5230      'start at end of line and work backwards
+                            Impt2=Imptr4+(5230)/2;
+
+//    FOR z&=1 TO 2616
+                            for(int z=0;z<2616;z++)
+                            {
+//    FOR y&=1 TO 3900
+                                for(int y=0;y<3900;y++)
+                                {
+//        @Impt1=@Impt2
+                                    Debug.Assert(Impt1 >= pImptr1 && Impt1 < pImptr1 + outputData.Length);
+                                    Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
+                                    *Impt1=*Impt2;
+//        Impt1=Impt1+2
+                                    Impt1=Impt1+(2)/2;
+//        Impt2=Impt2+5232    'move down 1 line
+                                    Impt2=Impt2+(5232)/2;
+//    NEXT y&
+                                }
+//    Impt2=Impt2-20404800-2
+                                Impt2=Impt2-(20404800-2)/2;
+//    NEXT z&
+                            }
+//    END SUB
+                        }
+                    }
+                    for(int x=0;x<3900;x++)
+                    {
+                        for(int y=0;y<2616;y++)
+                        {
+                            imageData[x,y] = scratchData[x*2616+y];
+                        }
+                    }
                 }
             }
             else if (bytesPerPixel == 1 || bytesPerPixel == 2)

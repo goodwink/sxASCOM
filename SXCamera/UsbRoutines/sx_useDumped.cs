@@ -35,8 +35,8 @@ namespace sx
     public partial class Camera
         : sxBase
     {
-        private int dump_cameraModel = 39;
-        private string dumpedPath = @"C:\Users\bretm\Astronomy\src\sxASCOM\dumped_data\costar\";
+        private int dump_cameraModel = 90;
+        private string dumpedPath = @"C:\Users\bretm\Astronomy\src\sxASCOM\dumped_data\m26c\";
         //private string dumpedPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + @"\";
 
         private object getDumpedObject(BinaryReader binReader, Type objectType)
