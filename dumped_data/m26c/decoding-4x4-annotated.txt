@@ -1,0 +1,78 @@
+'Bin 4x4 decoding for M26C
+SUB Arrayswap5 (BYVAL Imptr1&, BYVAL Imptr2&, BYVAL Imptr3&, BYVAL Imptr4&, BYVAL Linelength&, BYVAL Linecount&) EXPORT
+DIM Impt1 AS INTEGER PTR
+DIM Impt2 AS INTEGER PTR
+DIM Impt3 AS INTEGER PTR
+DIM Impt4 AS INTEGER PTR
+DIM Impt5 AS INTEGER PTR
+DIM Impt6 AS INTEGER PTR
+DIM Impt7 AS INTEGER PTR
+DIM Impt8 AS INTEGER PTR
+
+Linelength&=654
+Linecount&=975
+
+Linebytes&=Linelength& * 2
+
+Lbx2&=Linebytes&*2
+Lbx3&=Linebytes&*3
+Lbx5&=Linebytes&*5
+Linecount_2&=Linecount&/2
+Linecount_4&=Linecount&/4
+
+Impt1=Imptr4& + 2*Lbx2&                                             				'OUTPUT ARRAY START LINE
+Impt2=Imptr4& + (Linecount& * Linebytes&)                           			'OUTPUT ARRAY LAST LINE
+
+Impt5=Imptr3&                                                       				'INPUT BUFFER START
+Impt6=Imptr3&+2                                                     				'pixel 2 in input buffer
+
+FOR y&=1 TO Linecount&/2                                           			'IMAGE HEIGHT / 2
+FOR z&=1 TO Linelength&
+    @Impt1=@Impt5                                                  				'Green + Blue pixels
+    @Impt2=@Impt6                                                   				'Red + Green pixels
+
+
+    Impt1=Impt1+2                                                   				'shift along output by 1 pixels
+    Impt2=Impt2+2
+
+    Impt5=Impt5+4                                                   				'shift along input by 2 pixels
+    Impt6=Impt6+4
+
+NEXT Z&
+
+    Impt1=Impt1+Linebytes&                                          				'move output up by 1 row
+    Impt2=Impt2-Linebytes&*3                                       				'move output down by 1 row
+
+NEXT y&
+
+'Rotate image into normal orientation
+Impt1=Imptr1&+1950
+Impt2=Imptr4&+1308      						'start at end of line and work backwards
+
+FOR z&=1 TO 654
+FOR y&=1 TO 974
+    @Impt1=@Impt2
+    Impt1=Impt1+2
+    Impt2=Impt2+1308    						'move down 1 line
+NEXT y&
+Impt2=Impt2-1273992 -2
+NEXT z&
+
+'Average columns
+Impt1=Imptr1&
+Impt2=Imptr1&+2
+FOR Y&=1 TO 654
+FOR X&=1 TO 974
+    dat1&=@Impt1
+    dat2&=@Impt2
+    IF dat1&<0 THEN dat1&=dat1&+65535
+    IF dat2&<0 THEN dat2&=dat2&+65535
+    dat&=dat1&/2 + dat2&/2
+    IF dat&>32767 THEN dat&=dat&-65535
+    @Impt1=dat&
+    INCR Impt1
+    INCR Impt2
+NEXT X&
+NEXT Y&
+
+END SUB                                                    

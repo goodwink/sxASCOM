@@ -2104,6 +2104,7 @@ namespace sx
             else if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M26C)
             {
                 convertCameraDataToImageDataM26C();
+
             }
             else if (bytesPerPixel == 1 || bytesPerPixel == 2)
             {
