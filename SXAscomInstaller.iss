@@ -59,11 +59,9 @@ Filename: "{app}\ASCOM.SXCamera.exe"; Parameters: "/unregister"
 [CODE]
 // Global Variables
 var
-  OverviewPage: TInputOptionWizardPage;
   StandaloneGuiderPage: TInputOptionWizardPage;
   LodeStarsPage: TInputOptionWizardPage;
   CoStarsPage: TInputOptionWizardPage;
-  CoStarPage: TInputOptionWizardPage;
   ImagingCameraPage: TInputOptionWizardPage;
   GuideCameraPage: TInputOptionWizardPage;
   GuideCamerasPage: TInputOptionWizardPage;
@@ -80,14 +78,30 @@ var
    P  : Variant;
 begin
     Result := FALSE;  // Assume failure
+
     try               // Will catch all errors including missing reg data
-        H := CreateOLEObject('DriverHelper.Util');  // Assure both are available
-        H2 := CreateOleObject('DriverHelper2.Util');
+        try
+            H := CreateOLEObject('DriverHelper.Util');  // Assure both are available
+        except
+            RaiseException('Unable to locate DriverHelper.Util - is the ASCOM Platform correctly installed?');
+        end;
+
+        try
+            H2 := CreateOleObject('DriverHelper2.Util');
+        except
+            RaiseException('Unable to locate DriverHelper2.Util - is the ASCOM Platform correctly installed?');
+        end;
 
         if (H2.PlatformVersion >= {#ASCOM_VERSION_REQUIRED})
         then
             begin
-            P := CreateOLEObject('ASCOM.Utilities.Profile');
+
+            try
+                P := CreateOLEObject('ASCOM.Utilities.Profile');
+            except
+                RaiseException('Unable to create OLE object for ASCOM.Utilities.Profile - is the ASCOM Platform correctly installed?')
+            end;
+
             P.DeviceType := 'Camera';
 
             if P.IsRegistered('ASCOM.SXMain0.Camera') or 
@@ -112,7 +126,7 @@ begin
                 MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED} or greater is required for this driver.', mbInformation, MB_OK);
             end
     except
-        MsgBox('Caught an exception', mbInformation, MB_OK);
+        ShowExceptionMessage;
     end;
 end;
 
