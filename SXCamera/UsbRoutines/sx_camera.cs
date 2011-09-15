@@ -142,7 +142,7 @@ namespace sx
         private UInt16 idx;
         private SX_COOLER_BLOCK m_coolerBlock;
         private bool m_dump = false;
-        public static bool m_useDumped = true;
+        public static bool m_useDumped = false;
 
         // Properties
 
@@ -1416,6 +1416,7 @@ namespace sx
 //'Linecount&=3900
                             UInt32 Linecount = 3900;
 //Linecount_4&=Linecount&/4
+                            Debug.Assert(Linecount%2 == 0);
                             UInt32 Linecount_4 = Linecount/4;
 //Linelengthx2&=Linelength&*2
                             UInt32 Linelengthx2 = Linecount*2;
@@ -1427,12 +1428,16 @@ namespace sx
 //Imptr4& = Imptr4&  + 10464
                             Imptr4 = Imptr4 + (10464)/2;
 //Impt1=Imptr4& + LineBytes&                        'OUTPUT ARRAY START
+                            Debug.Assert((LineBytes/2) % 2 == 0);
                             Impt1=Imptr4 + (LineBytes)/2;
 //Impt2=Imptr4& + (Linecount& * LineBytes&) - Linelengthx8& + 4
+                            Debug.Assert(((Linecount * LineBytes) - Linelengthx8 + 4)%2 == 0);
                             Impt2=Imptr4 + ((Linecount * LineBytes) - Linelengthx8 + 4)/2;
 //Impt3=Imptr4& + LineBytes& + Linelengthx4& - 4
+                            Debug.Assert((LineBytes + Linelengthx4 - 4)%2 == 0);
                             Impt3=Imptr4 + (LineBytes + Linelengthx4 - 4)/2;
 //Impt4=Imptr4& + (Linecount& * LineBytes&) - Linelengthx4& + 4
+                            Debug.Assert(((Linecount * LineBytes) - Linelengthx4 + 4)%2 == 0);
                             Impt4=Imptr4 + ((Linecount * LineBytes) - Linelengthx4 + 4)/2;
 
 //Impt5=Imptr2&                                 'INPUT BUFFER START
@@ -1446,27 +1451,27 @@ namespace sx
 
 
 //FOR y&=1 TO Linecount_4&                   'IMAGE HEIGHT / 4
-                            for (int y=1;y<Linecount_4;y++)
+                            for (int y=0;y<Linecount_4;y++)
                             {
 //FOR z&=1 TO Linelength& STEP 2
-                                for(int z=1;z<Linelength;z+=2)
+                                for(int z=0;z<Linelength;z+=2)
                                 {
 //  @Impt1=@Impt7                          'Green pixels
                                     Debug.Assert(Impt1 >= pImptr4 && Impt1 < pImptr4 + scratchData.Length);
                                     Debug.Assert(Impt7 >= pImptr2 && Impt7 < pImptr2 + rawFrame1.Length);
-                                    *Impt1=*Impt7;
+                                    *Impt1 = *Impt7;
 //     @Impt2=@Impt8                           'Blue pixels
                                     Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
                                     Debug.Assert(Impt8 >= pImptr2 && Impt8 < pImptr2 + rawFrame1.Length);
-                                    *Impt2=*Impt8;
+                                    *Impt2 = *Impt8;
 //     @Impt3=@Impt5                           'Green pixels
                                     Debug.Assert(Impt3 >= pImptr4 && Impt3 < pImptr4 + scratchData.Length);
                                     Debug.Assert(Impt5 >= pImptr2 && Impt5 < pImptr2 + rawFrame1.Length);
-                                    *Impt3=*Impt5;
+                                    *Impt3 = *Impt5;
 //     @Impt4=@Impt6                           'Blue pixels
                                     Debug.Assert(Impt4 >= pImptr4 && Impt4 < pImptr4 + scratchData.Length);
                                     Debug.Assert(Impt6 >= pImptr2 && Impt6 < pImptr2 + rawFrame1.Length);
-                                    *Impt4=*Impt6;
+                                    *Impt4 = *Impt6;
 
 //     Impt1=Impt1+4                           'shift along by 2 pixels
                                     Impt1=Impt1+(4)/2;
@@ -1488,8 +1493,10 @@ namespace sx
                                 }
     
 //     Impt1=Impt1+Lbx3&                      'move output up by 4 rows
+                                Debug.Assert((lbx3%2) == 0);
                                 Impt1=Impt1+(lbx3)/2;
 //     Impt2=Impt2-Lbx5&
+                                Debug.Assert((lbx5%2) == 0);
                                 Impt2=Impt2-(lbx5)/2;
 //     Impt3=Impt3+Lbx3&
                                 Impt3=Impt3+(lbx3)/2;
@@ -1503,14 +1510,19 @@ namespace sx
                             }
 // field2:
 //    Imptr4&=Imptr4& + Linelengthx2&
+                            Debug.Assert((Linelengthx2)%2 == 0);
                             Imptr4=Imptr4 + (Linelengthx2)/2;
 //    Impt1=Imptr4& + LineBytes& + 2 -10464                            'Green pixels - OK       'OUTPUT ARRAY START
+                            Debug.Assert((LineBytes + 2 -10464)%2 == 0);
                             Impt1=Imptr4 + (LineBytes + 2 -10464)/2;
 //    Impt2=Imptr4& + (Linecount& * LineBytes&) - Linelengthx8& + 2    'Red pixels - OK
+                            Debug.Assert(((Linecount * LineBytes) - Linelengthx8 + 2)%2 == 0);
                             Impt2=Imptr4 + ((Linecount * LineBytes) - Linelengthx8 + 2)/2;
 //    Impt3=Imptr4& + LineBytes& + Linelengthx4& - 2 - 10464           'Green pixels - OK
+                            Debug.Assert((LineBytes + Linelengthx4 - 2 - 10464)%2 == 0);
                             Impt3=Imptr4 + (LineBytes + Linelengthx4 - 2 - 10464)/2;
 //    Impt4=Imptr4& + (Linecount& * LineBytes&) - Linelengthx4& + 2    'Red pixels - OK
+                            Debug.Assert(((Linecount * LineBytes) - Linelengthx4 + 2)%2 == 0);
                             Impt4=Imptr4 + ((Linecount * LineBytes) - Linelengthx4 + 2)/2;
 
 //    Impt5=Imptr3&                                 'INPUT BUFFER START
@@ -1523,27 +1535,27 @@ namespace sx
                             Impt8=Imptr3+(6)/2;
 
 //    FOR y&=1 TO Linecount_4&                     'IMAGE HEIGHT / 4
-                            for (int y=1;y<Linecount_4;y++)
+                            for (int y=0;y<Linecount_4;y++)
                             {
 //    FOR z&=1 TO Linelength& STEP 2
-                                for(int z=1;z<Linelength;z+=2)
+                                for(int z=0;z<Linelength;z+=2)
                                 {
 //        @Impt1=@Impt7
                                     Debug.Assert(Impt1 >= pImptr4 && Impt1 < pImptr4 + scratchData.Length);
                                     Debug.Assert(Impt7 >= pImptr3 && Impt7 < pImptr3 + rawFrame1.Length);
-                                    *Impt1=*Impt7;
+                                    *Impt1 = *Impt7;
 //        @Impt2=@Impt8
                                     Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
                                     Debug.Assert(Impt8 >= pImptr3 && Impt8 < pImptr3 + rawFrame1.Length);
-                                    *Impt2=*Impt8;
+                                    *Impt2 = *Impt8;
 //        @Impt3=@Impt5
                                     Debug.Assert(Impt3 >= pImptr4 && Impt3 < pImptr4 + scratchData.Length);
                                     Debug.Assert(Impt5 >= pImptr3 && Impt5 < pImptr3 + rawFrame1.Length);
-                                    *Impt3=*Impt5;
+                                    *Impt3 = *Impt5;
 //        @Impt4=@Impt6
                                     Debug.Assert(Impt4 >= pImptr4 && Impt4 < pImptr4 + scratchData.Length);
                                     Debug.Assert(Impt6 >= pImptr3 && Impt6 < pImptr3 + rawFrame1.Length);
-                                    *Impt4=*Impt6;
+                                    *Impt4 = *Impt6;
 
 //        Impt1=Impt1+4                           'shift along by 2 pixels
                                     Impt1=Impt1+(4)/2;
@@ -1596,7 +1608,7 @@ namespace sx
 //        @Impt1=@Impt2
                                     Debug.Assert(Impt1 >= pImptr1 && Impt1 < pImptr1 + outputData.Length);
                                     Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
-                                    *Impt1=*Impt2;
+                                    *Impt1 = *Impt2;
 //        Impt1=Impt1+2
                                     Impt1=Impt1+(2)/2;
 //        Impt2=Impt2+5232    'move down 1 line
