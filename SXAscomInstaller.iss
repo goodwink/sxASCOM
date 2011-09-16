@@ -4,7 +4,7 @@
 ;
 
 #define BUILD_TYPE "Release"
-#define APP_VERSION "2.1.1.2"
+#define APP_VERSION "2.1.1.3"
 #define ASCOM_VERSION_REQUIRED  "5.5"
 #define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
 
@@ -26,8 +26,8 @@ OutputBaseFilename="SXAscomInstaller-v{#APP_VERSION}"
 Compression=lzma
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
-WizardImageFile="C:\Program Files (x86)\ASCOM\InstallGen\Resources\WizardImage.bmp"
-LicenseFile="C:\Users\bretm\Astronomy\src\sxASCOM\CreativeCommons.txt"
+WizardImageFile="C:\Program Files\ASCOM\InstallGen\Resources\WizardImage.bmp"
+LicenseFile="CreativeCommons.txt"
 
 ; {cf}\ASCOM\Uninstall\Camera folder created by Platform, always
 UninstallFilesDir="{cf}\ASCOM\Uninstall\Camera\sxASCOM"
@@ -66,6 +66,66 @@ var
   GuideCameraPage: TInputOptionWizardPage;
   GuideCamerasPage: TInputOptionWizardPage;
 
+// Convert the version number.  I have had problems with 
+// internatioalization, so I had to write this function.  
+// The problem was that this line:
+// if (H2.PlatformVersion >= {#ASCOM_VERSION_REQUIRED})
+// was raising an exception.  The Platform version is not
+// internationlaized, and when used with the language set to
+// one that requires a comma instead of a period as the 
+// decimal point seperator (french was the language that 
+// caught it...)
+
+function MajorVersion(VersionString : String) : LongWord;
+var 
+    Accumulated : LongWord;
+    Index : Integer;
+    c : char;
+begin
+    Accumulated := 0;
+
+    for Index := 1 to Length(VersionString)
+    do
+        begin
+            c := VersionString[Index];
+
+            if ((c >= '0') and ( c <= '9'))
+            then
+                begin
+                    Accumulated := Accumulated * 10 + Ord(c) - Ord('0');
+                end
+            else
+                break;
+        end
+
+    Result := Accumulated;
+end;
+
+function MinorVersion(VersionString : String) : LongWord;
+var 
+    Accumulated : LongWord;
+    Index : Integer;
+    c : char;
+begin
+    Accumulated := 0;
+
+    for Index := 1 to Length(VersionString)
+    do
+        begin
+            c := VersionString[Index];
+
+            if ((c >= '0') and ( c <= '9'))
+            then
+                begin
+                    Accumulated := Accumulated * 10 + Ord(c) - Ord('0');
+                end
+            else
+                Accumulated := 0; // reset the accumulated when we hit a non-digit
+        end
+
+    Result := Accumulated;
+end;
+
 //
 // Before the installer UI appears, verify that the (prerequisite)
 // ASCOM Platform 5 or greater is installed, including both Helper
@@ -92,8 +152,14 @@ begin
             RaiseException('Unable to locate DriverHelper2.Util - is the ASCOM Platform correctly installed?');
         end;
 
-        if (H2.PlatformVersion >= {#ASCOM_VERSION_REQUIRED})
+        if ((MajorVersion(H2.PlatformVersion) < MajorVersion('{#ASCOM_VERSION_REQUIRED}')) or
+            ((MajorVersion(H2.PlatformVersion) = MajorVersion('{#ASCOM_VERSION_REQUIRED}')) and 
+             (MinorVersion(H2.PlatformVersion) < MinorVersion('{#ASCOM_VERSION_REQUIRED}'))))
         then
+            begin
+                MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED} or greater is required for this driver.', mbInformation, MB_OK);
+            end
+        else
             begin
 
             try
@@ -120,10 +186,6 @@ begin
                 begin
                     Result := TRUE;
                 end
-            end
-        else
-            begin
-                MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED} or greater is required for this driver.', mbInformation, MB_OK);
             end
     except
         ShowExceptionMessage;
