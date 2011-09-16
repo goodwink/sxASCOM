@@ -1,37 +1,25 @@
-Copyright (C) 2010-2013 Dad Dog Development Ltd.
+Copyright (C) 2010-2014 Dad Dog Development Ltd.
 
 This is the README.txt for version 6.0.0.0
 
-<<<<<<< HEAD
+
 
 
 
 I have changed my version numbering scheme - this is the the version that 
 would have been 3.0 before.  The first two numbers now indicate the miniumum
 version of ASCOM that must be installed.
-=======
-This is the README.txt for version 2.2.0.4
->>>>>>> Changes required for V2.2.0.4
+
 
 This is a Release build of the ASCOM driver for Starlight Xpress cameras.
 
 This version adds:
-<<<<<<< HEAD
+
 
 
     - ASCOM 6.0 and ICameraV2 support
 
-=======
-    - adding additional debugging to the installer
-    - a configuratino option for dumping camera data for offline analysis
-    - use of the ASCOM logging facility to write log files
-    - minor performance changes
-    - fixes a problem introduced in 2.2.0.0
-    - adds preliminary information for M26C support
-    - fixed a problem with dump data support
 
->>>>>>> Changes required for V2.2.0.4
-If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know
 what they are.
 
