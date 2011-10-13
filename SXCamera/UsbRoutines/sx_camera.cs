@@ -21,7 +21,7 @@
 // For more information please contact bretm@daddog.com
 
 //#define INTERLACED_DEBUG
-//#define USE_DUMPED_DATA
+#define USE_DUMPED_DATA
 
 using System;
 using System.IO;
@@ -142,7 +142,11 @@ namespace sx
         private UInt16 idx;
         private SX_COOLER_BLOCK m_coolerBlock;
         private bool m_dump = false;
+#if USE_DUMPED_DATA
+        public static bool m_useDumped = true;
+#else
         public static bool m_useDumped = false;
+#endif
 
         // Properties
 
@@ -1373,6 +1377,183 @@ namespace sx
 
                 UInt32 bytesPerLine = cameraBinnedWidth*bytesPerPixel;
 
+                int x=0;
+                int y=0;
+
+                unsafe
+                {
+                    fixed(byte *pRaw1 = rawFrame1, pRaw2 = rawFrame2)
+                    {
+                        UInt16 *pRawFrame1 = (UInt16 *)pRaw1;
+                        UInt16 *pRawFrame2 = (UInt16 *)pRaw2;
+
+                        for(y=0;y<binnedHeight;y += 2)
+                        {
+                            UInt16* pF1 = pRawFrame1 + y;
+                            UInt16* pF2 = pRawFrame2 + y;
+                            for(x=0;x<binnedWidth;x+=4)
+                            {
+                                imageData[x+0,binnedHeight - 1 - y] =                        *pF1++;
+                                imageData[cameraBinnedWidth - 1 - x, binnedHeight - 1 - y] = *pF1++;
+                                imageData[x+2,binnedHeight - 1 - y]                        = *pF1++;
+                                imageData[cameraBinnedWidth - 3 - x, binnedHeight - 1 - y] = *pF1++;
+
+                                imageData[x+0,binnedHeight - 1 - (y+1)] =                        *pF2++;
+                                imageData[cameraBinnedWidth - 1 - x, binnedHeight - 1 - (y+1)] = *pF2++;
+                                imageData[x+2,binnedHeight - 1 - (y+1)]                        = *pF2++;
+                                imageData[cameraBinnedWidth - 3 - x, binnedHeight - 1 - (y+1)] = *pF2++;
+
+                                pF1 += cameraBinnedWidth - 4;
+                                pF2 += cameraBinnedWidth - 4;
+                            }
+                        }
+                    }
+                }
+#if false
+#if true
+                //UInt16 [] frame1 = new UInt16[rawFrame1.Length/2];
+                //UInt16 [] frame2 = new UInt16[binnedWidth*binnedHeight];
+                Int32 [] frame1 = new Int32[cameraBinnedWidth*cameraBinnedHeight];
+                Int32 [] frame2 = new Int32[cameraBinnedWidth*cameraBinnedHeight];
+
+                unsafe
+                {
+                    fixed(byte *pRaw1 = rawFrame1, pRaw2 = rawFrame2)
+                    {
+                        UInt16 *pRawFrame1 = (UInt16 *)pRaw1;
+                        UInt16 *pRawFrame2 = (UInt16 *)pRaw2;
+
+                        for(uint j=0;j<rawFrame1.Length/2;j++)
+                        {
+                            frame1[j] = *pRawFrame1++;
+                            frame2[j] = *pRawFrame2++;
+                        }
+
+                    }
+                }
+
+                int x = 0, y = 0;
+                UInt32 srcIdx1;
+                UInt32 srcIdx2;
+
+                Int32[,] imageData1 = imageData;
+                Int32[,] imageData2 = new Int32[binnedWidth, binnedHeight];
+
+                try
+                {
+                    for(x = 0; x < binnedWidth;x++)
+                    {
+                        for(y = 0; y < binnedHeight; y++)
+                        {
+                            imageData1[x,y] = -1;
+                            imageData2[x,y] = -1;
+                        }
+                    }
+
+#if false
+                    for(x=0;x<frame1.Length;x++)
+                    {
+                        frame1[x] = (UInt16)x;
+                        frame2[x] = (UInt16)x;
+                    }
+#endif                    
+
+                    srcIdx1=0;
+                    srcIdx2=0;
+
+                    for(y=0;y<binnedHeight;y += 2)
+                    {
+                        for(x=0;x<cameraBinnedWidth/4;x++)
+                        {
+                            if (y < 4)
+                            {
+                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], x, y+0));
+                            }
+                            imageData1[x,y+0]                        = frame1[srcIdx1++];
+                            imageData1[x+cameraBinnedWidth/4,y+0]    = frame1[srcIdx1++];
+                            imageData1[x+2*cameraBinnedWidth/4,y+0]  = frame2[srcIdx2++];
+                            imageData1[x+3*cameraBinnedWidth/4,y+0]  = frame2[srcIdx2++];
+                            if (y < 4)
+                            {
+                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], x, y+1));
+                            }
+                            imageData1[x,y+1]                        = frame1[srcIdx1++];
+                            imageData1[x+cameraBinnedWidth/4,y+1]    = frame1[srcIdx1++];
+                            imageData1[x+2*cameraBinnedWidth/4,y+1]  = frame2[srcIdx2++];
+                            imageData1[x+3*cameraBinnedWidth/4,y+1]  = frame2[srcIdx2++];
+                        }
+                    }
+
+                    srcIdx1=0;
+                    srcIdx2=0;
+
+                    for (x = 0; x < binnedWidth/2; x += 2)
+                    {
+                        for(y=0;y<binnedHeight/2;y += 1) // for(y=0;y<binnedHeight;y += 2)
+                        {
+                            if (x < 4 )
+                            {
+                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], 1*(2*x+0), binnedHeight-1-y));
+                            }
+                            Debug.Assert(imageData2[2*x+0, binnedHeight - 1 - y] == -1);
+                            imageData2[1*(2*x+0), binnedHeight - 1 - y] = frame1[srcIdx1++];
+                            srcIdx1++;
+                            if (x < 4)
+                            {
+                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], 1*(2*x+1), binnedHeight-1-y));
+                            }
+                            Debug.Assert(imageData2[2*x+1, binnedHeight - 1 - y] == -1);
+                            imageData2[1*(2*x+1), binnedHeight - 1 - y] = frame1[srcIdx1++];
+                            srcIdx1++;
+                        }
+                    }
+
+                    for(x=0;x<cameraBinnedWidth/4;x++)
+                    {
+                        for(y=0;y<cameraBinnedHeight;y++)
+                        {
+                            //Debug.Assert(imageData2[x, binnedHeight-1-y] == imageData1[y,x]);
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Write(String.Format("caught an exception processing M26 data x = {0}, y = {1} - {2}\n", x, y, ex.ToString()));
+                    throw ex;
+                }
+#else
+#if true
+                unsafe
+                {
+                    uint x=0, y=0;
+
+                    fixed(byte *pRaw1 = rawFrame1, pRaw2 = rawFrame2)
+                    {
+                        UInt16 *pRawFrame1 = (UInt16 *)pRaw1;
+                        UInt16 *pRawFrame2 = (UInt16 *)pRaw2;
+                        UInt32 srcIdx1=0, srcIdx2=0;
+
+                        try
+                        {
+                            for(y=0;y<binnedHeight;y += 2)
+                            {
+                                for(x=0;x<cameraBinnedWidth/4;x++)
+                                {
+                                    srcIdx1++;
+                                    imageData[x,y+0]    = pRawFrame1[srcIdx1++];
+                                    srcIdx1++;
+                                    imageData[x,y+1]    = pRawFrame1[srcIdx1++];
+                                }
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Write(String.Format("caught an exception processing M26 data x = {0}, y = {1} - {2}\n", x, y, ex.ToString()));
+                            throw ex;
+                        }
+                    }
+                }
+#else
                 unsafe
                 {
                     UInt16 [] outputData = new UInt16[(2616+1)*(3900+1)];
@@ -1630,7 +1811,10 @@ namespace sx
                         }
                     }
                 }
-            }
+#endif
+#endif
+#endif
+            } // end of M26
             else if (bytesPerPixel == 1 || bytesPerPixel == 2)
             {
                 Log.Write(String.Format("convertCameraDataToImageData() processing {0} bit {1} camera data\n", bitsPerPixel, interlaced?"interlaced":"progressive"));
