@@ -101,7 +101,6 @@
     </Compile>
     <Compile Include="GarbageCollection.cs" />
     <Compile Include="LocalServer.cs" />
-    <Compile Include="logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmMain.resx">
       <SubType>Designer</SubType>
@@ -150,6 +149,15 @@
     <Compile Include="UsbRoutines\sx_controller.cs" />
     <Compile Include="UsbRoutines\sx_usb.cs" />
     <Compile Include="UsbRoutines\sx_useDumped.cs" />
+    <Compile Include="generic.cs" />
+    <Compile Include="Guide0.cs" />
+    <Compile Include="Guide1.cs" />
+    <Compile Include="Main1.cs" />
+    <Compile Include="Main0.cs" />
+    <Compile Include="Main2.cs" />
+    <Compile Include="Main3.cs" />
+    <Compile Include="Main4.cs" />
+    <Compile Include="Main5.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ASCOM.png" />
@@ -207,6 +215,12 @@
       <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UsbRoutines\UsbRoutines.csproj">
+      <Project>{6D973A74-AE1F-4B00-96A5-7652120196AD}</Project>
+      <Name>UsbRoutines</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
