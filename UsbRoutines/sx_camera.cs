@@ -27,7 +27,6 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
 using Logging;
@@ -681,16 +680,16 @@ namespace sx
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
         }
 
-        internal Byte maxXBin
+        public Byte maxXBin
         {
             get;
-            set;
+            internal set;
         }
 
-        internal Byte maxYBin
+        public Byte maxYBin
         {
             get;
-            set;
+            internal set;
         }
 
         internal void checkParms(bool useCCDSizes, SX_READ_DELAYED_BLOCK exposure)

@@ -188,6 +188,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Logging\Logging.csproj">
+      <Project>{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}</Project>
+      <Name>Logging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UsbRoutines\UsbRoutines.csproj">
       <Project>{6D973A74-AE1F-4B00-96A5-7652120196AD}</Project>
       <Name>UsbRoutines</Name>

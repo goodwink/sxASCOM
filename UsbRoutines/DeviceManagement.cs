@@ -22,7 +22,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using System.Text.RegularExpressions;
 
 
@@ -34,6 +33,7 @@ namespace WinUsbDemo
 
     sealed internal partial class DeviceManagement
     {
+#if False
         ///  <summary>
         ///  Compares two device path names. Used to find out if the device name 
         ///  of a recently attached or removed device matches the name of a 
@@ -108,7 +108,7 @@ namespace WinUsbDemo
 
             return false;
         }
-
+#endif
         internal static void parsePath(string path, out UInt16 vid, out UInt16 pid)
         {
             // A sample path looks like:
