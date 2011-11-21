@@ -42,7 +42,6 @@ using System.Threading;
 using Logging;
 using System.Reflection;
 
-using sx;
 using ASCOM;
 
 namespace ASCOM.SXCamera

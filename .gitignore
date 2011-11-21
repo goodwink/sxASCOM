@@ -3,7 +3,6 @@ bin
 obj
 *.exe*
 *.suo
-*.user
 *.swp
 *~
 tags
