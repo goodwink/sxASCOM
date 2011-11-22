@@ -781,7 +781,15 @@ namespace sx
 
             dumpReadDelayedBlock(currentExposure.userRequested, "exposure as requested - before any adjustments");
 
-            checkParms(false, currentExposure.userRequested);
+            try
+            {
+                checkParms(false, currentExposure.userRequested);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(String.Format("checkParms of userRequested generated exception {0}\n", ex));
+                throw;
+            }
 
             currentExposure.toCamera = currentExposure.userRequested;
 

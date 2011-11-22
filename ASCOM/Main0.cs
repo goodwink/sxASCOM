@@ -98,13 +98,11 @@ namespace ASCOM.SXMain0
 
                     return dReturn;
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
         }
@@ -124,13 +122,11 @@ namespace ASCOM.SXMain0
 
                     return false;
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
         }
@@ -159,13 +155,11 @@ namespace ASCOM.SXMain0
 
                     return bReturn;
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
         }
@@ -189,13 +183,11 @@ namespace ASCOM.SXMain0
 
                     return bReturn;
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
         }
@@ -228,13 +220,11 @@ namespace ASCOM.SXMain0
 
                     return bReturn;
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
             set
@@ -251,13 +241,11 @@ namespace ASCOM.SXMain0
                     sxCamera.coolerEnabled = value;
                     Log.Write(String.Format("CoolerOn set to {0}\n", value));
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
         }
@@ -280,13 +268,11 @@ namespace ASCOM.SXMain0
 
                     throw new ASCOM.PropertyNotImplementedException(SetError(String.Format("Cooler Power Must throw exception if not supported.")), false);
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
         }
@@ -308,13 +294,11 @@ namespace ASCOM.SXMain0
 
                     throw new ASCOM.PropertyNotImplementedException(SetError("HeatSinkTemperature must throw exception if data unavailable"), true);
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
         }
@@ -346,13 +330,11 @@ namespace ASCOM.SXMain0
 
                     return dReturn;
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
             set
@@ -376,13 +358,11 @@ namespace ASCOM.SXMain0
 
                     sxCamera.coolerSetPoint = (UInt16) ((value * 10) + 2732);
                 }
-                catch (ASCOM.DriverException ex)
-                {
-                    throw ex;
-                }
                 catch (System.Exception ex)
                 {
-                    throw new ASCOM.DriverException(SetError("Unable to complete " + MethodBase.GetCurrentMethod().Name + " request"), ex);
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
                 }
             }
         }
