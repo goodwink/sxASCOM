@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // tabs=4
 // Copyright 2010-2010 by Dad Dog Development, Ltd
 //
@@ -398,6 +397,10 @@ namespace ASCOM.SXCamera
                 {
                     Log.Write(String.Format("GetUInt16 was unable to convert {0} -- caught exception {1}\n", str, ex));
                 }
+                catch (OverflowException ex)
+                {
+                    Log.Write(String.Format("GetUInt16 was unable to convert {0} -- caught exception {1}\n", str, ex));
+                }
             }
 
             return iRet;
@@ -417,6 +420,10 @@ namespace ASCOM.SXCamera
                 catch (FormatException ex)
                 {
                     Log.Write(String.Format("GetByte was unable to convert {0} -- caught exceptin {1}\n", str, ex));
+                }
+                catch (OverflowException ex)
+                {
+                    Log.Write(String.Format("GetUInt16 was unable to convert {0} -- caught exception {1}\n", str, ex));
                 }
             }
 
@@ -782,7 +789,13 @@ namespace ASCOM.SXCamera
                         catch (System.FormatException ex)
                         {
                             error = true;
-                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}", F.VID.Text, ex.ToString()));
+                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}\n", F.VID.Text, ex.ToString()));
+                            MessageBox.Show("An invalid VID was entered.  Value was not changed");
+                        }
+                        catch (OverflowException ex)
+                        {
+                            error = true;
+                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}\n", F.VID.Text, ex.ToString()));
                             MessageBox.Show("An invalid VID was entered.  Value was not changed");
                         }
 
@@ -793,8 +806,14 @@ namespace ASCOM.SXCamera
                         catch (System.FormatException ex)
                         {
                             error = true;
-                            Log.Write(String.Format("Caught an exception converting PID [{0}] to UInt16: {1}", F.PID.Text, ex.ToString()));
+                            Log.Write(String.Format("Caught an exception converting PID [{0}] to UInt16: {1}\n", F.PID.Text, ex.ToString()));
                             MessageBox.Show("An invalid PID was entered.  Value was not changed");
+                        }
+                        catch (OverflowException ex)
+                        {
+                            error = true;
+                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}\n", F.VID.Text, ex.ToString()));
+                            MessageBox.Show("An invalid VID was entered.  Value was not changed");
                         }
 
                         if (!error)
@@ -813,6 +832,7 @@ namespace ASCOM.SXCamera
             }
             catch (ASCOM.DriverException ex)
             {
+                Log.Write(String.Format("Unable to complete SetupDialog request - ex = {0}\n", ex.ToString()));
                 throw ex;
             }
             catch (System.Exception ex)

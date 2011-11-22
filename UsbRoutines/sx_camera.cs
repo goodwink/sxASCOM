@@ -1020,6 +1020,16 @@ namespace sx
 
             currentExposure.toCamera.width *= 2;
 
+            try
+            {
+                checkParms(false, currentExposure.userRequested);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(String.Format("checkParms of userRequested generated exception {0}\n", ex));
+                throw;
+            }
+
             // in order for this to work, the height must be even
 
             if (currentExposure.toCamera.height % 2 == 1)
