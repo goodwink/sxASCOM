@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "Logging\Logging.csproj", "{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsbRoutines", "UsbRoutines\UsbRoutines.csproj", "{6D973A74-AE1F-4B00-96A5-7652120196AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASCOM", "ASCOM\ASCOM.csproj", "{D2998653-2206-4026-8AB7-03D0189B4E36}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}.Debug|x86.ActiveCfg = Debug|x86
+		{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}.Debug|x86.Build.0 = Debug|x86
+		{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}.Release|x86.ActiveCfg = Release|Any CPU
+		{6D973A74-AE1F-4B00-96A5-7652120196AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D973A74-AE1F-4B00-96A5-7652120196AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D973A74-AE1F-4B00-96A5-7652120196AD}.Debug|x86.ActiveCfg = Debug|x86
+		{6D973A74-AE1F-4B00-96A5-7652120196AD}.Debug|x86.Build.0 = Debug|x86
+		{6D973A74-AE1F-4B00-96A5-7652120196AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D973A74-AE1F-4B00-96A5-7652120196AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D973A74-AE1F-4B00-96A5-7652120196AD}.Release|x86.ActiveCfg = Release|Any CPU
+		{D2998653-2206-4026-8AB7-03D0189B4E36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2998653-2206-4026-8AB7-03D0189B4E36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2998653-2206-4026-8AB7-03D0189B4E36}.Debug|x86.ActiveCfg = Debug|x86
+		{D2998653-2206-4026-8AB7-03D0189B4E36}.Debug|x86.Build.0 = Debug|x86
+		{D2998653-2206-4026-8AB7-03D0189B4E36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2998653-2206-4026-8AB7-03D0189B4E36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2998653-2206-4026-8AB7-03D0189B4E36}.Release|x86.ActiveCfg = Release|x86
+		{D2998653-2206-4026-8AB7-03D0189B4E36}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
