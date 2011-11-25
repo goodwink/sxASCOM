@@ -62,7 +62,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Optimize>false</Optimize>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -96,14 +96,15 @@
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.Designer.cs">
+    <Compile Include="frmMain.designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
     <Compile Include="GarbageCollection.cs" />
+    <Compile Include="Guide.cs" />
     <Compile Include="LocalServer.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmMain.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>frmMain.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -150,14 +151,6 @@
     <Compile Include="UsbRoutines\sx_usb.cs" />
     <Compile Include="UsbRoutines\sx_useDumped.cs" />
     <Compile Include="generic.cs" />
-    <Compile Include="Guide0.cs" />
-    <Compile Include="Guide1.cs" />
-    <Compile Include="Main1.cs" />
-    <Compile Include="Main0.cs" />
-    <Compile Include="Main2.cs" />
-    <Compile Include="Main3.cs" />
-    <Compile Include="Main4.cs" />
-    <Compile Include="Main5.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ASCOM.png" />
