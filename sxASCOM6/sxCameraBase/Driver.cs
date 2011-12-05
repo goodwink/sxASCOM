@@ -93,7 +93,7 @@ namespace ASCOM.sxCameraBase
         protected bool bLastErrorValid;
         protected string lastErrorMessage;
         protected bool bHasGuideCamera;
-        protected ASCOM.SXCamera.Configuration m_config;
+        protected ASCOM.sxCameraBase.Configuration m_config;
         private UInt16 m_vid, m_pid;
         private bool m_skip;
         // elminiate lots of log chatter
@@ -117,10 +117,10 @@ namespace ASCOM.sxCameraBase
                                 
                 m_cameraId = whichCamera;
                 m_lastLoggedConnected = true;
-                m_config = new ASCOM.SXCamera.Configuration(whichController, whichCamera);
+                m_config = new ASCOM.sxCameraBase.Configuration(whichController, whichCamera);
                 m_controller = ASCOM.StarlightXpress.SharedResources.controllers[whichController];
                 
-                if (m_config.selectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)
+                if (m_config.selectionMethod == ASCOM.sxCameraBase.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY)
                 {
                     m_vid = m_pid = 0;
                 }
@@ -129,7 +129,7 @@ namespace ASCOM.sxCameraBase
                     m_vid = m_config.VID;
                     m_pid = m_config.PID;
                 }
-                m_skip = (m_config.selectionMethod == ASCOM.SXCamera.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL);
+                m_skip = (m_config.selectionMethod == ASCOM.sxCameraBase.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL);
 
                 oCameraStateLock = new Object();
                 oGuideStateLock = new Object();
@@ -439,13 +439,7 @@ namespace ASCOM.sxCameraBase
 
         #region Implementation of ICameraV2
 
-        public void SetupDialog()
-        {
-            using (var f = new SetupDialogForm())
-            {
-                f.ShowDialog();
-            }
-        }
+        abstract public void SetupDialog();
 
         public string Action(string actionName, string actionParameters)
         {

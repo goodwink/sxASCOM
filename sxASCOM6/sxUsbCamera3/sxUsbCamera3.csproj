@@ -128,13 +128,17 @@
       <Project>{7669D0BC-6E58-4C8F-95A1-A371CABDBF08}</Project>
       <Name>sxCameraBase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\sxMainCameraBase\sxUsbCameraBase.csproj">
-      <Project>{86C890DA-93C2-4726-8958-5DB94D9F570D}</Project>
-      <Name>sxUsbCameraBase</Name>
-    </ProjectReference>
     <ProjectReference Include="..\LocalServer\LocalServer.csproj">
       <Project>{1D275833-C85C-430E-A974-48AA1FE5F654}</Project>
       <Name>LocalServer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sxLogging\sxLogging.csproj">
+      <Project>{EEB5E11E-BCAF-43ED-B972-2ACA1B753873}</Project>
+      <Name>sxLogging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sxUsbCameraBase\sxUsbCameraBase.csproj">
+      <Project>{86C890DA-93C2-4726-8958-5DB94D9F570D}</Project>
+      <Name>sxUsbCameraBase</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

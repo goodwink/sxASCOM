@@ -27,6 +27,8 @@ using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
 using System.Globalization;
 
+using Logging;
+
 namespace ASCOM.GuideCamera2
 {
     //
@@ -48,15 +50,24 @@ namespace ASCOM.GuideCamera2
         // Driver ID and descriptive string that shows in the Chooser
         //
         private static string driverId = null;
+        private const UInt16 DEFAULT_CONTROLLER_NUMBER = 1;
+        private const UInt16 DEFAULT_CAMERAID = 1;
         #endregion
 
         //
         // Constructor - Must be public for COM registration!
         //
-        public Camera()
+        protected Camera(UInt16 controllerNumber, UInt16 cameraId) :
+            base(controllerNumber, cameraId)
         {
             driverId = Marshal.GenerateProgIdForType(this.GetType());
-            // TODO Add your constructor code
+            Log.Write(String.Format("Guide::Camera({0}, {1}) executing\n", controllerNumber, cameraId));
+        }
+
+        public Camera() :
+            this(DEFAULT_CONTROLLER_NUMBER, DEFAULT_CAMERAID)
+        {
+            Log.Write("Camera(): sxGuideCamera2");
         }
     }
 }

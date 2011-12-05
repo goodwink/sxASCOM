@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ASCOM.StarlightXpress</RootNamespace>
-    <AssemblyName>ASCOM.GenericGuideCamera.Camera</AssemblyName>
+    <AssemblyName>ASCOM.sxGuideCameraBase.Camera</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -124,13 +124,17 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LocalServer\LocalServer.csproj">
+      <Project>{1D275833-C85C-430E-A974-48AA1FE5F654}</Project>
+      <Name>LocalServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\sxCameraBase\sxCameraBase.csproj">
       <Project>{7669D0BC-6E58-4C8F-95A1-A371CABDBF08}</Project>
       <Name>sxCameraBase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LocalServer\LocalServer.csproj">
-      <Project>{1D275833-C85C-430E-A974-48AA1FE5F654}</Project>
-      <Name>LocalServer</Name>
+    <ProjectReference Include="..\sxLogging\sxLogging.csproj">
+      <Project>{EEB5E11E-BCAF-43ED-B972-2ACA1B753873}</Project>
+      <Name>sxLogging</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

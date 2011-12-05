@@ -111,13 +111,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Logging\sxLogging.csproj">
-      <Project>{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}</Project>
-      <Name>sxLogging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UsbRoutines\sxFirmware.csproj">
+    <ProjectReference Include="..\sxFirmware\sxFirmware.csproj">
       <Project>{6D973A74-AE1F-4B00-96A5-7652120196AD}</Project>
       <Name>sxFirmware</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sxLogging\sxLogging.csproj">
+      <Project>{EEB5E11E-BCAF-43ED-B972-2ACA1B753873}</Project>
+      <Name>sxLogging</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
