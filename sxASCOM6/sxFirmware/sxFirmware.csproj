@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
     <AssemblyName>sxUSBRoutines</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <RootNamespace>sx</RootNamespace>
     <TargetFrameworkSubset>
@@ -55,6 +55,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Acknowlegements.cs" />
@@ -72,13 +75,16 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Logging\Logging.csproj">
+    <ProjectReference Include="..\Logging\sxLogging.csproj">
       <Project>{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}</Project>
-      <Name>Logging</Name>
+      <Name>sxLogging</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(TargetPath)" "$(SolutionDir)\LocalServer\$(OutDir)\$(TargetFileName)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
