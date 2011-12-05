@@ -25,7 +25,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
-using WinUsbDemo;
+
 using Logging;
 
 namespace sx

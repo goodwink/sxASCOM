@@ -136,6 +136,10 @@
       <Project>{FB074451-1F94-4937-825A-9B8DA596CDB2}</Project>
       <Name>sxGuideCameraBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\sxLogging\sxLogging.csproj">
+      <Project>{EEB5E11E-BCAF-43ED-B972-2ACA1B753873}</Project>
+      <Name>sxLogging</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

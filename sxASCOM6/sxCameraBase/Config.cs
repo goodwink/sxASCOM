@@ -27,7 +27,7 @@ using ASCOM.Utilities;
 
 using Logging;
 
-namespace ASCOM.SXCamera
+namespace ASCOM.sxCameraBase
 {
     public class Configuration
     {
@@ -343,9 +343,7 @@ namespace ASCOM.SXCamera
             set { SetString(KEY_MAX_Y_BIN, value.ToString()); }
         }
 
-
-
-
+#if false
         /// <summary>
         /// Launches a configuration dialog box for the driver.  The call will not return
         /// until the user clicks OK or cancel manually.
@@ -366,169 +364,7 @@ namespace ASCOM.SXCamera
             }
         }
 
-        private void guideCameraSetupDialog()
-        {
-            MessageBox.Show(String.Format("There are no configurable settings for guide cameras.  All configuration is done from the main camera's configuration screen."));
-        }
 
-        private void mainCameraSetupDialog()
-        {
-            try
-            {
-                Log.Write(String.Format("SetupDialog, description = {0}\n", description));
-
-                SetupDialogForm F = new SetupDialogForm();
-
-                F.EnableLoggingCheckBox.Checked = enableLogging;
-                F.EnableUntestedCheckBox.Checked = enableUntested;
-                F.secondsAreMiliseconds.Checked = secondsAreMilliseconds;
-                F.dumpDataEnabled.Checked = dumpDataEnabled;
-                F.Version.Text = String.Format("Version: {0}", SharedResources.versionNumber);
-
-                F.selectionAllowAny.Checked = false;
-                F.selectionExactModel.Checked = false;
-                F.selectionExcludeModel.Checked = false;
-                F.VID.Text = VID.ToString();
-                F.PID.Text = PID.ToString();
-
-                F.vidLabel.Visible = true;
-                F.pidLabel.Visible = true;
-                F.VID.Visible = true;
-                F.PID.Visible = true;
-
-                switch (selectionMethod)
-                {
-                    case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY:
-                        F.selectionAllowAny.Checked = true;
-                        F.vidLabel.Visible = false;
-                        F.pidLabel.Visible = false;
-                        F.VID.Visible = false;
-                        F.PID.Visible = false;
-                        break;
-                    case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL:
-                        F.selectionExactModel.Checked = true;
-                        break;
-                    case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL:
-                        F.selectionExcludeModel.Checked = true;
-                        break;
-                    default:
-                        throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", selectionMethod));
-                }
-
-                F.advancedUSBParmsEnabled.Checked = false;
-                F.usbGroup.Enabled = false;
-
-                if (symetricBinning)
-                {
-                    F.symetricBinning.Checked = true;
-                    F.binLabel.Text = "Max Bin";
-                    F.xBinLabel.Visible = false;
-                    F.maxXBin.Visible = false;
-                }
-                else
-                {
-                    F.symetricBinning.Checked = false;
-                    F.binLabel.Text = "Max Y Bin";
-                    F.xBinLabel.Visible = true;
-                    F.maxXBin.Visible = true;
-                }
-
-                F.maxXBin.Value  = maxXBin;
-                F.maxYBin.Value  = maxYBin;
-
-                // some cameras cannot bin.  Don't allow the binning to be
-                // selected.
-                if (DEFAULT_VALUES[m_whichController].maxXBin == 1)
-                {
-                    F.binGroup.Enabled = false;
-                }
-
-                if (F.ShowDialog() == DialogResult.OK)
-                {
-                    Log.Write("ShowDialog returned OK - saving parameters\n");
-
-                    enableLogging = F.EnableLoggingCheckBox.Checked;
-                    enableUntested = F.EnableUntestedCheckBox.Checked;
-                    secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
-                    dumpDataEnabled = F.dumpDataEnabled.Checked;
-
-                    if (F.selectionAllowAny.Checked)
-                    {
-                        selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY;
-                    }
-                    else
-                    {
-                        bool error = false;
-                        try
-                        {
-                            VID = Convert.ToUInt16(F.VID.Text);
-                        }
-                        catch (System.FormatException ex)
-                        {
-                            error = true;
-                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}\n", F.VID.Text, ex.ToString()));
-                            MessageBox.Show("An invalid VID was entered.  Value was not changed");
-                        }
-                        catch (OverflowException ex)
-                        {
-                            error = true;
-                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}\n", F.VID.Text, ex.ToString()));
-                            MessageBox.Show("An invalid VID was entered.  Value was not changed");
-                        }
-
-                        try
-                        {
-                            PID = Convert.ToUInt16(F.PID.Text);
-                        }
-                        catch (System.FormatException ex)
-                        {
-                            error = true;
-                            Log.Write(String.Format("Caught an exception converting PID [{0}] to UInt16: {1}\n", F.PID.Text, ex.ToString()));
-                            MessageBox.Show("An invalid PID was entered.  Value was not changed");
-                        }
-                        catch (OverflowException ex)
-                        {
-                            error = true;
-                            Log.Write(String.Format("Caught an exception converting VID [{0}] to UInt16: {1}\n", F.VID.Text, ex.ToString()));
-                            MessageBox.Show("An invalid VID was entered.  Value was not changed");
-                        }
-
-                        if (!error)
-                        {
-                            if (F.selectionExactModel.Checked)
-                            {
-                                selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL;
-                            }
-                            else
-                            {
-                                selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL;
-                            }
-                        }
-                    }
-
-                    symetricBinning = F.symetricBinning.Checked;
-                    maxYBin = (byte)F.maxYBin.Value;
-
-                    if (symetricBinning)
-                    {
-                        maxXBin = maxYBin;
-                    }
-                    else
-                    {
-                        maxXBin = (byte)F.maxXBin.Value;
-                    }
-                }
-            }
-            catch (ASCOM.DriverException ex)
-            {
-                Log.Write(String.Format("Unable to complete SetupDialog request - ex = {0}\n", ex.ToString()));
-                throw ex;
-            }
-            catch (System.Exception ex)
-            {
-                Log.Write(String.Format("Unable to complete SetupDialog request - ex = {0}\n", ex.ToString()));
-                throw ex;
-            }
-        }
+#endif
     }
 }

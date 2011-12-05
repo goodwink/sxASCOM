@@ -13,6 +13,8 @@
     <RootNamespace>sx</RootNamespace>
     <TargetFrameworkSubset>
     </TargetFrameworkSubset>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>sxFirmware.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -64,6 +66,7 @@
     <Compile Include="DeviceManagement.cs" />
     <Compile Include="DeviceManagementApi.cs" />
     <Compile Include="FileIOApi.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="sx_base.cs" />
     <Compile Include="sx_camera.cs" />
     <Compile Include="sx_controller.cs" />
@@ -73,10 +76,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="sxFirmware.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Logging\sxLogging.csproj">
-      <Project>{7DC210D8-06B0-4719-B8EA-C0810C4A68DC}</Project>
+    <ProjectReference Include="..\sxLogging\sxLogging.csproj">
+      <Project>{EEB5E11E-BCAF-43ED-B972-2ACA1B753873}</Project>
       <Name>sxLogging</Name>
     </ProjectReference>
   </ItemGroup>

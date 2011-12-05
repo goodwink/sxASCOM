@@ -27,6 +27,8 @@ using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
 using System.Globalization;
 
+using Logging;
+
 namespace ASCOM.UsbCamera1
 {
     //
@@ -45,15 +47,25 @@ namespace ASCOM.UsbCamera1
     {
         #region Camera Constants
         private static string driverId;
+        private const UInt16 DEFAULT_CONTROLLER_NUMBER = 0;
+        private const UInt16 DEFAULT_CAMERA_ID = 0;
         #endregion
 
         //
         // Constructor - Must be public for COM registration!
         //
-        public Camera()
+
+        protected Camera(UInt16 controllerNumber, UInt16 cameraId) :
+            base(controllerNumber, cameraId)
         {
             driverId = Marshal.GenerateProgIdForType(this.GetType());
-            // TODO Add your constructor code
+            Log.Write(String.Format("sxUsbCamera::Camera({0}, {1}) executing\n", controllerNumber, cameraId));
+        }
+
+        public Camera() :
+            this(DEFAULT_CONTROLLER_NUMBER, DEFAULT_CAMERA_ID)
+        {
+            Log.Write("Camera(): sxUsbCamera1");
         }
     }
 }

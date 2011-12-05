@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ASCOM.GenericMainCamera</RootNamespace>
-    <AssemblyName>ASCOM.GenericMainCamera.Camera</AssemblyName>
+    <AssemblyName>ASCOM.sxUsbCameraBase.Camera</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -131,6 +131,14 @@
     <ProjectReference Include="..\LocalServer\LocalServer.csproj">
       <Project>{1D275833-C85C-430E-A974-48AA1FE5F654}</Project>
       <Name>LocalServer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sxFirmware\sxFirmware.csproj">
+      <Project>{6D973A74-AE1F-4B00-96A5-7652120196AD}</Project>
+      <Name>sxFirmware</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\sxLogging\sxLogging.csproj">
+      <Project>{EEB5E11E-BCAF-43ED-B972-2ACA1B753873}</Project>
+      <Name>sxLogging</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
