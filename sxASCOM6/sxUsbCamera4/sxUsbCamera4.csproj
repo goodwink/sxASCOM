@@ -80,12 +80,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="SetupDialogForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="SetupDialogForm.designer.cs">
-      <DependentUpon>SetupDialogForm.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -93,17 +87,11 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SetupDialogForm.resx">
-      <DependentUpon>SetupDialogForm.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="Camera.snk" />
-    <None Include="Test.js" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ASCOM.png" />
     <Content Include="ReadMe.htm" />
   </ItemGroup>
   <ItemGroup>
