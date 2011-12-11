@@ -8,7 +8,7 @@
     <ProjectGuid>{86C890DA-93C2-4726-8958-5DB94D9F570D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ASCOM.GenericMainCamera</RootNamespace>
+    <RootNamespace>ASCOM.sxUsbCameraBase</RootNamespace>
     <AssemblyName>ASCOM.sxUsbCameraBase.Camera</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
@@ -100,7 +100,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Camera.snk" />
-    <None Include="Test.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ASCOM.png" />

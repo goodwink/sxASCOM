@@ -25,6 +25,7 @@ using System.Collections;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 using ASCOM.DeviceInterface;
 using ASCOM.Utilities;
@@ -53,53 +54,63 @@ namespace ASCOM.sxUsbCameraBase
 
         override public void SetupDialog()
         {
-#if false
             try
             {
-                Log.Write(String.Format("SetupDialog, description = {0}\n", description));
+                Log.Write(String.Format("SetupDialog, description = {0}\n", m_config.description));
 
                 SetupDialogForm F = new SetupDialogForm();
 
-                F.EnableLoggingCheckBox.Checked = enableLogging;
-                F.EnableUntestedCheckBox.Checked = enableUntested;
-                F.secondsAreMiliseconds.Checked = secondsAreMilliseconds;
-                F.dumpDataEnabled.Checked = dumpDataEnabled;
-                F.Version.Text = String.Format("Version: {0}", SharedResources.versionNumber);
+                F.EnableLoggingCheckBox.Checked = m_config.enableLogging;
+                F.EnableUntestedCheckBox.Checked = m_config.enableUntested;
+                F.secondsAreMiliseconds.Checked = m_config.secondsAreMilliseconds;
+                F.dumpDataEnabled.Checked = m_config.dumpDataEnabled;
+                F.Version.Text = String.Format("Version: {0}", ASCOM.StarlightXpress.SharedResources.versionNumber);
 
                 F.selectionAllowAny.Checked = false;
                 F.selectionExactModel.Checked = false;
                 F.selectionExcludeModel.Checked = false;
-                F.VID.Text = VID.ToString();
-                F.PID.Text = PID.ToString();
+                F.VID.Text = m_config.VID.ToString();
+                F.PID.Text = m_config.PID.ToString();
 
                 F.vidLabel.Visible = true;
                 F.pidLabel.Visible = true;
                 F.VID.Visible = true;
                 F.PID.Visible = true;
 
-                switch (selectionMethod)
+                switch (m_config.selectionMethod)
                 {
-                    case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY:
+                    case ASCOM.sxCameraBase.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY:
                         F.selectionAllowAny.Checked = true;
                         F.vidLabel.Visible = false;
                         F.pidLabel.Visible = false;
                         F.VID.Visible = false;
                         F.PID.Visible = false;
                         break;
-                    case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL:
+                    case ASCOM.sxCameraBase.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL:
                         F.selectionExactModel.Checked = true;
                         break;
-                    case CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL:
+                    case ASCOM.sxCameraBase.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL:
                         F.selectionExcludeModel.Checked = true;
                         break;
                     default:
-                        throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", selectionMethod));
+                        throw new System.Exception(String.Format("Unknown Camera Selection Method {0} in SetupDialog", m_config.selectionMethod));
                 }
 
                 F.advancedUSBParmsEnabled.Checked = false;
                 F.usbGroup.Enabled = false;
 
-                if (symetricBinning)
+                // some cameras cannot bin.  
+                // If this camera can't bin, disble the binGroup so binning cannot be modified.
+                if (m_config.maxXBin > 1)
+                {
+                    F.binGroup.Enabled = true;
+                }
+                else
+                {
+                    F.binGroup.Enabled = false;
+                }
+
+                if (m_config.symetricBinning)
                 {
                     F.symetricBinning.Checked = true;
                     F.binLabel.Text = "Max Bin";
@@ -114,35 +125,28 @@ namespace ASCOM.sxUsbCameraBase
                     F.maxXBin.Visible = true;
                 }
 
-                F.maxXBin.Value  = maxXBin;
-                F.maxYBin.Value  = maxYBin;
-
-                // some cameras cannot bin.  Don't allow the binning to be
-                // selected.
-                if (DEFAULT_VALUES[m_whichController].maxXBin == 1)
-                {
-                    F.binGroup.Enabled = false;
-                }
+                F.maxXBin.Value  = m_config.maxXBin;
+                F.maxYBin.Value  = m_config.maxYBin;
 
                 if (F.ShowDialog() == DialogResult.OK)
                 {
                     Log.Write("ShowDialog returned OK - saving parameters\n");
 
-                    enableLogging = F.EnableLoggingCheckBox.Checked;
-                    enableUntested = F.EnableUntestedCheckBox.Checked;
-                    secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
-                    dumpDataEnabled = F.dumpDataEnabled.Checked;
+                    m_config.enableLogging = F.EnableLoggingCheckBox.Checked;
+                    m_config.enableUntested = F.EnableUntestedCheckBox.Checked;
+                    m_config.secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
+                    m_config.dumpDataEnabled = F.dumpDataEnabled.Checked;
 
                     if (F.selectionAllowAny.Checked)
                     {
-                        selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY;
+                        m_config.selectionMethod = ASCOM.sxCameraBase.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY;
                     }
                     else
                     {
                         bool error = false;
                         try
                         {
-                            VID = Convert.ToUInt16(F.VID.Text);
+                            m_config.VID = Convert.ToUInt16(F.VID.Text);
                         }
                         catch (System.FormatException ex)
                         {
@@ -159,7 +163,7 @@ namespace ASCOM.sxUsbCameraBase
 
                         try
                         {
-                            PID = Convert.ToUInt16(F.PID.Text);
+                            m_config.PID = Convert.ToUInt16(F.PID.Text);
                         }
                         catch (System.FormatException ex)
                         {
@@ -178,39 +182,33 @@ namespace ASCOM.sxUsbCameraBase
                         {
                             if (F.selectionExactModel.Checked)
                             {
-                                selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL;
+                                m_config.selectionMethod = ASCOM.sxCameraBase.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL;
                             }
                             else
                             {
-                                selectionMethod = Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL;
+                                m_config.selectionMethod = ASCOM.sxCameraBase.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL;
                             }
                         }
                     }
 
-                    symetricBinning = F.symetricBinning.Checked;
-                    maxYBin = (byte)F.maxYBin.Value;
+                    m_config.symetricBinning = F.symetricBinning.Checked;
+                    m_config.maxYBin = (byte)F.maxYBin.Value;
 
-                    if (symetricBinning)
+                    if (m_config.symetricBinning)
                     {
-                        maxXBin = maxYBin;
+                        m_config.maxXBin = m_config.maxYBin;
                     }
                     else
                     {
-                        maxXBin = (byte)F.maxXBin.Value;
+                        m_config.maxXBin = (byte)F.maxXBin.Value;
                     }
                 }
-            }
-            catch (ASCOM.DriverException ex)
-            {
-                Log.Write(String.Format("Unable to complete SetupDialog request - ex = {0}\n", ex.ToString()));
-                throw ex;
             }
             catch (System.Exception ex)
             {
                 Log.Write(String.Format("Unable to complete SetupDialog request - ex = {0}\n", ex.ToString()));
                 throw ex;
             }
-#endif
         }
 
         override public double CCDTemperature

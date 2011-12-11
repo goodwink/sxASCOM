@@ -59,12 +59,5 @@ namespace ASCOM.StarlightXpress.Properties {
                 resourceCulture = value;
             }
         }
-        
-        internal static System.Drawing.Bitmap ASCOM {
-            get {
-                object obj = ResourceManager.GetObject("ASCOM", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
     }
 }

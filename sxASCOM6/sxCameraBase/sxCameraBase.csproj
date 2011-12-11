@@ -101,7 +101,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Camera.snk" />
-    <None Include="Test.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ASCOM.png" />

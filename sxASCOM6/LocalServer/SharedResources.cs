@@ -66,6 +66,7 @@ namespace ASCOM.StarlightXpress
 
             for(int i=0;i<maxControllers;i++)
             {
+                Log.Write(String.Format("SharedResources() constructing controller {0}", i));
                 controllers[i] = new sx.Controller(m_lock);
             }
 
