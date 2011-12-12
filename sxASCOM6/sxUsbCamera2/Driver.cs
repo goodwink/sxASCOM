@@ -40,7 +40,7 @@ namespace ASCOM.UsbCamera2
     //
     [Guid("f93602ec-c025-442b-ba94-9441cb59a535")]
     [ServedClassName("UsbCamera2 Camera")]
-    [ProgId("ASCOM.UsbCamera2.Camera")]
+    [ProgId("ASCOM.sxUsbCamera2.Camera")]
     [ClassInterface(ClassInterfaceType.None)]
     [ComVisible(true)]
     public class Camera : ASCOM.sxUsbCameraBase.Camera

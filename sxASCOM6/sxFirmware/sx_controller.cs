@@ -139,14 +139,16 @@ namespace sx
                 this.Lock = Lock;
             }
 
+            m_iface = new USBInterface();
+
             Log.Write("Controller(): returns\n");
         }
 
         public void connect(UInt16 vid, UInt16 pid, bool skip)
         {
-            Log.Write(String.Format("controller.connect({0}, {1}, {2})\n", vid, pid, skip));
+            Log.Write(String.Format("controller.connect()"));
 
-            m_iface = new USBInterface(vid, pid, skip);
+            m_iface.connect(vid, pid, skip);
 
             Connected = true;
 
@@ -155,6 +157,15 @@ namespace sx
             getParams(ref m_ccdParms);
 
             Log.Write("controller.connect(): returns\n");
+        }
+
+        public void disconnect()
+        {
+            Log.Write(String.Format("controller.disconnect()"));
+
+            Connected = false;
+
+            m_iface.disconnect();
         }
 
         internal void buildCommandBlock(out SX_CMD_BLOCK block, Byte cmd_type, Byte cmd, UInt16 cmd_value, UInt16 index, UInt16 cmd_length)

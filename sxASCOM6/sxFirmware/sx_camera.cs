@@ -21,7 +21,7 @@
 // For more information please contact bretm@daddog.com
 
 //#define INTERLACED_DEBUG
-#define USE_DUMPED_DATA
+//#define USE_DUMPED_DATA
 
 using System;
 using System.IO;
@@ -621,7 +621,7 @@ namespace sx
         public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, bool bDump)
         {
             Log.Write(String.Format("sx.Camera() constructor: controller={0} cameraIdx={1}\n", controller, cameraIdx));
-            Log.Write(String.Format("m_useDumped=", m_useDumped));
+            Log.Write(String.Format("m_useDumped={0}", m_useDumped));
             idx = cameraIdx;
 
             m_controller = controller;
