@@ -706,6 +706,7 @@ namespace ASCOM.sxCameraBase
                     }
                     else
                     {
+                        m_controller.disconnect();
                         sxCamera = null;
                         m_Connected = false;
                     }

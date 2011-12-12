@@ -137,7 +137,7 @@ namespace ASCOM.sxCameraBase
             // Note that this picks main camera configuraitons for guide cameras too - 
             // there are currently no configuration values for guide cameras
             
-            m_driverId = "ASCOM.SXMain" + whichController.ToString() + "." + DEVICE_TYPE;
+            m_driverId = "ASCOM.sxUsbCamera" + whichController.ToString() + "." + DEVICE_TYPE;
 
             Log.Write(String.Format("Configuration() computes driverId={0}\n", m_driverId));
 

@@ -40,7 +40,7 @@ namespace ASCOM.GuideCamera2
     //
     [Guid("674fb492-5179-4226-bdc8-ae73da014209")]
     [ServedClassName("GuideCamera2 Camera")]
-    [ProgId("ASCOM.GuideCamera2.Camera")]
+    [ProgId("ASCOM.sxGuideCamera2.Camera")]
     [ClassInterface(ClassInterfaceType.None)]
     [ComVisible(true)]
     public class Camera : ASCOM.sxGuideCameraBase.Camera

@@ -166,6 +166,8 @@ namespace sx
 
             m_iface.connect(vid, pid, skip);
 
+            Connected = true;
+
             reset();
             firmwareVersion = getVersion();
             getParams(ref m_ccdParms);
@@ -176,6 +178,8 @@ namespace sx
         public void disconnect()
         {
             Log.Write(String.Format("controller.disconnect()"));
+
+            Connected = false;
 
             m_iface.disconnect();
         }

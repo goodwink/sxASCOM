@@ -52,6 +52,7 @@ namespace sx
         internal SafeFileHandle deviceHandle;
         internal string devicePathName;
         internal DeviceManagement myDeviceManagement = new WinUsbDemo.DeviceManagement();
+        internal bool m_connected = false;
 
         // Mutex
         internal Mutex m_mutex;
@@ -83,9 +84,10 @@ namespace sx
             internal set;
         }
 
+
         public void connect(UInt16 vid, UInt16 pid, bool skip)
         {
-            if (connected)
+            if (m_connected)
             {
                 Log.Write(String.Format("USBInterface.connect() for already connected interface - vid{0}, pid={1}, skip={2}) begins\n", vid, pid, skip));
             }
@@ -165,6 +167,7 @@ namespace sx
                             if (FileIO.GetDeviceHandle(devicePathName, out deviceHandle))
                             {
                                 Log.Write(String.Format("USBInterface.connect(): deviceHandle.IsInvalid={0}\n", deviceHandle.IsInvalid));
+
                                 connected = true;
                                 vid = foundVid;
                                 pid = foundPid;
