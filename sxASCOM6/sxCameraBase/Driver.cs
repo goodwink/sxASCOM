@@ -752,7 +752,16 @@ namespace ASCOM.sxCameraBase
 
         public string DriverInfo
         {
-            get { throw new PropertyNotImplementedException("DriverInfo", false); }
+            get 
+            { 
+                return "sxASCOM Driver version " + ASCOM.StarlightXpress.SharedResources.versionNumber + "\r\n" +
+                       "Copyright (C) 2011, 2012 Dad Dog Developtment Ltd\r\n" +
+                       "Author: Bret McKee <bretm@daddog.com>\r\n" +
+                       "\r\n" +
+                       "This work is licensed under the Creative Commons Attribution-No Derivative Works 3.0 License.\r\n" +
+                       "To view a copy of this license, visit http://creativecommons.org/licenses/by-nd/3.0/ or\r\n" +
+                       "send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.\r\n";
+            }
         }
 
         public string DriverVersion
@@ -771,7 +780,10 @@ namespace ASCOM.sxCameraBase
 
         public string Name
         {
-            get { throw new PropertyNotImplementedException("Name", false); }
+            get
+            {
+                return "sxASCOM";
+            }
         }
 
         public ArrayList SupportedActions
@@ -1208,7 +1220,7 @@ namespace ASCOM.sxCameraBase
                     {
                         if (state == CameraStates.cameraError)
                         {
-                                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request due to previous error\n", MethodBase.GetCurrentMethod().Name)));
+                                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request due to previous error", MethodBase.GetCurrentMethod().Name)));
                         }
                     }
 
@@ -1588,17 +1600,73 @@ namespace ASCOM.sxCameraBase
 
         public short BayerOffsetX
         {
-            get { throw new PropertyNotImplementedException("BayerOffsetX", false); }
+            get
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (sxCamera.isMonochrome)
+                    {
+                        throw new ASCOM.InvalidValueException("BayerOffsetX is undefined for monochrome cameras");
+                    }
+                    Log.Write(String.Format("sxCameraBase::BayerOffsetX get returns hard coded 0"));
+
+                    return 0;
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public short BayerOffsetY
         {
-            get { throw new PropertyNotImplementedException("BayerOffsetY", false); }
+            get 
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (sxCamera.isMonochrome)
+                    {
+                        throw new ASCOM.InvalidValueException("BayerOffsetY is undefined for monochrome cameras");
+                    }
+                    Log.Write(String.Format("sxCameraBase::BayerOffsetY get returns hard coded 0"));
+
+                    return 0;
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public bool CanFastReadout
         {
-            get { throw new PropertyNotImplementedException("CanFastReadout", false); }
+            get 
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    Log.Write(String.Format("sxCameraBase::CanFastReadout get returns hard coded false"));
+
+                    return false;
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public double ExposureMax
@@ -1613,34 +1681,153 @@ namespace ASCOM.sxCameraBase
 
         public double ExposureResolution
         {
-            get { throw new PropertyNotImplementedException("ExposureResolution", false); }
+            get { return 0.001; }
         }
 
         public bool FastReadout
         {
-            get { throw new PropertyNotImplementedException("FastReadout", false); }
-            set { throw new PropertyNotImplementedException("FastReadout", true); }
+            get 
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::FastReadout Get must throw and exception if CanFastReadout returns false";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, false); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
+            set
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::FastReadout Set must throw and exception if CanFastReadout returns false";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, true); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public short Gain
         {
-            get { throw new PropertyNotImplementedException("Gain", false); }
-            set { throw new PropertyNotImplementedException("Gain", true); }
+            get
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::Gain get throws an exception because gain is not supported";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, false); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
+            set
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::Gain set throws an exception because gain is not supported";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, true); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public short GainMax
         {
-            get { throw new PropertyNotImplementedException("GainMax", false); }
+            get 
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::GainMax throws an exception because gain is not supported";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, false); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public short GainMin
         {
-            get { throw new PropertyNotImplementedException("GainMin", false); }
+            get
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::GainMin throws an exception because gain is not supported";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, false); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public ArrayList Gains
         {
-            get { throw new PropertyNotImplementedException("Gains", false); }
+            get
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::Gains throws an exception because gain is not supported";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, false); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public short PercentCompleted
@@ -1650,22 +1837,125 @@ namespace ASCOM.sxCameraBase
 
         public short ReadoutMode
         {
-            get { throw new PropertyNotImplementedException("ReadoutMode", false); }
+            get
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::ReadoutMode get throws an exception because readoutmodes are not supported";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, false); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
+            set
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::ReadoutMode set throws an exception because readoutmodes are not supported";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, true); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public ArrayList ReadoutModes
         {
-            get { throw new PropertyNotImplementedException("ReadoutModes", false); }
+            get
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string msg = "sxCameraBase::ReadoutModes throws an exception because readoutmodes are not supported";
+                    Log.Write(msg);
+
+                    throw new PropertyNotImplementedException(msg, false); 
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public string SensorName
         {
-            get { throw new PropertyNotImplementedException("SensorName", false); }
+            get
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    string ret = sxCamera.sensorName;
+
+                    Log.Write("SensorName get returns " + ret);
+
+                    return ret;
+
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         public SensorType SensorType
         {
-            get { throw new PropertyNotImplementedException("SensorType", false); }
+            get
+            {
+                try
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    SensorType ret;
+
+                    if (sxCamera.isMonochrome)
+                    {
+                        ret = SensorType.Monochrome;
+                    }
+                    else if (sxCamera.isRGGB)
+                    {
+                        ret = SensorType.RGGB;
+                    }
+                    else
+                    {
+                        throw new ASCOM.DriverException(SetError(String.Format("SensorType get was unable to determine sensor type")));
+                    }
+
+                    Log.Write(String.Format("SensorType get returns {0}", ret));
+
+                    return ret;
+
+                }
+                catch (System.Exception ex)
+                {
+                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
+                    Log.Write(msg);
+                    throw ex;
+                }
+            }
         }
 
         #endregion

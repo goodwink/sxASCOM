@@ -318,7 +318,7 @@ namespace sx
             }
             Log.Write("getVersion has unlocked\n");
 
-            Log.Write(String.Format("getVersion() returns {0}\n", ver));
+            Log.Write(String.Format("getVersion() returns 0x{0:x}\n", ver));
 
             return ver;
         }

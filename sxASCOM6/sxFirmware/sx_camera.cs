@@ -187,6 +187,26 @@ namespace sx
             }
         }
 
+        public string sensorName
+        {
+            get;
+            internal set;
+        }
+
+        public bool isMonochrome
+        {
+            get;
+            internal set;
+        }
+
+        public bool isRGGB
+        {
+            get
+            {
+                return ! isMonochrome;
+            }
+        }
+
         public Byte hFrontPorch
         {
             get { return ccdParms.hfront_porch; }
@@ -454,6 +474,8 @@ namespace sx
         // - fullWellCapacity
         // - electronsPerADU
         // - progressive
+        // - sensorName
+        // - isMonochrome
         private void setInfo(bool bAllowUntested)
         {
             bool bUntested = false;
@@ -471,6 +493,8 @@ namespace sx
             // Most cameras can use software timing, so default is false
             mustUseHardwareTimer = false;
 
+            // sensorName is new for ASCOM v6, and for lots of cameras I don't know it
+
             switch ((CameraModels)cameraModel)
             {
                 case CameraModels.MODEL_H5:
@@ -479,6 +503,8 @@ namespace sx
                     fullWellCapacity = 30000;
                     electronsPerADU = 0.40;
                     progressive = true;
+                    sensorName = "ICX424AL";
+                    isMonochrome = true;
                     break;
 #if false
 // I don't know if this is progressive or interlaced
@@ -494,18 +520,24 @@ namespace sx
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
                     progressive = true;
+                    sensorName = "ICX285AL";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H9C:
                     description = "H9C";
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
                     progressive = true;
+                    sensorName = "ICX285AK";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_H16:
                     description = "H16";
                     fullWellCapacity = 40000;
                     electronsPerADU = 0.6;
                     progressive = true;
+                    sensorName = "KAI4022M";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H35:
                     bUntested = true;
@@ -513,6 +545,8 @@ namespace sx
                     fullWellCapacity = 50000;
                     electronsPerADU = 0.9;
                     progressive = true;
+                    sensorName = "KAI-11002";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H36:
                     bUntested = true;
@@ -520,12 +554,16 @@ namespace sx
                     fullWellCapacity = 30000;
                     electronsPerADU = 0.4;
                     progressive = true;
+                    sensorName = "KAI-16000";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_COSTAR:
                     description = "CoStar";
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
                     progressive = true;
+                    sensorName = "ICX429AK";
+                    isMonochrome = false;
                     maxXBin = 1;
                     maxYBin = 1;
                     mustUseHardwareTimer = true;
@@ -536,12 +574,16 @@ namespace sx
                     fullWellCapacity = 50000;
                     electronsPerADU = 0.9;
                     progressive = false;
+                    sensorName = "ICX429AL";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_M25C:
                     description = "M25C";
                     fullWellCapacity = 25000;
                     electronsPerADU = 0.40;
                     progressive = true;
+                    sensorName = "ICX453AQ";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_M26C:
                     bUntested = true;
@@ -549,6 +591,8 @@ namespace sx
                     fullWellCapacity = 25000;
                     electronsPerADU = 0.30;
                     progressive = false;
+                    sensorName = "ICX493AQA";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_MX5:
                     bUntested = true;
@@ -556,6 +600,8 @@ namespace sx
                     fullWellCapacity = 60000;
                     electronsPerADU = 1.0;
                     progressive = false;
+                    sensorName = "ICX405AL";
+                    isMonochrome = true;
                     maxXBin = 1;
                     maxYBin = 1;
                     break;
@@ -565,6 +611,8 @@ namespace sx
                     fullWellCapacity = 60000;
                     electronsPerADU = 1.0;
                     progressive = false;
+                    sensorName = "ICX405AK";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_MX7:
                     bUntested = true;
@@ -572,6 +620,8 @@ namespace sx
                     fullWellCapacity = 70000;
                     electronsPerADU = 1.3;
                     progressive = false;
+                    sensorName = "ICX429AL";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_MX7C:
                     bUntested = true;
@@ -579,6 +629,8 @@ namespace sx
                     fullWellCapacity = 70000;
                     electronsPerADU = 1.3;
                     progressive = false;
+                    sensorName = "ICX429AK";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_MX8C:
                     bUntested = true;
@@ -586,6 +638,8 @@ namespace sx
                     fullWellCapacity = 10000;
                     electronsPerADU = 1.0;
                     progressive = false;
+                    sensorName = "ICX406AQ";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_MX9:
                     bUntested = true;
@@ -593,6 +647,8 @@ namespace sx
                     fullWellCapacity = 100000;
                     electronsPerADU = 2.0;
                     progressive = false;
+                    sensorName = "UNKNOWN";
+                    isMonochrome = true;
                     break;
                 default:
                     bUntested = true;
@@ -603,6 +659,9 @@ namespace sx
                     // switch statement, and I expect most new models will be 
                     // progressive
                     progressive = true;
+                    sensorName = "UNKNOWN";
+                    // another guess
+                    isMonochrome = true;
                     break;
             }
 
