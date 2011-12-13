@@ -702,6 +702,8 @@ namespace sx
                     fullWellCapacity = 25000;
                     electronsPerADU = 0.30;
                     progressive = false;
+                    sensorName = "ICX493AQA";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_MX5:
                     bUntested = true;
