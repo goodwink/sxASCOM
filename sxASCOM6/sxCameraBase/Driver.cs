@@ -1606,6 +1606,8 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
+                    throw new PropertyNotImplementedException("BayerOffsetX is not implemented"); 
+#if false
                     if (sxCamera.isMonochrome)
                     {
                         throw new ASCOM.InvalidValueException("BayerOffsetX is undefined for monochrome cameras");
@@ -1613,6 +1615,7 @@ namespace ASCOM.sxCameraBase
                     Log.Write(String.Format("sxCameraBase::BayerOffsetX get returns hard coded 0"));
 
                     return 0;
+#endif
                 }
                 catch (System.Exception ex)
                 {
@@ -1631,6 +1634,8 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
+                    throw new PropertyNotImplementedException("BayerOffsetX is not implemented"); 
+#if false
                     if (sxCamera.isMonochrome)
                     {
                         throw new ASCOM.InvalidValueException("BayerOffsetY is undefined for monochrome cameras");
@@ -1638,6 +1643,7 @@ namespace ASCOM.sxCameraBase
                     Log.Write(String.Format("sxCameraBase::BayerOffsetY get returns hard coded 0"));
 
                     return 0;
+#endif
                 }
                 catch (System.Exception ex)
                 {
@@ -1929,6 +1935,9 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
+                    throw new PropertyNotImplementedException("SensorType is not implemented");
+#if false
+
                     SensorType ret;
 
                     if (sxCamera.isMonochrome)
@@ -1947,6 +1956,7 @@ namespace ASCOM.sxCameraBase
                     Log.Write(String.Format("SensorType get returns {0}", ret));
 
                     return ret;
+#endif
 
                 }
                 catch (System.Exception ex)
