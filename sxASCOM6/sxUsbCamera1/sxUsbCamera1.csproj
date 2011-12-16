@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ASCOM.StarlightXpress</RootNamespace>
-    <AssemblyName>ASCOM.MainCamera1.Camera</AssemblyName>
+    <AssemblyName>ASCOM.sxUsbCamera1.Camera</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>

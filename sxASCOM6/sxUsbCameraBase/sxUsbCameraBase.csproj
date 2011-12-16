@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ASCOM.sxUsbCameraBase</RootNamespace>
-    <AssemblyName>ASCOM.sxUsbCameraBase.Camera</AssemblyName>
+    <AssemblyName>sxUsbCameraBase</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
