@@ -29,7 +29,7 @@ using System.Globalization;
 
 using Logging;
 
-namespace ASCOM.GuideCamera2
+namespace ASCOM.sxGuideCamera2
 {
     //
     // Your driver's ID is ASCOM.GuideCamera2.Camera

@@ -6,15 +6,15 @@
 ;#define EXPIRATION "2013/04/15"
 #define EXPIRATION "0"
 #define APP_VERSION "6.0.0.0"
-#define ASCOM_VERSION_REQUIRED  "6.0"
-#define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
+#define ASCOM_VERSION_REQUIRED_MAJOR  "6"
+#define ASCOM_VERSION_REQUIRED_MINOR  "0"
 
 [Setup]
 AppId=sxASCOM
 AppName=ASCOM SX Camera Driver
 AppVerName=ASCOM SX Camera Driver {#APP_VERSION}
 AppPublisher=Bret McKee <bretm@daddog.com>
-AppPublisherURL=http://www.daddog.com/ascom/sx/index.html
+AppPublisherURL=http://www.daddog.com/ascom/sxcamera
 AppVersion={#APP_VERSION}
 AppSupportURL=http://tech.groups.yahoo.com/group/ASCOM-Talk/
 AppUpdatesURL=http://ascom-standards.org/
@@ -200,6 +200,7 @@ function InitializeSetup(): Boolean;
 var
    H : Variant;
    H2 : Variant;
+   U : Variant;
    P  : Variant;
 begin
     Result := FALSE;  // Assume failure
@@ -216,13 +217,17 @@ begin
         except
             RaiseException('Unable to locate DriverHelper2.Util - is the ASCOM Platform correctly installed?');
         end;
-
-        if ((MajorVersion(H2.PlatformVersion) < MajorVersion('{#ASCOM_VERSION_REQUIRED}')) or
-            ((MajorVersion(H2.PlatformVersion) = MajorVersion('{#ASCOM_VERSION_REQUIRED}')) and 
-             (MinorVersion(H2.PlatformVersion) < MinorVersion('{#ASCOM_VERSION_REQUIRED}'))))
+        
+        try
+            U := CreateOLEObject('ASCOM.Utilities.Util');
+        except
+            MsgBox('The ASCOM Utilities object has failed to load, this indicates that the ASCOM Platform has not been installed correctly', mbInformation, MB_OK);
+        end;
+        
+        if (not U.IsMinimumRequiredVersion({#ASCOM_VERSION_REQUIRED_MAJOR},{#ASCOM_VERSION_REQUIRED_MINOR}))
         then
             begin
-                MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED} or greater is required for this driver.', mbInformation, MB_OK);
+                MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED_MAJOR}.{#ASCOM_VERSION_REQUIRED_MINOR} or greater is required for this driver.', mbInformation, MB_OK);
             end
         else
             begin
@@ -245,14 +250,14 @@ begin
 
                 // see if there is still a version installed.  If so, it must require manual removal
 
-                if P.IsRegistered('ASCOM.SXMain0.Camera') or 
-                   P.IsRegistered('ASCOM.SXMain1.Camera') or 
-                   P.IsRegistered('ASCOM.SXMain2.Camera') or 
-                   P.IsRegistered('ASCOM.SXMain3.Camera') or 
-                   P.IsRegistered('ASCOM.SXMain4.Camera') or 
-                   P.IsRegistered('ASCOM.SXMain5.Camera') or 
-                   P.IsRegistered('ASCOM.SXGuide0.Camera') or
-                   P.IsRegistered('ASCOM.SXGuide1.Camera')
+                if P.IsRegistered('ASCOM.sxUsbCamera1.Camera') or 
+                 P.IsRegistered('ASCOM.sxUsbCamera2.Camera') or 
+                 P.IsRegistered('ASCOM.sxUsbCamera3.Camera') or 
+                 P.IsRegistered('ASCOM.sxUsbCamera4.Camera') or 
+                 P.IsRegistered('ASCOM.sxUsbCamera5.Camera') or 
+                 P.IsRegistered('ASCOM.sxUsbCamera6.Camera') or 
+                 P.IsRegistered('ASCOM.sxGuideCamera1.Camera') or
+                 P.IsRegistered('ASCOM.sxGuideCamera1.Camera')
                 then
                     begin
                         MsgBox('A previous version of this driver that cannot be automatically removed was detected. You must uninstall the previous version from the control panel before installation can proceed.', mbInformation, MB_OK);

@@ -29,7 +29,7 @@ using System.Globalization;
 
 using Logging;
 
-namespace ASCOM.UsbCamera4
+namespace ASCOM.sxUsbCamera4
 {
     //
     // Your driver's ID is ASCOM.UsbCamera4.Camera
