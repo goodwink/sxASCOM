@@ -294,8 +294,8 @@ namespace ASCOM.StarlightXpress
             try { Process.Start(si); }
             catch (System.ComponentModel.Win32Exception)
             {
-                MessageBox.Show("The StarlightXpress was not " + (arg == "/register" ? "registered" : "unregistered") +
-                    " because you did not allow it.", "StarlightXpress", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("The StarlightXpress ASCOM Driver was not " + (arg == "/register" ? "registered" : "unregistered") +
+                    " because you did not allow it.", "StarlightXpress ASCOM Driver", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
@@ -315,16 +315,91 @@ namespace ASCOM.StarlightXpress
         // adds DCOM info for the local server itself, so it can be activated
         // via an outboiud connection from TheSky.
         //
-        private static void RegisterObjects()
+        private static void RegisterObjects(string [] args)
         {
             if (!IsAdministrator)
             {
-                ElevateSelf("/register");
+                string arg = null;
+                foreach (string a in args)
+                {
+                    if (arg == null)
+                        arg = a;
+                    else
+                        arg += " " + a;
+                }
+                ElevateSelf(arg);
                 return;
             }
             //
             // If reached here, we're running elevated
             //
+
+            bool registerMain1 = false;
+            bool registerMain2 = false;
+
+            bool registerLodeStar1 = false;
+            bool registerLodeStar2 = false;
+
+            bool registerCoStar1 = false;
+            bool registerCoStar2 = false;
+
+            bool registerAutoGuide0 = false;
+            bool registerAutoGuide1 = false;
+
+            foreach (string opt in args)
+            {
+                switch (opt.ToLower())
+                {
+                    case "-lodestar":
+                    case "/lodestar":
+                        registerLodeStar1 = true;
+                        break;
+                    case "-lodestar2":
+                    case "/lodestar2":
+                        registerLodeStar1 = true;
+                        registerLodeStar2 = true;
+                        break;
+                    case "-costar":
+                    case "/costar":
+                        registerCoStar1 = true;
+                        break;
+                    case "-costar2":
+                    case "/costar2":
+                        registerCoStar1 = true;
+                        registerCoStar2 = true;
+                        break;
+                    case "-main":
+                    case "/main":
+                        registerMain1 = true;
+                        break;
+                    case "-main2":
+                    case "/main2":
+                        registerMain1 = true;
+                        registerMain2 = true;
+                        break;
+                    case "-autoguide":
+                    case "/autoguide":
+                        registerAutoGuide0 = true;
+                        break;
+                    case "-autoguide2":
+                    case "/autoguide2":
+                        registerAutoGuide0 = true;
+                        registerAutoGuide1 = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (registerAutoGuide0 && !registerMain1)
+            {
+                registerAutoGuide0 = false;
+            }
+
+            if (registerAutoGuide1 && !registerMain2)
+            {
+                registerAutoGuide1 = false;
+            }
 
             Assembly assy = Assembly.GetExecutingAssembly();
             Attribute attr = Attribute.GetCustomAttribute(assy, typeof(AssemblyTitleAttribute));
@@ -371,69 +446,159 @@ namespace ASCOM.StarlightXpress
             foreach (Type type in s_ComObjectTypes)
             {
                 bool bFail = false;
-                try
-                {
-                    //
-                    // HKCR\CLSID\clsid
-                    //
-                    string clsid = Marshal.GenerateGuidForType(type).ToString("B");
-                    string progid = Marshal.GenerateProgIdForType(type);
-                    //PWGS Generate device type from the Class name
-                    string deviceType = type.Name;
+                bool registerThisOne = false;
+                string chooserName = null;
 
-                    using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(string.Format("CLSID\\{0}", clsid)))
-                    {
-                        key.SetValue(null, progid);						// Could be assyTitle/Desc??, but .NET components show ProgId here
-                        key.SetValue("AppId", s_appId);
-                        using (RegistryKey key2 = key.CreateSubKey("Implemented Categories"))
+                switch (type.ToString().ToLower())
+                {
+                    case "ascom.sxusbcamera1.camera":
+                        registerThisOne = registerMain1;
+                        if (registerMain2)
                         {
-                            key2.CreateSubKey("{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}");
+                            chooserName = "Starlight Xpress Main Camera #1";
                         }
-                        using (RegistryKey key2 = key.CreateSubKey("ProgId"))
+                        else
                         {
-                            key2.SetValue(null, progid);
+                            chooserName = "Starlight Xpress Main Camera";
                         }
-                        key.CreateSubKey("Programmable");
-                        using (RegistryKey key2 = key.CreateSubKey("LocalServer32"))
+                        break;
+                    case "ascom.sxusbcamera2.camera":
+                        registerThisOne = registerMain2;
+                        chooserName = "Starlight Xpress Main Camera #2";
+                        break;
+                    case "ascom.sxusbcamera3.camera":
+                        if (registerLodeStar1)
                         {
-                            key2.SetValue(null, Application.ExecutablePath);
+                            registerThisOne = true;
+                            if (registerLodeStar2)
+                            {
+                                chooserName = "Starlight Xpress Lodestar Guider #1";
+                            }
+                            else
+                            {
+                                chooserName = "Starlight Xpress Lodestar Guider";
+                            }
                         }
-                    }
-                    //
-                    // HKCR\CLSID\progid
-                    //
-                    using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(progid))
-                    {
-                        key.SetValue(null, assyTitle);
-                        using (RegistryKey key2 = key.CreateSubKey("CLSID"))
+                        break;
+                    case "ascom.sxusbcamera4.camera":
+                        if (registerLodeStar2)
                         {
-                            key2.SetValue(null, clsid);
+                            registerThisOne = true;
+                            chooserName = "Starlight Xpress Lodestar Guider #2";
                         }
-                    }
-                    //
-                    // ASCOM 
-                    //
-                    assy = type.Assembly;
+                        break;
+                    case "ascom.sxusbcamera5.camera":
+                        if (registerCoStar1)
+                        {
+                            registerThisOne = true;
+                            if (registerCoStar2)
+                            {
+                                chooserName = "Starlight Xpress CoStar Guider #1";
+                            }
+                            else
+                            {
+                                chooserName = "Starlight Xpress CoStar Guider";
+                            }
+                        }
+                        break;
+                    case "ascom.sxusbcamera6.camera":
+                        if (registerCoStar2)
+                        {
+                            registerThisOne = true;
+                            chooserName = "Starlight Xpress CoStar Guider #2";
+                        }
+                        break;
+                    case "ascom.sxguidecamera1.camera":
+                        registerThisOne = registerAutoGuide0;
+                        if (registerAutoGuide1)
+                        {
+                            chooserName = "Starlight Xpress Autoguide Camera #1";
+                        }
+                        else
+                        {
+                            chooserName = "Starlight Xpress Autoguide Camera";
+                        }
+                        break;
+                    case "ascom.sxguidecamera2.camera":
+                        registerThisOne = registerAutoGuide1;
+                        chooserName = "Starlight Xpress Autoguide Camera #2";
+                        break;
+                    default:
+                        break;
+                }
 
-                    // Pull the display name from the ServedClassName attribute.
-                    attr = Attribute.GetCustomAttribute(type, typeof(ASCOM.ServedClassNameAttribute)); //PWGS Changed to search type for attribute rather than assembly
-                    string chooserName = ((ASCOM.ServedClassNameAttribute)attr).DisplayName ?? "MultiServer";
-                    using (var P = new ASCOM.Utilities.Profile())
+                if (registerThisOne)
+                {
+                    try
                     {
-                        P.DeviceType = deviceType;
-                        P.Register(progid, chooserName);
+                        //
+                        // HKCR\CLSID\clsid
+                        //
+                        string clsid = Marshal.GenerateGuidForType(type).ToString("B");
+                        string progid = Marshal.GenerateProgIdForType(type);
+                        //PWGS Generate device type from the Class name
+                        string deviceType = type.Name;
+
+                        using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(string.Format("CLSID\\{0}", clsid)))
+                        {
+                            key.SetValue(null, progid);						// Could be assyTitle/Desc??, but .NET components show ProgId here
+                            key.SetValue("AppId", s_appId);
+                            using (RegistryKey key2 = key.CreateSubKey("Implemented Categories"))
+                            {
+                                key2.CreateSubKey("{62C8FE65-4EBB-45e7-B440-6E39B2CDBF29}");
+                            }
+                            using (RegistryKey key2 = key.CreateSubKey("ProgId"))
+                            {
+                                key2.SetValue(null, progid);
+                            }
+                            key.CreateSubKey("Programmable");
+                            using (RegistryKey key2 = key.CreateSubKey("LocalServer32"))
+                            {
+                                key2.SetValue(null, Application.ExecutablePath);
+                            }
+                        }
+                        //
+                        // HKCR\CLSID\progid
+                        //
+                        using (RegistryKey key = Registry.ClassesRoot.CreateSubKey(progid))
+                        {
+                            key.SetValue(null, assyTitle);
+                            using (RegistryKey key2 = key.CreateSubKey("CLSID"))
+                            {
+                                key2.SetValue(null, clsid);
+                            }
+                        }
+                        //
+                        // ASCOM 
+                        //
+                        assy = type.Assembly;
+
+#if true
+                        // this is a fine looking bit of code, but right now sxASCOM doesn't use it - the name is 
+                        // selected above based on the assembly name.  This is mostly because we are being
+                        // fancy and adding #1 to the name only if there are two
+#else
+                        // Pull the display name from the ServedClassName attribute.
+                        attr = Attribute.GetCustomAttribute(type, typeof(ASCOM.ServedClassNameAttribute)); //PWGS Changed to search type for attribute rather than assembly
+                        string chooserName = ((ASCOM.ServedClassNameAttribute)attr).DisplayName ?? "MultiServer";
+#endif
+                        using (var P = new ASCOM.Utilities.Profile())
+                        {
+                            P.DeviceType = deviceType;
+                            P.Register(progid, chooserName);
+                        }
                     }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error while registering the server:\n" + ex.ToString(),
+                                "StarlightXpress", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                        bFail = true;
+                    }
+                    finally
+                    {
+                    }
+                    if (bFail) break;
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error while registering the server:\n" + ex.ToString(),
-                            "StarlightXpress", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                    bFail = true;
-                }
-                finally
-                {
-                }
-                if (bFail) break;
             }
         }
 
@@ -557,7 +722,7 @@ namespace ASCOM.StarlightXpress
                     case "/register":
                     case "-regserver":											// Emulate VB6
                     case "/regserver":
-                        RegisterObjects();										// Register each served object
+                        RegisterObjects(args);									// Register each served object
                         bRet = false;
                         break;
 

@@ -5,13 +5,14 @@
 
 #define BUILD_TYPE "Debug"
 #define APP_VERSION "2.2.0.5"
-#define ASCOM_VERSION_REQUIRED  "5.5"
+#define ASCOM_VERSION_REQUIRED_MAJOR  6
+#define ASCOM_VERSION_REQUIRED_MINOR  0
 
 [Setup]
 AppName=ASCOM SX Camera Driver
 AppVerName=ASCOM SX Camera Driver {#APP_VERSION}
 AppPublisher=Bret McKee <bretm@daddog.com>
-AppPublisherURL=http://www.daddog.com/ascom/sx/index.html
+AppPublisherURL=http://www.daddog.com/ascom/sxcamera
 AppVersion={#APP_VERSION}
 AppSupportURL=http://tech.groups.yahoo.com/group/ASCOM-Talk/
 AppUpdatesURL=http://ascom-standards.org/
@@ -80,66 +81,6 @@ var
   GuideCameraPage: TInputOptionWizardPage;
   GuideCamerasPage: TInputOptionWizardPage;
 
-// Convert the version number.  I have had problems with 
-// internatioalization, so I had to write this function.  
-// The problem was that this line:
-// if (H2.PlatformVersion >= {#ASCOM_VERSION_REQUIRED})
-// was raising an exception.  The Platform version is not
-// internationlaized, and when used with the language set to
-// one that requires a comma instead of a period as the 
-// decimal point seperator (french was the language that 
-// caught it...)
-
-function MajorVersion(VersionString : String) : LongWord;
-var 
-    Accumulated : LongWord;
-    Index : Integer;
-    c : char;
-begin
-    Accumulated := 0;
-
-    for Index := 1 to Length(VersionString)
-    do
-        begin
-            c := VersionString[Index];
-
-            if ((c >= '0') and ( c <= '9'))
-            then
-                begin
-                    Accumulated := Accumulated * 10 + Ord(c) - Ord('0');
-                end
-            else
-                break;
-        end
-
-    Result := Accumulated;
-end;
-
-function MinorVersion(VersionString : String) : LongWord;
-var 
-    Accumulated : LongWord;
-    Index : Integer;
-    c : char;
-begin
-    Accumulated := 0;
-
-    for Index := 1 to Length(VersionString)
-    do
-        begin
-            c := VersionString[Index];
-
-            if ((c >= '0') and ( c <= '9'))
-            then
-                begin
-                    Accumulated := Accumulated * 10 + Ord(c) - Ord('0');
-                end
-            else
-                Accumulated := 0; // reset the accumulated when we hit a non-digit
-        end
-
-    Result := Accumulated;
-end;
-
 //
 // Before the installer UI appears, verify that the (prerequisite)
 // ASCOM Platform 5 or greater is installed, including both Helper
@@ -149,6 +90,7 @@ function InitializeSetup(): Boolean;
 var
    H : Variant;
    H2 : Variant;
+   U : Variant;
    P  : Variant;
 begin
     Result := FALSE;  // Assume failure
@@ -165,13 +107,17 @@ begin
         except
             RaiseException('Unable to locate DriverHelper2.Util - is the ASCOM Platform correctly installed?');
         end;
-
-        if ((MajorVersion(H2.PlatformVersion) < MajorVersion('{#ASCOM_VERSION_REQUIRED}')) or
-            ((MajorVersion(H2.PlatformVersion) = MajorVersion('{#ASCOM_VERSION_REQUIRED}')) and 
-             (MinorVersion(H2.PlatformVersion) < MinorVersion('{#ASCOM_VERSION_REQUIRED}'))))
+        
+        try
+            U := CreateOLEObject('ASCOM.Utilities.Util');
+        except
+            MsgBox('The ASCOM Utilities object has failed to load, this indicates that the ASCOM Platform has not been installed correctly', mbInformation, MB_OK);
+        end;
+        
+        if (not U.IsMinimumRequiredVersion({#ASCOM_VERSION_REQUIRED_MAJOR},{#ASCOM_VERSION_REQUIRED_MINOR}))
         then
             begin
-                MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED} or greater is required for this driver.', mbInformation, MB_OK);
+                MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED_MAJOR}.{#ASCOM_VERSION_REQUIRED_MINOR} or greater is required for this driver.', mbInformation, MB_OK);
             end
         else
             begin
@@ -184,14 +130,14 @@ begin
 
             P.DeviceType := 'Camera';
 
-            if P.IsRegistered('ASCOM.SXMain0.Camera') or 
-               P.IsRegistered('ASCOM.SXMain1.Camera') or 
-               P.IsRegistered('ASCOM.SXMain2.Camera') or 
-               P.IsRegistered('ASCOM.SXMain3.Camera') or 
-               P.IsRegistered('ASCOM.SXMain4.Camera') or 
-               P.IsRegistered('ASCOM.SXMain5.Camera') or 
-               P.IsRegistered('ASCOM.SXGuide0.Camera') or
-               P.IsRegistered('ASCOM.SXGuide1.Camera')
+            if P.IsRegistered('ASCOM.sxUsbCamera1.Camera') or 
+               P.IsRegistered('ASCOM.sxUsbCamera2.Camera') or 
+               P.IsRegistered('ASCOM.sxUsbCamera3.Camera') or 
+               P.IsRegistered('ASCOM.sxUsbCamera4.Camera') or 
+               P.IsRegistered('ASCOM.sxUsbCamera5.Camera') or 
+               P.IsRegistered('ASCOM.sxUsbCamera6.Camera') or 
+               P.IsRegistered('ASCOM.sxGuideCamera1.Camera') or
+               P.IsRegistered('ASCOM.sxGuideCamera1.Camera')
             then
                 begin
                     MsgBox('A previous version of this driver was detected. You must uninstall the previous version (from the control panel) before installation can proceed.', mbInformation, MB_OK);
