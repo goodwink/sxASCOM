@@ -27,6 +27,7 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
 using Logging;
@@ -141,11 +142,12 @@ namespace sx
         private UInt16 idx;
         private SX_COOLER_BLOCK m_coolerBlock;
         private bool m_dump = false;
-#if USE_DUMPED_DATA
-        public static bool m_useDumped = true;
-#else
-        public static bool m_useDumped = false;
-#endif
+
+        private bool m_useDumped
+        {
+            get;
+            set;
+        }
 
         // Properties
 
@@ -677,13 +679,35 @@ namespace sx
              }
         }
 
-        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, bool bDump)
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested):
+            this(controller, cameraIdx, bAllowUntested, false, null)
+        {
+        }
+
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, bool bDump) :
+            this(controller, cameraIdx, bAllowUntested, bDump, null)
+        {
+        }
+
+
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, string dumpedModelName) :
+            this(controller, cameraIdx, bAllowUntested, false, dumpedModelName)
+        {
+        }
+
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, bool bDump, string dumpedModelName)
         {
             Log.Write(String.Format("sx.Camera() constructor: controller={0} cameraIdx={1}\n", controller, cameraIdx));
-            Log.Write(String.Format("m_useDumped={0}", m_useDumped));
+            Log.Write(String.Format("dumpedModelName={0}", dumpedModelName));
             idx = cameraIdx;
 
             m_controller = controller;
+
+            if (dumpedModelName != null)
+            {
+                m_useDumped = true;
+                setupDump(dumpedModelName);
+            }
 
             if (m_useDumped)
             {

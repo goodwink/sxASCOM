@@ -25,6 +25,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
+
 using WinUsbDemo;
 using Logging;
 
@@ -34,9 +35,15 @@ namespace sx
     public partial class Camera
         : sxBase
     {
-        private int dump_cameraModel = 90;
-        private string dumpedPath = @"C:\Users\bretm\Astronomy\src\sxASCOM\dumped_data\m26c\";
-        //private string dumpedPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + @"\";
+        private string m_dumpedModelName;
+        private string m_dumpedPath;
+
+        private void setupDump(string dumpedModelName)
+        {
+            m_dumpedModelName = dumpedModelName;
+            m_dumpedPath = dumpedModelName.Substring(0,dumpedModelName.LastIndexOf('\\')+1);
+            Log.Write(String.Format("for dumpedModelName={0} dumpedPath={1}", dumpedModelName, m_dumpedPath));
+        }
 
         private object getDumpedObject(BinaryReader binReader, Type objectType)
         {
@@ -65,10 +72,10 @@ namespace sx
         {
             try
             {
-                using (BinaryReader binReader = new BinaryReader(File.Open(dumpedPath + String.Format("ascom-sx-{0}.model", dump_cameraModel) , FileMode.Open)))
+                using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedModelName, FileMode.Open)))
                 {
                      cameraModel = binReader.ReadUInt16();
-                     Log.Write(String.Format("undumped cameraModel={0}\n", cameraModel));
+                     Log.Write(String.Format("getModelDumped() cameraModel={0}\n", cameraModel));
                 }
             }
             catch (System.Exception ex)
@@ -81,7 +88,7 @@ namespace sx
         {
             try
             {
-                using (BinaryReader binReader = new BinaryReader(File.Open(dumpedPath + String.Format("ascom-sx-{0}.parms", dump_cameraModel) , FileMode.Open)))
+                using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.parms", cameraModel) , FileMode.Open)))
                 {
                     ccdParms = (SX_CCD_PARAMS)getDumpedObject(binReader, typeof(SX_CCD_PARAMS));
                 }
@@ -96,12 +103,12 @@ namespace sx
         {
             try
             {
-                using (BinaryReader binReader = new BinaryReader(File.Open(dumpedPath + String.Format("ascom-sx-{0}.exposure", dump_cameraModel) , FileMode.Open)))
+                using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.exposure", cameraModel) , FileMode.Open)))
                 {
                     currentExposure = (EXPOSURE_INFO)getDumpedObject(binReader, typeof(EXPOSURE_INFO));
-                    dumpReadDelayedBlock(currentExposure.userRequested, "undumped exposure as requested");
-                    dumpReadDelayedBlock(currentExposure.toCamera, "undumped exposure toCamera");
-                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "undumped exposure as toCameraSecond");
+                    dumpReadDelayedBlock(currentExposure.userRequested, "getDumpedExposure() read userRequested");
+                    dumpReadDelayedBlock(currentExposure.toCamera, "getDumpedExposure() read toCamera");
+                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "getDumpedExposure() read toCameraSecond");
 
                 }
             }
@@ -128,7 +135,7 @@ namespace sx
                 rawFrame1 = new byte[binnedWidth*binnedHeight*bytesPerPixel];
                 try
                 {
-                    using (BinaryReader binReader = new BinaryReader(File.Open(dumpedPath + String.Format("ascom-sx-{0}.frame1.raw", dump_cameraModel) , FileMode.Open)))
+                    using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.frame1.raw", cameraModel) , FileMode.Open)))
                     {
                         binReader.Read(rawFrame1, 0, rawFrame1.Length);
                         Log.Write(String.Format("undumped {0} bytes into rawFrame1\n", rawFrame1.Length));
@@ -142,7 +149,7 @@ namespace sx
 
                         rawFrame2 = new byte[binnedWidth*binnedHeight*bytesPerPixel];
 
-                        using (BinaryReader binReader = new BinaryReader(File.Open(dumpedPath + String.Format("ascom-sx-{0}.frame1.raw", dump_cameraModel) , FileMode.Open)))
+                        using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.frame1.raw", cameraModel) , FileMode.Open)))
                         {
                             binReader.Read(rawFrame2, 0, rawFrame2.Length);
                             Log.Write(String.Format("undumped {0} bytes into rawFrame2\n", rawFrame2.Length));
