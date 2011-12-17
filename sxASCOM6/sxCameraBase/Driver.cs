@@ -557,12 +557,6 @@ namespace ASCOM.sxCameraBase
             {
                 Log.Write(String.Format("sxCameraBase::StartExposure({0}, {1}) begins\n", duration, light));
 
-                if (m_config.secondsAreMilliseconds)
-                {
-                    duration /= 1000;
-                    Log.Write(String.Format("sxCameraBase::StartExposure(): after secondsAreMilliseconds adjustment, duration={0}\n", duration));
-                }
-
                 // because of timing accuracy, we do all short exposures with the HW timer
                 if (duration <= 1.1)
                 {
@@ -647,7 +641,7 @@ namespace ASCOM.sxCameraBase
                     if (value)
                     {
 #if DEBUG
-                        if (DateTime.Now.CompareTo(new DateTime(2012,01,15)) > 0)
+                        if (DateTime.Now.CompareTo(new DateTime(2012, 01, 15)) > 0)
                         {
                             MessageBox.Show("This debug release has expired.  Please update your bits", "Expired");
                             throw new ASCOM.PropertyNotImplementedException(SetError("connected: non-production release expired"), true);
@@ -662,20 +656,32 @@ namespace ASCOM.sxCameraBase
                         try
                         {
                             Log.Write(String.Format("m_controller.Connected={0}\n", m_controller.Connected));
-                            if (!m_controller.Connected && !sx.Camera.m_useDumped)
+
+                            if (!m_controller.Connected && !m_config.bUseDumpedData)
                             {
-                                try
+                                m_controller.connect(m_vid, m_pid, m_skip);
+                            }
+
+                            if (m_config.bUseDumpedData)
+                            {
+                                OpenFileDialog dlg = new OpenFileDialog();
+
+                                dlg.ValidateNames = true;
+                                dlg.Multiselect = false;
+                                dlg.Title = "Select a dumped model file";
+
+                                if (dlg.ShowDialog(ASCOM.StarlightXpress.StarlightXpress.s_MainForm) == DialogResult.OK)
                                 {
-                                    m_controller.connect(m_vid, m_pid, m_skip);
+                                    sxCamera = new sx.Camera(m_controller, m_cameraId, m_config.enableUntested, dlg.FileName);
                                 }
-                                catch (System.Exception ex)
+                                else
                                 {
-                                    String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
-                                    Log.Write(msg);
-                                    throw ex;
                                 }
                             }
-                            sxCamera = new sx.Camera(m_controller, m_cameraId, m_config.enableUntested, m_config.dumpDataEnabled);
+                            else
+                            {
+                                sxCamera = new sx.Camera(m_controller, m_cameraId, m_config.enableUntested, m_config.bDumpData);
+                            }
                             m_Connected = true;
                             // set properties to defaults. These all talk to the camera, and having them here saves
                             // a lot of try/catch blocks in other places

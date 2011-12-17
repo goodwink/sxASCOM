@@ -62,8 +62,8 @@ namespace ASCOM.sxUsbCameraBase
 
                 F.EnableLoggingCheckBox.Checked = m_config.enableLogging;
                 F.EnableUntestedCheckBox.Checked = m_config.enableUntested;
-                F.secondsAreMiliseconds.Checked = m_config.secondsAreMilliseconds;
-                F.dumpDataEnabled.Checked = m_config.dumpDataEnabled;
+                F.dumpDataEnabled.Checked = m_config.bDumpData;
+                F.useDumpedData.Checked = m_config.bUseDumpedData;
                 F.Version.Text = String.Format("Version: {0}", ASCOM.StarlightXpress.SharedResources.versionNumber);
 
                 F.selectionAllowAny.Checked = false;
@@ -134,8 +134,8 @@ namespace ASCOM.sxUsbCameraBase
 
                     m_config.enableLogging = F.EnableLoggingCheckBox.Checked;
                     m_config.enableUntested = F.EnableUntestedCheckBox.Checked;
-                    m_config.secondsAreMilliseconds = F.secondsAreMiliseconds.Checked;
-                    m_config.dumpDataEnabled = F.dumpDataEnabled.Checked;
+                    m_config.bDumpData = F.dumpDataEnabled.Checked;
+                    m_config.bUseDumpedData = F.useDumpedData.Checked;
 
                     if (F.selectionAllowAny.Checked)
                     {

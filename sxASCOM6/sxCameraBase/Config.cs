@@ -50,9 +50,6 @@ namespace ASCOM.sxCameraBase
         private const string KEY_LOG_FILE_NAME = "LogFileName";
         private string DEFAULT_LOG_FILE_NAME = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "\\" + "ascom-sx-camera.log";
 
-        private const string KEY_SECONDS_ARE_MILLISECONDS = "SecondsAreMilliseconds";
-        private const bool DEFAULT_SECONDS_ARE_MILLISECONDS = false;
-
         private const string KEY_SELECTION_METHOD = "Selection";
         private const string KEY_VID = "VID";
         private const string KEY_PID = "PID";
@@ -74,6 +71,8 @@ namespace ASCOM.sxCameraBase
         private const byte DEFAULT_MAX_X_BIN = 4;
 #endif
 
+        private const String KEY_USE_DUMPED_DATA = "UseDumpedData";
+
         private const String KEY_DUMP_DATA_ENABLED = "DumpDataEnabled";
         private const bool DEFAULT_DUMP_DATA_ENABLED = false;
 
@@ -88,8 +87,8 @@ namespace ASCOM.sxCameraBase
         {
             public bool enableUntested;
             public bool enableLogging;
-            public bool secondsAreMilliseconds;
             public bool dumpDataEnabled;
+            public bool useDumpedData;
             public string selectionMethod;
             public UInt16 VID;
             public UInt16 PID;
@@ -97,11 +96,10 @@ namespace ASCOM.sxCameraBase
             public byte maxXBin;
             public byte maxYBin;
 
-            internal CAMERA_VALUES(bool enableUntested, bool enableLogging, bool secondsAreMilliseconds, string selectionMethod, UInt16 VID, UInt16 PID, bool symetricBinning, byte maxXBin, byte maxYBin, bool dumpDataEnabled)
+            internal CAMERA_VALUES(bool enableUntested, bool enableLogging, string selectionMethod, UInt16 VID, UInt16 PID, bool symetricBinning, byte maxXBin, byte maxYBin, bool dumpDataEnabled)
             {
                 this.enableUntested = enableUntested;
                 this.enableLogging = enableLogging;
-                this.secondsAreMilliseconds = secondsAreMilliseconds;
                 this.selectionMethod = selectionMethod;
                 this.VID = VID;
                 this.PID = PID;
@@ -109,17 +107,18 @@ namespace ASCOM.sxCameraBase
                 this.maxXBin = maxXBin;
                 this.maxYBin = maxYBin;
                 this.dumpDataEnabled = dumpDataEnabled;
+                this.useDumpedData = false; // defaults to false for all cameras
             }
         };
 
         internal CAMERA_VALUES[] DEFAULT_VALUES = 
         {
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517, DEFAULT_SYMETRIC_BINNING, 1, 1, DEFAULT_DUMP_DATA_ENABLED),
-            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, DEFAULT_SECONDS_ARE_MILLISECONDS, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517, DEFAULT_SYMETRIC_BINNING, 1, 1, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507, DEFAULT_SYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517, DEFAULT_SYMETRIC_BINNING, 1, 1, DEFAULT_DUMP_DATA_ENABLED),
+            new CAMERA_VALUES(DEFAULT_ENABLE_UNTESTED, DEFAULT_ENABLE_LOGGING, Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517, DEFAULT_SYMETRIC_BINNING, 1, 1, DEFAULT_DUMP_DATA_ENABLED),
         };
 
         private ASCOM.Utilities.Profile m_profile;
@@ -137,7 +136,7 @@ namespace ASCOM.sxCameraBase
             // Note that this picks main camera configuraitons for guide cameras too - 
             // there are currently no configuration values for guide cameras
             
-            m_driverId = "ASCOM.sxUsbCamera" + whichController.ToString() + "." + DEVICE_TYPE;
+            m_driverId = String.Format("ASCOM.sxUsbCamera{0}.{1}", whichController+1, DEVICE_TYPE);
 
             Log.Write(String.Format("Configuration() computes driverId={0}\n", m_driverId));
 
@@ -276,13 +275,13 @@ namespace ASCOM.sxCameraBase
             set { SetString(KEY_ENABLE_LOGGING, value.ToString()); }
         }
 
-        public bool secondsAreMilliseconds
+        public bool bUseDumpedData
         {
-            get { return GetBool(KEY_SECONDS_ARE_MILLISECONDS, DEFAULT_VALUES[m_whichController].secondsAreMilliseconds); }
-            set { SetString(KEY_SECONDS_ARE_MILLISECONDS, value.ToString()); }
+            get { return GetBool(KEY_USE_DUMPED_DATA, DEFAULT_VALUES[m_whichController].useDumpedData); }
+            set { SetString(KEY_USE_DUMPED_DATA, value.ToString()); }
         }
 
-        public bool dumpDataEnabled
+        public bool bDumpData
         {
             get { return GetBool(KEY_DUMP_DATA_ENABLED, DEFAULT_VALUES[m_whichController].dumpDataEnabled); }
             set { SetString(KEY_DUMP_DATA_ENABLED, value.ToString()); }
@@ -342,29 +341,5 @@ namespace ASCOM.sxCameraBase
             get { return GetByte(KEY_MAX_Y_BIN, DEFAULT_VALUES[m_whichController].maxYBin); }
             set { SetString(KEY_MAX_Y_BIN, value.ToString()); }
         }
-
-#if false
-        /// <summary>
-        /// Launches a configuration dialog box for the driver.  The call will not return
-        /// until the user clicks OK or cancel manually.
-        /// </summary>
-        /// <exception cref=" System.Exception">Must throw an exception if Setup dialog is unavailable.</exception>
-        public void SetupDialog()
-        {
-            switch (m_whichCamera)
-            {
-                case 0:
-                    mainCameraSetupDialog();
-                    break;
-                case 1:
-                    guideCameraSetupDialog();
-                    break;
-                default:
-                    throw new System.Exception(String.Format("Unknown cameraID {0} in SetupDialog", m_whichCamera));
-            }
-        }
-
-
-#endif
     }
 }

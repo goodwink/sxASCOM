@@ -124,7 +124,6 @@ namespace sx
                         dumpReadDelayedBlock(currentExposure.toCamera, "getDumpedExposure() read toCamera");
                         dumpReadDelayedBlock(currentExposure.toCameraSecond, "getDumpedExposure() read toCameraSecond");
                     }
-
                 }
             }
             catch (System.Exception ex)

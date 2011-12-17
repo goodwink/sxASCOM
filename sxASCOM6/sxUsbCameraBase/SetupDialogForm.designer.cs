@@ -58,8 +58,8 @@ namespace ASCOM.sxUsbCameraBase
             this.EnableLoggingCheckBox = new System.Windows.Forms.CheckBox();
             this.EnableUntestedCheckBox = new System.Windows.Forms.CheckBox();
             this.Version = new System.Windows.Forms.Label();
-            this.secondsAreMiliseconds = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.dumpDataEnabled = new System.Windows.Forms.CheckBox();
             this.PID = new System.Windows.Forms.MaskedTextBox();
             this.selectionExcludeModel = new System.Windows.Forms.RadioButton();
             this.VID = new System.Windows.Forms.MaskedTextBox();
@@ -77,7 +77,7 @@ namespace ASCOM.sxUsbCameraBase
             this.xBinLabel = new System.Windows.Forms.Label();
             this.maxXBin = new System.Windows.Forms.NumericUpDown();
             this.binLabel = new System.Windows.Forms.Label();
-            this.dumpDataEnabled = new System.Windows.Forms.CheckBox();
+            this.useDumpedData = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.usbGroup.SuspendLayout();
             this.binGroup.SuspendLayout();
@@ -171,18 +171,18 @@ namespace ASCOM.sxUsbCameraBase
             this.Version.TabIndex = 102;
             this.Version.Text = "Version: a.b.c";
             // 
-            // secondsAreMiliseconds
+            // dumpDataEnabled
             // 
-            this.secondsAreMiliseconds.AutoSize = true;
-            this.secondsAreMiliseconds.Location = new System.Drawing.Point(20, 208);
-            this.secondsAreMiliseconds.Margin = new System.Windows.Forms.Padding(4);
-            this.secondsAreMiliseconds.Name = "secondsAreMiliseconds";
-            this.secondsAreMiliseconds.Size = new System.Drawing.Size(191, 21);
-            this.secondsAreMiliseconds.TabIndex = 3;
-            this.secondsAreMiliseconds.Text = "Seconds Are Milliseconds";
-            this.toolTip1.SetToolTip(this.secondsAreMiliseconds, "Divide the requested exposure by 1000.  Useful if you need faster exposures than " +
+            this.dumpDataEnabled.AutoSize = true;
+            this.dumpDataEnabled.Location = new System.Drawing.Point(20, 208);
+            this.dumpDataEnabled.Margin = new System.Windows.Forms.Padding(4);
+            this.dumpDataEnabled.Name = "dumpDataEnabled";
+            this.dumpDataEnabled.Size = new System.Drawing.Size(275, 21);
+            this.dumpDataEnabled.TabIndex = 3;
+            this.dumpDataEnabled.Text = "Dump Data to File (for debugging only)";
+            this.toolTip1.SetToolTip(this.dumpDataEnabled, "Divide the requested exposure by 1000.  Useful if you need faster exposures than " +
                     "your caputure software allows for.");
-            this.secondsAreMiliseconds.UseVisualStyleBackColor = true;
+            this.dumpDataEnabled.UseVisualStyleBackColor = true;
             // 
             // PID
             // 
@@ -404,27 +404,27 @@ namespace ASCOM.sxUsbCameraBase
             this.binLabel.TabIndex = 2;
             this.binLabel.Text = "Max Bin";
             // 
-            // dumpDataEnabled
+            // useDumpedData
             // 
-            this.dumpDataEnabled.AutoSize = true;
-            this.dumpDataEnabled.Location = new System.Drawing.Point(20, 237);
-            this.dumpDataEnabled.Name = "dumpDataEnabled";
-            this.dumpDataEnabled.Size = new System.Drawing.Size(275, 21);
-            this.dumpDataEnabled.TabIndex = 106;
-            this.dumpDataEnabled.Text = "Dump Data to File (for debugging only)";
-            this.dumpDataEnabled.UseVisualStyleBackColor = true;
+            this.useDumpedData.AutoSize = true;
+            this.useDumpedData.Location = new System.Drawing.Point(20, 237);
+            this.useDumpedData.Name = "useDumpedData";
+            this.useDumpedData.Size = new System.Drawing.Size(278, 21);
+            this.useDumpedData.TabIndex = 106;
+            this.useDumpedData.Text = "Use Dumped Data (for debugging only)";
+            this.useDumpedData.UseVisualStyleBackColor = true;
             // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(449, 496);
-            this.Controls.Add(this.dumpDataEnabled);
+            this.Controls.Add(this.useDumpedData);
             this.Controls.Add(this.binGroup);
             this.Controls.Add(this.advancedUSBParmsEnabled);
             this.Controls.Add(this.usbGroup);
             this.Controls.Add(this.Copyright);
-            this.Controls.Add(this.secondsAreMiliseconds);
+            this.Controls.Add(this.dumpDataEnabled);
             this.Controls.Add(this.Version);
             this.Controls.Add(this.EnableUntestedCheckBox);
             this.Controls.Add(this.EnableLoggingCheckBox);
@@ -461,7 +461,6 @@ namespace ASCOM.sxUsbCameraBase
         public System.Windows.Forms.CheckBox EnableLoggingCheckBox;
         public System.Windows.Forms.CheckBox EnableUntestedCheckBox;
         public System.Windows.Forms.Label Version;
-        public System.Windows.Forms.CheckBox secondsAreMiliseconds;
         private System.Windows.Forms.ToolTip toolTip1;
         internal System.Windows.Forms.RadioButton selectionAllowAny;
         internal System.Windows.Forms.RadioButton selectionExcludeModel;
@@ -479,7 +478,8 @@ namespace ASCOM.sxUsbCameraBase
         public System.Windows.Forms.RadioButton radioButton2;
         public System.Windows.Forms.RadioButton symetricBinning;
         public System.Windows.Forms.NumericUpDown maxYBin;
-        public System.Windows.Forms.CheckBox dumpDataEnabled;
+        public System.Windows.Forms.CheckBox useDumpedData;
         public System.Windows.Forms.GroupBox binGroup;
+        public System.Windows.Forms.CheckBox dumpDataEnabled;
     }
 }

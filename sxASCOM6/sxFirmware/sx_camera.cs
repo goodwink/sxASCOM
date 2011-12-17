@@ -27,6 +27,7 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
 using Logging;
@@ -845,7 +846,6 @@ namespace sx
             this(controller, cameraIdx, bAllowUntested, bDump, null)
         {
         }
-
 
         public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, string dumpedModelName) :
             this(controller, cameraIdx, bAllowUntested, false, dumpedModelName)
