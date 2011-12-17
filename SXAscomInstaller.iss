@@ -37,38 +37,38 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Dirs]
 Name: "{cf}\ASCOM\Uninstall\Camera\sxASCOM"
-Name: "{app}"
+Name: "{app}\sxASCOM"
 
 [Files]
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
-Source: "SXCamera.Readme.txt"; DestDir: "{app}"; Flags: isreadme
+Source: "SXCamera.Readme.txt"; DestDir: "{app}\sxASCOM"; Flags: isreadme
 ; The local server executable
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.StarlightXpress.Server.exe";  DestDir: "{app}"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.StarlightXpress.Server.exe";  DestDir: "{app}\sxASCOM"
 ; Utility dlls
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxLogging.dll";                     DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxFirmware.dll";                    DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxCameraBase.dll";                  DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxUsbCameraBase.dll";               DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxGuideCameraBase.dll";             DestDir: "{app}"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxLogging.dll";                     DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxFirmware.dll";                    DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxCameraBase.dll";                  DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxUsbCameraBase.dll";               DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\sxGuideCameraBase.dll";             DestDir: "{app}\sxASCOM"
 ; ASCOM camera dlls
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera1.Camera.dll";            DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera2.Camera.dll";            DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera3.Camera.dll";            DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera4.Camera.dll";            DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera5.Camera.dll";            DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera6.Camera.dll";            DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxGuideCamera1.Camera.dll";          DestDir: "{app}"
-Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxGuideCamera2.Camera.dll";          DestDir: "{app}"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera1.Camera.dll";            DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera2.Camera.dll";            DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera3.Camera.dll";            DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera4.Camera.dll";            DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera5.Camera.dll";            DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera6.Camera.dll";            DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxGuideCamera1.Camera.dll";          DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxGuideCamera2.Camera.dll";          DestDir: "{app}\sxASCOM"
 
 ; Only if driver is .NET
 [Run]
 ; Only for .NET local-server drivers
-Filename: "{app}\ASCOM.SXCamera.exe"; Parameters: "{code:RegistrationArgs}"
+Filename: "{app}\sxASCOM\ASCOM.StarlightXpress.Server.exe"; Parameters: "{code:RegistrationArgs}"
 
 ; Only if driver is .NET
 [UninstallRun]
 ; Only for .NET local-server drivers
-Filename: "{app}\ASCOM.SXCamera.exe"; Parameters: "/unregister"
+Filename: "{app}\sxASCOM\ASCOM.StarlightXpress.Server.exe"; Parameters: "/unregister"
 
 
 [CODE]
