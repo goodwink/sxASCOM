@@ -37,7 +37,7 @@ def updateVersion(dirName, fileName, major, minor, revision, build):
 
     with open(os.path.join(dirName, fileName), "r+b") as file:
         for line in file:
-            line = re.sub(r'AssemblyVersion([^)]*)', "AssemblyVersion({0}.{1}.{2}.{3}".format(major, minor, revision, build), line)
+            line = re.sub(r'AssemblyVersion([^)]*)', 'AssemblyVersion("{0}.{1}.{2}.{3}"'.format(major, minor, revision, build), line)
             line = re.sub(r'APP_VERSION ".*"', 'APP_VERSION "{0}.{1}.{2}.{3}"'.format(major, minor, revision, build), line)
             lines.append(line)
         file.seek(0)
@@ -59,6 +59,7 @@ def updateVersions(major, minor, revision, build):
 def main():
     if len(sys.argv) != 1 and len(sys.argv) != 3:
         print("usage: {0} [major minor]".format(sys.argv[0]), file=sys.stderr)
+        sys.exit(1)
 
     (version, commits, hex) = runCmdOK("git describe").split("-")
 
