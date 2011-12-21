@@ -1,8 +1,6 @@
 To do a release, be sure to:
 
-- merge changes into the develop branch
 - change the expiration date (if enabled) in SXAscomInstaller.iss
-- edit SXCamera.Readme
 - bump the version number 
 - bump_version.py
   - commit changes using printed git commands
