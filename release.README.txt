@@ -1,10 +1,9 @@
 To do a release, be sure to:
 
 - bump the version number 
-  - Properties -> Assemblyinfo.cs
-  - SXAscomInstaller.iss
+  - bump_version.py
     also set the type (Release vs debug)
-- change the expiration date (if enabled) in sxGeneric\Driver.cs
+- change the expiration date (if enabled) in sxCameraBase\Driver.cs
 - edit SXCamera.Readme
 - commit changes
   git commit -a -m "Changes required for V1.3.10"

@@ -34,5 +34,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 //
 // TODO - Set your driver's version here
-[assembly: AssemblyVersion("6.0.0.0")]
+[assembly: AssemblyVersion("3.0.11354.2059")]
 [assembly: AssemblyFileVersion("6.0.0.0")]

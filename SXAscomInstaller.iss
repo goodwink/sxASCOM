@@ -4,7 +4,7 @@
 ;
 
 #define BUILD_TYPE "Debug"
-#define APP_VERSION "2.2.0.5"
+#define APP_VERSION "3.0.11354.2059"
 #define ASCOM_VERSION_REQUIRED_MAJOR  6
 #define ASCOM_VERSION_REQUIRED_MINOR  0
 
@@ -41,7 +41,7 @@ Name: "{app}\sxASCOM"
 
 [Files]
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
-Source: "SXCamera.Readme.txt"; DestDir: "{app}\sxASCOM"; Flags: isreadme
+Source: "Readme.txt"; DestDir: "{app}\sxASCOM"; Flags: isreadme
 ; The local server executable
 Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.StarlightXpress.Server.exe";  DestDir: "{app}\sxASCOM"
 ; Utility dlls
