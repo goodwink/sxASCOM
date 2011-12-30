@@ -6,6 +6,7 @@ To do a release, be sure to:
   - commit changes using printed git commands
   - create a tag using the printed git commands
 - create a change log with:
+
   git log --pretty=format:"%s (%ai by %aN <%aE>)" --no-merges releases/2.2/master..HEAD  > changelog.txt
   echo >> changelog.txt
   git diff -b --shortstat origin/releases/2.2/master..HEAD >> changelog.txt
@@ -17,6 +18,6 @@ To do a release, be sure to:
 - create a zip file
   c:\progra~1\winzip\wzzip <release>.zip <release.exe>
 
-- Copy the files to 
+
   start explorer "C:\Users\bretm\Documents\MyWebSites\daddog.com\ascom\sx\driver"
 - rename the files

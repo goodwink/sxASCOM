@@ -1,25 +1,25 @@
-//tabs=4
-// --------------------------------------------------------------------------------
-// TODO fill in this information for your driver, then remove this line!
+// tabs=4
+// Copyright 2010-2010 by Dad Dog Development, Ltd
 //
-// ASCOM Camera driver for UsbCamera2
+// This work is licensed under the Creative Commons Attribution-No Derivative 
+// Works 3.0 License. 
 //
-// Description:	Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam 
-//				nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 
-//				erat, sed diam voluptua. At vero eos et accusam et justo duo 
-//				dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 
-//				sanctus est Lorem ipsum dolor sit amet.
+// A copy of the license should have been included with this software. If
+// not, you can also view a copy of this license, at:
 //
-// Implements:	ASCOM Camera interface version: 1.0
-// Author:		(XXX) Your N. Here <your@email.here>
+// http://creativecommons.org/licenses/by-nd/3.0/ or 
+// send a letter to:
 //
-// Edit Log:
+// Creative Commons
+// 171 Second Street
+// Suite 300
+// San Francisco, California, 94105, USA.
+// 
+// If this license is not suitable for your purposes, it is possible to 
+// obtain it under a different license. 
 //
-// Date			Who	Vers	Description
-// -----------	---	-----	-------------------------------------------------------
-// dd-mmm-yyyy	XXX	1.0.0	Initial edit, from ASCOM Camera Driver template
-// --------------------------------------------------------------------------------
-//
+// For more information please contact bretm@daddog.com
+
 using System;
 using System.Collections;
 using System.Runtime.InteropServices;
