@@ -61,7 +61,7 @@ def main():
         print("usage: {0} [major minor]".format(sys.argv[0]), file=sys.stderr)
         sys.exit(1)
 
-    (version, commits, hex) = runCmdOK("git describe").split("-")
+    version = runCmdOK("git describe").split("-")[0]
 
     if len(sys.argv) == 3:
         major = int(sys.argv[1])
