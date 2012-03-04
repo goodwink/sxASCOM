@@ -641,7 +641,11 @@ namespace ASCOM.sxCameraBase
                     if (value)
                     {
 #if DEBUG
-                        if (DateTime.Now.CompareTo(new DateTime(2012, 6, 1)) > 0)
+                        DateTime expiration = new DateTime(2012, 6, 1);
+                        Log.Write(String.Format("expiration check: now={0} expires={1} compareTo()={2}", 
+                                DateTime.Now, expiration, DateTime.Now.CompareTo(expiration)));
+
+                        if (DateTime.Now.CompareTo(expiration) > 0)
                         {
                             MessageBox.Show("This debug release has expired.  Please update your bits", "Expired");
                             throw new ASCOM.PropertyNotImplementedException(SetError("connected: non-production release expired"), true);
