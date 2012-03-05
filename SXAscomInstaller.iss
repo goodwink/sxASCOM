@@ -4,7 +4,7 @@
 ;
 
 #define BUILD_TYPE "Release"
-#define APP_VERSION "2.1.1.2"
+#define APP_VERSION "2.1.1.3"
 #define ASCOM_VERSION_REQUIRED  "5.5"
 #define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
 
@@ -26,8 +26,8 @@ OutputBaseFilename="SXAscomInstaller-v{#APP_VERSION}"
 Compression=lzma
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
-WizardImageFile="C:\Program Files (x86)\ASCOM\InstallGen\Resources\WizardImage.bmp"
-LicenseFile="C:\Users\bretm\Astronomy\src\sxASCOM\CreativeCommons.txt"
+WizardImageFile="C:\Program Files\ASCOM\InstallGen\Resources\WizardImage.bmp"
+LicenseFile="CreativeCommons.txt"
 
 ; {cf}\ASCOM\Uninstall\Camera folder created by Platform, always
 UninstallFilesDir="{cf}\ASCOM\Uninstall\Camera\sxASCOM"
