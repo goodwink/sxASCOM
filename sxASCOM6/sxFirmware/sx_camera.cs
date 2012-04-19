@@ -1,4 +1,3 @@
-// tabs=4
 // Copyright 2010-2010 by Dad Dog Development, Ltd
 //
 // This work is licensed under the Creative Commons Attribution-No Derivative 
@@ -137,6 +136,7 @@ namespace sx
         private byte [] rawFrame1;
         private byte [] rawFrame2;
         private Int32[,] imageData;
+        private Int32[,] biasFrame;
         private bool imageDataValid;
         private object oImageDataLock;
         private UInt16 idx;
@@ -744,9 +744,14 @@ namespace sx
 
             buildReadDelayedBlock(out nextExposure, 0, 0, frameWidth, frameHeight, 1, 1, 0);
 
+            oImageDataLock = new object();
+
             imageDataValid = false;
 
-            oImageDataLock = new object();
+            if (true)
+            {
+                recordBiasFrame();
+            }
 
             if (hasCoolerControl)
             {
@@ -760,6 +765,7 @@ namespace sx
                 setCoolerInfo(ref m_coolerBlock, out tempBlock);
                 Log.Write(String.Format("sx.Camera() constructor cooler init.  temp={0} enabled={1}\n", m_coolerBlock.coolerTemp, m_coolerBlock.coolerEnabled));
             }
+
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
         }
 
@@ -858,9 +864,9 @@ namespace sx
             currentExposure.userRequested = nextExposure;
         }
 
-        internal UInt16 adjustReadDelayedBlock()
+        internal byte adjustReadDelayedBlock()
         {
-            UInt16 fieldFlags = SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD;
+            int fieldFlags = SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD;
 
             dumpReadDelayedBlock(currentExposure.userRequested, "exposure as requested - before any adjustments");
 
@@ -959,11 +965,11 @@ namespace sx
 
                     if (binnedOffsetIsOdd)
                     {
-                        fieldFlags = SX_CCD_FLAGS_FIELD_ODD;
+                        fieldFlags &= ~SX_CCD_FLAGS_FIELD_EVEN;
                     }
                     else
                     {
-                        fieldFlags = SX_CCD_FLAGS_FIELD_EVEN;
+                        fieldFlags &= ~SX_CCD_FLAGS_FIELD_ODD;
                     }
 
                     // if the height is odd, we need to adjust the height of the first frame because after the division by
@@ -999,7 +1005,7 @@ namespace sx
                     int expectedStartRow = currentExposure.userRequested.y_offset / yBin;
                     int actualStartRow = 2 * (currentExposure.toCamera.y_offset / yBin);
 
-                    if (fieldFlags == SX_CCD_FLAGS_FIELD_ODD)
+                    if ((fieldFlags & SX_CCD_FLAGS_FIELD_ODD) != 0)
                     {
                         actualStartRow += 1;
                     }
@@ -1099,8 +1105,22 @@ namespace sx
                 }
             }
 
-            return fieldFlags;
+            return (byte)fieldFlags;
         }
+
+        internal byte adjustReadDelayedBlockForBiasFrame()
+        {
+            int fieldFlags = adjustReadDelayedBlock();
+
+            // for bias frames, we don't expose either frame, so clear those bits
+
+            fieldFlags &= ~(SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD);
+
+            Log.Write(String.Format("adjustReadDelayedBlockForBiasFrame() returns 0x{0:x}", fieldFlags));
+
+            return (byte) fieldFlags;
+        }
+
 
         internal void dumpReadBlock(SX_READ_BLOCK block)
         {
@@ -1909,7 +1929,7 @@ namespace sx
             {
                 Log.Write(String.Format("convertCameraDataToImageData() processing {0} bit {1} camera data\n", bitsPerPixel, interlaced?"interlaced":"progressive"));
 
-#if INTERLACED_DEBUG
+#if true || INTERLACED_DEBUG
                 if (rawFrame2 != null)
                 {
                     Int64 frame1=0;
@@ -2041,6 +2061,8 @@ namespace sx
             {
                 //adjustInterlaced();
             }
+
+            applyBiasFrame();
 
             Log.Write("convertCameraDataToImageData(): ends\n");
         }
@@ -2499,12 +2521,47 @@ namespace sx
             Debug.Assert(count == 0);
         }
 
+        internal void applyBiasFrame()
+        {
+            if (biasFrame != null)
+            {
+                Debug.Assert(biasFrame.GetUpperBound(0) == imageData.GetUpperBound(0));
+                Debug.Assert(biasFrame.GetUpperBound(1) == imageData.GetUpperBound(1));
+
+                Int32 nPixels = (biasFrame.GetUpperBound(0) + 1) *  (biasFrame.GetUpperBound(1) + 1);
+
+                for (int x = 0; x < biasFrame.GetUpperBound(0); x++)
+                {
+                    Int32 thisBias = biasData[x];
+
+                    unsafe
+                    {
+                        fixed (Int32* pImageDataBase = imageData, pBiasDataBase = biasFrame)
+                        {
+                            Int32* pImageData = pImageDataBase;
+                            Int32* pBiasData = pBiasDataBase;
+
+                            try
+                            {
+                                //*pImageData++ *= *pBiasData++;
+                            }
+                            catch (System.Exception ex)
+                            {
+                                Log.Write(String.Format("applyBiasFrame generated exception {0}\n", ex));
+                                throw;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         unsafe internal void adjustInterlaced()
         {
             Int64 evenTotal=0;
             Int64 oddTotal=0;
 
-            Log.Write("adjustProgressive() begins\n");
+            Log.Write("adjustInterlaced() begins\n");
 #if INTERLACED_DEBUG
             {
                 Int64 frameFinal=0;
@@ -2666,7 +2723,7 @@ namespace sx
                 Log.Write(String.Format("stats: frameFinalOdd = {0:N0}, ave={1}\n", frameFinalOdd, frameFinalOdd/(imageData.LongLength/2)));
             }
 #endif
-            Log.Write("adjustProgressive() ends\n");
+            Log.Write("adjustInterlaced() ends\n");
         }
 
         public void guideNorth(int durationMS)
@@ -2697,17 +2754,53 @@ namespace sx
             }
             else
             {
-                recordPixelsUSB(bDelayed, out exposureEnd);
+                recordPixelsUSB(bDelayed, false, out exposureEnd);
             }
         }
 
-        public void recordPixelsUSB(bool bDelayed, out DateTimeOffset exposureEnd)
+        private void recordBiasFrame()
+        {
+            DateTimeOffset exposureEnd;
+
+            Log.Write("recoriding bias frame");
+
+            freezeParameters();
+            recordPixelsUSB(true, true, out exposureEnd);
+
+            Debug.Assert(imageDataValid);
+            Debug.Assert(imageData != null);
+
+            biasFrame = imageData;
+
+            imageData = null;
+            imageDataValid = false;
+        }
+
+        public void recordPixelsUSB(bool bDelayed, bool bBias, out DateTimeOffset exposureEnd)
         {
             SX_CMD_BLOCK cmdBlock;
+            byte firstExposureFlags;
+            byte secondExposureFlags = 0;
 
-            Log.Write(String.Format("recordPixels entered - bDelayed = {0}\n", bDelayed));
-            UInt16 firstExposureFlags = adjustReadDelayedBlock();
-            UInt16 secondExposureFlags = (UInt16)((SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD) & ~firstExposureFlags);
+            Log.Write(String.Format("recordPixels entered - bDelayed={0} bBias={1}", bDelayed, bBias));
+
+            if (bBias)
+            {
+                firstExposureFlags = adjustReadDelayedBlockForBiasFrame();
+                secondExposureFlags = firstExposureFlags;
+            }
+            else
+            {
+                firstExposureFlags = adjustReadDelayedBlock();
+
+                // secondExposureFlags has the same bits set as firstExposureFlags
+                int temp = firstExposureFlags;
+
+                // except that the odd and even field bits are flipped
+                temp ^= (SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD);
+
+                secondExposureFlags = (byte) temp;
+            }
 
             Debug.Assert(currentExposure.toCamera.x_bin != 7 && currentExposure.toCamera.y_bin != 7);
 
@@ -2762,8 +2855,11 @@ namespace sx
                     SX_READ_BLOCK readBlock;
                     Log.Write("recordPixels() preparing for second frame download\n");
 
-                    Debug.Assert(secondExposureFlags != 0);
-                    Debug.Assert(secondExposureFlags != firstExposureFlags);
+                    if (!bBias)
+                    {
+                        Debug.Assert(secondExposureFlags != 0);
+                        Debug.Assert(secondExposureFlags != firstExposureFlags);
+                    }
 
                     clearAllRegisters();
                     initReadBlock(currentExposure.toCamera, out readBlock);

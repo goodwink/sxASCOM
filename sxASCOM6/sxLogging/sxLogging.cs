@@ -67,7 +67,7 @@ namespace Logging
                             m_startTime = m_lastWriteTime;
                             m_enabled = true;
 
-                            Log.Write(String.Format("Logging begins at {0}\n", m_startTime));
+                            Log.Write(String.Format("Logging begins at {0}", m_startTime));
                         }
                         else
                         {
