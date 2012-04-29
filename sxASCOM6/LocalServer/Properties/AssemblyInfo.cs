@@ -43,7 +43,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("3.0.12064.1238")]
+[assembly: AssemblyVersion("3.0.12120.1158")]
 [assembly: AssemblyFileVersion("6.0.0.0")]
 
 [assembly: ComVisibleAttribute(false)]

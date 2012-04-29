@@ -641,7 +641,7 @@ namespace ASCOM.sxCameraBase
                     if (value)
                     {
 #if DEBUG
-                        DateTime expiration = new DateTime(2012, 6, 1);
+                        DateTime expiration = new DateTime(2012, 7, 1);
                         Log.Write(String.Format("expiration check: now={0} expires={1} compareTo()={2}", 
                                 DateTime.Now, expiration, DateTime.Now.CompareTo(expiration)));
 
