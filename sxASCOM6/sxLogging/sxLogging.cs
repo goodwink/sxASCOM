@@ -25,6 +25,8 @@ using System.IO;
 using System.Text;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Logging
 {
@@ -105,6 +107,29 @@ namespace Logging
                     m_lastWriteTime = currentTime;
                 }
             }
+        }
+
+        public static void Write(string formatString, params object[] args)
+        {
+            if (enabled)
+            {
+                Log.Write(String.Format(formatString, args));
+            }
+        }
+
+        public static void Entry(string methodName)
+        {
+            Log.Write("Entering " + methodName);
+        }
+
+        public static void Entry()
+        {
+            StackTrace stackTrace = new StackTrace();
+            StackFrame stackFrame = stackTrace.GetFrame(1);
+            MethodBase methodBase = stackFrame.GetMethod();
+
+            Log.Entry(methodBase.Name);
+            
         }
     }
 }
