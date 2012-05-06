@@ -62,6 +62,22 @@ namespace sx
             private set;
         }
 
+        public UInt16 vid
+        {
+            get
+            {
+                return m_iface.vid;
+            }
+        }
+
+        public UInt16 pid
+        {
+            get
+            {
+                return m_iface.pid;
+            }
+        }
+
         protected void verifyConnected(string caller)
         {
             if (!Connected)

@@ -31,6 +31,18 @@ namespace sx
         // Mutex
         internal Mutex m_mutex;
 
+        public UInt16 vid
+        {
+            get;
+            internal set;
+        }
+
+        public UInt16 pid
+        {
+            get;
+            internal set;
+        }
+
         // Look for a device with:
         //  any Vid/Pid if Vid == 0
         //  Vid/Pid as specified if skip = False
@@ -111,6 +123,8 @@ namespace sx
                         if (FileIO.GetDeviceHandle(devicePathName, out deviceHandle))
                         {
                             Log.Write(String.Format("USBInterface: deviceHandle.IsInvalid={0}\n", deviceHandle.IsInvalid));
+                            vid = foundVid;
+                            pid = foundPid;
                             break;
                         }
 
