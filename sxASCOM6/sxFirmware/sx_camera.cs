@@ -132,6 +132,11 @@ namespace sx
         MODEL_H694C = 0xB7,
     }
 
+    internal enum CameraPids
+    {
+        PID_SUPERSTAR = 0509,
+    }
+
     public partial class Camera
         : sxBase
     {
@@ -524,7 +529,17 @@ namespace sx
                     progressive = true;
 #endif
                 case CameraModels.MODEL_H9:
-                    description = "H9";
+                    // the SuperStar guider is basically an uncooled H9 with a different
+                    // PID. See which we have
+                    if ((CameraPids)m_controller.pid == CameraPids.PID_SUPERSTAR)
+                    {
+                        description = "SuperStar";
+                    }
+                    else
+                    {
+                        description = "H9";
+                    }
+
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
                     progressive = true;
