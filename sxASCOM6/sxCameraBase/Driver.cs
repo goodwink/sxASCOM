@@ -221,10 +221,9 @@ namespace ASCOM.sxCameraBase
             {
                 Log.Write(String.Format("sxCameraBase::softwareCapture({0}, {1}): begins\n", Duration, Light));
 
-                sxCamera.clearCCDAndRegisters(); // For exposures > 1 second we will clear the registers again just before
+                sxCamera.clearCCDAndRegisters(); // For exposures >= 2 second we will clear the registers again just before
                                                     // the exposure ends to clear any accumulated noise.
-                bool bAllRegistersCleareded = false;
-                bool bVerticalRegistersCleareded = false;
+                bool bRegistersCleareded = false;
 
                 if (Duration > ImageCommandTime)
                 {
@@ -238,10 +237,9 @@ namespace ASCOM.sxCameraBase
 
                 if (desiredExposureLength.TotalSeconds < 2.0)
                 {
-                    sxCamera.clearAllRegisters();
+                    sxCamera.clearRegisters();
                     // For short exposures we don't do the clear the registers inside the loop
-                    bAllRegistersCleareded = true;
-                    bVerticalRegistersCleareded = true; 
+                    bRegistersCleareded = true;
                 }
                 
                 exposureStart = DateTime.Now;
@@ -257,17 +255,11 @@ namespace ASCOM.sxCameraBase
                     remainingExposureTime = exposureEnd - DateTime.Now)
                 {
                     
-                    if (remainingExposureTime.TotalSeconds < 2.0 && !bAllRegistersCleareded)
+                    if (remainingExposureTime.TotalSeconds < 2.0 && !bRegistersCleareded)
                     {
-                        Log.Write("softwareCapture(): doing clearAllRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
-                        sxCamera.clearAllRegisters();
-                        bAllRegistersCleareded = true;
-                    }
-                    else if (remainingExposureTime.TotalSeconds < 1.0 && !bVerticalRegistersCleareded)
-                    {
-                        Log.Write("softwareCapture(): doing clearVerticalRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
-                        sxCamera.clearVerticalRegisters();
-                        bVerticalRegistersCleareded = true;
+                        Log.Write("softwareCapture(): doing clearRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        sxCamera.clearRegisters();
+                        bRegistersCleareded = true;
                     }
                     else if (remainingExposureTime.TotalMilliseconds > 75)
                     {
@@ -641,7 +633,7 @@ namespace ASCOM.sxCameraBase
                     if (value)
                     {
 #if DEBUG
-                        if (DateTime.Now.CompareTo(new DateTime(2012, 01, 15)) > 0)
+                        if (DateTime.Now.CompareTo(new DateTime(2012, 06, 15)) > 0)
                         {
                             MessageBox.Show("This debug release has expired.  Please update your bits", "Expired");
                             throw new ASCOM.PropertyNotImplementedException(SetError("connected: non-production release expired"), true);

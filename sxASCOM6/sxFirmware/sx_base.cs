@@ -61,7 +61,6 @@ namespace sx
         internal const Byte SX_CCD_FLAGS_NOWIPE_FRAME = 8;	   // Don't apply WIPE when clearing frame
         internal const Byte SX_CCD_FLAGS_TDI = 32;	           // Implement TDI (drift scan) operation
         internal const Byte SX_CCD_FLAGS_NOCLEAR_FRAME = 64;   // Don't clear frame, even when asked
-        internal const Byte SX_CCD_FLAGS_CLEAR_VERT = 128;     // Clear the vertical registers
 
         // STAR2K values
         internal const UInt16 SX_STAR2K_STOP  = 0;
