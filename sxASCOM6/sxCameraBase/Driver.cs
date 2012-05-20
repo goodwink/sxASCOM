@@ -347,42 +347,42 @@ namespace ASCOM.sxCameraBase
 
                     try
                     {
-                        sxCamera.width = (UInt16)(NumX * BinX);
+                        sxCamera.width = (UInt16)(NumX * BinXActual);
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
                         SetError(ex.ToString());
-                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumX.ToString(), "1-" + (CameraXSize/BinX).ToString(), ex);
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumX.ToString(), "1-" + (CameraXSize/BinXActual).ToString(), ex);
                     }
 
                     try
                     {
-                        sxCamera.height = (UInt16)(NumY * BinY);
+                        sxCamera.height = (UInt16)(NumY * BinYActual);
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
                         SetError(ex.ToString());
-                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumY.ToString(), "1-" + (CameraYSize/BinYActual).ToString(), ex);
                     }
                     
                     try
                     {
-                        sxCamera.xOffset = (UInt16)(StartX * BinX);
+                        sxCamera.xOffset = (UInt16)(StartX * BinXActual);
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
                         SetError(ex.ToString());
-                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartX.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartX.ToString(), "1-" + (CameraYSize/BinYActual).ToString(), ex);
                     }
 
                     try
                     {
-                        sxCamera.yOffset = (UInt16)(StartY * BinY);
+                        sxCamera.yOffset = (UInt16)(StartY * BinYActual);
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
                         SetError(ex.ToString());
-                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartY.ToString(), "1-" + (CameraYSize/BinYActual).ToString(), ex);
                     }
 
                     CaptureDelegate captureDelegate;
@@ -677,32 +677,44 @@ namespace ASCOM.sxCameraBase
                             m_Connected = true;
                             // set properties to defaults. These all talk to the camera, and having them here saves
                             // a lot of try/catch blocks in other places
-                            BinX = 1;
-                            BinY = 1;
-                            NumX = sxCamera.frameWidth;
-                            NumY = sxCamera.frameHeight;
+
+                            if (m_config.fixedBinning)
+                            {
+                                BinXActual = m_config.fixedBin;
+                                BinYActual = m_config.fixedBin;
+                                NumX = sxCamera.frameWidth/ m_config.fixedBin;
+                                NumY = sxCamera.frameHeight/ m_config.fixedBin;
+                            }
+                            else
+                            {
+                                BinXActual = 1;
+                                BinYActual = 1;
+                                NumX = sxCamera.frameWidth;
+                                NumY = sxCamera.frameHeight;
+                            }
                             StartX = 0;
                             StartY = 0;
+
                             bHasGuideCamera = sxCamera.hasGuideCamera;
 
                             sxCamera.bInterlacedEqualization = m_config.interlacedEqualizeFrames;
 
-                            if (!m_config.interlacedDoubleExposeShortExposures)
-                            {
-                                sxCamera.interlacedDoubleExposureThreshold = 0;
-                            }
-                            else
+                            if (m_config.interlacedDoubleExposeShortExposures)
                             {
                                 sxCamera.interlacedDoubleExposureThreshold = m_config.interlacedDoubleExposureThreshold;
                             }
-
-                            if (!m_config.interlacedGaussianBlur)
+                            else
                             {
-                                sxCamera.interlacedGaussianBlurRadius = 0;
+                                sxCamera.interlacedDoubleExposureThreshold = 0;
+                            }
+
+                            if (m_config.interlacedGaussianBlur)
+                            {
+                                sxCamera.interlacedGaussianBlurRadius = m_config.interlacedGaussianBlurRadius;
                             }
                             else
                             {
-                                sxCamera.interlacedGaussianBlurRadius = m_config.interlacedGaussianBlurRadius;
+                                sxCamera.interlacedGaussianBlurRadius = 0;
                             }
                         }
                         catch (System.Exception ex)
@@ -813,13 +825,48 @@ namespace ASCOM.sxCameraBase
         {
             get
             {
+                short ret = BinXActual;
+
+                if (m_config.fixedBinning)
+                {
+                    ret = 1;
+                }
+
+                Log.Write(String.Format("sxCameraBase::BinX get returns {0}\n", ret));
+
+                return ret;
+            }
+            set
+            {
+                if (m_config.fixedBinning)
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (value != 1)
+                    {
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinX set value out of range")), value.ToString(), MaxBinXActual.ToString());
+                    }
+                    BinXActual = m_config.fixedBin;
+                }
+                else
+                {
+                    BinXActual = value;
+                }
+                Log.Write(String.Format("sxCameraBase::BinX set to {0}\n", value));
+            }
+        }
+
+        internal short BinXActual
+        {
+            get
+            {
                 try
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     short ret = sxCamera.xBin;
 
-                    Log.Write(String.Format("sxCameraBase::BinX get returns {0}\n", ret));
+                    Log.Write(String.Format("sxCameraBase::BinXActual get returns {0}\n", ret));
 
                     return ret;
                 }
@@ -836,18 +883,18 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (value > MaxBinX)
+                    if (value > MaxBinXActual)
                     {
-                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinX set value out of range")), value.ToString(), MaxBinX.ToString());
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinXActual set value out of range")), value.ToString(), MaxBinXActual.ToString());
                     }
-
+                    
                     sxCamera.xBin = (byte)value;
-                    Log.Write(String.Format("sxCameraBase::BinX set to {0}\n", value));
+                    Log.Write(String.Format("sxCameraBase::BinXActual set to {0}\n", value));
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
                     SetError(ex.ToString());
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinX.ToString(), ex);
+                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinXActual.ToString(), ex);
                 }
                 catch (System.Exception ex)
                 {
@@ -862,13 +909,47 @@ namespace ASCOM.sxCameraBase
         {
             get
             {
+                short ret = BinYActual;
+
+                if (m_config.fixedBinning)
+                {
+                    ret = 1;
+                }
+
+                Log.Write(String.Format("sxCameraBase::BinY get returns {0}\n", ret));
+
+                return ret;
+            }
+            set
+            {
+                if (m_config.fixedBinning)
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (value != 1)
+                    {
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinY set value out of range")), value.ToString(), MaxBinYActual.ToString());
+                    }
+                    BinYActual = m_config.fixedBin;
+                }
+                else
+                {
+                    BinYActual = value;
+                }
+                Log.Write(String.Format("sxCameraBase::BinY set to {0}\n", value));
+            }
+        }
+        public short BinYActual
+        {
+            get
+            {
                 try
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     short ret = sxCamera.yBin;
 
-                    Log.Write(String.Format("sxCameraBase::BinY get returns {0}\n", ret));
+                    Log.Write(String.Format("sxCameraBase::BinYActual get returns {0}\n", ret));
 
                     return ret;
                 }
@@ -885,18 +966,18 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (value > MaxBinY)
+                    if (value > MaxBinYActual)
                     {
-                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinY set value out of range")), value.ToString(), MaxBinY.ToString());
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinYActual set value out of range")), value.ToString(), MaxBinYActual.ToString());
                     }
 
                     sxCamera.yBin = (byte)value;
-                    Log.Write(String.Format("sxCameraBase::BinY set to {0}\n", value));
+                    Log.Write(String.Format("sxCameraBase::BinYActual set to {0}\n", value));
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
                     SetError(ex.ToString());
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinY.ToString(), ex);
+                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinYActual.ToString(), ex);
                 }
                 catch (System.Exception ex)
                 {
@@ -944,6 +1025,11 @@ namespace ASCOM.sxCameraBase
 
                     int ret = sxCamera.frameWidth;
 
+                    if (m_config.fixedBinning)
+                    {
+                        ret /= m_config.fixedBin;
+                    }
+
                     Log.Write(String.Format("sxCameraBase::CameraXSize get returns m_CameraXSize {0}\n", ret));
 
                     return ret;
@@ -966,6 +1052,11 @@ namespace ASCOM.sxCameraBase
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     int ret = sxCamera.frameHeight;
+
+                    if (m_config.fixedBinning)
+                    {
+                        ret /= m_config.fixedBin;
+                    }
 
                     Log.Write(String.Format("sxCameraBase::CameraYSize get returns CameraYSize {0}\n", ret));
 
@@ -1110,7 +1201,7 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    double dRet =  MaxADU * ElectronsPerADU / (BinX * BinY);
+                    double dRet =  MaxADU * ElectronsPerADU / (BinXActual * BinYActual);
 
                     Log.Write(String.Format("sxCameraBase::FullWellCapacity get returns {0}\n", dRet));
 
@@ -1358,6 +1449,23 @@ namespace ASCOM.sxCameraBase
 
         public short MaxBinX
         {
+            get
+            {
+                short ret = MaxBinXActual;
+
+                if (m_config.fixedBinning)
+                {
+                    ret = 1;
+                }
+
+                Log.Write(String.Format("sxCameraBase::MaxBinX get returns {0}\n", ret));
+
+                return ret;
+            }
+        }
+
+        internal short MaxBinXActual
+        {
             get 
             {
                 try
@@ -1371,7 +1479,7 @@ namespace ASCOM.sxCameraBase
                         ret = m_config.maxXBin;
                     }
 
-                    Log.Write(String.Format("sxCameraBase::MaxBinX get returns {0}\n", ret));
+                    Log.Write(String.Format("sxCameraBase::MaxBinXActual get returns {0}\n", ret));
 
                     return ret;
                 }
@@ -1386,6 +1494,22 @@ namespace ASCOM.sxCameraBase
 
         public short MaxBinY
         {
+            get
+            {
+                short ret = MaxBinYActual;
+
+                if (m_config.fixedBinning)
+                {
+                    ret = 1;
+                }
+
+                Log.Write(String.Format("sxCameraBase::MaxBinY get returns {0}\n", ret));
+
+                return ret;
+            }
+        }
+        public short MaxBinYActual
+        {
             get 
             {
                 try
@@ -1399,7 +1523,7 @@ namespace ASCOM.sxCameraBase
                         ret = m_config.maxYBin;
                     }
 
-                    Log.Write(String.Format("sxCameraBase::MaxBinY get returns {0}\n", ret));
+                    Log.Write(String.Format("sxCameraBase::MaxBinYActual get returns {0}\n", ret));
 
                     return ret;
                 }
@@ -1498,6 +1622,11 @@ namespace ASCOM.sxCameraBase
 
                     double ret = sxCamera.pixelWidth;
 
+                    if (m_config.fixedBinning)
+                    {
+                        ret *= m_config.fixedBin;
+                    }
+
                     Log.Write(String.Format("sxCameraBase::PixelSizeX get returns {0}\n", ret));
 
                     return ret;
@@ -1520,6 +1649,11 @@ namespace ASCOM.sxCameraBase
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     double ret = sxCamera.pixelHeight;
+
+                    if (m_config.fixedBinning)
+                    {
+                        ret *= m_config.fixedBin;
+                    }
 
                     Log.Write(String.Format("sxCameraBase::PixelSizeY get returns {0}\n", ret));
 

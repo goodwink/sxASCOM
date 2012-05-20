@@ -101,7 +101,7 @@ namespace ASCOM.sxUsbCameraBase
 
                 F.fixedBinning.Checked = m_config.fixedBinning;
                 F.fixedBin.Enabled = F.fixedBinning.Checked;
-                F.fixedBin.Text = m_config.fixedBin.ToString();
+                F.fixedBin.Value = m_config.fixedBin;
 
                 // interlaced box
                 F.equalizeFrames.Checked = m_config.interlacedEqualizeFrames;
@@ -173,6 +173,14 @@ namespace ASCOM.sxUsbCameraBase
                     }
 
                     // binning box
+
+                    m_config.fixedBinning = F.fixedBinning.Checked;
+
+                    if (m_config.fixedBinning)
+                    {
+                        m_config.fixedBin = (byte)F.fixedBin.Value;
+                    }
+                    
                     m_config.asymetricBinning = F.asymetricBinning.Checked;
                     m_config.maxYBin = (byte)F.maxYBin.Value;
 

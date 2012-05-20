@@ -1225,17 +1225,20 @@ namespace sx
         {
             SX_CMD_BLOCK cmdBlock;
 
-            if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME)) != 0)
+            if (!m_useDumped)
             {
-                throw new ArgumentException("Invalid flags passed to ClearPixels");
+                if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME)) != 0)
+                {
+                    throw new ArgumentException("Invalid flags passed to ClearPixels");
+                }
+
+                m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
+
+                Log.Write("clear about to Write\n");
+                m_controller.Write(cmdBlock);
+                echo("done"); // the clear takes a long time - when the echo returns we know it is done
+                Log.Write("clear about to return\n");
             }
-
-            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
-
-            Log.Write("clear about to Write\n");
-            m_controller.Write(cmdBlock);
-            echo("done"); // the clear takes a long time - when the echo returns we know it is done
-            Log.Write("clear about to return\n");
         }
 
         public void clearCCDAndRegisters()
