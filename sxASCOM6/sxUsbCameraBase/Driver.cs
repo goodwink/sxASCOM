@@ -60,12 +60,61 @@ namespace ASCOM.sxUsbCameraBase
 
                 SetupDialogForm F = new SetupDialogForm();
 
-                F.EnableLoggingCheckBox.Checked = m_config.enableLogging;
-                F.EnableUntestedCheckBox.Checked = m_config.enableUntested;
-                F.dumpDataEnabled.Checked = m_config.bDumpData;
-                F.useDumpedData.Checked = m_config.bUseDumpedData;
                 F.Version.Text = String.Format("Version: {0}", ASCOM.StarlightXpress.SharedResources.versionNumber);
 
+                F.EnableLoggingCheckBox.Checked = m_config.enableLogging;
+
+                F.EnableUntestedCheckBox.Checked = m_config.enableUntested;
+
+                F.dumpDataEnabled.Checked = m_config.bDumpData;
+
+                F.useDumpedData.Checked = m_config.bUseDumpedData;
+
+                // some cameras cannot bin.  
+                // If this camera can't bin, disble the binGroup so binning cannot be modified.
+                if (m_config.maxXBin > 1)
+                {
+                    F.binGroup.Enabled = true;
+                }
+                else
+                {
+                    F.binGroup.Enabled = false;
+                }
+
+                if (m_config.asymetricBinning)
+                {
+                    F.asymetricBinning.Checked = true;
+                    F.xBinLabel.Text = "Max Y Bin";
+                    F.yBinLabel.Visible = true;
+                    F.maxYBin.Visible = true;
+                }
+                else
+                {
+                    F.asymetricBinning.Checked = false;
+                    F.xBinLabel.Text = "Max Bin";
+                    F.yBinLabel.Visible = false;
+                    F.maxYBin.Visible = false;
+                }
+
+                F.maxXBin.Value  = m_config.maxXBin;
+                F.maxYBin.Value  = m_config.maxYBin;
+
+                F.fixedBinning.Checked = m_config.fixedBinning;
+                F.fixedBin.Enabled = F.fixedBinning.Checked;
+                F.fixedBin.Text = m_config.fixedBin.ToString();
+
+                // interlaced box
+                F.equalizeFrames.Checked = m_config.interlacedEqualizeFrames;
+
+                F.doubleExposeShort.Checked = m_config.interlacedDoubleExposeShortExposures;
+                F.interlacedDoubleExposureThreshold.Enabled = F.doubleExposeShort.Checked;
+                F.interlacedDoubleExposureThreshold.Value = m_config.interlacedDoubleExposureThreshold;
+
+                F.gaussianBlur.Checked = m_config.interlacedGaussianBlur;
+                F.gaussianBlurRadius.Enabled = F.gaussianBlur.Checked;
+                F.gaussianBlurRadius.Value = (decimal)m_config.interlacedGaussianBlurRadius;
+
+                // advanced USB box
                 F.selectionAllowAny.Checked = false;
                 F.selectionExactModel.Checked = false;
                 F.selectionExcludeModel.Checked = false;
@@ -99,35 +148,6 @@ namespace ASCOM.sxUsbCameraBase
                 F.advancedUSBParmsEnabled.Checked = false;
                 F.usbGroup.Enabled = false;
 
-                // some cameras cannot bin.  
-                // If this camera can't bin, disble the binGroup so binning cannot be modified.
-                if (m_config.maxXBin > 1)
-                {
-                    F.binGroup.Enabled = true;
-                }
-                else
-                {
-                    F.binGroup.Enabled = false;
-                }
-
-                if (m_config.symetricBinning)
-                {
-                    F.symetricBinning.Checked = true;
-                    F.binLabel.Text = "Max Bin";
-                    F.xBinLabel.Visible = false;
-                    F.maxXBin.Visible = false;
-                }
-                else
-                {
-                    F.symetricBinning.Checked = false;
-                    F.binLabel.Text = "Max Y Bin";
-                    F.xBinLabel.Visible = true;
-                    F.maxXBin.Visible = true;
-                }
-
-                F.maxXBin.Value  = m_config.maxXBin;
-                F.maxYBin.Value  = m_config.maxYBin;
-
                 if (F.ShowDialog() == DialogResult.OK)
                 {
                     Log.Write("ShowDialog returned OK - saving parameters\n");
@@ -137,6 +157,35 @@ namespace ASCOM.sxUsbCameraBase
                     m_config.bDumpData = F.dumpDataEnabled.Checked;
                     m_config.bUseDumpedData = F.useDumpedData.Checked;
 
+                    // interlaced box
+                    m_config.interlacedEqualizeFrames = F.equalizeFrames.Checked;
+
+                    m_config.interlacedDoubleExposeShortExposures = F.doubleExposeShort.Checked;
+                    if (m_config.interlacedDoubleExposeShortExposures)
+                    {
+                        m_config.interlacedDoubleExposureThreshold = (UInt16)F.interlacedDoubleExposureThreshold.Value;
+                    }
+
+                    m_config.interlacedGaussianBlur = F.gaussianBlur.Checked;
+                    if (m_config.interlacedGaussianBlur)
+                    {
+                        m_config.interlacedGaussianBlurRadius = (double)F.gaussianBlurRadius.Value;
+                    }
+
+                    // binning box
+                    m_config.asymetricBinning = F.asymetricBinning.Checked;
+                    m_config.maxYBin = (byte)F.maxYBin.Value;
+
+                    if (m_config.asymetricBinning)
+                    {
+                        m_config.maxXBin = m_config.maxYBin;
+                    }
+                    else
+                    {
+                        m_config.maxXBin = (byte)F.maxXBin.Value;
+                    }
+
+                    // advanced usp box
                     if (F.selectionAllowAny.Checked)
                     {
                         m_config.selectionMethod = ASCOM.sxCameraBase.Configuration.CAMERA_SELECTION_METHOD.CAMERA_SELECTION_ANY;
@@ -191,17 +240,6 @@ namespace ASCOM.sxUsbCameraBase
                         }
                     }
 
-                    m_config.symetricBinning = F.symetricBinning.Checked;
-                    m_config.maxYBin = (byte)F.maxYBin.Value;
-
-                    if (m_config.symetricBinning)
-                    {
-                        m_config.maxXBin = m_config.maxYBin;
-                    }
-                    else
-                    {
-                        m_config.maxXBin = (byte)F.maxXBin.Value;
-                    }
                 }
             }
             catch (System.Exception ex)

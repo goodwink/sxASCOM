@@ -684,6 +684,26 @@ namespace ASCOM.sxCameraBase
                             StartX = 0;
                             StartY = 0;
                             bHasGuideCamera = sxCamera.hasGuideCamera;
+
+                            sxCamera.bInterlacedEqualization = m_config.interlacedEqualizeFrames;
+
+                            if (!m_config.interlacedDoubleExposeShortExposures)
+                            {
+                                sxCamera.interlacedDoubleExposureThreshold = 0;
+                            }
+                            else
+                            {
+                                sxCamera.interlacedDoubleExposureThreshold = m_config.interlacedDoubleExposureThreshold;
+                            }
+
+                            if (!m_config.interlacedGaussianBlur)
+                            {
+                                sxCamera.interlacedGaussianBlurRadius = 0;
+                            }
+                            else
+                            {
+                                sxCamera.interlacedGaussianBlurRadius = m_config.interlacedGaussianBlurRadius;
+                            }
                         }
                         catch (System.Exception ex)
                         {
@@ -989,7 +1009,7 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    bool bRet = ! m_config.symetricBinning;
+                    bool bRet = m_config.asymetricBinning;
 
                     // The SX cameras can actualy do asymmetric binning, but with bayer color cameras it makes things weird, 
                     // and I don't need it, so I'm disallowing it.
