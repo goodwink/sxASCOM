@@ -20,8 +20,7 @@
 //
 // For more information please contact bretm@daddog.com
 
-//#define INTERLACED_DEBUG
-//#define USE_DUMPED_DATA
+#define INTERLACED_DEBUG
 
 using System;
 using System.IO;
@@ -132,6 +131,11 @@ namespace sx
         MODEL_H694C = 0xB7,
     }
 
+    internal enum CameraPids
+    {
+        PID_SUPERSTAR = 0509,
+    }
+
     public partial class Camera
         : sxBase
     {
@@ -156,6 +160,24 @@ namespace sx
         }
 
         // Properties
+
+        public bool bInterlacedEqualization
+        {
+            get;
+            set;
+        }
+
+        public UInt16 interlacedDoubleExposureThreshold
+        {
+            get;
+            set;
+        }
+
+        public double interlacedGaussianBlurRadius
+        {
+            get;
+            set;
+        }
 
         public UInt16 cameraModel
         {
@@ -524,7 +546,17 @@ namespace sx
                     progressive = true;
 #endif
                 case CameraModels.MODEL_H9:
-                    description = "H9";
+                    // the SuperStar guider is basically an uncooled H9 with a different
+                    // PID. See which we have
+                    if ((CameraPids)m_controller.pid == CameraPids.PID_SUPERSTAR)
+                    {
+                        description = "SuperStar";
+                    }
+                    else
+                    {
+                        description = "H9";
+                    }
+
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
                     progressive = true;
@@ -1193,17 +1225,20 @@ namespace sx
         {
             SX_CMD_BLOCK cmdBlock;
 
-            if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME | SX_CCD_FLAGS_CLEAR_VERT)) != 0)
+            if (!m_useDumped)
             {
-                throw new ArgumentException("Invalid flags passed to ClearPixels");
+                if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME)) != 0)
+                {
+                    throw new ArgumentException("Invalid flags passed to ClearPixels");
+                }
+
+                m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
+
+                Log.Write("clear about to Write\n");
+                m_controller.Write(cmdBlock);
+                echo("done"); // the clear takes a long time - when the echo returns we know it is done
+                Log.Write("clear about to return\n");
             }
-
-            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
-
-            Log.Write("clear about to Write\n");
-            m_controller.Write(cmdBlock);
-            echo("done"); // the clear takes a long time - when the echo returns we know it is done
-            Log.Write("clear about to return\n");
         }
 
         public void clearCCDAndRegisters()
@@ -1213,20 +1248,11 @@ namespace sx
             Log.Write("clearCCDAndRegisters() returns\n");
         }
 
-        public void clearAllRegisters()
+        public void clearRegisters()
         {
-            Log.Write("clearAllRegisters() entered\n");
+            Log.Write("clearRegisters() entered\n");
             clear(SX_CCD_FLAGS_NOWIPE_FRAME);
-            Log.Write("clearAllRegisters() returns\n");
-        }
-
-        public void clearVerticalRegisters()
-        {
-#if false // this might be M26C specific - don't call until better understood
-            Log.Write("clearVertialRegisters entered\n");
-            clear(SX_CCD_FLAGS_CLEAR_VERT);
-            Log.Write("clearVertialRegisters returns\n");
-#endif
+            Log.Write("clearRegisters() returns\n");
         }
 
         public void getModel()
@@ -1964,7 +1990,7 @@ namespace sx
 
                     for(Int32 i = 0; i <rawFrame2.Length/2; i++)
                     {
-                        frame2 += BitConverter.ToUInt16(rawFrame2, 2 * i);
+                        frame2 += BitConverter.ToUInt16(rawFrame2, 2*i);
                     }
 
                     Log.Write(String.Format("stats: frame1 + frame2 = {0:N0}\n", frame1 + frame2));
@@ -2081,7 +2107,7 @@ namespace sx
             }
             if (interlaced)
             {
-                //adjustInterlaced();
+                adjustInterlaced();
             }
 
             Log.Write("convertCameraDataToImageData(): ends\n");
@@ -2541,12 +2567,89 @@ namespace sx
             Debug.Assert(count == 0);
         }
 
+        internal void gaussianBlur(double radius)
+        {
+            if (radius > 0)
+            {
+                int nWeights = (int)(6*radius);
+                
+                if (nWeights < 3)
+                {
+                    nWeights = 3;
+                }
+                else if(nWeights % 2 == 0)
+                {
+                    nWeights++;
+                }
+
+                double [] weights = new Double[nWeights];
+                    
+                double total = 0;
+
+                for(int i=0;i<nWeights;i++)
+                {
+                    double x = -(nWeights/2) + i;
+                    double coeff = 1/Math.Sqrt(2*Math.PI*radius*radius);
+                    double exp = Math.Exp(-(x*x)/(2*radius*radius));
+
+                    weights[i] = coeff*exp;
+                    total += weights[i];
+                }
+
+                for(int i=0; i < nWeights; i ++)
+                {
+                    weights[i] /= total;
+                    Log.Write(String.Format("Weight[{0}]={1}", i, weights[i]));
+                }
+
+                for(Int32 y=0;y<imageData.GetUpperBound(1) + 1;y++)
+                {
+                    for(Int32 x=nWeights/2;x<(imageData.GetUpperBound(0) + 1) - (nWeights);x++)
+                    {
+                        double newPixel = 0.0;
+
+                        for(Int32 blur=0;blur<nWeights;blur++)
+                        {
+                            try
+                            {
+                                newPixel += imageData[x+blur,y] * weights[blur];
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(String.Format("blur caught an exception {0}\n", ex));
+                                throw;
+                            }
+                        }
+                        
+                        imageData[x,y] = (Int32)newPixel;
+                    }
+                }
+
+                for(Int32 x=0;x<imageData.GetUpperBound(0) + 1;x++)
+                {
+                    for(Int32 y=nWeights/2;y<(imageData.GetUpperBound(1) + 1) - (nWeights);y++)
+                    {
+                        double newPixel = 0.0;
+
+                        for(Int32 blur=0;blur<nWeights;blur++)
+                        {
+                            newPixel += imageData[x,y+blur] * weights[blur];
+                        }
+                        
+                        imageData[x,y] = (Int32)newPixel;
+                    }
+                }
+            }
+        }
+
         unsafe internal void adjustInterlaced()
         {
             Int64 evenTotal=0;
             Int64 oddTotal=0;
+            Int32 minEven = 20000;
+            Int32 minOdd  = 20000;
 
-            Log.Write("adjustProgressive() begins\n");
+            Log.Write("adjustInterlaced() begins\n");
 #if INTERLACED_DEBUG
             {
                 Int64 frameFinal=0;
@@ -2561,51 +2664,32 @@ namespace sx
                         if (y % 2 == 0)
                         {
                             frameFinalEven += imageData[x,y];
+                            if (imageData[x,y] < minEven)
+                            {
+                                minEven = imageData[x,y];
+                            }
                         }
                         else
                         {
                             frameFinalOdd += imageData[x,y];
+                            if (imageData[x,y] < minOdd)
+                            {
+                                minOdd = imageData[x,y];
+                            }
                         }
                     }
                 }
                 Log.Write(String.Format("before stats: frameFinal = {0:N0}, even+odd={1:N0}\n", frameFinal, frameFinalEven+frameFinalOdd));
                 Log.Write(String.Format("stats: frameFinal = {0:N0}, ave={1}\n", frameFinal, frameFinal/imageData.LongLength));
-                Log.Write(String.Format("stats: frameFinalEven = {0:N0}, ave={1}\n", frameFinalEven, frameFinalEven/(imageData.LongLength/2)));
-                Log.Write(String.Format("stats: frameFinalOdd = {0:N0}, ave={1}\n", frameFinalOdd, frameFinalOdd/(imageData.LongLength/2)));
+                Log.Write(String.Format("stats: frameFinalEven = {0:N0}, ave={1} min={2}\n", frameFinalEven, frameFinalEven/(imageData.LongLength/2), minEven));
+                Log.Write(String.Format("stats: frameFinalOdd = {0:N0}, ave={1} min={2}\n", frameFinalOdd, frameFinalOdd/(imageData.LongLength/2), minOdd));
             }
 #endif
 
-
-            // compute the values
-            for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
+            if (bInterlacedEqualization)
             {
-                fixed(Int32 *pImageData = &imageData[x,0])
-                {
-                    Int32 count=imageData.GetUpperBound(1)+1;
-                    Int32 *p = pImageData;
 
-                    while(count > 1)
-                    {
-                        evenTotal += *p++;
-                        oddTotal  += *p++;
-                        count-=2;
-                    }
-
-                    if (count != 0)
-                    {
-                        evenTotal += *p++;
-                    }
-                }
-            }
-
-            Log.Write(String.Format("evenTotal={0:N0} oddTotal={1:N0} evenTotal+oddTotal={2:N0}\n", evenTotal, oddTotal, evenTotal+oddTotal));
-
-            if (evenTotal < oddTotal)
-            {
-                double ratio = evenTotal/(double)oddTotal;
-                Log.Write(String.Format("adjusting even pixels, ratio={0}\n", ratio));
-
-                // adjust the even rows
+                // compute the values
                 for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
                 {
                     fixed(Int32 *pImageData = &imageData[x,0])
@@ -2615,68 +2699,65 @@ namespace sx
 
                         while(count > 1)
                         {
-                            Int32 value = (Int32)(*p * ratio);
-
-                            if (value > UInt16.MaxValue)
-                            {
-                                value = UInt16.MaxValue;
-                            }
-                            *p = value;
-                            p += 2;
+                            evenTotal += *p++;
+                            oddTotal  += *p++;
                             count-=2;
                         }
 
                         if (count != 0)
                         {
-                            Int32 value = (Int32)(*p * ratio);
-
-                            if (value > UInt16.MaxValue)
-                            {
-                                value = UInt16.MaxValue;
-                            }
-                            *p = value;
-                            p += 2;
+                            evenTotal += *p++;
                         }
                     }
                 }
-            }
-            else
-            {
-                double ratio = oddTotal/(double)evenTotal;
 
-                Log.Write(String.Format("adjusting even pixels, ratio={0}\n", ratio));
+                Log.Write(String.Format("evenTotal={0:N0} oddTotal={1:N0} evenTotal+oddTotal={2:N0}\n", evenTotal, oddTotal, evenTotal+oddTotal));
 
-                // adjust the odd rows
+                Int64 aveTotal = (evenTotal + oddTotal)/2;
+                double evenAdjust = oddTotal/(double)aveTotal;
+                double oddAdjust = evenTotal/(double)aveTotal;
+                Log.Write(String.Format("adjusting pixels, evenAdjust={0} oddAdjust={1}\n", evenAdjust, oddAdjust));
+
                 for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
                 {
-                    fixed(Int32 *pImageData = &imageData[x,1])
+                    fixed(Int32 *pImageData = &imageData[x,0])
                     {
-                        Int32 count=imageData.GetUpperBound(1);
+                        Int32 count=imageData.GetUpperBound(1)+1;
                         Int32 *p = pImageData;
 
-                        while(count > 1)
-                        {
-                            Int32 value = (Int32)(*p * ratio);
+                        // adjust the pixels, but leave saturated pixels alone
 
-                            if (value > UInt16.MaxValue)
+                        while(count > 0)
+                        {
+                            Int32 value = (Int32)(*p);
+
+                            if (value < UInt16.MaxValue)
                             {
-                                value = UInt16.MaxValue;
+                                value = (Int32)(value * evenAdjust);
+
+                                if (value > UInt16.MaxValue)
+                                {
+                                    value = UInt16.MaxValue;
+                                }
+                                *p = value;
                             }
-                            *p = value;
-                            p += 2;
+                            p++;
+
+                            value = (Int32)(*p);
+
+                            if (value < UInt16.MaxValue)
+                            {
+                                value = (Int32)(value * oddAdjust);
+
+                                if (value > UInt16.MaxValue)
+                                {
+                                    value = UInt16.MaxValue;
+                                }
+                                *p = value;
+                            }
+                            p++;
+
                             count-=2;
-                        }
-
-                        if (count != 0)
-                        {
-                            Int32 value = (Int32)(*p * ratio);
-
-                            if (value > UInt16.MaxValue)
-                            {
-                                value = UInt16.MaxValue;
-                            }
-                            *p = value;
-                            p += 2;
                         }
                     }
                 }
@@ -2709,6 +2790,8 @@ namespace sx
             }
 #endif
             Log.Write("adjustProgressive() ends\n");
+
+            gaussianBlur(interlacedGaussianBlurRadius);
         }
 
         public void guideNorth(int durationMS)
@@ -2807,16 +2890,28 @@ namespace sx
                     Debug.Assert(secondExposureFlags != 0);
                     Debug.Assert(secondExposureFlags != firstExposureFlags);
 
-                    clearAllRegisters();
-                    initReadBlock(currentExposure.toCamera, out readBlock);
-                    m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
-                                                    SX_CMD_READ_PIXELS,
-                                                    secondExposureFlags,
-                                                    idx,
-                                                    (UInt16)Marshal.SizeOf(readBlock));
+                    if (bDelayed && currentExposure.toCamera.delay < interlacedDoubleExposureThreshold)
+                    {
+                        m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
+                                                        SX_CMD_READ_PIXELS_DELAYED,
+                                                        secondExposureFlags,
+                                                        idx,
+                                                        (UInt16)Marshal.SizeOf(currentExposure.toCamera));
+                        m_controller.Write(cmdBlock, currentExposure.toCamera);
+                    }
+                    else
+                    {
+                        clearRegisters();
+                        initReadBlock(currentExposure.toCamera, out readBlock);
+                        m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
+                                                        SX_CMD_READ_PIXELS,
+                                                        secondExposureFlags,
+                                                        idx,
+                                                        (UInt16)Marshal.SizeOf(readBlock));
 
-                    Log.Write(String.Format("recordPixels() second frame requesting read, flags = {0}\n", secondExposureFlags));
-                    m_controller.Write(cmdBlock, readBlock);
+                        Log.Write(String.Format("recordPixels() second frame requesting read, flags = {0}\n", secondExposureFlags));
+                        m_controller.Write(cmdBlock, readBlock);
+                    }
 
                     exposureEnd = DateTimeOffset.Now;
                     Log.Write("recordPixels() second frame requesting download\n");

@@ -80,8 +80,26 @@ namespace sx
 
         public bool Connected
         {
-            get;
-            private set;
+            get
+            {
+                return m_iface.connected;
+            }
+        }
+
+        public UInt16 vid
+        {
+            get
+            {
+                return m_iface.vid;
+            }
+        }
+
+        public UInt16 pid
+        {
+            get
+            {
+                return m_iface.pid;
+            }
         }
 
         protected void verifyConnected(string caller)
@@ -128,8 +146,6 @@ namespace sx
         {
             Log.Write(String.Format("Controller() entered\n"));
 
-            Connected = false;
-            
             if (Lock == null)
             {
                 this.Lock = this;
@@ -150,8 +166,6 @@ namespace sx
 
             m_iface.connect(vid, pid, skip);
 
-            Connected = true;
-
             reset();
             firmwareVersion = getVersion();
             getParams(ref m_ccdParms);
@@ -162,8 +176,6 @@ namespace sx
         public void disconnect()
         {
             Log.Write(String.Format("controller.disconnect()"));
-
-            Connected = false;
 
             m_iface.disconnect();
         }

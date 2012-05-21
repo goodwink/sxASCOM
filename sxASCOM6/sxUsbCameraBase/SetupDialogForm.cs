@@ -67,48 +67,44 @@ namespace ASCOM.sxUsbCameraBase
 
         private void camera1SelectionAllowAny_CheckedChanged(object sender, EventArgs e)
         {
-            if (selectionAllowAny.Checked)
-            {
-                vidLabel.Visible = false;
-                pidLabel.Visible = false;
-                VID.Visible = false;
-                PID.Visible = false;
-            }
-            else
-            {
-                vidLabel.Visible = true;
-                pidLabel.Visible = true;
-                VID.Visible = true;
-                PID.Visible = true;
-            }
+            vidLabel.Visible = !selectionAllowAny.Checked;
+            pidLabel.Visible = !selectionAllowAny.Checked;
+            VID.Visible = !selectionAllowAny.Checked;
+            PID.Visible = !selectionAllowAny.Checked;
         }
 
         private void handleAdvancedUsbPropertiesChange(object sender, EventArgs e)
         {
-            if (advancedUSBParmsEnabled.Checked)
-            {
-                usbGroup.Enabled = true;
-            }
-            else
-            {
-                usbGroup.Enabled = false;
-            }
+            usbGroup.Enabled = advancedUSBParmsEnabled.Checked;
         }
 
-        private void symetricBinning_CheckedChanged(object sender, EventArgs e)
+        private void asymetricBinning_CheckedChanged(object sender, EventArgs e)
         {
-            if (symetricBinning.Checked)
+            if (asymetricBinning.Checked)
             {
-                binLabel.Text = "Max Bin";
-                xBinLabel.Visible = false;
-                maxXBin.Visible = false;
+                xBinLabel.Text = "Max X Bin";
             }
             else
             {
-                binLabel.Text = "Max Y Bin";
-                xBinLabel.Visible = true;
-                maxXBin.Visible = true;
+                xBinLabel.Text = "Max Bin";
             }
+            yBinLabel.Visible = asymetricBinning.Checked;
+            maxYBin.Visible = asymetricBinning.Checked;
+        }
+
+        private void fixedBinning_CheckedChanged(object sender, EventArgs e)
+        {
+            fixedBin.Enabled = fixedBinning.Checked;
+        }
+
+        private void gaussianBlur_CheckedChanged(object sender, EventArgs e)
+        {
+            gaussianBlurRadius.Enabled = gaussianBlur.Checked;
+        }
+
+        private void doubleExposeShort_CheckedChanged(object sender, EventArgs e)
+        {
+            interlacedDoubleExposureThreshold.Enabled = doubleExposeShort.Checked;
         }
     }
 }
