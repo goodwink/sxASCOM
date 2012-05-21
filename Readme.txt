@@ -8,18 +8,16 @@ which contains new, untested or lightly tested code and will expire.
 There is a STABLE release available - please use that version if it meets
 your needs.
 
-This is the first release of the ICamera2/ASCOM 6 version of the sxASCOM
+This is the second release of the ICamera2/ASCOM 6 version of the sxASCOM
 driver. In order to use this version of the driver you will have to upgrade
 your ASCOM platform to version 6.
 
-There has been a substancial reorganization of the driver, but there is
-not all that much new code, so while I'm sure there will be a few issues
-I don't expect too many problems (famous last words...)
-
 This version adds:
-    - iCamera2/ASCOM 6 support
-    - a configuration option for dumping camera data for offline analysis
-    - a configuration option for using dumped camera data offline for analysis
+    - support for the 2012 SX cameras (674/694/Superstar)
+    - a bunch of quality enhancments for the lodestar
+    - "fixed binning", which lets you set a bin mode from the 
+       configuration screen for software that doesn't support
+       binning
 
 With the exception of the Bayer matrix informational features (which needs 
 a firmware tweak from Starlight Xpress to fully implement) I belive this is 

@@ -4,7 +4,7 @@
 ;
 
 #define BUILD_TYPE "Debug"
-#define APP_VERSION "3.0.12120.1158"
+#define APP_VERSION "3.0.12142.0130"
 #define ASCOM_VERSION_REQUIRED_MAJOR  6
 #define ASCOM_VERSION_REQUIRED_MINOR  0
 
@@ -291,3 +291,4 @@ begin
         if GuideCamerasPage.Values[2] then
             Result := Result + ' /autoguide2'
 end;
+
