@@ -1,3 +1,25 @@
+// tabs=4
+// Copyright 2010-2010 by Dad Dog Development, Ltd
+//
+// This work is licensed under the Creative Commons Attribution-No Derivative 
+// Works 3.0 License. 
+//
+// A copy of the license should have been included with this software. If
+// not, you can also view a copy of this license, at:
+//
+// http://creativecommons.org/licenses/by-nd/3.0/ or 
+// send a letter to:
+//
+// Creative Commons
+// 171 Second Street
+// Suite 300
+// San Francisco, California, 94105, USA.
+// 
+// If this license is not suitable for your purposes, it is possible to 
+// obtain it under a different license. 
+//
+// For more information please contact bretm@daddog.com
+
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -58,8 +80,10 @@ namespace sx
 
         public bool Connected
         {
-            get;
-            private set;
+            get
+            {
+                return m_iface.connected;
+            }
         }
 
         public UInt16 vid
@@ -122,8 +146,6 @@ namespace sx
         {
             Log.Write(String.Format("Controller() entered\n"));
 
-            Connected = false;
-            
             if (Lock == null)
             {
                 this.Lock = this;
@@ -133,22 +155,29 @@ namespace sx
                 this.Lock = Lock;
             }
 
+            m_iface = new USBInterface();
+
             Log.Write("Controller(): returns\n");
         }
 
         public void connect(UInt16 vid, UInt16 pid, bool skip)
         {
-            Log.Write(String.Format("controller.connect({0}, {1}, {2})\n", vid, pid, skip));
+            Log.Write(String.Format("controller.connect()"));
 
-            m_iface = new USBInterface(vid, pid, skip);
-
-            Connected = true;
+            m_iface.connect(vid, pid, skip);
 
             reset();
             firmwareVersion = getVersion();
             getParams(ref m_ccdParms);
 
             Log.Write("controller.connect(): returns\n");
+        }
+
+        public void disconnect()
+        {
+            Log.Write(String.Format("controller.disconnect()"));
+
+            m_iface.disconnect();
         }
 
         internal void buildCommandBlock(out SX_CMD_BLOCK block, Byte cmd_type, Byte cmd, UInt16 cmd_value, UInt16 index, UInt16 cmd_length)
@@ -204,14 +233,41 @@ namespace sx
             return (Array)Read(System.Array.CreateInstance(elementType, 0).GetType(), numElements * Marshal.SizeOf(elementType));
         }
 
+        internal void ReadBytes(byte [] buf)
+        {
+            lock (this.Lock)
+            {
+                m_iface.Read(buf);
+            }
+        }
+
         internal byte[] ReadBytes(Int32 numBytes)
         {
-            return (byte[])Read(typeof(byte[]), numBytes);
+            byte [] bytes = new byte[numBytes];
+            ReadBytes(bytes);
+
+            return bytes;
         }
 
         internal string ReadString(Int32 numCharsToRead)
         {
             return (string)Read(typeof(System.String), numCharsToRead);
+        }
+
+        internal Int32 ReadInt32()
+        {
+            byte[] bytes = new byte[sizeof(Int32)];
+
+            ReadBytes(bytes);
+            return System.BitConverter.ToInt32(bytes, 0);
+        }
+
+        internal UInt32 ReadUInt32()
+        {
+            byte[] bytes = new byte[sizeof(UInt32)];
+
+            ReadBytes(bytes);
+            return System.BitConverter.ToUInt32(bytes, 0);
         }
 
         internal object ReadObject(Type returnType)
@@ -259,7 +315,6 @@ namespace sx
         public uint getVersion()
         {
             SX_CMD_BLOCK cmdBlock;
-            byte[] bytes;
             UInt32 ver = 0;
 
             verifyConnected(MethodBase.GetCurrentMethod().Name);
@@ -271,13 +326,11 @@ namespace sx
                 Log.Write("getVersion has locked\n");
                 Write(cmdBlock);
 
-                bytes = ReadBytes(Marshal.SizeOf(ver));
+                ver = ReadUInt32();
             }
             Log.Write("getVersion has unlocked\n");
 
-            ver = System.BitConverter.ToUInt32(bytes, 0);
-
-            Log.Write(String.Format("getVersion() returns {0}\n", ver));
+            Log.Write(String.Format("getVersion() returns 0x{0:x}\n", ver));
 
             return ver;
         }
@@ -300,7 +353,6 @@ namespace sx
         public int getTimer()
         {
             SX_CMD_BLOCK cmdBlock;
-            byte[] bytes;
             Int32 ms = 0;
 
             verifyConnected(MethodBase.GetCurrentMethod().Name);
@@ -312,11 +364,9 @@ namespace sx
                 Log.Write("getTimer has locked\n");
                 Write(cmdBlock);
 
-                bytes = ReadBytes(Marshal.SizeOf(ms));
+                ms = ReadInt32();
             }
             Log.Write("getTimer has unlocked\n");
-
-            ms = System.BitConverter.ToInt32(bytes, 0);
 
             Log.Write("Timer = " + ms + "\n");
 

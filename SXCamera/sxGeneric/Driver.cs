@@ -194,7 +194,7 @@ namespace ASCOM.SXGeneric
         /// </summary>
         /// <value>BinX sets/gets the X binning value</value>
         /// <exception>Must throw an exception for illegal binning values</exception>
-        public short BinX
+        private short BinXActual
         {
             get
             {
@@ -204,7 +204,7 @@ namespace ASCOM.SXGeneric
 
                     short ret = sxCamera.xBin;
 
-                    Log.Write(String.Format("Generic::BinX get returns {0}\n", ret));
+                    Log.Write(String.Format("Generic::BinXActual get returns {0}\n", ret));
 
                     return ret;
                 }
@@ -223,18 +223,18 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (value > MaxBinX)
+                    if (value > MaxBinXActual)
                     {
-                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinX set value out of range")), value.ToString(), MaxBinX.ToString());
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinXActual set value out of range")), value.ToString(), MaxBinXActual.ToString());
                     }
 
                     sxCamera.xBin = (byte)value;
-                    Log.Write(String.Format("Generic::BinX set to {0}\n", value));
+                    Log.Write(String.Format("Generic::BinXActual set to {0}\n", value));
                 }
                 catch (ArgumentOutOfRangeException ex)
                 {
                     SetError(ex.ToString());
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinX.ToString(), ex);
+                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinXActual.ToString(), ex);
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -247,6 +247,42 @@ namespace ASCOM.SXGeneric
             }
         }
 
+        public short BinX
+        {
+            get
+            {
+                short ret = BinXActual;
+
+                if (m_config.fixedBinning)
+                {
+                    ret = 1;
+                }
+
+                Log.Write(String.Format("sxCameraBase::BinX get returns {0}\n", ret));
+
+                return ret;
+            }
+            set
+            {
+                if (m_config.fixedBinning)
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (value != 1)
+                    {
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinX set value out of range")), value.ToString(), MaxBinXActual.ToString());
+                    }
+                    BinXActual = m_config.fixedBin;
+                }
+                else
+                {
+                    BinXActual = value;
+                }
+                Log.Write(String.Format("sxCameraBase::BinX set to {0}\n", value));
+            }
+        }
+
+
         /// <summary>
         /// Sets the binning factor for the Y axis  Also returns the current value.  Should
         /// default to 1 when the camera link is established.  Note:  driver does not check
@@ -254,7 +290,7 @@ namespace ASCOM.SXGeneric
         /// upon StartExposure.
         /// </summary>
         /// <exception>Must throw an exception for illegal binning values</exception>
-        public short BinY
+        private short BinYActual
         {
             get
             {
@@ -283,9 +319,9 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    if (value > MaxBinY)
+                    if (value > MaxBinYActual)
                     {
-                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinY set value out of range")), value.ToString(), MaxBinY.ToString());
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinY set value out of range")), value.ToString(), MaxBinYActual.ToString());
                     }
 
                     sxCamera.yBin = (byte)value;
@@ -294,7 +330,7 @@ namespace ASCOM.SXGeneric
                 catch (ArgumentOutOfRangeException ex)
                 {
                     SetError(ex.ToString());
-                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinY.ToString(), ex);
+                    throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, value.ToString(), "1-" + MaxBinYActual.ToString(), ex);
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -306,6 +342,42 @@ namespace ASCOM.SXGeneric
                 }
             }
         }
+
+        public short BinY
+        {
+            get
+            {
+                short ret = BinYActual;
+
+                if (m_config.fixedBinning)
+                {
+                    ret = 1;
+                }
+
+                Log.Write(String.Format("sxCameraBase::BinY get returns {0}\n", ret));
+
+                return ret;
+            }
+            set
+            {
+                if (m_config.fixedBinning)
+                {
+                    verifyConnected(MethodBase.GetCurrentMethod().Name);
+
+                    if (value != 1)
+                    {
+                        throw new ASCOM.InvalidValueException(SetError(String.Format("BinY set value out of range")), value.ToString(), MaxBinYActual.ToString());
+                    }
+                    BinYActual = m_config.fixedBin;
+                }
+                else
+                {
+                    BinYActual = value;
+                }
+                Log.Write(String.Format("sxCameraBase::BinY set to {0}\n", value));
+            }
+        }
+
 
         /// <summary>
         /// Returns the current CCD temperature in degrees Celsius. Only valid if
@@ -389,6 +461,11 @@ namespace ASCOM.SXGeneric
 
                     int ret = sxCamera.frameWidth;
 
+                    if (m_config.fixedBinning)
+                    {
+                        ret /= m_config.fixedBin;
+                    }
+
                     Log.Write(String.Format("Generic::CameraXSize get returns m_CameraXSize {0}\n", ret));
 
                     return ret;
@@ -417,6 +494,11 @@ namespace ASCOM.SXGeneric
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     int ret = sxCamera.frameHeight;
+
+                    if (m_config.fixedBinning)
+                    {
+                        ret /= m_config.fixedBin;
+                    }
 
                     Log.Write(String.Format("Generic::CameraYSize get returns CameraYSize {0}\n", ret));
 
@@ -474,7 +556,7 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    bool bRet = ! m_config.symetricBinning;
+                    bool bRet = m_config.asymetricBinning;
 
                     // The SX cameras can actualy do asymmetric binning, but with bayer color cameras it makes things weird, 
                     // and I don't need it, so I'm disallowing it.
@@ -591,7 +673,7 @@ namespace ASCOM.SXGeneric
                     if (value)
                     {
 #if DEBUG
-                        if (DateTime.Now.CompareTo(new DateTime(2011,7,15)) > 0)
+                        if (DateTime.Now.CompareTo(new DateTime(2012,8,15)) > 0)
                         {
                             MessageBox.Show("This debug release has expired.  Please update your bits", "Expired");
                             throw new ASCOM.PropertyNotImplementedException(SetError("connected: non-production release expired"), true);
@@ -606,7 +688,7 @@ namespace ASCOM.SXGeneric
                         try
                         {
                             Log.Write(String.Format("m_controller.Connected={0}\n", m_controller.Connected));
-                            if (!m_controller.Connected)
+                            if (!m_controller.Connected && !m_config.bUseDumpedData)
                             {
                                 try
                                 {
@@ -617,17 +699,71 @@ namespace ASCOM.SXGeneric
                                     throw new ASCOM.DriverException(SetError(String.Format("SharedResources().controllerConnect(): caught an exception {0}\n", ex.ToString())), ex);
                                 }
                             }
-                            sxCamera = new sx.Camera(m_controller, m_cameraId, m_config.enableUntested);
+
+                            if (m_config.bUseDumpedData)
+                            {
+                                OpenFileDialog dlg = new OpenFileDialog();
+
+                                dlg.ValidateNames = true;
+                                dlg.Multiselect = false;
+                                dlg.Title = "Select a dumped model file";
+
+                                if (dlg.ShowDialog(ASCOM.SXCamera.SXCamera.m_MainForm) == DialogResult.OK)
+                                {
+                                    sxCamera = new sx.Camera(m_controller, m_cameraId, m_config.enableUntested, dlg.FileName);
+                                }
+                                else
+                                {
+                                }
+                            }
+                            else
+                            {
+                                sxCamera = new sx.Camera(m_controller, m_cameraId, m_config.enableUntested, m_config.bDumpData);
+                            }
+
                             m_Connected = true;
                             // set properties to defaults. These all talk to the camera, and having them here saves
                             // a lot of try/catch blocks in other places
-                            BinX = 1;
-                            BinY = 1;
-                            NumX = sxCamera.frameWidth;
-                            NumY = sxCamera.frameHeight;
+
+                            if (m_config.fixedBinning)
+                            {
+                                BinXActual = m_config.fixedBin;
+                                BinYActual = m_config.fixedBin;
+                                NumX = sxCamera.frameWidth / m_config.fixedBin;
+                                NumY = sxCamera.frameHeight / m_config.fixedBin;
+                            }
+                            else
+                            {
+                                BinXActual = 1;
+                                BinYActual = 1;
+                                NumX = sxCamera.frameWidth;
+                                NumY = sxCamera.frameHeight;
+                            }
                             StartX = 0;
                             StartY = 0;
                             bHasGuideCamera = sxCamera.hasGuideCamera;
+
+                            sxCamera.bInterlacedEqualization = m_config.interlacedEqualizeFrames;
+                            sxCamera.bSquareLodestarPixels = m_config.squareLodestarPixels;
+
+                            if (m_config.interlacedDoubleExposeShortExposures)
+                            {
+                                sxCamera.interlacedDoubleExposureThreshold = m_config.interlacedDoubleExposureThreshold;
+                            }
+                            else
+                            {
+                                sxCamera.interlacedDoubleExposureThreshold = 0;
+                            }
+
+                            if (m_config.interlacedGaussianBlur)
+                            {
+                                sxCamera.interlacedGaussianBlurRadius = m_config.interlacedGaussianBlurRadius;
+                            }
+                            else
+                            {
+                                sxCamera.interlacedGaussianBlurRadius = 0;
+                            }
+                            
                         }
                         catch (System.Exception ex)
                         {
@@ -771,7 +907,7 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    double dRet =  MaxADU * ElectronsPerADU / (BinX * BinY);
+                    double dRet =  MaxADU * ElectronsPerADU / (BinXActual * BinYActual);
 
                     Log.Write(String.Format("Generic::FullWellCapacity get returns {0}\n", dRet));
 
@@ -1139,7 +1275,8 @@ namespace ASCOM.SXGeneric
         /// AsymmetricBinning = True, returns the maximum allowed binning factor for the X axis.
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if data unavailable.</exception>
-        public short MaxBinX
+        ///
+        private short MaxBinXActual
         {
             get 
             {
@@ -1154,7 +1291,7 @@ namespace ASCOM.SXGeneric
                         ret = m_config.maxXBin;
                     }
 
-                    Log.Write(String.Format("Generic::MaxBinX get returns {0}\n", ret));
+                    Log.Write(String.Format("Generic::MaxBinXActual get returns {0}\n", ret));
 
                     return ret;
                 }
@@ -1169,12 +1306,30 @@ namespace ASCOM.SXGeneric
             }
         }
 
+        public short MaxBinX
+        {
+            get
+            {
+                short ret = MaxBinXActual;
+
+                if (m_config.fixedBinning)
+                {
+                    ret = 1;
+                }
+
+                Log.Write(String.Format("sxCameraBase::MaxBinX get returns {0}\n", ret));
+
+                return ret;
+            }
+        }
+
         /// <summary>
-        /// If AsymmetricBinning = False, equals MaxBinX. If AsymmetricBinning = True,
+        /// If AsymmetricBinning = False, equals MaxBinXActual. If AsymmetricBinning = True,
         /// returns the maximum allowed binning factor for the Y axis.
         /// </summary>
         /// <exception cref=" System.Exception">Must throw exception if data unavailable.</exception>
-        public short MaxBinY
+        /// 
+        public short MaxBinYActual
         {
             get 
             {
@@ -1189,7 +1344,7 @@ namespace ASCOM.SXGeneric
                         ret = m_config.maxYBin;
                     }
 
-                    Log.Write(String.Format("Generic::MaxBinY get returns {0}\n", ret));
+                    Log.Write(String.Format("Generic::MaxBinYActual get returns {0}\n", ret));
 
                     return ret;
                 }
@@ -1203,6 +1358,24 @@ namespace ASCOM.SXGeneric
                 }
             }
         }
+
+        public short MaxBinY
+        {
+            get
+            {
+                short ret = MaxBinYActual;
+
+                if (m_config.fixedBinning)
+                {
+                    ret = 1;
+                }
+
+                Log.Write(String.Format("sxCameraBase::MaxBinY get returns {0}\n", ret));
+
+                return ret;
+            }
+        }
+ 
 
         /// <summary>
         /// Sets the subframe width. Also returns the current value.  If binning is active,
@@ -1313,6 +1486,11 @@ namespace ASCOM.SXGeneric
 
                     double ret = sxCamera.pixelWidth;
 
+                    if (m_config.fixedBinning)
+                    {
+                        ret *= m_config.fixedBin;
+                    }
+
                     Log.Write(String.Format("Generic::PixelSizeX get returns {0}\n", ret));
 
                     return ret;
@@ -1342,6 +1520,11 @@ namespace ASCOM.SXGeneric
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
                     double ret = sxCamera.pixelHeight;
+
+                    if (m_config.fixedBinning)
+                    {
+                        ret *= m_config.fixedBin;
+                    }
 
                     Log.Write(String.Format("Generic::PixelSizeY get returns {0}\n", ret));
 
@@ -1526,8 +1709,7 @@ namespace ASCOM.SXGeneric
 
                 sxCamera.clearCCDAndRegisters(); // For exposures > 1 second we will clear the registers again just before
                                                     // the exposure ends to clear any accumulated noise.
-                bool bAllRegistersCleareded = false;
-                bool bVerticalRegistersCleareded = false;
+                bool bRegistersCleareded = false;
 
                 if (Duration > ImageCommandTime)
                 {
@@ -1541,10 +1723,9 @@ namespace ASCOM.SXGeneric
 
                 if (desiredExposureLength.TotalSeconds < 2.0)
                 {
-                    sxCamera.clearAllRegisters();
+                    sxCamera.clearRegisters();
                     // For short exposures we don't do the clear the registers inside the loop
-                    bAllRegistersCleareded = true;
-                    bVerticalRegistersCleareded = true; 
+                    bRegistersCleareded = true;
                 }
                 
                 exposureStart = DateTime.Now;
@@ -1560,17 +1741,11 @@ namespace ASCOM.SXGeneric
                     remainingExposureTime = exposureEnd - DateTime.Now)
                 {
                     
-                    if (remainingExposureTime.TotalSeconds < 2.0 && !bAllRegistersCleareded)
+                    if (remainingExposureTime.TotalSeconds < 2.0 && !bRegistersCleareded)
                     {
                         Log.Write("softwareCapture(): doing clearAllRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
-                        sxCamera.clearAllRegisters();
-                        bAllRegistersCleareded = true;
-                    }
-                    else if (remainingExposureTime.TotalSeconds < 1.0 && !bVerticalRegistersCleareded)
-                    {
-                        Log.Write("softwareCapture(): doing clearVerticalRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
-                        sxCamera.clearVerticalRegisters();
-                        bVerticalRegistersCleareded = true;
+                        sxCamera.clearRegisters();
+                        bRegistersCleareded = true;
                     }
                     else if (remainingExposureTime.TotalMilliseconds > 75)
                     {
@@ -1638,12 +1813,6 @@ namespace ASCOM.SXGeneric
             {
                 Log.Write(String.Format("Generic::StartExposure({0}, {1}) begins\n", Duration, Light));
 
-                if (m_config.secondsAreMilliseconds)
-                {
-                    Duration /= 1000;
-                    Log.Write(String.Format("Generic::StartExposure(): after secondsAreMilliseconds adjustment, duration={0}\n", Duration));
-                }
-
                 // because of timing accuracy, we do all short exposures with the HW timer
                 if (Duration <= 1.1)
                 {
@@ -1697,27 +1866,27 @@ namespace ASCOM.SXGeneric
 
                     try
                     {
-                        sxCamera.width = (UInt16)(NumX * BinX);
+                        sxCamera.width = (UInt16)(NumX * BinXActual);
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
                         SetError(ex.ToString());
-                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumX.ToString(), "1-" + (CameraXSize/BinX).ToString(), ex);
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumX.ToString(), "1-" + (CameraXSize/BinXActual).ToString(), ex);
                     }
 
                     try
                     {
-                        sxCamera.height = (UInt16)(NumY * BinY);
+                        sxCamera.height = (UInt16)(NumY * BinYActual);
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
                         SetError(ex.ToString());
-                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
+                        throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, NumY.ToString(), "1-" + (CameraYSize/BinYActual).ToString(), ex);
                     }
                     
                     try
                     {
-                        sxCamera.xOffset = (UInt16)(StartX * BinX);
+                        sxCamera.xOffset = (UInt16)(StartX * BinXActual);
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
@@ -1727,7 +1896,7 @@ namespace ASCOM.SXGeneric
 
                     try
                     {
-                        sxCamera.yOffset = (UInt16)(StartY * BinY);
+                        sxCamera.yOffset = (UInt16)(StartY * BinYActual);
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
