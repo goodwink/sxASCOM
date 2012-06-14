@@ -1,4 +1,26 @@
-﻿using System;
+﻿// tabs=4
+// Copyright 2010-2010 by Dad Dog Development, Ltd
+//
+// This work is licensed under the Creative Commons Attribution-No Derivative 
+// Works 3.0 License. 
+//
+// A copy of the license should have been included with this software. If
+// not, you can also view a copy of this license, at:
+//
+// http://creativecommons.org/licenses/by-nd/3.0/ or 
+// send a letter to:
+//
+// Creative Commons
+// 171 Second Street
+// Suite 300
+// San Francisco, California, 94105, USA.
+// 
+// If this license is not suitable for your purposes, it is possible to 
+// obtain it under a different license. 
+//
+// For more information please contact bretm@daddog.com
+
+using System;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
 
@@ -24,6 +46,17 @@ namespace WinUsbDemo
 
         [DllImport("kernel32", SetLastError = true)]
         internal extern static int ReadFile(SafeFileHandle handle, IntPtr lpBuffer, Int32 numBytesToRead, out Int32 numBytesRead, IntPtr overlapped_MustBeZero);
+
+        [System.Runtime.InteropServices.DllImport("kernel32", SetLastError = true)]
+        internal extern static unsafe bool ReadFile
+        (
+            SafeFileHandle hFile,     // handle to file
+            void* pBuffer,            // data buffer
+            int NumberOfBytesToRead,  // number of bytes to read
+            int *pNumberOfBytesRead,  // number of bytes read
+            int Overlapped            // overlapped buffer
+        );
+
 
         [DllImport("kernel32", SetLastError = true)]
         internal extern static int WriteFile(SafeFileHandle handle, IntPtr lpBuffer, Int32 numBytesToWrite, out Int32 numBytesWritten, IntPtr overlapped_MustBeZero);

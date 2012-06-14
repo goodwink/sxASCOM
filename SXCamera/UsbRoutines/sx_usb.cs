@@ -1,8 +1,31 @@
+// tabs=4
+// Copyright 2010-2010 by Dad Dog Development, Ltd
+//
+// This work is licensed under the Creative Commons Attribution-No Derivative 
+// Works 3.0 License. 
+//
+// A copy of the license should have been included with this software. If
+// not, you can also view a copy of this license, at:
+//
+// http://creativecommons.org/licenses/by-nd/3.0/ or 
+// send a letter to:
+//
+// Creative Commons
+// 171 Second Street
+// Suite 300
+// San Francisco, California, 94105, USA.
+// 
+// If this license is not suitable for your purposes, it is possible to 
+// obtain it under a different license. 
+//
+// For more information please contact bretm@daddog.com
+
 using System;
 using System.Threading;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using WinUsbDemo;
+using System.Diagnostics;
 
 using Logging;
 
@@ -47,103 +70,134 @@ namespace sx
         //  any Vid/Pid if Vid == 0
         //  Vid/Pid as specified if skip = False
         //  any Vid/Pid except the ones specified if skip == True
-        public USBInterface(UInt16 vid, UInt16 pid, bool skip)
+        public USBInterface()
         {
-            System.Guid Guid = new System.Guid(GUID_STRING);
-            Int32 index = 0;
+            Log.Write(String.Format("USBInterface()"));
+        }
 
-            Log.Write(String.Format("USBInterface({0}, {1}, {2}) begins\n", vid, pid, skip));
+        public bool connected
+        {
+            get;
+            internal set;
+        }
 
-            while (true)
+        public void connect(UInt16 vid, UInt16 pid, bool skip)
+        {
+            if (connected)
             {
-                bool bUseThisDevice = true;
+                Log.Write(String.Format("USBInterface.connect() for already connected interface - vid{0}, pid={1}, skip={2}) begins\n", vid, pid, skip));
+            }
+            else
+            {
+                System.Guid Guid = new System.Guid(GUID_STRING);
+                Int32 index = 0;
 
-                if (!myDeviceManagement.FindDeviceFromGuid(Guid, out devicePathName, ref index))
+                Log.Write(String.Format("USBInterface.connect() begins vid{0}, pid={1}, skip={2}) begins\n", vid, pid, skip));
+
+                while (true)
                 {
-                    throw new System.IO.IOException(String.Format("Unable to locate a USB device with GUID {0}, vid={1}, pid={2}, skip={3}", Guid, vid, pid, skip));
-                }
+                    bool bUseThisDevice = true;
 
-                Log.Write(String.Format("USBInterface: Considering USB Device {0}\n", devicePathName));
-
-                UInt16 foundVid, foundPid;
-
-                DeviceManagement.parsePath(devicePathName, out foundVid, out foundPid);
-
-                Log.Write(String.Format("USBInterface: checking VID/PID - foundVID={0} foundPID={1}\n", foundVid, foundPid));
-
-                if (vid != 0)
-                {
-                    bool bVIDMatch = (foundVid == vid);
-                    bool bPIDMatch = (foundPid == pid);
-
-                    Log.Write(String.Format("USBInterface: initally bVIDMatch={0} bPIDMatch={1}\n", bVIDMatch, bPIDMatch));
-
-                    // a pid of 0xffff matches guide cameras
-
-                    if (pid == 0xffff)
+                    if (!myDeviceManagement.FindDeviceFromGuid(Guid, out devicePathName, ref index))
                     {
-                       bPIDMatch = (foundPid == 507)  || (foundPid == 517);
+                        throw new System.IO.IOException(String.Format("Unable to locate a USB device with GUID {0}, vid={1}, pid={2}, skip={3}", Guid, vid, pid, skip));
                     }
 
-                    bUseThisDevice = (bVIDMatch && bPIDMatch);
+                    Log.Write(String.Format("USBInterface.connect(): Considering USB Device {0}\n", devicePathName));
 
-                    Log.Write(String.Format("USBInterface: pre skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
+                    UInt16 foundVid, foundPid;
 
-                    if (skip)
+                    DeviceManagement.parsePath(devicePathName, out foundVid, out foundPid);
+
+                    Log.Write(String.Format("USBInterface.connect(): checking VID/PID - foundVID={0} foundPID={1}\n", foundVid, foundPid));
+
+                    if (vid != 0)
                     {
-                        bUseThisDevice = !bUseThisDevice;
+                        bool bVIDMatch = (foundVid == vid);
+                        bool bPIDMatch = (foundPid == pid);
+
+                        Log.Write(String.Format("USBInterface.connect(): initally bVIDMatch={0} bPIDMatch={1}\n", bVIDMatch, bPIDMatch));
+
+                        // a pid of 0xffff matches guide cameras
+
+                        if (pid == 0xffff)
+                        {
+                           bPIDMatch = (foundPid == 507)  || (foundPid == 517);
+                        }
+
+                        bUseThisDevice = (bVIDMatch && bPIDMatch);
+
+                        Log.Write(String.Format("USBInterface.connect(): pre skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
+
+                        if (skip)
+                        {
+                            bUseThisDevice = !bUseThisDevice;
+                        }
+
+                        Log.Write(String.Format("USBInterface.connect(): post skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
                     }
 
-                    Log.Write(String.Format("USBInterface: post skip check bVIDMatch={0} bPIDMatch={1} bUseThisDevice={2}\n", bVIDMatch, bPIDMatch, bUseThisDevice));
-                }
-
-                if (bUseThisDevice)
-                {
-                    // For reasons I don't undersand, we can get a device handle for a device thatis already open, 
-                    // even though we specify no sharing of the file when we open it.  So, in order to make sure 
-                    // that we don't open the same camera twice we create a mutex that has the same name as 
-                    // the device (execpt that we have to replace "\" with "/" because // mutex names cannot contain "\").
-                    // If we find that the mutex already existed, we assume the device is already in use and keep looking.
-
-                    String mutexName = devicePathName.Replace("\\", "/");
-                    bool createdNew;
-
-                    m_mutex = new Mutex(true, mutexName, out createdNew);
-
-                    Log.Write(String.Format("USBInterface: mutexName={0} createdNew={1}\n", mutexName, createdNew));
-
-                    if (!createdNew)
+                    if (bUseThisDevice)
                     {
-                        Log.Write(String.Format("USBInterface: mutex was already in use - closing handle and continuing search\n"));
+                        // For reasons I don't undersand, we can get a device handle for a device thatis already open, 
+                        // even though we specify no sharing of the file when we open it.  So, in order to make sure 
+                        // that we don't open the same camera twice we create a mutex that has the same name as 
+                        // the device (execpt that we have to replace "\" with "/" because // mutex names cannot contain "\").
+                        // If we find that the mutex already existed, we assume the device is already in use and keep looking.
+
+                        String mutexName = devicePathName.Replace("\\", "/");
+                        bool createdNew;
+
+                        m_mutex = new Mutex(true, mutexName, out createdNew);
+
+                        Log.Write(String.Format("USBInterface.connect(): mutexName={0} createdNew={1}\n", mutexName, createdNew));
+
+                        if (!createdNew)
+                        {
+                            Log.Write(String.Format("USBInterface.connect(): mutex was already in use - closing handle and continuing search\n"));
+                        }
+                        else
+                        {
+                            Log.Write(String.Format("USBInterface: attempting to get a handle for USB Device {0}\n", devicePathName));
+
+                            if (FileIO.GetDeviceHandle(devicePathName, out deviceHandle))
+                            {
+                                Log.Write(String.Format("USBInterface.connect(): deviceHandle.IsInvalid={0}\n", deviceHandle.IsInvalid));
+                                connected = true;
+                                vid = foundVid;
+                                pid = foundPid;
+                                break;
+                            }
+
+                            Log.Write(String.Format("USBInterface.connect(): Unable to get a device handle for GUID {0} using path {1} - skipping", Guid, devicePathName));
+
+                        }
+
+                        m_mutex.Close();
                     }
                     else
                     {
-                        Log.Write(String.Format("USBInterface: attempting to get a handle for USB Device {0}\n", devicePathName));
-
-                        if (FileIO.GetDeviceHandle(devicePathName, out deviceHandle))
-                        {
-                            Log.Write(String.Format("USBInterface: deviceHandle.IsInvalid={0}\n", deviceHandle.IsInvalid));
-                            vid = foundVid;
-                            pid = foundPid;
-                            break;
-                        }
-
-                        Log.Write(String.Format("USBInterface: Unable to get a device handle for GUID {0} using path {1} - skipping", Guid, devicePathName));
-
+                        Log.Write(String.Format("USBInterface.connect(): skipping USB Device {0} because of skip/vid/pid\n", devicePathName));
                     }
-
-                    m_mutex.Close();
-                }
-                else
-                {
-                    Log.Write(String.Format("USBInterface: skipping USB Device {0} because of skip/vid/pid\n", devicePathName));
-                }
-            } 
+                } 
+            }
         }
 
-        public USBInterface()
-            : this(0,0, false)
+        public void disconnect()
         {
+            if (!connected)
+            {
+                Log.Write(String.Format("USBInterface.disconnect() for unconnected interface\n"));
+            }
+            else
+            {
+                Log.Write(String.Format("USBInterface.disconnect()\n"));
+                FileIO.CloseDeviceHandle(deviceHandle);
+
+                m_mutex.Close();
+                m_mutex = null;
+                connected = false;
+            }
         }
 
         internal Int32 ObjectSize(Object o)
@@ -270,6 +324,62 @@ namespace sx
             Write(block, null);
         }
 
+        private unsafe void readBytes(byte *buf, Int32 numBytesToRead)
+        {
+            int error = 0;
+            Log.Write(String.Format("readBytes(): begins for {0} bytes\n", numBytesToRead));
+
+            while (numBytesToRead > 0)
+            {
+                Int32 bytesRead;
+
+                if (FileIO.ReadFile(deviceHandle, buf, numBytesToRead, &bytesRead, 0))
+                {
+                    buf += bytesRead;
+                    numBytesToRead -= bytesRead;
+                    Log.Write(String.Format("readBytes(): ReadFile() read {0} bytes - numBytesToRead={1}\n", bytesRead, numBytesToRead));
+                }
+                else
+                {
+                    error = Marshal.GetLastWin32Error();
+                    System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception(error);
+                    string errMsg = ex.Message;
+
+                    Log.Write(String.Format("ReadFile: error={0} ({1}) numBytesToRead={2}\n", error, errMsg, numBytesToRead));
+
+                    throw new System.IO.IOException(String.Format("ReadFile: error={0} ({1}) numBytesToRead={2}\n", error, errMsg, numBytesToRead));
+                }
+            }
+
+            Log.Write("Read bytes(): ends\n");
+        }
+
+        internal unsafe void Read(byte [] buffer, Int32 numElementsToRead)
+        {
+            fixed (byte *buf = buffer)
+            {
+                readBytes(buf, numElementsToRead * sizeof(byte));
+            }
+        }
+
+        internal void Read(byte [] buffer)
+        {
+            Read(buffer, buffer.Length * sizeof(byte));
+        }
+
+        internal unsafe void Read(UInt16 [] buffer, Int32 numElementsToRead)
+        {
+            fixed (UInt16 *buf = buffer)
+            {
+                readBytes((byte *)buf, numElementsToRead*sizeof(UInt16));
+            }
+        }
+
+        internal void Read(UInt16 [] buffer)
+        {
+            Read(buffer, buffer.Length);
+        }
+
         internal object Read(Type returnType, Int32 numBytesToRead)
         {
             IntPtr unManagedBuffer = IntPtr.Zero;
@@ -280,9 +390,8 @@ namespace sx
             try
             {
                 unManagedBuffer = Marshal.AllocHGlobal(numBytesToRead);
-                int error = 0;
 
-                while (error == 0 && numBytesToRead > numBytesRead)
+                while (numBytesToRead > numBytesRead)
                 {
                     Int32 thisRead = 0;
                     IntPtr buf = new IntPtr(unManagedBuffer.ToInt64() + numBytesRead);
@@ -290,56 +399,23 @@ namespace sx
 
                     Log.Write(String.Format("usbRead: buf=0x{0:x16} numBytesToRead={1,8} numBytesRead={2,8} readSize={3,8}\n", buf.ToInt64(), numBytesToRead, numBytesRead, readSize));
 
-                    int ret = FileIO.ReadFile(deviceHandle, buf, readSize, out thisRead, IntPtr.Zero);
-
-                    if (ret == 0)
-                    {
-                        error = Marshal.GetLastWin32Error();
-                    }
-                    else
+                    if (FileIO.ReadFile(deviceHandle, buf, readSize, out thisRead, IntPtr.Zero) > 0)
                     {
                         numBytesRead += thisRead;
                     }
-                }
-
-                if (false && error == 0 && numBytesToRead > 1024 * 1024 * 10)
-                {
-                    Log.Write(String.Format("about to try an extra read after a {0} read", numBytesToRead));
-
-                    IntPtr dummyUnManagedBuffer = Marshal.AllocHGlobal(1);
-
-                    int thisRead;
-                    int dummyRet;
-
-                    do
+                    else
                     {
-                        dummyRet = FileIO.ReadFile(deviceHandle, dummyUnManagedBuffer, 1, out thisRead, IntPtr.Zero);
-                        if (dummyRet == 0)
-                        {
-                            Log.Write(String.Format("extra read returns 0\n"));
-                        }
-                        else
-                        {
-                            Log.Write(String.Format("extra read returns {0} data was {1}\n", dummyRet, Marshal.ReadByte(dummyUnManagedBuffer)));
-                        }
-                    } while (dummyRet > 0);
-                }
+                        int error = Marshal.GetLastWin32Error();
 
-                if (error != 0)
-                {
-                    System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception();
-                    string errMsg = ex.Message;
+                        System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception();
+                        string errMsg = ex.Message;
 
-                    Log.Write("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead + "\n");
-                    throw new System.IO.IOException("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead);
+                        Log.Write("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead + "\n");
+                        throw new System.IO.IOException("ReadFile: error=" + error + " (" + errMsg + ") to read=" + numBytesToRead + " read=" + numBytesRead);
+                    }
+               }
 
-                }
-
-                if (numBytesRead != numBytesToRead)
-                {
-                    Log.Write("ReadFile: short read numBytesToRead=" + numBytesToRead + " numBytesRead=" + numBytesRead + "\n");
-                    throw new System.IO.IOException("ReadFile: short read numBytesToRead=" + numBytesToRead + " numBytesRead=" + numBytesRead);
-                }
+                Debug.Assert(numBytesRead == numBytesToRead);
 
                 Log.Write("ReadFile: after loop numBytesRead=" + numBytesRead + "\n");
 
