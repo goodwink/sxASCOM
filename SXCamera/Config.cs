@@ -182,7 +182,7 @@ namespace ASCOM.SXCamera
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
-                        DEFAULT_SQUARE_LODESTAR_PIXELS,
+                        false, // square lodestar pixels
                         DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
                         DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
                     ),
@@ -194,7 +194,7 @@ namespace ASCOM.SXCamera
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
-                        DEFAULT_SQUARE_LODESTAR_PIXELS,
+                        false, // square lodestar pixels
                         DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
                         DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
                     ),
@@ -206,10 +206,10 @@ namespace ASCOM.SXCamera
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
-                        DEFAULT_INTERLACED_EQUALIZE_FRAMES,
+                        false, // equalize frames
                         DEFAULT_SQUARE_LODESTAR_PIXELS,
-                        true, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
-                        true, 1.0
+                        false, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
+                        true, 1.0 // gaussian blur
                     ),
             new CAMERA_VALUES(
                         DEFAULT_ENABLE_UNTESTED, 
@@ -218,10 +218,10 @@ namespace ASCOM.SXCamera
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
-                        DEFAULT_INTERLACED_EQUALIZE_FRAMES,
+                        false, // equalize frames
                         DEFAULT_SQUARE_LODESTAR_PIXELS,
-                        true, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
-                        true, 1.0
+                        false, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
+                        true, 1.0 // gaussian blur
                     ),
             // costars
             new CAMERA_VALUES(
@@ -232,7 +232,7 @@ namespace ASCOM.SXCamera
                         DEFAULT_ASYMETRIC_BINNING, 1, 1,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
-                        DEFAULT_SQUARE_LODESTAR_PIXELS,
+                        false, // square lodestar pixels
                         DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
                         DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
                     ),
@@ -244,7 +244,7 @@ namespace ASCOM.SXCamera
                         DEFAULT_ASYMETRIC_BINNING, 1, 1,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
-                        DEFAULT_SQUARE_LODESTAR_PIXELS,
+                        false, // square lodestar pixels
                         DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
                         DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
                     ),
