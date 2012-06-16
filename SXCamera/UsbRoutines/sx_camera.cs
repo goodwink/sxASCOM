@@ -100,6 +100,17 @@ namespace sx
         MODEL_LX1 = 0x46,
         // ------------------ CoStar --------------------
         MODEL_COSTAR = 0x27,
+        // ------------------ H674/H674C
+        MODEL_H674  = 0x56,
+        MODEL_H674C = 0xB6,
+        // ------------------ H694/H694C
+        MODEL_H694  = 0x57,
+        MODEL_H694C = 0xB7,
+    }
+
+    internal enum CameraPids
+    {
+        PID_SUPERSTAR = 0509,
     }
 
     public partial class Camera
@@ -463,7 +474,16 @@ namespace sx
                     progressive = true;
 #endif
                 case CameraModels.MODEL_H9:
-                    description = "H9";
+                    // the SuperStar guider is basically an uncooled H9 with a different
+                    // PID. See which we have
+                    if ((CameraPids)m_controller.pid == CameraPids.PID_SUPERSTAR)
+                    {
+                        description = "SuperStar";
+                    }
+                    else
+                    {
+                        description = "H9";
+                    }
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
                     progressive = true;
@@ -557,6 +577,34 @@ namespace sx
                     fullWellCapacity = 100000;
                     electronsPerADU = 2.0;
                     progressive = false;
+                    break;
+                case CameraModels.MODEL_H674:
+                    bUntested = true;
+                    description = "H674";
+                    fullWellCapacity = 20000;
+                    electronsPerADU = 0.3;
+                    progressive = true;
+                    break;
+                case CameraModels.MODEL_H674C:
+                    bUntested = true;
+                    description = "H674C";
+                    fullWellCapacity = 20000;
+                    electronsPerADU = 0.3;
+                    progressive = true;
+                    break;
+                case CameraModels.MODEL_H694:
+                    bUntested = true;
+                    description = "H694";
+                    fullWellCapacity = 20000;
+                    electronsPerADU = 0.3;
+                    progressive = true;
+                    break;
+                case CameraModels.MODEL_H694C:
+                    bUntested = true;
+                    description = "H694C";
+                    fullWellCapacity = 20000;
+                    electronsPerADU = 0.3;
+                    progressive = true;
                     break;
                 default:
                     bUntested = true;
