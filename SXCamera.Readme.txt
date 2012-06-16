@@ -1,20 +1,37 @@
 Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
-This is the README.txt for version 2.1.1.2
+This is the README.txt for version 2.2
 
-This is an UNSTABLE release of the ASCOM driver for Starlight Xpress cameras,
+This is an BETA release of the ASCOM driver for Starlight Xpress cameras,
 which contains new, untested or lightly tested code and will expire.
 
-There is a STABLE release available - please use that version if it meets
+There is a PRODUCTION release available - please use that version if it meets
 your needs.
 
 This version adds:
-    - support for CoStar
-    - support for up to 8 cameras 
-        (2xImaging, 2xLodestar, 2xCostar, 2xGuider)
-    - a complete rewrite of the pixel processing code, resulting in measured
-        speedups of up to 30X (on my machine lodestar processing dropped
-        from 120ms/frame to 4ms/frame)
+    - support for Superstar/H694/H694C
+    - interlaced camera (lodestar mostly) banding improvements:
+      - symetric binning now reads out as progressive, which
+        avoids banding problems entirely
+      - an option to make the camera looked like it does not support binning
+        while setting a fixed binning mode. This can be used to force a 
+        program which does not support binning to bin (PHD is a fine 
+        example) so you take advantage of the progressive 
+        readout of binned images
+      - several options to make banding better for unbinned images
+          - take a second exposure for the second frame.  This elminates 
+            banding but doubles exposure time.
+          - apply a gaussian blur. This is useful for applications
+            that try to follow stars
+          - equalize odd and even frame brightness.  Because of
+            chip issues, this doesn't work as well as you might think it
+            would 
+    - an option to square lodestar pixels so plate solvers can solve
+      the images.  This is done the "easy way" - it expands the pixels
+      horizontally but does not increase the apparent size of the sensor,
+      so it throws away a few pixels from the right edge. Doing it the 
+      "right way" is much harder, and for a guide camera didn't
+      seem to be worth it.
 
 If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know
