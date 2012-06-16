@@ -4,7 +4,7 @@
 ;
 
 #define BUILD_TYPE "Release"
-#define APP_VERSION "2.1.1.2"
+#define APP_VERSION "2.1.1.3"
 #define ASCOM_VERSION_REQUIRED  "5.5"
 #define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
 
@@ -26,8 +26,8 @@ OutputBaseFilename="SXAscomInstaller-v{#APP_VERSION}"
 Compression=lzma
 SolidCompression=yes
 ; Put there by Platform if Driver Installer Support selected
-WizardImageFile="C:\Program Files (x86)\ASCOM\InstallGen\Resources\WizardImage.bmp"
-LicenseFile="C:\Users\bretm\Astronomy\src\sxASCOM\CreativeCommons.txt"
+WizardImageFile="C:\Program Files\ASCOM\InstallGen\Resources\WizardImage.bmp"
+LicenseFile="CreativeCommons.txt"
 
 ; {cf}\ASCOM\Uninstall\Camera folder created by Platform, always
 UninstallFilesDir="{cf}\ASCOM\Uninstall\Camera\sxASCOM"
@@ -59,14 +59,72 @@ Filename: "{app}\ASCOM.SXCamera.exe"; Parameters: "/unregister"
 [CODE]
 // Global Variables
 var
-  OverviewPage: TInputOptionWizardPage;
   StandaloneGuiderPage: TInputOptionWizardPage;
   LodeStarsPage: TInputOptionWizardPage;
   CoStarsPage: TInputOptionWizardPage;
-  CoStarPage: TInputOptionWizardPage;
   ImagingCameraPage: TInputOptionWizardPage;
   GuideCameraPage: TInputOptionWizardPage;
   GuideCamerasPage: TInputOptionWizardPage;
+
+// Convert the version number.  I have had problems with 
+// internatioalization, so I had to write this function.  
+// The problem was that this line:
+// if (H2.PlatformVersion >= {#ASCOM_VERSION_REQUIRED})
+// was raising an exception.  The Platform version is not
+// internationlaized, and when used with the language set to
+// one that requires a comma instead of a period as the 
+// decimal point seperator (french was the language that 
+// caught it...)
+
+function MajorVersion(VersionString : String) : LongWord;
+var 
+    Accumulated : LongWord;
+    Index : Integer;
+    c : char;
+begin
+    Accumulated := 0;
+
+    for Index := 1 to Length(VersionString)
+    do
+        begin
+            c := VersionString[Index];
+
+            if ((c >= '0') and ( c <= '9'))
+            then
+                begin
+                    Accumulated := Accumulated * 10 + Ord(c) - Ord('0');
+                end
+            else
+                break;
+        end
+
+    Result := Accumulated;
+end;
+
+function MinorVersion(VersionString : String) : LongWord;
+var 
+    Accumulated : LongWord;
+    Index : Integer;
+    c : char;
+begin
+    Accumulated := 0;
+
+    for Index := 1 to Length(VersionString)
+    do
+        begin
+            c := VersionString[Index];
+
+            if ((c >= '0') and ( c <= '9'))
+            then
+                begin
+                    Accumulated := Accumulated * 10 + Ord(c) - Ord('0');
+                end
+            else
+                Accumulated := 0; // reset the accumulated when we hit a non-digit
+        end
+
+    Result := Accumulated;
+end;
 
 //
 // Before the installer UI appears, verify that the (prerequisite)
@@ -80,14 +138,36 @@ var
    P  : Variant;
 begin
     Result := FALSE;  // Assume failure
-    try               // Will catch all errors including missing reg data
-        H := CreateOLEObject('DriverHelper.Util');  // Assure both are available
-        H2 := CreateOleObject('DriverHelper2.Util');
 
-        if (H2.PlatformVersion >= {#ASCOM_VERSION_REQUIRED})
+    try               // Will catch all errors including missing reg data
+        try
+            H := CreateOLEObject('DriverHelper.Util');  // Assure both are available
+        except
+            RaiseException('Unable to locate DriverHelper.Util - is the ASCOM Platform correctly installed?');
+        end;
+
+        try
+            H2 := CreateOleObject('DriverHelper2.Util');
+        except
+            RaiseException('Unable to locate DriverHelper2.Util - is the ASCOM Platform correctly installed?');
+        end;
+
+        if ((MajorVersion(H2.PlatformVersion) < MajorVersion('{#ASCOM_VERSION_REQUIRED}')) or
+            ((MajorVersion(H2.PlatformVersion) = MajorVersion('{#ASCOM_VERSION_REQUIRED}')) and 
+             (MinorVersion(H2.PlatformVersion) < MinorVersion('{#ASCOM_VERSION_REQUIRED}'))))
         then
             begin
-            P := CreateOLEObject('ASCOM.Utilities.Profile');
+                MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED} or greater is required for this driver.', mbInformation, MB_OK);
+            end
+        else
+            begin
+
+            try
+                P := CreateOLEObject('ASCOM.Utilities.Profile');
+            except
+                RaiseException('Unable to create OLE object for ASCOM.Utilities.Profile - is the ASCOM Platform correctly installed?')
+            end;
+
             P.DeviceType := 'Camera';
 
             if P.IsRegistered('ASCOM.SXMain0.Camera') or 
@@ -107,12 +187,8 @@ begin
                     Result := TRUE;
                 end
             end
-        else
-            begin
-                MsgBox('The ASCOM Platform {#ASCOM_VERSION_REQUIRED} or greater is required for this driver.', mbInformation, MB_OK);
-            end
     except
-        MsgBox('Caught an exception', mbInformation, MB_OK);
+        ShowExceptionMessage;
     end;
 end;
 
