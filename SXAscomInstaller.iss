@@ -210,32 +210,45 @@ begin
         else
             begin
 
-            try
-                P := CreateOLEObject('ASCOM.Utilities.Profile');
-            except
-                RaiseException('Unable to create OLE object for ASCOM.Utilities.Profile - is the ASCOM Platform correctly installed?')
-            end;
-
-            P.DeviceType := 'Camera';
-
-            if (IsUpgrade())
-            then
-                begin
-                    if MsgBox('A previous version of this driver was detected and will be uninstalled before this installation proceeds.', mbInformation, MB_OKCANCEL) = IDOK
-                    then
-                        begin
-                          UnInstallOldVersion();
-                          Result := TRUE;
-                        end
+                try
+                    P := CreateOLEObject('ASCOM.Utilities.Profile');
+                except
+                    RaiseException('Unable to create OLE object for ASCOM.Utilities.Profile - is the ASCOM Platform correctly installed?')
                 end
-            else
-                begin
-                    Result := TRUE;
-                end
+
+                P.DeviceType := 'Camera';
+
+                // see if there is a version we can auto remove
+                if IsUpgrade() and 
+                    (MsgBox('A previous version of this driver was detected and will be uninstalled before this installation proceeds.',
+                        mbInformation, MB_OKCANCEL) = IDOK)
+                then
+                    UnInstallOldVersion();
+
+
+                // see if there is still a version installed.  If so, it must require manual removal
+
+                if P.IsRegistered('ASCOM.SXMain0.Camera') or 
+                   P.IsRegistered('ASCOM.SXMain1.Camera') or 
+                   P.IsRegistered('ASCOM.SXMain2.Camera') or 
+                   P.IsRegistered('ASCOM.SXMain3.Camera') or 
+                   P.IsRegistered('ASCOM.SXMain4.Camera') or 
+                   P.IsRegistered('ASCOM.SXMain5.Camera') or 
+                   P.IsRegistered('ASCOM.SXGuide0.Camera') or
+                   P.IsRegistered('ASCOM.SXGuide1.Camera')
+                then
+                    begin
+                        MsgBox('A previous version of this driver that cannot be automatically removed was detected. You must uninstall the previous version from the control panel before installation can proceed.', mbInformation, MB_OK);
+                    end
+                else
+                    begin
+                        // all the old versions are gone, we can proceed
+                        Result := TRUE;
+                    end
             end
     except
         ShowExceptionMessage;
-    end;
+    end
 end;
 
 function ShouldSkipPage(PageID: Integer): Boolean;
