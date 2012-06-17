@@ -1,15 +1,13 @@
 To do a release, be sure to:
 
 - bump the version number 
-  - Properties -> Assemblyinfo.cs
-  - SXAscomInstaller.iss
-    also set the type (Release vs debug)
+  - bump_version.py
 - change the expiration date (if enabled) in sxGeneric\Driver.cs
 - create a change log with:
-  git log --pretty=format:"%s (%ai by %aN <%aE>)" v1.3.9...  > changelog.txt
+  git log --pretty=format:"%s (%ai by %aN <%aE>)" --no-merges ICamera2/master...  > changelog.txt
   echo >> changelog.txt
-  git diff -b --shortstat v1.3.9..HEAD >> changelog.txt
-  git log --pretty=format:"%s (%ai by %aN <%aE>)" > changelog.full.txt
+  git diff -b --shortstat ICamera2/master..HEAD >> changelog.txt
+  git log --pretty=format:"%s (%ai by %aN <%aE>)" --no-merges > changelog.full.txt
 - edit SXCamera.Readme
 - commit changes
   git commit -a -m "Changes required for V1.3.10"
