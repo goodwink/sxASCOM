@@ -73,20 +73,36 @@ namespace ASCOM.SXCamera
             }
         }
 
-        private void symetricBinning_CheckedChanged(object sender, EventArgs e)
+        private void asymetricBinning_CheckedChanged(object sender, EventArgs e)
         {
-            if (symetricBinning.Checked)
+            if (asymetricBinning.Checked)
+            {
+                binLabel.Text = "Max Y Bin";
+                xBinLabel.Visible = true;
+                maxXBin.Visible = true;
+
+            }
+            else
             {
                 binLabel.Text = "Max Bin";
                 xBinLabel.Visible = false;
                 maxXBin.Visible = false;
             }
-            else
-            {
-                binLabel.Text = "Max Y Bin";
-                xBinLabel.Visible = true;
-                maxXBin.Visible = true;
-            }
+        }
+
+        private void fixedBinning_CheckedChanged(object sender, EventArgs e)
+        {
+            fixedBin.Enabled = fixedBinning.Checked;
+        }
+
+        private void doubleExposeShort_CheckedChanged(object sender, EventArgs e)
+        {
+            doubleExposureThreshold.Enabled = doubleExposeShort.Checked;
+        }
+
+        private void gaussianBlur_CheckedChanged(object sender, EventArgs e)
+        {
+            gaussianBlurRadius.Enabled = gaussianBlur.Checked;
         }
     }
 }
