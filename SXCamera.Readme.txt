@@ -10,6 +10,7 @@ your needs.
 
 This version adds:
     - support for Superstar/H694/H694C
+    - installer automatically removes previous version if possible
     - interlaced camera (lodestar mostly) banding improvements:
       - symetric binning now reads out as progressive, which
         avoids banding problems entirely
