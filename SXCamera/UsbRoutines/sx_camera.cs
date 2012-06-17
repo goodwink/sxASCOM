@@ -1,5 +1,26 @@
-//#define INTERLACED_DEBUG
-//#define USE_DUMPED_DATA
+// tabs=4
+// Copyright 2010-2010 by Dad Dog Development, Ltd
+//
+// This work is licensed under the Creative Commons Attribution-No Derivative 
+// Works 3.0 License. 
+//
+// A copy of the license should have been included with this software. If
+// not, you can also view a copy of this license, at:
+//
+// http://creativecommons.org/licenses/by-nd/3.0/ or 
+// send a letter to:
+//
+// Creative Commons
+// 171 Second Street
+// Suite 300
+// San Francisco, California, 94105, USA.
+// 
+// If this license is not suitable for your purposes, it is possible to 
+// obtain it under a different license. 
+//
+// For more information please contact bretm@daddog.com
+
+#define INTERLACED_DEBUG
 
 using System;
 using System.IO;
@@ -96,8 +117,10 @@ namespace sx
         MODEL_MX9 = 0x49,
         // ------------------ M25C --------------------
         MODEL_M25C = 0x59,
+        // ------------------ M26C --------------------
+        MODEL_M26C = 0x5A,
         // ------------------ Lodestar --------------------
-        MODEL_LX1 = 0x46,
+        MODEL_LODESTAR = 0x46,
         // ------------------ CoStar --------------------
         MODEL_COSTAR = 0x27,
         // ------------------ H674/H674C
@@ -129,9 +152,38 @@ namespace sx
         private UInt16 idx;
         private SX_COOLER_BLOCK m_coolerBlock;
         private bool m_dump = false;
-        private bool m_useDumped = false;
+
+        private bool m_useDumped
+        {
+            get;
+            set;
+        }
 
         // Properties
+
+        public bool bInterlacedEqualization
+        {
+            get;
+            set;
+        }
+
+        public UInt16 interlacedDoubleExposureThreshold
+        {
+            get;
+            set;
+        }
+
+        public double interlacedGaussianBlurRadius
+        {
+            get;
+            set;
+        }
+        
+        public bool bSquareLodestarPixels
+        {
+            get;
+            set;
+        }
 
         public UInt16 cameraModel
         {
@@ -168,6 +220,26 @@ namespace sx
             get
             {
                 return !progressive;
+            }
+        }
+
+        public string sensorName
+        {
+            get;
+            internal set;
+        }
+
+        public bool isMonochrome
+        {
+            get;
+            internal set;
+        }
+
+        public bool isRGGB
+        {
+            get
+            {
+                return ! isMonochrome;
             }
         }
 
@@ -222,7 +294,7 @@ namespace sx
         {
             get 
             { 
-                UInt16 ret; ret=ccdHeight;
+                UInt16 ret=ccdHeight;
 
                 if (interlaced)
                 {
@@ -233,25 +305,56 @@ namespace sx
             }
         }
 
-        public double pixelWidth
+        private double ccdPixelWidth
         {
-            get { return ccdParms.pixel_uwidth / (double)256; }
+            get
+            {
+                double dReturn =  ccdParms.pixel_uwidth / (double)256;
+
+                return dReturn;
+            }
         }
 
-        public double pixelHeight
+        private double ccdPixelHeight
         {
             get 
             { 
-                double dRet =  ccdParms.pixel_uheight / (double)256; 
+                double dReturn =  ccdParms.pixel_uheight / (double)256; 
 
                 // interlaced cameras report their pixel height as 2X what
                 // it actually is
                 if (idx == 0 && interlaced)
                 {
-                    dRet /= 2.0;
+                    dReturn /= 2.0;
                 }
 
-                return dRet;
+                return dReturn;
+            }
+        }
+
+        public double pixelWidth
+        {
+            get
+            {
+                double dReturn = ccdPixelWidth;
+
+                if (((CameraModels)cameraModel == CameraModels.MODEL_LODESTAR) &&
+                      bSquareLodestarPixels)
+                {
+                    dReturn = ccdPixelHeight;
+                }
+
+                return dReturn;
+            }
+        }
+
+        public double pixelHeight
+        {
+            get 
+            {
+                double dReturn = ccdPixelHeight;
+
+                return dReturn;
             }
         }
 
@@ -438,6 +541,8 @@ namespace sx
         // - fullWellCapacity
         // - electronsPerADU
         // - progressive
+        // - sensorName
+        // - isMonochrome
         private void setInfo(bool bAllowUntested)
         {
             bool bUntested = false;
@@ -455,6 +560,8 @@ namespace sx
             // Most cameras can use software timing, so default is false
             mustUseHardwareTimer = false;
 
+            // sensorName is new for ASCOM v6, and for lots of cameras I don't know it
+
             switch ((CameraModels)cameraModel)
             {
                 case CameraModels.MODEL_H5:
@@ -463,6 +570,8 @@ namespace sx
                     fullWellCapacity = 30000;
                     electronsPerADU = 0.40;
                     progressive = true;
+                    sensorName = "ICX424AL";
+                    isMonochrome = true;
                     break;
 #if false
 // I don't know if this is progressive or interlaced
@@ -484,21 +593,28 @@ namespace sx
                     {
                         description = "H9";
                     }
+
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
                     progressive = true;
+                    sensorName = "ICX285AL";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H9C:
                     description = "H9C";
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
                     progressive = true;
+                    sensorName = "ICX285AK";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_H16:
                     description = "H16";
                     fullWellCapacity = 40000;
                     electronsPerADU = 0.6;
                     progressive = true;
+                    sensorName = "KAI4022M";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H35:
                     bUntested = true;
@@ -506,6 +622,8 @@ namespace sx
                     fullWellCapacity = 50000;
                     electronsPerADU = 0.9;
                     progressive = true;
+                    sensorName = "KAI-11002";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H36:
                     bUntested = true;
@@ -513,28 +631,45 @@ namespace sx
                     fullWellCapacity = 30000;
                     electronsPerADU = 0.4;
                     progressive = true;
+                    sensorName = "KAI-16000";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_COSTAR:
                     description = "CoStar";
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
                     progressive = true;
+                    sensorName = "ICX429AK";
+                    isMonochrome = false;
                     maxXBin = 1;
                     maxYBin = 1;
                     mustUseHardwareTimer = true;
                     hasBiasData = true;
                     break;
-                case CameraModels.MODEL_LX1:
+                case CameraModels.MODEL_LODESTAR:
                     description = "Lodestar";
                     fullWellCapacity = 50000;
                     electronsPerADU = 0.9;
                     progressive = false;
+                    sensorName = "ICX429AL";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_M25C:
                     description = "M25C";
                     fullWellCapacity = 25000;
                     electronsPerADU = 0.40;
                     progressive = true;
+                    sensorName = "ICX453AQ";
+                    isMonochrome = false;
+                    break;
+                case CameraModels.MODEL_M26C:
+                    bUntested = true;
+                    description = "M26C";
+                    fullWellCapacity = 25000;
+                    electronsPerADU = 0.30;
+                    progressive = false;
+                    sensorName = "ICX493AQA";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_MX5:
                     bUntested = true;
@@ -542,6 +677,10 @@ namespace sx
                     fullWellCapacity = 60000;
                     electronsPerADU = 1.0;
                     progressive = false;
+                    sensorName = "ICX405AL";
+                    isMonochrome = true;
+                    maxXBin = 1;
+                    maxYBin = 1;
                     break;
                 case CameraModels.MODEL_MX5C:
                     bUntested = true;
@@ -549,6 +688,8 @@ namespace sx
                     fullWellCapacity = 60000;
                     electronsPerADU = 1.0;
                     progressive = false;
+                    sensorName = "ICX405AK";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_MX7:
                     bUntested = true;
@@ -556,6 +697,8 @@ namespace sx
                     fullWellCapacity = 70000;
                     electronsPerADU = 1.3;
                     progressive = false;
+                    sensorName = "ICX429AL";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_MX7C:
                     bUntested = true;
@@ -563,6 +706,8 @@ namespace sx
                     fullWellCapacity = 70000;
                     electronsPerADU = 1.3;
                     progressive = false;
+                    sensorName = "ICX429AK";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_MX8C:
                     bUntested = true;
@@ -570,6 +715,8 @@ namespace sx
                     fullWellCapacity = 10000;
                     electronsPerADU = 1.0;
                     progressive = false;
+                    sensorName = "ICX406AQ";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_MX9:
                     bUntested = true;
@@ -577,6 +724,8 @@ namespace sx
                     fullWellCapacity = 100000;
                     electronsPerADU = 2.0;
                     progressive = false;
+                    sensorName = "UNKNOWN";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H674:
                     bUntested = true;
@@ -584,6 +733,8 @@ namespace sx
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
                     progressive = true;
+                    sensorName = "ICX674ALG";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H674C:
                     bUntested = true;
@@ -591,6 +742,8 @@ namespace sx
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
                     progressive = true;
+                    sensorName = "ICX674AQG";
+                    isMonochrome = false;
                     break;
                 case CameraModels.MODEL_H694:
                     bUntested = true;
@@ -598,6 +751,8 @@ namespace sx
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
                     progressive = true;
+                    sensorName = "ICX694ALG";
+                    isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H694C:
                     bUntested = true;
@@ -605,6 +760,8 @@ namespace sx
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
                     progressive = true;
+                    sensorName = "ICX694AQG";
+                    isMonochrome = true;
                     break;
                 default:
                     bUntested = true;
@@ -615,6 +772,9 @@ namespace sx
                     // switch statement, and I expect most new models will be 
                     // progressive
                     progressive = true;
+                    sensorName = "UNKNOWN";
+                    // another guess
+                    isMonochrome = true;
                     break;
             }
 
@@ -630,17 +790,48 @@ namespace sx
              }
         }
 
-        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested)
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested):
+            this(controller, cameraIdx, bAllowUntested, false, null)
+        {
+        }
+
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, bool bDump) :
+            this(controller, cameraIdx, bAllowUntested, bDump, null)
+        {
+        }
+
+
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, string dumpedModelName) :
+            this(controller, cameraIdx, bAllowUntested, false, dumpedModelName)
+        {
+        }
+
+        public Camera(Controller controller, UInt16 cameraIdx, bool bAllowUntested, bool bDump, string dumpedModelName)
         {
             Log.Write(String.Format("sx.Camera() constructor: controller={0} cameraIdx={1}\n", controller, cameraIdx));
-
+            Log.Write(String.Format("dumpedModelName={0}", dumpedModelName));
             idx = cameraIdx;
 
             m_controller = controller;
 
+            if (dumpedModelName != null)
+            {
+                m_useDumped = true;
+                setupDump(dumpedModelName);
+            }
+
             if (m_useDumped)
             {
+                Log.Write("Using Dumped Data");
                 m_controller = null;
+            }
+            else 
+            {
+                m_dump = bDump;
+                if (m_dump)
+                {
+                    Log.Write("sx.Camera(): enabling data dump\n");
+                }
             }
 
             if (cameraIdx > 0)
@@ -683,16 +874,16 @@ namespace sx
             Log.Write(String.Format("sx.Camera() constructor returns\n"));
         }
 
-        internal Byte maxXBin
+        public Byte maxXBin
         {
             get;
-            set;
+            internal set;
         }
 
-        internal Byte maxYBin
+        public Byte maxYBin
         {
             get;
-            set;
+            internal set;
         }
 
         internal void checkParms(bool useCCDSizes, SX_READ_DELAYED_BLOCK exposure)
@@ -784,7 +975,15 @@ namespace sx
 
             dumpReadDelayedBlock(currentExposure.userRequested, "exposure as requested - before any adjustments");
 
-            checkParms(false, currentExposure.userRequested);
+            try
+            {
+                checkParms(false, currentExposure.userRequested);
+            }
+            catch (Exception ex)
+            {
+                Log.Write(String.Format("checkParms of userRequested generated exception {0}\n", ex));
+                throw;
+            }
 
             currentExposure.toCamera = currentExposure.userRequested;
 
@@ -833,116 +1032,141 @@ namespace sx
 
                 if (interlaced)
                 {
-                    // if we are binning, it is possible that dividing the height by 2 will elminiate a
-                    // a binned row that would exist in a progressive camera
-                    //
-                    // suppose a sensor has 10 lines and we are binning by 3.  If the sensor was progressive,
-                    // there would be 3 binned lines.  But with a progressive sensor, we can only get 2 binned lines, 
-                    // 1 from each "half" of the sensor
-
-                    UInt16 yBin = currentExposure.userRequested.y_bin;
-                    UInt16 binnedOffset = (UInt16)(currentExposure.toCamera.y_offset/yBin);
-                    currentExposure.toCamera.y_offset = (UInt16)(binnedOffset/2 * yBin);
-
-                    UInt16 binnedRows = (UInt16)(currentExposure.toCamera.height/yBin);
-                    currentExposure.toCamera.height = (UInt16)(binnedRows/2 * yBin);
-
-                    // See if our modified parameters are still legal
-                    try
+                    if (currentExposure.userRequested.y_bin > 1 && currentExposure.userRequested.y_bin == currentExposure.userRequested.x_bin)
                     {
-                        checkParms(true, currentExposure.toCamera);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(String.Format("checkParms after intial interlaced adjustments generated an exception {0}\n", ex));
-                        throw;
-                    }
+                        // Interlaced cameras can be treated as progressive when binned.
+                        // In order for it to work, we have to leave x_bin aone but set y_bin to 1
+                        // And the height requested is 1/2 of the total because we are reqesting it from
+                        // the interlaced frame, whic only has half the rows
+                        currentExposure.toCamera.y_bin = 1;
+                        currentExposure.toCamera.height /= currentExposure.userRequested.x_bin;
 
-                    dumpReadDelayedBlock(currentExposure.toCamera, "after initial progressive adjustments");
+                        dumpReadDelayedBlock(currentExposure.toCamera, "after interlaced binned adjustments");
 
-                    bool binnedOffsetIsOdd = ((currentExposure.userRequested.y_offset/yBin) % 2) != 0;
-                    bool binnedHeightIsOdd = ((currentExposure.userRequested.height/yBin) % 2) != 0;
+                        try
+                        {
+                            checkParms(false, currentExposure.toCamera);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write(String.Format("checkParms after interlaced binned adjustment generated exception {0}\n", ex));
+                            throw;
+                        }
 
-                    Log.Write(String.Format("making final interlaced adjustments, binnedOffsetIsOdd={0}, binnedHeightIsOdd={1}\n", binnedOffsetIsOdd, binnedHeightIsOdd));
-
-                    currentExposure.toCameraSecond = currentExposure.toCamera;
-
-                    Log.Write(String.Format("binnedHeightIsOdd = {0}, height={1}, ccdHeight={2}\n", binnedHeightIsOdd, currentExposure.userRequested.height, ccdHeight));
-
-                    if (binnedOffsetIsOdd)
-                    {
-                        fieldFlags = SX_CCD_FLAGS_FIELD_ODD;
                     }
                     else
                     {
-                        fieldFlags = SX_CCD_FLAGS_FIELD_EVEN;
-                    }
-
-                    // if the height is odd, we need to adjust the height of the first frame because after the division by
-                    // two for interlaced, we have lost a row.
-                    //
-                    // For example, if the original height was 3, the height of both frames after division is 1, which 
-                    // leaves us capturing only 2 lines.  We add one back if we can without falling off the bottom
-                    //
-
-                    if (binnedHeightIsOdd && currentExposure.toCamera.y_offset + currentExposure.toCamera.height + yBin < ccdHeight)
-                    {
-                        Log.Write(String.Format("adding {0} to first camera height ({1}) for odd height\n", yBin, currentExposure.toCamera.height));
-                        currentExposure.toCamera.height += yBin;
-                    }
-
-                    int expectedRows = currentExposure.userRequested.height/yBin;
-                    int actualRows = currentExposure.toCamera.height/yBin + currentExposure.toCameraSecond.height/yBin;
-                    int rowDelta = expectedRows - actualRows;
-
-                    Debug.Assert(rowDelta == 0 || rowDelta == 1);
-
-                    if (rowDelta == 1)
-                    {
-                        // Note we are losing a line that we might be able to recover by trying to move everthing up.
-                        // This is hard so we just let the user end up with a black line a the bottom.  
+                        // if we are binning, it is possible that dividing the height by 2 will elminiate a
+                        // a binned row that would exist in a progressive camera
                         //
-                        // This is where the code to do that would go if we were doing it
-                        
-                        Log.Write(String.Format("Interlaced camera is losing a row in for odd height\n"));
-                    }
+                        // suppose a sensor has 10 lines and we are binning by 3.  If the sensor was progressive,
+                        // there would be 3 binned lines.  But with a progressive sensor, we can only get 2 binned lines, 
+                        // 1 from each "half" of the sensor
+
+                        UInt16 yBin = currentExposure.userRequested.y_bin;
+                        UInt16 binnedOffset = (UInt16)(currentExposure.toCamera.y_offset/yBin);
+                        currentExposure.toCamera.y_offset = (UInt16)(binnedOffset/2 * yBin);
+
+                        UInt16 binnedRows = (UInt16)(currentExposure.toCamera.height/yBin);
+                        currentExposure.toCamera.height = (UInt16)(binnedRows/2 * yBin);
+
+                        // See if our modified parameters are still legal
+                        try
+                        {
+                            checkParms(true, currentExposure.toCamera);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write(String.Format("checkParms after intial interlaced adjustments generated an exception {0}\n", ex));
+                            throw;
+                        }
+
+                        dumpReadDelayedBlock(currentExposure.toCamera, "after initial progressive adjustments");
+
+                        bool binnedOffsetIsOdd = ((currentExposure.userRequested.y_offset/yBin) % 2) != 0;
+                        bool binnedHeightIsOdd = ((currentExposure.userRequested.height/yBin) % 2) != 0;
+
+                        Log.Write(String.Format("making final interlaced adjustments, binnedOffsetIsOdd={0}, binnedHeightIsOdd={1}\n", binnedOffsetIsOdd, binnedHeightIsOdd));
+
+                        currentExposure.toCameraSecond = currentExposure.toCamera;
+
+                        Log.Write(String.Format("binnedHeightIsOdd = {0}, height={1}, ccdHeight={2}\n", binnedHeightIsOdd, currentExposure.userRequested.height, ccdHeight));
+
+                        if (binnedOffsetIsOdd)
+                        {
+                            fieldFlags = SX_CCD_FLAGS_FIELD_ODD;
+                        }
+                        else
+                        {
+                            fieldFlags = SX_CCD_FLAGS_FIELD_EVEN;
+                        }
+
+                        // if the height is odd, we need to adjust the height of the first frame because after the division by
+                        // two for interlaced, we have lost a row.
+                        //
+                        // For example, if the original height was 3, the height of both frames after division is 1, which 
+                        // leaves us capturing only 2 lines.  We add one back if we can without falling off the bottom
+                        //
+
+                        if (binnedHeightIsOdd && currentExposure.toCamera.y_offset + currentExposure.toCamera.height + yBin < ccdHeight)
+                        {
+                            Log.Write(String.Format("adding {0} to first camera height ({1}) for odd height\n", yBin, currentExposure.toCamera.height));
+                            currentExposure.toCamera.height += yBin;
+                        }
+
+                        int expectedRows = currentExposure.userRequested.height/yBin;
+                        int actualRows = currentExposure.toCamera.height/yBin + currentExposure.toCameraSecond.height/yBin;
+                        int rowDelta = expectedRows - actualRows;
+
+                        Debug.Assert(rowDelta == 0 || rowDelta == 1);
+
+                        if (rowDelta == 1)
+                        {
+                            // Note we are losing a line that we might be able to recover by trying to move everthing up.
+                            // This is hard so we just let the user end up with a black line a the bottom.  
+                            //
+                            // This is where the code to do that would go if we were doing it
+                            
+                            Log.Write(String.Format("Interlaced camera is losing a row in for odd height\n"));
+                        }
 
 #if DEBUG
-                    int expectedStartRow = currentExposure.userRequested.y_offset / yBin;
-                    int actualStartRow = 2 * (currentExposure.toCamera.y_offset / yBin);
+                        int expectedStartRow = currentExposure.userRequested.y_offset / yBin;
+                        int actualStartRow = 2 * (currentExposure.toCamera.y_offset / yBin);
 
-                    if (fieldFlags == SX_CCD_FLAGS_FIELD_ODD)
-                    {
-                        actualStartRow += 1;
-                    }
+                        if (fieldFlags == SX_CCD_FLAGS_FIELD_ODD)
+                        {
+                            actualStartRow += 1;
+                        }
 
-                    int startDelta = expectedStartRow - actualStartRow;
-                    Debug.Assert(startDelta == 0 || startDelta == 2);
+                        int startDelta = expectedStartRow - actualStartRow;
+                        Debug.Assert(startDelta == 0 || startDelta == 2);
 
-                    Log.Write(String.Format("rowDelta={0} startDelta={1}\n", rowDelta, startDelta));
+                        Log.Write(String.Format("rowDelta={0} startDelta={1}\n", rowDelta, startDelta));
 #endif
 
-                    dumpReadDelayedBlock(currentExposure.toCamera, "first frame after final interlaced adjustments");
-                    // See if our modified parameters are still legal
-                    try
-                    {
-                        checkParms(true, currentExposure.toCamera);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(String.Format("checkParms of first frame after final interlaced adjusments generated exception {0}\n", ex));
-                        throw;
-                    }
+                        dumpReadDelayedBlock(currentExposure.toCamera, "first frame after final interlaced adjustments");
+                        // See if our modified parameters are still legal
+                        try
+                        {
+                            checkParms(true, currentExposure.toCamera);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write(String.Format("checkParms of first frame after final interlaced adjusments generated exception {0}\n", ex));
+                            throw;
+                        }
 
-                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after final interlaced adjustments");
-                    try
-                    {
-                        checkParms(true, currentExposure.toCameraSecond);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(String.Format("checkParms of second frame after final interlaced adjustments generated exception {0}\n", ex));
-                        throw;
+                        dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after final interlaced adjustments");
+                        try
+                        {
+                            checkParms(true, currentExposure.toCameraSecond);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write(String.Format("checkParms of second frame after final interlaced adjustments generated exception {0}\n", ex));
+                            throw;
+                        }
                     }
                 }
 
@@ -1063,17 +1287,20 @@ namespace sx
         {
             SX_CMD_BLOCK cmdBlock;
 
-            if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME | SX_CCD_FLAGS_CLEAR_VERT)) != 0)
+            if (!m_useDumped)
             {
-                throw new ArgumentException("Invalid flags passed to ClearPixels");
+                if ((Flags & ~(SX_CCD_FLAGS_NOWIPE_FRAME | SX_CCD_FLAGS_TDI | SX_CCD_FLAGS_NOCLEAR_FRAME)) != 0)
+                {
+                    throw new ArgumentException("Invalid flags passed to ClearPixels");
+                }
+
+                m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
+
+                Log.Write("clear about to Write\n");
+                m_controller.Write(cmdBlock);
+                echo("done"); // the clear takes a long time - when the echo returns we know it is done
+                Log.Write("clear about to return\n");
             }
-
-            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_CLEAR_PIXELS, Flags, idx, 0);
-
-            Log.Write("clear about to Write\n");
-            m_controller.Write(cmdBlock);
-            echo("done"); // the clear takes a long time - when the echo returns we know it is done
-            Log.Write("clear about to return\n");
         }
 
         public void clearCCDAndRegisters()
@@ -1083,20 +1310,11 @@ namespace sx
             Log.Write("clearCCDAndRegisters() returns\n");
         }
 
-        public void clearAllRegisters()
+        public void clearRegisters()
         {
-            Log.Write("clearAllRegisters() entered\n");
+            Log.Write("clearRegisters() entered\n");
             clear(SX_CCD_FLAGS_NOWIPE_FRAME);
-            Log.Write("clearAllRegisters() returns\n");
-        }
-
-        public void clearVerticalRegisters()
-        {
-#if false // this might be M26C specific - don't call until better understood
-            Log.Write("clearVertialRegisters entered\n");
-            clear(SX_CCD_FLAGS_CLEAR_VERT);
-            Log.Write("clearVertialRegisters returns\n");
-#endif
+            Log.Write("clearRegisters() returns\n");
         }
 
         public void getModel()
@@ -1270,7 +1488,6 @@ namespace sx
             }
 
             printCCDParams();
-
         }
 
         void getCCDParamsUSB()
@@ -1295,14 +1512,14 @@ namespace sx
             }
         }
 
-        internal void convertCameraDataToImageData()
+        internal void convertCameraDataToImageData(bool bIsInterlaced)
         {
             UInt32 cameraBinnedWidth  = (UInt32)(currentExposure.toCamera.width / currentExposure.toCamera.x_bin);
             UInt32 cameraBinnedHeight = (UInt32)(currentExposure.toCamera.height / currentExposure.toCamera.y_bin);
             UInt32 binnedWidth        = (UInt32)(currentExposure.userRequested.width / currentExposure.userRequested.x_bin);
             UInt32 binnedHeight       = (UInt32)(currentExposure.userRequested.height / currentExposure.userRequested.y_bin);
 
-            Log.Write(String.Format("convertCameraDataToImageData(): x_bin = {0} binnedWidth={1} binnedHeight={2}\n", currentExposure.toCamera.x_bin, binnedWidth, binnedHeight));
+            Log.Write(String.Format("convertCameraDataToImageData({0}): x_bin = {1} binnedWidth={2} binnedHeight={3}\n", bIsInterlaced, currentExposure.toCamera.x_bin, binnedWidth, binnedHeight));
             if (imageData == null || imageData.GetUpperBound(0) + 1 != binnedWidth || imageData.GetUpperBound(1) + 1 != binnedHeight)
             {
                 Log.Write(String.Format("allocating imageData\n"));
@@ -1335,7 +1552,7 @@ namespace sx
                 // 201 rows that becomes 402 rows when we unswizzle it here, so the last row will be 0
 
                 Log.Write(String.Format("convertCameraDataToImageData(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
-                Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixes={1}, len={2}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length));
+                Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixels={1}, len={2}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length));
 
                 Debug.Assert((cameraBinnedHeight * 2 == binnedHeight) || (cameraBinnedHeight * 2 + 1 == binnedHeight) || (cameraBinnedHeight * 2 - 1 == binnedHeight));
 
@@ -1366,9 +1583,461 @@ namespace sx
                     throw ex;
                 }
             }
+            else if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M26C)
+            {
+                Log.Write("convertCameraDataToImageData(): decoding M26C data\n");
+                Log.Write(String.Format("convertCameraDataToImageData(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
+                Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixels={1}, rawFrame1.Length={2} rawFrame2.Length=={3}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length, rawFrame2.Length));
+
+                Debug.Assert(currentExposure.toCamera.width == ccdWidth);
+                Debug.Assert(currentExposure.toCamera.height == ccdHeight);
+                Debug.Assert(currentExposure.toCamera.x_bin == 1);
+                Debug.Assert(currentExposure.toCamera.y_bin == 1);
+                Debug.Assert(bytesPerPixel == 2);
+
+                UInt32 bytesPerLine = cameraBinnedWidth*bytesPerPixel;
+
+                int x=0;
+                int y=0;
+
+                unsafe
+                {
+                    fixed(byte *pRaw1 = rawFrame1, pRaw2 = rawFrame2)
+                    {
+                        UInt16 *pRawFrame1 = (UInt16 *)pRaw1;
+                        UInt16 *pRawFrame2 = (UInt16 *)pRaw2;
+
+                        for(y=0;y<binnedHeight;y += 2)
+                        {
+                            UInt16* pF1 = pRawFrame1 + y;
+                            UInt16* pF2 = pRawFrame2 + y;
+                            for(x=0;x<binnedWidth;x+=4)
+                            {
+                                imageData[x+0,binnedHeight - 1 - y] =                        *pF1++;
+                                imageData[cameraBinnedWidth - 1 - x, binnedHeight - 1 - y] = *pF1++;
+                                imageData[x+2,binnedHeight - 1 - y]                        = *pF1++;
+                                imageData[cameraBinnedWidth - 3 - x, binnedHeight - 1 - y] = *pF1++;
+
+                                imageData[x+0,binnedHeight - 1 - (y+1)] =                        *pF2++;
+                                imageData[cameraBinnedWidth - 1 - x, binnedHeight - 1 - (y+1)] = *pF2++;
+                                imageData[x+2,binnedHeight - 1 - (y+1)]                        = *pF2++;
+                                imageData[cameraBinnedWidth - 3 - x, binnedHeight - 1 - (y+1)] = *pF2++;
+
+                                pF1 += cameraBinnedWidth - 4;
+                                pF2 += cameraBinnedWidth - 4;
+                            }
+                        }
+                    }
+                }
+#if false
+#if true
+                //UInt16 [] frame1 = new UInt16[rawFrame1.Length/2];
+                //UInt16 [] frame2 = new UInt16[binnedWidth*binnedHeight];
+                Int32 [] frame1 = new Int32[cameraBinnedWidth*cameraBinnedHeight];
+                Int32 [] frame2 = new Int32[cameraBinnedWidth*cameraBinnedHeight];
+
+                unsafe
+                {
+                    fixed(byte *pRaw1 = rawFrame1, pRaw2 = rawFrame2)
+                    {
+                        UInt16 *pRawFrame1 = (UInt16 *)pRaw1;
+                        UInt16 *pRawFrame2 = (UInt16 *)pRaw2;
+
+                        for(uint j=0;j<rawFrame1.Length/2;j++)
+                        {
+                            frame1[j] = *pRawFrame1++;
+                            frame2[j] = *pRawFrame2++;
+                        }
+
+                    }
+                }
+
+                int x = 0, y = 0;
+                UInt32 srcIdx1;
+                UInt32 srcIdx2;
+
+                Int32[,] imageData1 = imageData;
+                Int32[,] imageData2 = new Int32[binnedWidth, binnedHeight];
+
+                try
+                {
+                    for(x = 0; x < binnedWidth;x++)
+                    {
+                        for(y = 0; y < binnedHeight; y++)
+                        {
+                            imageData1[x,y] = -1;
+                            imageData2[x,y] = -1;
+                        }
+                    }
+
+#if false
+                    for(x=0;x<frame1.Length;x++)
+                    {
+                        frame1[x] = (UInt16)x;
+                        frame2[x] = (UInt16)x;
+                    }
+#endif                    
+
+                    srcIdx1=0;
+                    srcIdx2=0;
+
+                    for(y=0;y<binnedHeight;y += 2)
+                    {
+                        for(x=0;x<cameraBinnedWidth/4;x++)
+                        {
+                            if (y < 4)
+                            {
+                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], x, y+0));
+                            }
+                            imageData1[x,y+0]                        = frame1[srcIdx1++];
+                            imageData1[x+cameraBinnedWidth/4,y+0]    = frame1[srcIdx1++];
+                            imageData1[x+2*cameraBinnedWidth/4,y+0]  = frame2[srcIdx2++];
+                            imageData1[x+3*cameraBinnedWidth/4,y+0]  = frame2[srcIdx2++];
+                            if (y < 4)
+                            {
+                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], x, y+1));
+                            }
+                            imageData1[x,y+1]                        = frame1[srcIdx1++];
+                            imageData1[x+cameraBinnedWidth/4,y+1]    = frame1[srcIdx1++];
+                            imageData1[x+2*cameraBinnedWidth/4,y+1]  = frame2[srcIdx2++];
+                            imageData1[x+3*cameraBinnedWidth/4,y+1]  = frame2[srcIdx2++];
+                        }
+                    }
+
+                    srcIdx1=0;
+                    srcIdx2=0;
+
+                    for (x = 0; x < binnedWidth/2; x += 2)
+                    {
+                        for(y=0;y<binnedHeight/2;y += 1) // for(y=0;y<binnedHeight;y += 2)
+                        {
+                            if (x < 4 )
+                            {
+                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], 1*(2*x+0), binnedHeight-1-y));
+                            }
+                            Debug.Assert(imageData2[2*x+0, binnedHeight - 1 - y] == -1);
+                            imageData2[1*(2*x+0), binnedHeight - 1 - y] = frame1[srcIdx1++];
+                            srcIdx1++;
+                            if (x < 4)
+                            {
+                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], 1*(2*x+1), binnedHeight-1-y));
+                            }
+                            Debug.Assert(imageData2[2*x+1, binnedHeight - 1 - y] == -1);
+                            imageData2[1*(2*x+1), binnedHeight - 1 - y] = frame1[srcIdx1++];
+                            srcIdx1++;
+                        }
+                    }
+
+                    for(x=0;x<cameraBinnedWidth/4;x++)
+                    {
+                        for(y=0;y<cameraBinnedHeight;y++)
+                        {
+                            //Debug.Assert(imageData2[x, binnedHeight-1-y] == imageData1[y,x]);
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.Write(String.Format("caught an exception processing M26 data x = {0}, y = {1} - {2}\n", x, y, ex.ToString()));
+                    throw ex;
+                }
+#else
+#if true
+                unsafe
+                {
+                    uint x=0, y=0;
+
+                    fixed(byte *pRaw1 = rawFrame1, pRaw2 = rawFrame2)
+                    {
+                        UInt16 *pRawFrame1 = (UInt16 *)pRaw1;
+                        UInt16 *pRawFrame2 = (UInt16 *)pRaw2;
+                        UInt32 srcIdx1=0, srcIdx2=0;
+
+                        try
+                        {
+                            for(y=0;y<binnedHeight;y += 2)
+                            {
+                                for(x=0;x<cameraBinnedWidth/4;x++)
+                                {
+                                    srcIdx1++;
+                                    imageData[x,y+0]    = pRawFrame1[srcIdx1++];
+                                    srcIdx1++;
+                                    imageData[x,y+1]    = pRawFrame1[srcIdx1++];
+                                }
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Log.Write(String.Format("caught an exception processing M26 data x = {0}, y = {1} - {2}\n", x, y, ex.ToString()));
+                            throw ex;
+                        }
+                    }
+                }
+#else
+                unsafe
+                {
+                    UInt16 [] outputData = new UInt16[(2616+1)*(3900+1)];
+                    UInt16 [] scratchData = new UInt16[(2616+2)*(3900+2)];
+                    fixed(UInt16 *pImptr1=outputData, pImptr4 = scratchData)
+                    {
+                        UInt16 *Imptr1 = pImptr1;
+                        UInt16 *Imptr4 = pImptr4;
+                        fixed(byte *pImptr2 = rawFrame1, pImptr3 = rawFrame2)
+                        {
+                            UInt16 *Imptr2 = (UInt16 *)pImptr2;
+                            UInt16 *Imptr3 = (UInt16 *)pImptr3;
+// 'This routine takes the raw unbinned data starting at Imptr2& and Imptr3&, and rearranges it into the array at Imptr4&
+
+//SUB Arrayswap2 (BYVAL Imptr1&, BYVAL Imptr2&, BYVAL Imptr3&, BYVAL Imptr4&, BYVAL Linelength&, BYVAL Linecount&) EXPORT
+//DIM Impt1 AS INTEGER PTR
+                            UInt16 *Impt1;
+//DIM Impt2 AS INTEGER PTR
+                            UInt16 *Impt2;
+//DIM Impt3 AS INTEGER PTR
+                            UInt16 *Impt3;
+//DIM Impt4 AS INTEGER PTR
+                            UInt16 *Impt4;
+//DIM Impt5 AS INTEGER PTR
+                            UInt16 *Impt5;
+//DIM Impt6 AS INTEGER PTR
+                            UInt16 *Impt6;
+//DIM Impt7 AS INTEGER PTR
+                            UInt16 *Impt7;
+//DIM Impt8 AS INTEGER PTR
+                            UInt16 *Impt8;
+
+//'Linelength&=2616
+                            UInt32 Linelength = 2616;
+//LineBytes&=Linelength& * 2
+                            UInt32 LineBytes = Linelength*2;
+//Lbx3&=LineBytes&*3
+                            UInt32 lbx3 = LineBytes * 3;
+//Lbx5&=LineBytes&*5
+                            UInt32 lbx5 = LineBytes * 5;
+//'Linecount&=3900
+                            UInt32 Linecount = 3900;
+//Linecount_4&=Linecount&/4
+                            Debug.Assert(Linecount%2 == 0);
+                            UInt32 Linecount_4 = Linecount/4;
+//Linelengthx2&=Linelength&*2
+                            UInt32 Linelengthx2 = Linecount*2;
+//Linelengthx4&=Linelength&*4
+                            UInt32 Linelengthx4 = Linecount*4;
+//Linelengthx8&=Linelength&*8
+                            UInt32 Linelengthx8 = Linecount*8;
+
+//Imptr4& = Imptr4&  + 10464
+                            Imptr4 = Imptr4 + (10464)/2;
+//Impt1=Imptr4& + LineBytes&                        'OUTPUT ARRAY START
+                            Debug.Assert((LineBytes/2) % 2 == 0);
+                            Impt1=Imptr4 + (LineBytes)/2;
+//Impt2=Imptr4& + (Linecount& * LineBytes&) - Linelengthx8& + 4
+                            Debug.Assert(((Linecount * LineBytes) - Linelengthx8 + 4)%2 == 0);
+                            Impt2=Imptr4 + ((Linecount * LineBytes) - Linelengthx8 + 4)/2;
+//Impt3=Imptr4& + LineBytes& + Linelengthx4& - 4
+                            Debug.Assert((LineBytes + Linelengthx4 - 4)%2 == 0);
+                            Impt3=Imptr4 + (LineBytes + Linelengthx4 - 4)/2;
+//Impt4=Imptr4& + (Linecount& * LineBytes&) - Linelengthx4& + 4
+                            Debug.Assert(((Linecount * LineBytes) - Linelengthx4 + 4)%2 == 0);
+                            Impt4=Imptr4 + ((Linecount * LineBytes) - Linelengthx4 + 4)/2;
+
+//Impt5=Imptr2&                                 'INPUT BUFFER START
+                            Impt5=Imptr2;
+//Impt6=Imptr2&+2
+                            Impt6=Imptr2+(2)/2;
+//Impt7=Imptr2&+4
+                            Impt7=Imptr2+(4)/2;
+//Impt8=Imptr2&+6
+                            Impt8=Imptr2+(6)/2;
+
+
+//FOR y&=1 TO Linecount_4&                   'IMAGE HEIGHT / 4
+                            for (int y=0;y<Linecount_4;y++)
+                            {
+//FOR z&=1 TO Linelength& STEP 2
+                                for(int z=0;z<Linelength;z+=2)
+                                {
+//  @Impt1=@Impt7                          'Green pixels
+                                    Debug.Assert(Impt1 >= pImptr4 && Impt1 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt7 >= pImptr2 && Impt7 < pImptr2 + rawFrame1.Length);
+                                    *Impt1 = *Impt7;
+//     @Impt2=@Impt8                           'Blue pixels
+                                    Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt8 >= pImptr2 && Impt8 < pImptr2 + rawFrame1.Length);
+                                    *Impt2 = *Impt8;
+//     @Impt3=@Impt5                           'Green pixels
+                                    Debug.Assert(Impt3 >= pImptr4 && Impt3 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt5 >= pImptr2 && Impt5 < pImptr2 + rawFrame1.Length);
+                                    *Impt3 = *Impt5;
+//     @Impt4=@Impt6                           'Blue pixels
+                                    Debug.Assert(Impt4 >= pImptr4 && Impt4 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt6 >= pImptr2 && Impt6 < pImptr2 + rawFrame1.Length);
+                                    *Impt4 = *Impt6;
+
+//     Impt1=Impt1+4                           'shift along by 2 pixels
+                                    Impt1=Impt1+(4)/2;
+//     Impt2=Impt2+4
+                                    Impt2=Impt2+(4)/2;
+//     Impt3=Impt3+4
+                                    Impt3=Impt3+(4)/2;
+//     Impt4=Impt4+4
+                                    Impt4=Impt4+(4)/2;
+//     Impt5=Impt5+8                           'shift along by 4 pixels
+                                    Impt5=Impt5+(8)/2;
+//     Impt6=Impt6+8
+                                    Impt6=Impt6+(8)/2;
+//     Impt7=Impt7+8
+                                    Impt7=Impt7+(8)/2;
+//     Impt8=Impt8+8
+                                    Impt8=Impt8+(8)/2;
+//    NEXT Z&
+                                }
+    
+//     Impt1=Impt1+Lbx3&                      'move output up by 4 rows
+                                Debug.Assert((lbx3%2) == 0);
+                                Impt1=Impt1+(lbx3)/2;
+//     Impt2=Impt2-Lbx5&
+                                Debug.Assert((lbx5%2) == 0);
+                                Impt2=Impt2-(lbx5)/2;
+//     Impt3=Impt3+Lbx3&
+                                Impt3=Impt3+(lbx3)/2;
+//     Impt4=Impt4-Lbx5&
+                                Impt4=Impt4-(lbx5)/2;
+//     Impt5=Impt5
+//     Impt6=Impt6
+//     Impt7=Impt7
+//     Impt8=Impt8
+// NEXT y&
+                            }
+// field2:
+//    Imptr4&=Imptr4& + Linelengthx2&
+                            Debug.Assert((Linelengthx2)%2 == 0);
+                            Imptr4=Imptr4 + (Linelengthx2)/2;
+//    Impt1=Imptr4& + LineBytes& + 2 -10464                            'Green pixels - OK       'OUTPUT ARRAY START
+                            Debug.Assert((LineBytes + 2 -10464)%2 == 0);
+                            Impt1=Imptr4 + (LineBytes + 2 -10464)/2;
+//    Impt2=Imptr4& + (Linecount& * LineBytes&) - Linelengthx8& + 2    'Red pixels - OK
+                            Debug.Assert(((Linecount * LineBytes) - Linelengthx8 + 2)%2 == 0);
+                            Impt2=Imptr4 + ((Linecount * LineBytes) - Linelengthx8 + 2)/2;
+//    Impt3=Imptr4& + LineBytes& + Linelengthx4& - 2 - 10464           'Green pixels - OK
+                            Debug.Assert((LineBytes + Linelengthx4 - 2 - 10464)%2 == 0);
+                            Impt3=Imptr4 + (LineBytes + Linelengthx4 - 2 - 10464)/2;
+//    Impt4=Imptr4& + (Linecount& * LineBytes&) - Linelengthx4& + 2    'Red pixels - OK
+                            Debug.Assert(((Linecount * LineBytes) - Linelengthx4 + 2)%2 == 0);
+                            Impt4=Imptr4 + ((Linecount * LineBytes) - Linelengthx4 + 2)/2;
+
+//    Impt5=Imptr3&                                 'INPUT BUFFER START
+                            Impt5=Imptr3;
+//    Impt6=Imptr3&+2
+                            Impt6=Imptr3+(2)/2;
+//    Impt7=Imptr3&+4
+                            Impt7=Imptr3+(4)/2;
+//    Impt8=Imptr3&+6
+                            Impt8=Imptr3+(6)/2;
+
+//    FOR y&=1 TO Linecount_4&                     'IMAGE HEIGHT / 4
+                            for (int y=0;y<Linecount_4;y++)
+                            {
+//    FOR z&=1 TO Linelength& STEP 2
+                                for(int z=0;z<Linelength;z+=2)
+                                {
+//        @Impt1=@Impt7
+                                    Debug.Assert(Impt1 >= pImptr4 && Impt1 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt7 >= pImptr3 && Impt7 < pImptr3 + rawFrame1.Length);
+                                    *Impt1 = *Impt7;
+//        @Impt2=@Impt8
+                                    Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt8 >= pImptr3 && Impt8 < pImptr3 + rawFrame1.Length);
+                                    *Impt2 = *Impt8;
+//        @Impt3=@Impt5
+                                    Debug.Assert(Impt3 >= pImptr4 && Impt3 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt5 >= pImptr3 && Impt5 < pImptr3 + rawFrame1.Length);
+                                    *Impt3 = *Impt5;
+//        @Impt4=@Impt6
+                                    Debug.Assert(Impt4 >= pImptr4 && Impt4 < pImptr4 + scratchData.Length);
+                                    Debug.Assert(Impt6 >= pImptr3 && Impt6 < pImptr3 + rawFrame1.Length);
+                                    *Impt4 = *Impt6;
+
+//        Impt1=Impt1+4                           'shift along by 2 pixels
+                                    Impt1=Impt1+(4)/2;
+//        Impt2=Impt2+4
+                                    Impt2=Impt2+(4)/2;
+//        Impt3=Impt3+4
+                                    Impt3=Impt3+(4)/2;
+//        Impt4=Impt4+4
+                                    Impt4=Impt4+(4)/2;
+//        Impt5=Impt5+8                           'shift along by 4 pixels
+                                    Impt5=Impt5+(8)/2;
+//        Impt6=Impt6+8
+                                    Impt6=Impt6+(8)/2;
+//        Impt7=Impt7+8
+                                    Impt7=Impt7+(8)/2;
+//        Impt8=Impt8+8
+                                    Impt8=Impt8+(8)/2;
+//    NEXT Z&
+                                }
+//        Impt1=Impt1+Lbx3&                      'move output up by 4 rows
+                                Impt1=Impt1+(lbx3)/2;
+//        Impt2=Impt2-Lbx5&
+                                Impt2=Impt2-(lbx5)/2;
+//        Impt3=Impt3+Lbx3&
+                                Impt3=Impt3+(lbx3)/2;
+//        Impt4=Impt4-Lbx5&
+                                Impt4=Impt4-(lbx5)/2;
+//        Impt5=Impt5
+//        Impt6=Impt6
+//        Impt7=Impt7
+//        Impt8=Impt8
+//    NEXT y&
+
+                            }
+//     'This section rotates the data at Imptr4& and creates a geometrically correct 1x1 image
+
+//    derotate:
+
+//    Impt1=Imptr1&+7802
+                            Impt1=Imptr1+(7802)/2;
+//    Impt2=Imptr4&+5230      'start at end of line and work backwards
+                            Impt2=Imptr4+(5230)/2;
+
+//    FOR z&=1 TO 2616
+                            for(int z=0;z<2616;z++)
+                            {
+//    FOR y&=1 TO 3900
+                                for(int y=0;y<3900;y++)
+                                {
+//        @Impt1=@Impt2
+                                    Debug.Assert(Impt1 >= pImptr1 && Impt1 < pImptr1 + outputData.Length);
+                                    Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
+                                    *Impt1 = *Impt2;
+//        Impt1=Impt1+2
+                                    Impt1=Impt1+(2)/2;
+//        Impt2=Impt2+5232    'move down 1 line
+                                    Impt2=Impt2+(5232)/2;
+//    NEXT y&
+                                }
+//    Impt2=Impt2-20404800-2
+                                Impt2=Impt2-(20404800-2)/2;
+//    NEXT z&
+                            }
+//    END SUB
+                        }
+                    }
+                    for(int x=0;x<3900;x++)
+                    {
+                        for(int y=0;y<2616;y++)
+                        {
+                            imageData[x,y] = scratchData[x*2616+y];
+                        }
+                    }
+                }
+#endif
+#endif
+#endif
+            } // end of M26
             else if (bytesPerPixel == 1 || bytesPerPixel == 2)
             {
-                Log.Write(String.Format("convertCameraDataToImageData() processing {0} bit {1} camera data\n", bitsPerPixel, interlaced?"interlaced":"progressive"));
+                Log.Write(String.Format("convertCameraDataToImageData() processing {0} bit {1} camera data\n", bitsPerPixel, bIsInterlaced?"interlaced":"progressive"));
 
 #if INTERLACED_DEBUG
                 if (rawFrame2 != null)
@@ -1383,7 +2052,7 @@ namespace sx
 
                     for(Int32 i = 0; i <rawFrame2.Length/2; i++)
                     {
-                        frame2 += BitConverter.ToUInt16(rawFrame2, 2 * i);
+                        frame2 += BitConverter.ToUInt16(rawFrame2, 2*i);
                     }
 
                     Log.Write(String.Format("stats: frame1 + frame2 = {0:N0}\n", frame1 + frame2));
@@ -1405,14 +2074,14 @@ namespace sx
                     // For  example, you would expect a 10x10 sensor binned 3X to give 3 rows.  But
                     // with an interlaced camera it is actally 2x10x5, and the 5 only gives 1 row for 3X
                     // binning. 
-                    if (interlaced)
+                    if (bIsInterlaced)
                     {
                         actualHeight += (UInt32)(rawFrame2.Length / bytesPerPixel / cameraBinnedWidth);
                     }
 
                     Log.Write(String.Format("actualHeight={0}\n", actualHeight));
 
-                    Debug.Assert(actualHeight == binnedHeight || (interlaced && (actualHeight == binnedHeight - 1)));
+                    Debug.Assert(actualHeight == binnedHeight || (bIsInterlaced && (actualHeight == binnedHeight - 1)));
 
                     if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
                     {
@@ -1432,7 +2101,7 @@ namespace sx
                         UInt32 yOffset =  y;
                         byte [] rawFrame = rawFrame1;
 
-                        if (interlaced)
+                        if (bIsInterlaced)
                         {
                             if (y % 2 == 1)
                             {
@@ -1443,7 +2112,7 @@ namespace sx
                         }
                         UInt32 destOffset = y;
 #if false && INTERLACED_DEBUG
-                        if (interlaced)
+                        if (bIsInterlaced)
                         {
                                 destOffset = yOffset + (y % 2) * binnedHeight/2;
                         }
@@ -1498,9 +2167,14 @@ namespace sx
             {
                 throw new System.Exception(String.Format("Unable to decode image - unknown camera or pixel type"));
             }
-            if (interlaced)
+            if (bIsInterlaced)
             {
-                //adjustInterlaced();
+                adjustInterlaced();
+            }
+
+            if (bSquareLodestarPixels)
+            {
+                squarePixels();
             }
 
             Log.Write("convertCameraDataToImageData(): ends\n");
@@ -1527,7 +2201,7 @@ namespace sx
             Log.Write(String.Format("setPixelSize: bytesPerPixel=\n", bytesPerPixel));
         }
 
-        internal byte [] downloadPixels(bool setValid, SX_READ_DELAYED_BLOCK exposure)
+        internal byte [] downloadPixels(SX_READ_DELAYED_BLOCK exposure)
         {
             Int32 binnedWidth = exposure.width / exposure.x_bin;
             Int32 binnedHeight = exposure.height / exposure.y_bin;
@@ -1537,6 +2211,24 @@ namespace sx
             Log.Write(String.Format("downloadPixels(): requesting {0} pixels, {1} bytes each ({2} bytes)\n", imagePixels, bytesPerPixel, imagePixels * bytesPerPixel));
 
             ret = m_controller.ReadBytes(imagePixels * bytesPerPixel);
+
+#if true
+            {
+                int totalExtra = 0;
+                int extra = 0;
+                int size = 1;
+                byte [] stashed = ret;
+                
+                while (extra < totalExtra)
+                {
+                    ret = m_controller.ReadBytes(size);
+                    extra += size;
+                    Log.Write(String.Format("extra = {0}", extra));
+                }
+
+                ret = stashed;
+            }
+#endif
 
             Log.Write("downloadPixels(): read completed\n");
 
@@ -1960,12 +2652,89 @@ namespace sx
             Debug.Assert(count == 0);
         }
 
+        internal void gaussianBlur(double radius)
+        {
+            if (radius > 0)
+            {
+                int nWeights = (int)(6*radius);
+                
+                if (nWeights < 3)
+                {
+                    nWeights = 3;
+                }
+                else if(nWeights % 2 == 0)
+                {
+                    nWeights++;
+                }
+
+                double [] weights = new Double[nWeights];
+                    
+                double total = 0;
+
+                for(int i=0;i<nWeights;i++)
+                {
+                    double x = -(nWeights/2) + i;
+                    double coeff = 1/Math.Sqrt(2*Math.PI*radius*radius);
+                    double exp = Math.Exp(-(x*x)/(2*radius*radius));
+
+                    weights[i] = coeff*exp;
+                    total += weights[i];
+                }
+
+                for(int i=0; i < nWeights; i ++)
+                {
+                    weights[i] /= total;
+                    Log.Write(String.Format("Weight[{0}]={1}", i, weights[i]));
+                }
+
+                for(Int32 y=0;y<imageData.GetUpperBound(1) + 1;y++)
+                {
+                    for(Int32 x=nWeights/2;x<(imageData.GetUpperBound(0) + 1) - (nWeights);x++)
+                    {
+                        double newPixel = 0.0;
+
+                        for(Int32 blur=0;blur<nWeights;blur++)
+                        {
+                            try
+                            {
+                                newPixel += imageData[x+blur,y] * weights[blur];
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(String.Format("blur caught an exception {0}\n", ex));
+                                throw;
+                            }
+                        }
+                        
+                        imageData[x,y] = (Int32)newPixel;
+                    }
+                }
+
+                for(Int32 x=0;x<imageData.GetUpperBound(0) + 1;x++)
+                {
+                    for(Int32 y=nWeights/2;y<(imageData.GetUpperBound(1) + 1) - (nWeights);y++)
+                    {
+                        double newPixel = 0.0;
+
+                        for(Int32 blur=0;blur<nWeights;blur++)
+                        {
+                            newPixel += imageData[x,y+blur] * weights[blur];
+                        }
+                        
+                        imageData[x,y] = (Int32)newPixel;
+                    }
+                }
+            }
+        }
+
         unsafe internal void adjustInterlaced()
         {
             Int64 evenTotal=0;
             Int64 oddTotal=0;
+            Int32 minEven = 20000;
+            Int32 minOdd  = 20000;
 
-            Log.Write("adjustProgressive() begins\n");
+            Log.Write("adjustInterlaced() begins\n");
 #if INTERLACED_DEBUG
             {
                 Int64 frameFinal=0;
@@ -1980,51 +2749,32 @@ namespace sx
                         if (y % 2 == 0)
                         {
                             frameFinalEven += imageData[x,y];
+                            if (imageData[x,y] < minEven)
+                            {
+                                minEven = imageData[x,y];
+                            }
                         }
                         else
                         {
                             frameFinalOdd += imageData[x,y];
+                            if (imageData[x,y] < minOdd)
+                            {
+                                minOdd = imageData[x,y];
+                            }
                         }
                     }
                 }
                 Log.Write(String.Format("before stats: frameFinal = {0:N0}, even+odd={1:N0}\n", frameFinal, frameFinalEven+frameFinalOdd));
                 Log.Write(String.Format("stats: frameFinal = {0:N0}, ave={1}\n", frameFinal, frameFinal/imageData.LongLength));
-                Log.Write(String.Format("stats: frameFinalEven = {0:N0}, ave={1}\n", frameFinalEven, frameFinalEven/(imageData.LongLength/2)));
-                Log.Write(String.Format("stats: frameFinalOdd = {0:N0}, ave={1}\n", frameFinalOdd, frameFinalOdd/(imageData.LongLength/2)));
+                Log.Write(String.Format("stats: frameFinalEven = {0:N0}, ave={1} min={2}\n", frameFinalEven, frameFinalEven/(imageData.LongLength/2), minEven));
+                Log.Write(String.Format("stats: frameFinalOdd = {0:N0}, ave={1} min={2}\n", frameFinalOdd, frameFinalOdd/(imageData.LongLength/2), minOdd));
             }
 #endif
 
-
-            // compute the values
-            for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
+            if (bInterlacedEqualization)
             {
-                fixed(Int32 *pImageData = &imageData[x,0])
-                {
-                    Int32 count=imageData.GetUpperBound(1)+1;
-                    Int32 *p = pImageData;
 
-                    while(count > 1)
-                    {
-                        evenTotal += *p++;
-                        oddTotal  += *p++;
-                        count-=2;
-                    }
-
-                    if (count != 0)
-                    {
-                        evenTotal += *p++;
-                    }
-                }
-            }
-
-            Log.Write(String.Format("evenTotal={0:N0} oddTotal={1:N0} evenTotal+oddTotal={2:N0}\n", evenTotal, oddTotal, evenTotal+oddTotal));
-
-            if (evenTotal < oddTotal)
-            {
-                double ratio = evenTotal/(double)oddTotal;
-                Log.Write(String.Format("adjusting even pixels, ratio={0}\n", ratio));
-
-                // adjust the even rows
+                // compute the values
                 for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
                 {
                     fixed(Int32 *pImageData = &imageData[x,0])
@@ -2034,68 +2784,65 @@ namespace sx
 
                         while(count > 1)
                         {
-                            Int32 value = (Int32)(*p * ratio);
-
-                            if (value > UInt16.MaxValue)
-                            {
-                                value = UInt16.MaxValue;
-                            }
-                            *p = value;
-                            p += 2;
+                            evenTotal += *p++;
+                            oddTotal  += *p++;
                             count-=2;
                         }
 
                         if (count != 0)
                         {
-                            Int32 value = (Int32)(*p * ratio);
-
-                            if (value > UInt16.MaxValue)
-                            {
-                                value = UInt16.MaxValue;
-                            }
-                            *p = value;
-                            p += 2;
+                            evenTotal += *p++;
                         }
                     }
                 }
-            }
-            else
-            {
-                double ratio = oddTotal/(double)evenTotal;
 
-                Log.Write(String.Format("adjusting even pixels, ratio={0}\n", ratio));
+                Log.Write(String.Format("evenTotal={0:N0} oddTotal={1:N0} evenTotal+oddTotal={2:N0}\n", evenTotal, oddTotal, evenTotal+oddTotal));
 
-                // adjust the odd rows
+                Int64 aveTotal = (evenTotal + oddTotal)/2;
+                double evenAdjust = oddTotal/(double)aveTotal;
+                double oddAdjust = evenTotal/(double)aveTotal;
+                Log.Write(String.Format("adjusting pixels, evenAdjust={0} oddAdjust={1}\n", evenAdjust, oddAdjust));
+
                 for(UInt32 x=0;x<imageData.GetUpperBound(0)+1;x++)
                 {
-                    fixed(Int32 *pImageData = &imageData[x,1])
+                    fixed(Int32 *pImageData = &imageData[x,0])
                     {
-                        Int32 count=imageData.GetUpperBound(1);
+                        Int32 count=imageData.GetUpperBound(1)+1;
                         Int32 *p = pImageData;
 
-                        while(count > 1)
-                        {
-                            Int32 value = (Int32)(*p * ratio);
+                        // adjust the pixels, but leave saturated pixels alone
 
-                            if (value > UInt16.MaxValue)
+                        while(count > 0)
+                        {
+                            Int32 value = (Int32)(*p);
+
+                            if (value < UInt16.MaxValue)
                             {
-                                value = UInt16.MaxValue;
+                                value = (Int32)(value * evenAdjust);
+
+                                if (value > UInt16.MaxValue)
+                                {
+                                    value = UInt16.MaxValue;
+                                }
+                                *p = value;
                             }
-                            *p = value;
-                            p += 2;
+                            p++;
+
+                            value = (Int32)(*p);
+
+                            if (value < UInt16.MaxValue)
+                            {
+                                value = (Int32)(value * oddAdjust);
+
+                                if (value > UInt16.MaxValue)
+                                {
+                                    value = UInt16.MaxValue;
+                                }
+                                *p = value;
+                            }
+                            p++;
+
                             count-=2;
-                        }
-
-                        if (count != 0)
-                        {
-                            Int32 value = (Int32)(*p * ratio);
-
-                            if (value > UInt16.MaxValue)
-                            {
-                                value = UInt16.MaxValue;
-                            }
-                            *p = value;
-                            p += 2;
                         }
                     }
                 }
@@ -2128,6 +2875,70 @@ namespace sx
             }
 #endif
             Log.Write("adjustProgressive() ends\n");
+
+            gaussianBlur(interlacedGaussianBlurRadius);
+        }
+
+        // Note: SquarePixels is designed to deal with Lodestar's rectangluar pixels
+        //       because they cause plate solves to fail.  The "right" thing to have 
+        //       done would be to change the reported width, and deal with the issue
+        //       everywhere. Instead I take the easy way out, and square the pixels
+        //       "in place". This doesn't change the image size, and since the difference
+        //       is small, I just throw away the "extra" pixels.
+
+        internal void squarePixels()
+        {
+            if (((CameraModels)cameraModel == CameraModels.MODEL_LODESTAR) &&
+                  bSquareLodestarPixels)
+            {
+                Int32 [] temp = new Int32[imageData.GetUpperBound(0) + 1];
+                double offset = 0.0;
+                double ratio = ccdPixelHeight/ccdPixelWidth;
+
+                Debug.Assert(ratio < 1.0);
+
+                for(UInt32 y=0;y<imageData.GetUpperBound(1) + 1;y++)
+                {
+                    offset = 0.0;
+
+                    for(UInt32 x=0;x<imageData.GetUpperBound(0) + 1;x++)
+                    {
+                        double w1;
+                        double w2;
+
+                        double nextOffset = offset + ratio;
+
+                        if ((int)offset == (int)nextOffset)
+                        {
+                            w1 = 1.0;
+                            w2 = 0.0;
+                        }
+                        else
+                        {
+                            w1 = Math.Ceiling(offset) - offset;
+                            w2 = 1 - w1;
+                        }
+
+                        try
+                        {
+                            temp[x] = (Int32)(w1 * imageData[(int)offset,y] +
+                                              w2 * imageData[(int)nextOffset,y]);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Write(String.Format("caught an exception squaring pixels: y={0} x={1} w1={2} w2={3} offset={4} nextOffset={5}: {6}", y, x, w1, w2, offset, nextOffset, ex));
+                            throw;
+                        }
+
+                        offset = nextOffset;
+                    }
+
+                    for(UInt32 x=0;x<imageData.GetUpperBound(0) + 1;x++)
+                    {
+                        imageData[x,y] = temp[x];
+                    }
+                }
+            }
         }
 
         public void guideNorth(int durationMS)
@@ -2213,12 +3024,19 @@ namespace sx
                 Log.Write(String.Format("recordPixels() requested read, flags = {0}\n", firstExposureFlags)); 
                 exposureEnd = DateTimeOffset.Now;
             
-                
+                if (interlaced && secondExposureFlags == 0)
+                {
+                    // undo the interlaced as progressive changes we made above
+                    currentExposure.toCamera.y_bin = currentExposure.toCamera.x_bin;
+                    currentExposure.toCamera.height *= currentExposure.toCamera.x_bin;
+                    rawFrame2 = null;
+                }
+
                 Log.Write("recordPixelsDelayed requesting download\n");
-                rawFrame1 = downloadPixels(progressive, currentExposure.toCamera);
+                rawFrame1 = downloadPixels(currentExposure.toCamera);
                 Log.Write("recordPixels() download completed\n");
 
-                if (idx == 0 && interlaced)
+                if (idx == 0 && secondExposureFlags != 0)
                 {
                     SX_READ_BLOCK readBlock;
                     Log.Write("recordPixels() preparing for second frame download\n");
@@ -2226,20 +3044,32 @@ namespace sx
                     Debug.Assert(secondExposureFlags != 0);
                     Debug.Assert(secondExposureFlags != firstExposureFlags);
 
-                    clearAllRegisters();
-                    initReadBlock(currentExposure.toCamera, out readBlock);
-                    m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
-                                                    SX_CMD_READ_PIXELS,
-                                                    secondExposureFlags,
-                                                    idx,
-                                                    (UInt16)Marshal.SizeOf(readBlock));
+                    if (bDelayed && currentExposure.toCamera.delay < interlacedDoubleExposureThreshold)
+                    {
+                        m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
+                                                        SX_CMD_READ_PIXELS_DELAYED,
+                                                        secondExposureFlags,
+                                                        idx,
+                                                        (UInt16)Marshal.SizeOf(currentExposure.toCamera));
+                        m_controller.Write(cmdBlock, currentExposure.toCamera);
+                    }
+                    else
+                    {
+                        clearRegisters();
+                        initReadBlock(currentExposure.toCamera, out readBlock);
+                        m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
+                                                        SX_CMD_READ_PIXELS,
+                                                        secondExposureFlags,
+                                                        idx,
+                                                        (UInt16)Marshal.SizeOf(readBlock));
 
-                    Log.Write(String.Format("recordPixels() second frame requesting read, flags = {0}\n", secondExposureFlags));
-                    m_controller.Write(cmdBlock, readBlock);
+                        Log.Write(String.Format("recordPixels() second frame requesting read, flags = {0}\n", secondExposureFlags));
+                        m_controller.Write(cmdBlock, readBlock);
+                    }
 
                     exposureEnd = DateTimeOffset.Now;
                     Log.Write("recordPixels() second frame requesting download\n");
-                    rawFrame2 = downloadPixels(false, currentExposure.toCameraSecond);
+                    rawFrame2 = downloadPixels(currentExposure.toCameraSecond);
                     Log.Write("recordPixels() second frame download completed\n");
                 }
             }
@@ -2249,7 +3079,7 @@ namespace sx
                 dumpFrame();
             }
 
-            convertCameraDataToImageData();
+            convertCameraDataToImageData(interlaced && secondExposureFlags != 0);
 
             lock (oImageDataLock)
             {
