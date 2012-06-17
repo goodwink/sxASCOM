@@ -673,7 +673,10 @@ namespace ASCOM.SXGeneric
                     if (value)
                     {
 #if DEBUG
-                        if (DateTime.Now.CompareTo(new DateTime(2012,8,15)) > 0)
+                        DateTime expirationDate = new DateTime(2012, 8, 15);
+                        DateTime currentDate = DateTime.Now;
+                        Log.Write(String.Format("this version expires on {0}, it is currently {1}", expirationDate, currentDate));
+                        if (currentDate.CompareTo(expirationDate) > 0)
                         {
                             MessageBox.Show("This debug release has expired.  Please update your bits", "Expired");
                             throw new ASCOM.PropertyNotImplementedException(SetError("connected: non-production release expired"), true);
