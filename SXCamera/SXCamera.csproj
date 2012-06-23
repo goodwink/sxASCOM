@@ -131,6 +131,8 @@
     <Compile Include="sxMain3\Driver.cs" />
     <Compile Include="sxMain4\Driver.cs" />
     <Compile Include="sxMain5\Driver.cs" />
+    <Compile Include="sxMain6\Driver.cs" />
+    <Compile Include="sxMain7\Driver.cs" />
     <Compile Include="UsbRoutines\Acknowlegements.cs" />
     <Compile Include="UsbRoutines\sx_dump.cs" />
     <Compile Include="UsbRoutines\DeviceManagement.cs" />
