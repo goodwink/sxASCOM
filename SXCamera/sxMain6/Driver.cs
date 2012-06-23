@@ -8,7 +8,7 @@ using ASCOM.Interface;
 
 using Logging;
 
-namespace ASCOM.SXMain4
+namespace ASCOM.SXMain6
 {
     //
     // Your driver's ID is ASCOM.SXCamera.Camera
@@ -17,17 +17,17 @@ namespace ASCOM.SXMain4
     // The ClassInterface/None addribute prevents an empty interface called
     // _Camera from being created and used as the [default] interface
     //
-    [Guid("c150cbaa-429d-4bad-84ff-27077b4156a4")]
+    [Guid("c150cbaa-429d-4bad-84ff-27077b4156a6")]
     [ClassInterface(ClassInterfaceType.None)]
     public class Camera : ASCOM.SXMain0.Camera
     {
-        private const UInt16 DEFAULT_CONTROLLER_NUMBER = 4;
+        private const UInt16 DEFAULT_CONTROLLER_NUMBER = 6;
         private const UInt16 DEFAULT_CAMERA_ID = 0;
 
         public Camera() :
             base(DEFAULT_CONTROLLER_NUMBER, DEFAULT_CAMERA_ID)
         {
-            Log.Write(String.Format("Main4::Camera() executing\n"));
+            Log.Write(String.Format("Main5::Camera() executing\n"));
         }
     }
 }

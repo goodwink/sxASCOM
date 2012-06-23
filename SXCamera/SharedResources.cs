@@ -31,7 +31,7 @@ namespace ASCOM.SXCamera
         private static object m_lock = null;
         private static bool bSerializeControllers = true;
         public static sx.Controller [] controllers;
-        private const uint maxControllers = 6;
+        private const uint maxControllers = 8;
 
         static SharedResources()								// Static initialization
         {
