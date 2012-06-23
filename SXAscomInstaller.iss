@@ -63,6 +63,7 @@ var
   StandaloneGuiderPage: TInputOptionWizardPage;
   LodeStarsPage: TInputOptionWizardPage;
   CoStarsPage: TInputOptionWizardPage;
+  SuperStarsPage: TInputOptionWizardPage;
   ImagingCameraPage: TInputOptionWizardPage;
   GuideCameraPage: TInputOptionWizardPage;
   GuideCamerasPage: TInputOptionWizardPage;
@@ -261,6 +262,9 @@ begin
     if PageID = CoStarsPage.ID then
         Result := StandAloneGuiderPage.Values[0];
 
+    if PageID = SuperStarsPage.ID then
+        Result := StandAloneGuiderPage.Values[0];
+
     if PageID = GuideCamerasPage.ID then
         Result := not ImagingCameraPage.Values[2];
 
@@ -274,7 +278,7 @@ begin
     Result := TRUE;
     if CurPageID = ImagingCameraPage.ID then
     begin
-        if LodeStarsPage.Values[0] and CostarsPage.Values[0] and ImagingCameraPage.Values[0] then
+        if LodeStarsPage.Values[0] and CostarsPage.Values[0] and SuperstarsPage.Values[0] and ImagingCameraPage.Values[0] then
         begin
             MsgBox('No cameras specified for Installation, unable to proceed', mbError, MB_OK);
             Result := FALSE;
@@ -323,7 +327,20 @@ begin
     CoStarsPage.Values[1] := False;
     CoStarsPage.Values[2] := False;
 
-    ImagingCameraPage := CreateInputOptionPage(CoStarsPage.ID,
+    SuperStarsPage := CreateInputOptionPage(CoStarsPage.ID,
+      'SuperStar Configuration', 
+      'SuperStar is a small, eyepiece sized color guide camera that connects to your PC via USB.',
+      'Do you have a Starlight Xpress SuperStar USB Guide Camera?',
+      True, False);
+    SuperStarsPage.Add('No');
+    SuperStarsPage.Add('Yes, I have 1 SuperStar Camera');
+    SuperStarsPage.Add('Yes, I have 2 SuperStar Cameras');
+
+    SuperStarsPage.Values[0] := True;
+    SuperStarsPage.Values[1] := False;
+    SuperStarsPage.Values[2] := False;
+
+    ImagingCameraPage := CreateInputOptionPage(SuperStarsPage.ID,
       'Imaging Camera Configuration', 
       'This is a camera which connects to to your PC via USB.',
       'Do you have a Starlight Xpress Imaging Camera?',
@@ -377,6 +394,12 @@ begin
     else 
         if CoStarsPage.Values[2] then
             Result := Result + ' /costar2';
+
+    if SuperStarsPage.Values[1] then
+        Result := Result + ' /superstar'
+    else 
+        if SuperStarsPage.Values[2] then
+            Result := Result + ' /superstar2';
 
     if ImagingCameraPage.Values[1] then
         Result := Result + ' /main'
