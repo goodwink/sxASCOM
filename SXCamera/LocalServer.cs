@@ -28,6 +28,7 @@ using Microsoft.Win32;
 using System.Text.RegularExpressions;
 
 using ASCOM.Utilities;
+using Logging;
 
 namespace ASCOM.SXCamera
 {
@@ -237,6 +238,8 @@ namespace ASCOM.SXCamera
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain3.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain4.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain5.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain6.Camera"));
+            m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXMain7.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXGuide0.Camera"));
             m_ComObjectTypes.Add(System.Type.GetType("ASCOM.SXGuide1.Camera"));
 #if False
@@ -352,11 +355,16 @@ namespace ASCOM.SXCamera
             bool registerCoStar0 = false;
             bool registerCoStar1 = false;
 
+            bool registerSuperStar0 = false;
+            bool registerSuperStar1 = false;
+
             bool registerAutoGuide0 = false;
             bool registerAutoGuide1 = false;
 
             foreach (string opt in args)
             {
+                Log.Write(String.Format("handling option {0}", opt));
+
                 switch (opt.ToLower())
                 {
                     case "-lodestar":
@@ -377,6 +385,15 @@ namespace ASCOM.SXCamera
                         registerCoStar0 = true;
                         registerCoStar1 = true;
                         break;
+                    case "-superstar":
+                    case "/superstar":
+                        registerSuperStar0 = true;
+                        break;
+                    case "-superstar2":
+                    case "/superstar2":
+                        registerSuperStar0 = true;
+                        registerSuperStar1 = true;
+                        break;
                     case "-main":
                     case "/main":
                         registerMain0 = true;
@@ -396,6 +413,7 @@ namespace ASCOM.SXCamera
                         registerAutoGuide1 = true;
                         break;
                     default:
+                        Log.Write(String.Format("unknown option {0}", opt));
                         break;
                 }
             }
@@ -459,6 +477,8 @@ namespace ASCOM.SXCamera
                 bool registerThisOne = false;
                 string ascomName = null;
 
+                Log.Write(String.Format("processing driver assembly {0}",  type.ToString().ToLower()));
+
                 switch (type.ToString().ToLower())
                 {
                     case "ascom.sxmain0.camera":
@@ -477,9 +497,9 @@ namespace ASCOM.SXCamera
                         ascomName = "Starlight Xpress Main Camera #2";
                         break;
                     case "ascom.sxmain2.camera":
-                        if (registerLodeStar0)
+                        registerThisOne = registerLodeStar0;
+                        if (registerThisOne)
                         {
-                            registerThisOne = true;
                             if (registerLodeStar1)
                             {
                                 ascomName = "Starlight Xpress Lodestar Guider #1";
@@ -491,16 +511,16 @@ namespace ASCOM.SXCamera
                         }
                         break;
                     case "ascom.sxmain3.camera":
-                        if (registerLodeStar1)
+                        registerThisOne = registerLodeStar1;
+                        if (registerThisOne)
                         {
-                            registerThisOne = true;
                             ascomName = "Starlight Xpress Lodestar Guider #2";
                         }
                         break;
                     case "ascom.sxmain4.camera":
-                        if (registerCoStar0)
+                        registerThisOne = registerCoStar0;
+                        if (registerThisOne)
                         {
-                            registerThisOne = true;
                             if (registerCoStar1)
                             {
                                 ascomName = "Starlight Xpress CoStar Guider #1";
@@ -512,10 +532,31 @@ namespace ASCOM.SXCamera
                         }
                         break;
                     case "ascom.sxmain5.camera":
-                        if (registerCoStar1)
+                        registerThisOne = registerCoStar1;
+                        if (registerThisOne)
                         {
-                            registerThisOne = true;
                             ascomName = "Starlight Xpress CoStar Guider #2";
+                        }
+                        break;
+                    case "ascom.sxmain6.camera":
+                        registerThisOne = registerSuperStar0;
+                        if (registerThisOne)
+                        {
+                            if (registerSuperStar1)
+                            {
+                                ascomName = "Starlight Xpress SuperStar Guider #1";
+                            }
+                            else
+                            {
+                                ascomName = "Starlight Xpress SuperStar Guider";
+                            }
+                        }
+                        break;
+                    case "ascom.sxmain7.camera":
+                        registerThisOne = registerSuperStar1;
+                        if (registerThisOne)
+                        {
+                            ascomName = "Starlight Xpress SuperStar Guider #2";
                         }
                         break;
                     case "ascom.sxguide0.camera":
@@ -536,6 +577,8 @@ namespace ASCOM.SXCamera
                     default:
                         break;
                 }
+
+                Log.Write(String.Format("registerThisOne {0}, name={1}",  registerThisOne, ascomName));
 
                 if (registerThisOne)
                 {

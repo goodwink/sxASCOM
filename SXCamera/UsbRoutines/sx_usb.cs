@@ -122,7 +122,7 @@ namespace sx
 
                         if (pid == 0xffff)
                         {
-                           bPIDMatch = (foundPid == 507)  || (foundPid == 517);
+                           bPIDMatch = (foundPid == 507)  || (foundPid == 509)  || (foundPid == 517);
                         }
 
                         bUseThisDevice = (bVIDMatch && bPIDMatch);
