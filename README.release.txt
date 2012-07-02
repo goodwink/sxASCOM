@@ -7,9 +7,9 @@ To do a release, be sure to:
 - commit changes
   git commit -a -m "Changes required for V1.3.10"
 - create a change log with:
-  git log --pretty=format:"%s (%ai by %aN <%aE>)" --no-merges ICamera2/master...  > changelog.txt
+  git log --pretty=format:"%s (%ai by %aN <%aE>)" --no-merges releases/2.1/master...  > changelog.txt
   echo >> changelog.txt
-  git diff -b --shortstat ICamera2/master..HEAD >> changelog.txt
+  git diff -b --shortstat releases/2.1/master..HEAD >> changelog.txt
   git log --pretty=format:"%s (%ai by %aN <%aE>)" --no-merges > changelog.full.txt
 - build
 - create a tag
