@@ -94,7 +94,7 @@ namespace sx
         MODEL_H5 = 0x05,
         MODEL_H5C = 0x85,
         // ------------------ H9 --------------------
-        MODEL_H9 = 0x09,
+        MODEL_H9 = 0x09, // And superstar
         MODEL_H9C = 0x89,
         // ------------------ H16 --------------------
         MODEL_H16 = 0x10,

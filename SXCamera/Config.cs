@@ -174,6 +174,7 @@ namespace ASCOM.SXCamera
         internal CAMERA_VALUES[] DEFAULT_VALUES =
         {
             // main cameras
+            //CAMERA_VALUES[0]
             new CAMERA_VALUES(
                         DEFAULT_ENABLE_UNTESTED, 
                         DEFAULT_ENABLE_LOGGING, 
@@ -182,10 +183,11 @@ namespace ASCOM.SXCamera
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
-                        false, // square lodestar pixels
+                        false, // square lodestar pixels -- always false for non-lodestars
                         DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
                         DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
                     ),
+            //CAMERA_VALUES[1]
             new CAMERA_VALUES(
                         DEFAULT_ENABLE_UNTESTED, 
                         DEFAULT_ENABLE_LOGGING, 
@@ -194,11 +196,12 @@ namespace ASCOM.SXCamera
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
-                        false, // square lodestar pixels
+                        false, // square lodestar pixels -- always false for non-lodestars
                         DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
                         DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
                     ),
             // lodestars
+            //CAMERA_VALUES[2]
             new CAMERA_VALUES(
                         DEFAULT_ENABLE_UNTESTED, 
                         DEFAULT_ENABLE_LOGGING, 
@@ -206,11 +209,12 @@ namespace ASCOM.SXCamera
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
-                        false, // equalize frames
+                        false, // equalize frames -- override default for lodestar
                         DEFAULT_SQUARE_LODESTAR_PIXELS,
-                        false, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
-                        true, 1.0 // gaussian blur
+                        false, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD, // double expose short -- override default for lodestar
+                        true, 1.0 // gaussian blur -- override default for lodestar
                     ),
+            //CAMERA_VALUES[3]
             new CAMERA_VALUES(
                         DEFAULT_ENABLE_UNTESTED, 
                         DEFAULT_ENABLE_LOGGING, 
@@ -218,12 +222,13 @@ namespace ASCOM.SXCamera
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
-                        false, // equalize frames
+                        false, // equalize frames -- override default for lodestar
                         DEFAULT_SQUARE_LODESTAR_PIXELS,
-                        false, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
-                        true, 1.0 // gaussian blur
+                        false, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD, // double expose short -- override default for lodestar
+                        true, 1.0 // gaussian blur -- override default for lodestar
                     ),
             // costars
+            //CAMERA_VALUES[4]
             new CAMERA_VALUES(
                         DEFAULT_ENABLE_UNTESTED, 
                         DEFAULT_ENABLE_LOGGING, 
@@ -232,10 +237,11 @@ namespace ASCOM.SXCamera
                         DEFAULT_ASYMETRIC_BINNING, 1, 1,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
-                        false, // square lodestar pixels
+                        false, // square lodestar pixels -- always false for non-lodestars
                         DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
                         DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
                     ),
+            //CAMERA_VALUES[5]
             new CAMERA_VALUES(
                         DEFAULT_ENABLE_UNTESTED, 
                         DEFAULT_ENABLE_LOGGING, 
@@ -244,7 +250,34 @@ namespace ASCOM.SXCamera
                         DEFAULT_ASYMETRIC_BINNING, 1, 1,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
-                        false, // square lodestar pixels
+                        false, // square lodestar pixels -- always false for non-lodestars
+                        DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
+                        DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
+                    ),
+            // superstars
+            //CAMERA_VALUES[6]
+            new CAMERA_VALUES(
+                        DEFAULT_ENABLE_UNTESTED, 
+                        DEFAULT_ENABLE_LOGGING, 
+                        DEFAULT_DUMP_DATA_ENABLED,
+                        Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 509,
+                        DEFAULT_ASYMETRIC_BINNING, 1, 1,
+                        DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
+                        DEFAULT_INTERLACED_EQUALIZE_FRAMES,
+                        false, // square lodestar pixels -- always false for non-lodestars
+                        DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
+                        DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
+                    ),
+            //CAMERA_VALUES[7]
+            new CAMERA_VALUES(
+                        DEFAULT_ENABLE_UNTESTED, 
+                        DEFAULT_ENABLE_LOGGING, 
+                        DEFAULT_DUMP_DATA_ENABLED,
+                        Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 509,
+                        DEFAULT_ASYMETRIC_BINNING, 1, 1,
+                        DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
+                        DEFAULT_INTERLACED_EQUALIZE_FRAMES,
+                        false, // square lodestar pixels -- always false for non-lodestars
                         DEFAULT_INTERLACED_DOUBLE_EXPOSE_SHORT_EXPOSURES, DEFAULT_INTERLACED_DOUBLE_EXPOSURE_THRESHOLD,
                         DEFAULT_INTERLACED_GAUSSIAN_BLUR, DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS
                     ),
