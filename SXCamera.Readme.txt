@@ -11,6 +11,7 @@ your needs.
 This version adds:
     - support for Superstar/H694/H694C
       - updates installer to treat Superstar as a guide camera
+      - fixes issues issues with Superstar not able to connect
     - installer automatically removes previous version if possible
     - interlaced camera (lodestar mostly) banding improvements:
       - symetric binning now reads out as progressive, which

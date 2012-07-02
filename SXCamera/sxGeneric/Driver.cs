@@ -673,7 +673,7 @@ namespace ASCOM.SXGeneric
                     if (value)
                     {
 #if DEBUG
-                        DateTime expirationDate = new DateTime(2012, 8, 15);
+                        DateTime expirationDate = new DateTime(2012, 9, 1);
                         DateTime currentDate = DateTime.Now;
                         Log.Write(String.Format("this version expires on {0}, it is currently {1}", expirationDate, currentDate));
                         if (currentDate.CompareTo(expirationDate) > 0)
