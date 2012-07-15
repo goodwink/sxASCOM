@@ -261,7 +261,7 @@ namespace ASCOM.SXCamera
                         DEFAULT_ENABLE_LOGGING, 
                         DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 509,
-                        DEFAULT_ASYMETRIC_BINNING, 1, 1,
+                        DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
                         false, // square lodestar pixels -- always false for non-lodestars
@@ -274,7 +274,7 @@ namespace ASCOM.SXCamera
                         DEFAULT_ENABLE_LOGGING, 
                         DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 509,
-                        DEFAULT_ASYMETRIC_BINNING, 1, 1,
+                        DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
                         DEFAULT_INTERLACED_EQUALIZE_FRAMES,
                         false, // square lodestar pixels -- always false for non-lodestars
