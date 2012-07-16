@@ -17,6 +17,6 @@ To do a release, be sure to:
 - git push
 - git push --tags
 - create the installer
-- Copy the files to 
-  "C:\Users\bretm\Documents\My Web Sites\daddog.com\ascom\sx\driver"
-- rename the files
+- create a zip file
+  c:\progra~1\winzip\wzzip <release>.zip <release.exe>
+
