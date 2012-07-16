@@ -2687,38 +2687,48 @@ namespace sx
                     Log.Write(String.Format("Weight[{0}]={1}", i, weights[i]));
                 }
 
+                Int32 [,] tmpImageData = new Int32[imageData.GetUpperBound(0)+1, imageData.GetUpperBound(1)+1];
+
                 for(Int32 y=0;y<imageData.GetUpperBound(1) + 1;y++)
                 {
-                    for(Int32 x=nWeights/2;x<(imageData.GetUpperBound(0) + 1) - (nWeights);x++)
+                    for(Int32 x=0;x<imageData.GetUpperBound(0) + 1;x++)
                     {
                         double newPixel = 0.0;
 
-                        for(Int32 blur=0;blur<nWeights;blur++)
+                        for(Int32 blur=Math.Max(0, nWeights/2-x);blur<Math.Min(nWeights, imageData.GetUpperBound(0)-x+nWeights/2+1);blur++)
                         {
                             try
                             {
-                                newPixel += imageData[x+blur,y] * weights[blur];
+                                newPixel += imageData[x-nWeights/2+blur,y] * weights[blur];
                             }
                             catch (Exception ex)
                             {
-                                Log.Write(String.Format("blur caught an exception {0}\n", ex));
+                                Log.Write(String.Format("blur first loop caught an exception {0}\n", ex));
                                 throw;
                             }
                         }
-                        
-                        imageData[x,y] = (Int32)newPixel;
+
+                        tmpImageData[x,y] = (Int32)newPixel;
                     }
                 }
 
                 for(Int32 x=0;x<imageData.GetUpperBound(0) + 1;x++)
                 {
-                    for(Int32 y=nWeights/2;y<(imageData.GetUpperBound(1) + 1) - (nWeights);y++)
+                    for(Int32 y=0;y<imageData.GetUpperBound(1) + 1;y++)
                     {
                         double newPixel = 0.0;
 
-                        for(Int32 blur=0;blur<nWeights;blur++)
+                        for(Int32 blur=Math.Max(0, nWeights/2-y);blur<Math.Min(nWeights, imageData.GetUpperBound(1)-y+nWeights/2+1);blur++)
                         {
-                            newPixel += imageData[x,y+blur] * weights[blur];
+                            try
+                            {
+                                newPixel += tmpImageData[x,y+-nWeights/2+blur] * weights[blur];
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Write(String.Format("blur second loop caught an exception {0}\n", ex));
+                                throw;
+                            }
                         }
                         
                         imageData[x,y] = (Int32)newPixel;
