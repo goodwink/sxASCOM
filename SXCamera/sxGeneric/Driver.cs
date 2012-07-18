@@ -672,16 +672,23 @@ namespace ASCOM.SXGeneric
                 {
                     if (value)
                     {
-#if DEBUG
-                        DateTime expirationDate = new DateTime(2012, 8, 15);
+                        DateTime expirationDate = new DateTime(Convert.ToInt64(m_config.releaseType));
                         DateTime currentDate = DateTime.Now;
-                        Log.Write(String.Format("this version expires on {0}, it is currently {1}", expirationDate, currentDate));
-                        if (currentDate.CompareTo(expirationDate) > 0)
+
+                        if (expirationDate.Ticks == 0)
                         {
-                            MessageBox.Show("This debug release has expired.  Please update your bits", "Expired");
-                            throw new ASCOM.PropertyNotImplementedException(SetError("connected: non-production release expired"), true);
+                            Log.Write(String.Format("this version does not expire"));
                         }
-#endif
+                        else 
+                        {
+                            Log.Write(String.Format("this version expires on {0}, it is currently {1}", expirationDate, currentDate));
+
+                            if (currentDate.CompareTo(expirationDate) > 0)
+                            {
+                                MessageBox.Show("This Beta release has expired.  Please update your driver", "Expired");
+                                throw new ASCOM.PropertyNotImplementedException(SetError("connected: Beta release expired"), true);
+                            }
+                        }
 
                         if (m_Connected)
                         {

@@ -4,7 +4,8 @@
 ;
 
 #define BUILD_TYPE "Debug"
-#define APP_VERSION "2.2.12175.1719"
+#define EXPIRATION "2012/09/16"
+#define APP_VERSION "2.2.12197.2238"
 #define ASCOM_VERSION_REQUIRED  "5.5"
 #define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
 
@@ -412,4 +413,6 @@ begin
     else
         if GuideCamerasPage.Values[2] then
             Result := Result + ' /autoguide2'
+
+    Result := Result + ' /expiration={#EXPIRATION}'
 end;

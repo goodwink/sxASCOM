@@ -2,7 +2,7 @@ To do a release, be sure to:
 
 - bump the version number 
   - bump_version.py
-- change the expiration date (if enabled) in sxGeneric\Driver.cs
+- change the expiration date (if enabled) in SXAscomInstaller.iss
 - edit SXCamera.Readme
 - commit changes
   git commit -a -m "Changes required for V1.3.10"
