@@ -327,6 +327,7 @@ namespace ASCOM.SXCamera
             RegistryKey key = null;
             RegistryKey key2 = null;
             RegistryKey key3 = null;
+            DateTime expiration = new DateTime(1);
 
             if (!IsAdministrator)
             {
@@ -363,9 +364,11 @@ namespace ASCOM.SXCamera
 
             foreach (string opt in args)
             {
-                Log.Write(String.Format("handling option {0}", opt));
+                string [] arg = opt.ToLower().Split('=');
 
-                switch (opt.ToLower())
+                Log.Write(String.Format("handling option {0} from {1} which split into {2} pieces", opt, arg[0], arg.Length));
+
+                switch (arg[0])
                 {
                     case "-lodestar":
                     case "/lodestar":
@@ -411,6 +414,19 @@ namespace ASCOM.SXCamera
                     case "/autoguide2":
                         registerAutoGuide0 = true;
                         registerAutoGuide1 = true;
+                        break;
+                    case "-expiration":
+                    case "/expiration":
+                        string [] dateParts = arg[1].Split('/');
+                        Log.Write(String.Format("expiration={0}", arg[1]));
+                        if (dateParts.Length == 1)
+                        {
+                            expiration = new DateTime(Convert.ToInt64(dateParts[0]));
+                        }
+                        else
+                        {
+                            expiration = new DateTime(Convert.ToInt32(dateParts[0]), Convert.ToInt32(dateParts[1]), Convert.ToInt32(dateParts[2]));
+                        }
                         break;
                     default:
                         Log.Write(String.Format("unknown option {0}", opt));
@@ -635,6 +651,7 @@ namespace ASCOM.SXCamera
                             chooserName = ascomName;
                         }
                         P.Register(progid, chooserName);
+                        P.WriteValue(progid, "ReleaseType", expiration.Ticks.ToString());
                         try										// In case Helper becomes native .NET
                         {
                             Marshal.ReleaseComObject(P);
