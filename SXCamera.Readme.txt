@@ -9,6 +9,7 @@ There is a PRODUCTION release available - please use that version if it meets
 your needs.
 
 This version adds:
+    - support for cameras with shutters
     - support for Superstar/H694/H694C
       - updates installer to treat Superstar as a guide camera
     - installer automatically removes previous version if possible
