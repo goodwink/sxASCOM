@@ -1713,6 +1713,8 @@ namespace ASCOM.SXGeneric
 
         internal void softwareCapture(double Duration, bool Light)
         {
+            bool shutterIsOpen = false;
+
             try
             {
                 Log.Write(String.Format("Generic::softwareCapture({0}, {1}): begins\n", Duration, Light));
@@ -1720,6 +1722,9 @@ namespace ASCOM.SXGeneric
                 sxCamera.clearCCDAndRegisters(); // For exposures > 1 second we will clear the registers again just before
                                                     // the exposure ends to clear any accumulated noise.
                 bool bRegistersCleareded = false;
+
+                shutterIsOpen = true;
+                sxCamera.shutterOpen();
 
                 if (Duration > ImageCommandTime)
                 {
@@ -1770,6 +1775,9 @@ namespace ASCOM.SXGeneric
                     }
                 }
 
+                sxCamera.shutterClose();
+                shutterIsOpen = false;
+
                 lock (oCameraStateLock)
                 {
                     if (bAbortRequested)
@@ -1807,6 +1815,11 @@ namespace ASCOM.SXGeneric
                     {
                         state = CameraStates.cameraIdle;
                     }
+                }
+
+                if (shutterIsOpen)
+                {
+                    sxCamera.shutterClose();
                 }
             }
         }
