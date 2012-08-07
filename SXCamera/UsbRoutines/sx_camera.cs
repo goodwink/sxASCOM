@@ -41,6 +41,12 @@ namespace sx
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
+    internal struct SX_SHUTTER_BLOCK
+    {
+        internal UInt16 unused;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     internal struct SX_READ_BLOCK
     {
         internal UInt16 x_offset;
@@ -1334,16 +1340,16 @@ namespace sx
         public void getModelUSB()
         {
             SX_CMD_BLOCK cmdBlock;
-            byte[] bytes = new byte[Marshal.SizeOf(cameraModel)];
+            byte[] bytes;
 
-            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (UInt16)bytes.Length);
+            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_CAMERA_MODEL, 0, idx, (UInt16)Marshal.SizeOf(cameraModel));
 
             lock (m_controller.Lock)
             {
                 Log.Write("getModel has locked\n");
                 m_controller.Write(cmdBlock);
 
-                bytes = m_controller.ReadBytes(bytes.Length);
+                bytes = m_controller.ReadBytes(Marshal.SizeOf(cameraModel));
             }
             Log.Write("getModel has unlocked\n");
 
@@ -1358,7 +1364,7 @@ namespace sx
         internal void setCoolerInfo(ref SX_COOLER_BLOCK inBlock, out SX_COOLER_BLOCK outBlock)
         {
             SX_CMD_BLOCK cmdBlock;
-            byte[] bytes = new byte[Marshal.SizeOf(inBlock)];
+            byte[] bytes;
 
             Log.Write(String.Format("setCoolerInfo inBlock temp={0} enabled={1}\n", inBlock.coolerTemp, inBlock.coolerEnabled));
             m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_READ, SX_CMD_COOLER_CONTROL, inBlock.coolerTemp, (UInt16)inBlock.coolerEnabled, 0);
@@ -1463,6 +1469,43 @@ namespace sx
         public bool hasCoolerControl
         {
             get { return !m_useDumped && ((ccdParms.extra_capabilities & SXUSB_CAPS_COOLER) == SXUSB_CAPS_COOLER); }
+        }
+
+        internal void shutterControl(bool open)
+        {
+            if (hasShutter)
+            {
+                SX_CMD_BLOCK cmdBlock;
+                UInt16 cmd_value = open ? SHUTTER_CONTROL_OPEN_SHUTTER : SHUTTER_CONTROL_CLOSE_SHUTTER;
+                byte[] bytes;
+
+                Log.Write(String.Format("shutterControl({0}) begins", open));
+                m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS, SX_CMD_SHUTTER_CONTROL, cmd_value, 0, 0);
+
+                lock (m_controller.Lock)
+                {
+                    Log.Write("shutterControl has locked\n");
+                    m_controller.Write(cmdBlock);
+
+                    bytes = m_controller.ReadBytes(Marshal.SizeOf(typeof(SX_SHUTTER_BLOCK)));
+                }
+                Log.Write("shutterControl has unlocked\n");
+            }
+        }
+
+        public void shutterOpen()
+        {
+            shutterControl(true);
+        }
+
+        public void shutterClose()
+        {
+            shutterControl(false);
+        }
+
+        public bool hasShutter
+        {
+            get { return !m_useDumped && ((ccdParms.extra_capabilities & SXUSB_CAPS_SHUTTER) == SXUSB_CAPS_SHUTTER); }
         }
 
         void printCCDParams()

@@ -31,6 +31,7 @@ namespace sx
         internal const Byte SX_CMD_CAMERA_MODEL = 14;
         internal const Byte SX_CMD_LOAD_EEPROM = 15;
         internal const Byte SX_CMD_COOLER_CONTROL = 30;
+        internal const Byte SX_CMD_SHUTTER_CONTROL = 32;
 
         // flags
         internal const Byte SX_CCD_FLAGS_FIELD_ODD = 1;        // Specify odd field for MX cameras
@@ -60,18 +61,21 @@ namespace sx
         internal const Byte SXUSB_CAPS_COOLER       = 0x10;
         internal const Byte SXUSB_CAPS_SHUTTER      = 0x20;
 
-        const UInt16 COLOR_MATRIX_PACKED_RGB         = 0x8000;
-        const UInt16 COLOR_MATRIX_PACKED_BGR         = 0x4000;
-        const UInt16 COLOR_MATRIX_PACKED_RED_SIZE    = 0x0F00;
-        const UInt16 COLOR_MATRIX_PACKED_GREEN_SIZE  = 0x00F0;
-        const UInt16 COLOR_MATRIX_PACKED_BLUE_SIZE   = 0x000F;
-        const UInt16 COLOR_MATRIX_MATRIX_ALT_EVEN    = 0x2000;
-        const UInt16 COLOR_MATRIX_MATRIX_ALT_ODD     = 0x1000;
-        const UInt16 COLOR_MATRIX_MATRIX_2X2         = 0x0000;
-        const UInt16 COLOR_MATRIX_MATRIX_RED_MASK    = 0x0F00;
-        const UInt16 COLOR_MATRIX_MATRIX_GREEN_MASK  = 0x00F0;
-        const UInt16 COLOR_MATRIX_MATRIX_BLUE_MASK   = 0x000F;
-        const UInt16 COLOR_MATRIX_MONOCHROME         = 0x0FFF;
+        internal const UInt16 COLOR_MATRIX_PACKED_RGB         = 0x8000;
+        internal const UInt16 COLOR_MATRIX_PACKED_BGR         = 0x4000;
+        internal const UInt16 COLOR_MATRIX_PACKED_RED_SIZE    = 0x0F00;
+        internal const UInt16 COLOR_MATRIX_PACKED_GREEN_SIZE  = 0x00F0;
+        internal const UInt16 COLOR_MATRIX_PACKED_BLUE_SIZE   = 0x000F;
+        internal const UInt16 COLOR_MATRIX_MATRIX_ALT_EVEN    = 0x2000;
+        internal const UInt16 COLOR_MATRIX_MATRIX_ALT_ODD     = 0x1000;
+        internal const UInt16 COLOR_MATRIX_MATRIX_2X2         = 0x0000;
+        internal const UInt16 COLOR_MATRIX_MATRIX_RED_MASK    = 0x0F00;
+        internal const UInt16 COLOR_MATRIX_MATRIX_GREEN_MASK  = 0x00F0;
+        internal const UInt16 COLOR_MATRIX_MATRIX_BLUE_MASK   = 0x000F;
+        internal const UInt16 COLOR_MATRIX_MONOCHROME         = 0x0FFF;
+
+        internal const UInt16 SHUTTER_CONTROL_OPEN_SHUTTER    = 0x4000;
+        internal const UInt16 SHUTTER_CONTROL_CLOSE_SHUTTER   = 0x8000;
 
     }
 }
