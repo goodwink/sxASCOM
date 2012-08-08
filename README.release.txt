@@ -1,5 +1,6 @@
 To do a release, be sure to:
 
+- merge changes into the develop branch
 - bump the version number 
   - bump_version.py
 - change the expiration date (if enabled) in SXAscomInstaller.iss
