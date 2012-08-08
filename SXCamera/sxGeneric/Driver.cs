@@ -946,10 +946,11 @@ namespace ASCOM.SXGeneric
                 try
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    bool bReturn = sxCamera.hasShutter;
 
-                    Log.Write("Generic::HasShutter get returns hard coded false\n");
+                    Log.Write(String.Format("Generic::HasShutter get returns {0}\n", bReturn));
 
-                    return false;
+                    return bReturn;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1723,8 +1724,11 @@ namespace ASCOM.SXGeneric
                                                     // the exposure ends to clear any accumulated noise.
                 bool bRegistersCleareded = false;
 
-                shutterIsOpen = true;
-                sxCamera.shutterOpen();
+                if (Light)
+                {
+                    shutterIsOpen = true;
+                    sxCamera.shutterOpen();
+                }
 
                 if (Duration > ImageCommandTime)
                 {
@@ -1775,8 +1779,11 @@ namespace ASCOM.SXGeneric
                     }
                 }
 
-                sxCamera.shutterClose();
-                shutterIsOpen = false;
+                if (shutterIsOpen)
+                {
+                    sxCamera.shutterClose();
+                    shutterIsOpen = false;
+                }
 
                 lock (oCameraStateLock)
                 {
