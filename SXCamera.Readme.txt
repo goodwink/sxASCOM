@@ -2,14 +2,15 @@ Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
 This is the README.txt for version 2.2
 
-This is an BETA release of the ASCOM driver for Starlight Xpress cameras,
-which contains new, untested or lightly tested code and will expire.
+This is an Release Candidate build of the ASCOM driver for Starlight Xpress cameras.
+It contains new, untested or lightly tested code and will expire.
 
 There is a PRODUCTION release available - please use that version if it meets
 your needs.
 
 This version adds:
-    - support for cameras with shutters
+    - support for cameras with shutters, including handling of darks and
+      zero length exposures.
     - support for Superstar/H694/H694C
       - updates installer to treat Superstar as a guide camera
     - installer automatically removes previous version if possible
