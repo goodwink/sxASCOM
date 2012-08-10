@@ -1724,7 +1724,7 @@ namespace ASCOM.SXGeneric
                                                     // the exposure ends to clear any accumulated noise.
                 bool bRegistersCleareded = false;
 
-                if (Light)
+                if (Light && Duration > 0)
                 {
                     shutterIsOpen = true;
                     sxCamera.shutterOpen();
