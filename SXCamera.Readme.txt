@@ -9,6 +9,7 @@ There is a PRODUCTION release available - please use that version if it meets
 your needs.
 
 This version adds:
+    - Move H694/H674 from untested to tested
     - support for cameras with shutters, including handling of darks and
       zero length exposures.
     - support for Superstar/H694/H694C
