@@ -734,7 +734,6 @@ namespace sx
                     isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H674:
-                    bUntested = true;
                     description = "H674";
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
@@ -743,7 +742,6 @@ namespace sx
                     isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H674C:
-                    bUntested = true;
                     description = "H674C";
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
@@ -752,7 +750,6 @@ namespace sx
                     isMonochrome = false;
                     break;
                 case CameraModels.MODEL_H694:
-                    bUntested = true;
                     description = "H694";
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
@@ -761,7 +758,6 @@ namespace sx
                     isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H694C:
-                    bUntested = true;
                     description = "H694C";
                     fullWellCapacity = 20000;
                     electronsPerADU = 0.3;
