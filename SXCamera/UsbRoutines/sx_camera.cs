@@ -105,6 +105,8 @@ namespace sx
         // ------------------ H16 --------------------
         MODEL_H16 = 0x10,
         MODEL_H16C = 0x90,
+        // ------------------ H18 --------------------
+        MODEL_H18 = 0x12,
         // ------------------ H35 --------------------
         MODEL_H35 = 0x23,
         MODEL_H35C = 0xB5,
@@ -620,6 +622,14 @@ namespace sx
                     electronsPerADU = 0.6;
                     progressive = true;
                     sensorName = "KAI4022M";
+                    isMonochrome = true;
+                    break;
+                case CameraModels.MODEL_H18:
+                    description = "H18";
+                    fullWellCapacity = 25000;
+                    electronsPerADU = 0.35;
+                    progressive = true;
+                    sensorName = "KAF8300M";
                     isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H35:
