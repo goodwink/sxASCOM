@@ -794,6 +794,7 @@ namespace ASCOM.SXGeneric
                     {
                         sxCamera = null;
                         m_Connected = false;
+                        m_controller.disconnect();
                     }
 
                     // set the last logged values to something that they are not, so that 
