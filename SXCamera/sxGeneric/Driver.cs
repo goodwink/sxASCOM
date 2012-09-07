@@ -686,7 +686,6 @@ namespace ASCOM.SXGeneric
                             if (currentDate.CompareTo(expirationDate) > 0)
                             {
                                 MessageBox.Show("This Beta release has expired.  Please update your driver", "Expired");
-                                throw new ASCOM.PropertyNotImplementedException(SetError("connected: Beta release expired"), true);
                             }
                         }
 
