@@ -9,6 +9,7 @@ There is a PRODUCTION release available - please use that version if it meets
 your needs.
 
 This version adds:
+    - Fixed a few pre-release minor issues
     - Add camera data for H18
     - Move H694/H674 from untested to tested
     - support for cameras with shutters, including handling of darks and
