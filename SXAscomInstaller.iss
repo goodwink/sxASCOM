@@ -4,7 +4,9 @@
 ;
 
 #define BUILD_TYPE "Release"
-#define EXPIRATION "2012/10/15"
+; set EXPIRATION to 0 for no expiraration
+; #define EXPIRATION "2012/10/15"
+#define EXPIRATION "0"
 #define APP_VERSION "2.2.12251.1808"
 #define ASCOM_VERSION_REQUIRED  "5.5"
 #define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
@@ -12,7 +14,7 @@
 [Setup]
 AppId=sxASCOM
 AppName=ASCOM SX Camera Driver
-AppVerName=ASCOM SX Camera Driver {#APP_VERSION}
+AppVerName=ASCOM SX Camera Driver {#APP_VERSION}R
 AppPublisher=Bret McKee <bretm@daddog.com>
 AppPublisherURL=http://www.daddog.com/ascom/sx/index.html
 AppVersion={#APP_VERSION}

@@ -1,12 +1,10 @@
-Copyright (C) 2010-2011 Dad Dog Development Ltd.
+Copyright (C) 2010-2012 Dad Dog Development Ltd.
 
 This is the README.txt for version 2.2
 
-This is an Release Candidate build of the ASCOM driver for Starlight Xpress cameras.
-It contains new, untested or lightly tested code and will expire.
-
-There is a PRODUCTION release available - please use that version if it meets
-your needs.
+This is a production release of the ASCOM driver for Starlight Xpress 
+cameras -- it is compiled with optimization, does not enable logging by 
+default and does not expire.
 
 This version adds:
     - Fixed a few pre-release minor issues
