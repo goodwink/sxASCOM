@@ -672,16 +672,22 @@ namespace ASCOM.SXGeneric
                 {
                     if (value)
                     {
-#if DEBUG
-                        DateTime expirationDate = new DateTime(2012, 8, 15);
+                        DateTime expirationDate = new DateTime(Convert.ToInt64(m_config.releaseType));
                         DateTime currentDate = DateTime.Now;
-                        Log.Write(String.Format("this version expires on {0}, it is currently {1}", expirationDate, currentDate));
-                        if (currentDate.CompareTo(expirationDate) > 0)
+
+                        if (expirationDate.Ticks == 0)
                         {
-                            MessageBox.Show("This debug release has expired.  Please update your bits", "Expired");
-                            throw new ASCOM.PropertyNotImplementedException(SetError("connected: non-production release expired"), true);
+                            Log.Write(String.Format("this version does not expire"));
                         }
-#endif
+                        else 
+                        {
+                            Log.Write(String.Format("this version expires on {0}, it is currently {1}", expirationDate, currentDate));
+
+                            if (currentDate.CompareTo(expirationDate) > 0)
+                            {
+                                MessageBox.Show("This Beta release has expired.  Please update your driver", "Expired");
+                            }
+                        }
 
                         if (m_Connected)
                         {
@@ -787,6 +793,7 @@ namespace ASCOM.SXGeneric
                     {
                         sxCamera = null;
                         m_Connected = false;
+                        m_controller.disconnect();
                     }
 
                     // set the last logged values to something that they are not, so that 
@@ -939,10 +946,11 @@ namespace ASCOM.SXGeneric
                 try
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
+                    bool bReturn = sxCamera.hasShutter;
 
-                    Log.Write("Generic::HasShutter get returns hard coded false\n");
+                    Log.Write(String.Format("Generic::HasShutter get returns {0}\n", bReturn));
 
-                    return false;
+                    return bReturn;
                 }
                 catch (ASCOM.DriverException ex)
                 {
@@ -1706,6 +1714,8 @@ namespace ASCOM.SXGeneric
 
         internal void softwareCapture(double Duration, bool Light)
         {
+            bool shutterIsOpen = false;
+
             try
             {
                 Log.Write(String.Format("Generic::softwareCapture({0}, {1}): begins\n", Duration, Light));
@@ -1713,6 +1723,12 @@ namespace ASCOM.SXGeneric
                 sxCamera.clearCCDAndRegisters(); // For exposures > 1 second we will clear the registers again just before
                                                     // the exposure ends to clear any accumulated noise.
                 bool bRegistersCleareded = false;
+
+                if (Light && Duration > 0)
+                {
+                    shutterIsOpen = true;
+                    sxCamera.shutterOpen();
+                }
 
                 if (Duration > ImageCommandTime)
                 {
@@ -1763,6 +1779,12 @@ namespace ASCOM.SXGeneric
                     }
                 }
 
+                if (shutterIsOpen)
+                {
+                    sxCamera.shutterClose();
+                    shutterIsOpen = false;
+                }
+
                 lock (oCameraStateLock)
                 {
                     if (bAbortRequested)
@@ -1800,6 +1822,11 @@ namespace ASCOM.SXGeneric
                     {
                         state = CameraStates.cameraIdle;
                     }
+                }
+
+                if (shutterIsOpen)
+                {
+                    sxCamera.shutterClose();
                 }
             }
         }
