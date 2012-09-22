@@ -59,15 +59,15 @@ namespace ASCOM.SXCamera
             this.dumpDataEnabled = new System.Windows.Forms.CheckBox();
             this.useDumpedData = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.squareLodestarPixels = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.gaussianBlurRadius = new System.Windows.Forms.NumericUpDown();
-            this.gaussianBlur = new System.Windows.Forms.CheckBox();
             this.doubleExposureThreshold = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
+            this.gaussianBlurRadius = new System.Windows.Forms.NumericUpDown();
             this.doubleExposeShort = new System.Windows.Forms.CheckBox();
             this.equalizeFrames = new System.Windows.Forms.CheckBox();
-            this.squareLodestarPixels = new System.Windows.Forms.CheckBox();
+            this.gaussianBlur = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.usbGroup.SuspendLayout();
             this.binGroup.SuspendLayout();
@@ -75,8 +75,8 @@ namespace ASCOM.SXCamera
             ((System.ComponentModel.ISupportInitialize)(this.maxYBin)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.maxXBin)).BeginInit();
             this.groupBox2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gaussianBlurRadius)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.doubleExposureThreshold)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gaussianBlurRadius)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -161,7 +161,7 @@ namespace ASCOM.SXCamera
             // PID
             // 
             this.PID.Location = new System.Drawing.Point(43, 116);
-            this.PID.Mask = "9990";
+            this.PID.Mask = "99990";
             this.PID.Name = "PID";
             this.PID.PromptChar = ' ';
             this.PID.Size = new System.Drawing.Size(36, 20);
@@ -444,6 +444,16 @@ namespace ASCOM.SXCamera
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Interlaced Adjustments";
             // 
+            // squareLodestarPixels
+            // 
+            this.squareLodestarPixels.AutoSize = true;
+            this.squareLodestarPixels.Location = new System.Drawing.Point(7, 42);
+            this.squareLodestarPixels.Name = "squareLodestarPixels";
+            this.squareLodestarPixels.Size = new System.Drawing.Size(134, 17);
+            this.squareLodestarPixels.TabIndex = 8;
+            this.squareLodestarPixels.Text = "Square Lodestar Pixels";
+            this.squareLodestarPixels.UseVisualStyleBackColor = true;
+            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -461,36 +471,6 @@ namespace ASCOM.SXCamera
             this.label4.Size = new System.Drawing.Size(43, 13);
             this.label4.TabIndex = 6;
             this.label4.Text = "Radius:";
-            // 
-            // gaussianBlurRadius
-            // 
-            this.gaussianBlurRadius.DecimalPlaces = 1;
-            this.gaussianBlurRadius.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            this.gaussianBlurRadius.Location = new System.Drawing.Point(63, 89);
-            this.gaussianBlurRadius.Maximum = new decimal(new int[] {
-            99,
-            0,
-            0,
-            65536});
-            this.gaussianBlurRadius.Name = "gaussianBlurRadius";
-            this.gaussianBlurRadius.Size = new System.Drawing.Size(57, 20);
-            this.gaussianBlurRadius.TabIndex = 5;
-            this.gaussianBlurRadius.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // gaussianBlur
-            // 
-            this.gaussianBlur.AutoSize = true;
-            this.gaussianBlur.Location = new System.Drawing.Point(6, 65);
-            this.gaussianBlur.Name = "gaussianBlur";
-            this.gaussianBlur.Size = new System.Drawing.Size(91, 17);
-            this.gaussianBlur.TabIndex = 4;
-            this.gaussianBlur.Text = "Gaussian Blur";
-            this.gaussianBlur.UseVisualStyleBackColor = true;
-            this.gaussianBlur.CheckedChanged += new System.EventHandler(this.gaussianBlur_CheckedChanged);
             // 
             // doubleExposureThreshold
             // 
@@ -514,6 +494,25 @@ namespace ASCOM.SXCamera
             this.label3.TabIndex = 2;
             this.label3.Text = "Cutoff:";
             // 
+            // gaussianBlurRadius
+            // 
+            this.gaussianBlurRadius.DecimalPlaces = 1;
+            this.gaussianBlurRadius.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            this.gaussianBlurRadius.Location = new System.Drawing.Point(63, 89);
+            this.gaussianBlurRadius.Maximum = new decimal(new int[] {
+            99,
+            0,
+            0,
+            65536});
+            this.gaussianBlurRadius.Name = "gaussianBlurRadius";
+            this.gaussianBlurRadius.Size = new System.Drawing.Size(57, 20);
+            this.gaussianBlurRadius.TabIndex = 5;
+            this.gaussianBlurRadius.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // doubleExposeShort
             // 
             this.doubleExposeShort.AutoSize = true;
@@ -535,15 +534,16 @@ namespace ASCOM.SXCamera
             this.equalizeFrames.Text = "Equalize Frames";
             this.equalizeFrames.UseVisualStyleBackColor = true;
             // 
-            // squareLodestarPixels
+            // gaussianBlur
             // 
-            this.squareLodestarPixels.AutoSize = true;
-            this.squareLodestarPixels.Location = new System.Drawing.Point(7, 42);
-            this.squareLodestarPixels.Name = "squareLodestarPixels";
-            this.squareLodestarPixels.Size = new System.Drawing.Size(134, 17);
-            this.squareLodestarPixels.TabIndex = 8;
-            this.squareLodestarPixels.Text = "Square Lodestar Pixels";
-            this.squareLodestarPixels.UseVisualStyleBackColor = true;
+            this.gaussianBlur.AutoSize = true;
+            this.gaussianBlur.Location = new System.Drawing.Point(6, 65);
+            this.gaussianBlur.Name = "gaussianBlur";
+            this.gaussianBlur.Size = new System.Drawing.Size(91, 17);
+            this.gaussianBlur.TabIndex = 4;
+            this.gaussianBlur.Text = "Gaussian Blur";
+            this.gaussianBlur.UseVisualStyleBackColor = true;
+            this.gaussianBlur.CheckedChanged += new System.EventHandler(this.gaussianBlur_CheckedChanged);
             // 
             // SetupDialogForm
             // 
@@ -581,8 +581,8 @@ namespace ASCOM.SXCamera
             ((System.ComponentModel.ISupportInitialize)(this.maxXBin)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.gaussianBlurRadius)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.doubleExposureThreshold)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.gaussianBlurRadius)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

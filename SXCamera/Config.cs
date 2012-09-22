@@ -97,6 +97,9 @@ namespace ASCOM.SXCamera
         private const string KEY_INTERLACED_GAUSSIAN_BLUR_RADIUS = "InterlacedGaussianBlurRadius";
         private const double DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS = 1.0;
 
+        private const string KEY_RELEASE_TYPE = "ReleaseType";
+        private const Int64 DEFAULT_RELEASE_TYPE = 0;
+
         public enum CAMERA_SELECTION_METHOD
         {
             CAMERA_SELECTION_ANY,
@@ -396,6 +399,26 @@ namespace ASCOM.SXCamera
             return iRet;
         }
 
+        internal Int64 GetInt64(string name, Int64 defaultValue)
+        {
+            Int64 iRet = defaultValue;
+            string str = GetString(name);
+
+            if (str != null && str != "")
+            {
+                try
+                {
+                    iRet = Convert.ToInt64(str);
+                }
+                catch (FormatException ex)
+                {
+                    Log.Write(String.Format("GetUInt16 was unable to convert {0} -- caught exception {1}\n", str, ex));
+                }
+            }
+
+            return iRet;
+        }
+
         internal byte GetByte(string name, byte defaultValue)
         {
             byte iRet = defaultValue;
@@ -557,6 +580,13 @@ namespace ASCOM.SXCamera
             get { return GetDouble(KEY_INTERLACED_GAUSSIAN_BLUR_RADIUS, DEFAULT_VALUES[m_whichController].interlacedGaussianBlurRadius); }
             set { SetString(       KEY_INTERLACED_GAUSSIAN_BLUR_RADIUS, value.ToString()); }
         }
+
+        public Int64 releaseType
+        {
+            get { return GetInt64(KEY_RELEASE_TYPE, DEFAULT_RELEASE_TYPE); }
+            set { SetString(      KEY_RELEASE_TYPE, value.ToString()); }
+        }  
+
 
         /// <summary>
         /// Launches a configuration dialog box for the driver.  The call will not return
