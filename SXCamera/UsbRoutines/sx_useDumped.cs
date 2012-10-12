@@ -149,7 +149,7 @@ namespace sx
 
                         rawFrame2 = new byte[binnedWidth*binnedHeight*bytesPerPixel];
 
-                        using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.frame1.raw", cameraModel) , FileMode.Open)))
+                        using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.frame2.raw", cameraModel) , FileMode.Open)))
                         {
                             binReader.Read(rawFrame2, 0, rawFrame2.Length);
                             Log.Write(String.Format("undumped {0} bytes into rawFrame2\n", rawFrame2.Length));
