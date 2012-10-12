@@ -68,6 +68,9 @@ namespace ASCOM.SXCamera
             this.doubleExposeShort = new System.Windows.Forms.CheckBox();
             this.equalizeFrames = new System.Windows.Forms.CheckBox();
             this.gaussianBlur = new System.Windows.Forms.CheckBox();
+            this.waitForCooldown = new System.Windows.Forms.CheckBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.hardwareExposureThreshold = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.usbGroup.SuspendLayout();
             this.binGroup.SuspendLayout();
@@ -77,6 +80,7 @@ namespace ASCOM.SXCamera
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.doubleExposureThreshold)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gaussianBlurRadius)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.hardwareExposureThreshold)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdOK
@@ -247,7 +251,7 @@ namespace ASCOM.SXCamera
             this.usbGroup.Controls.Add(this.selectionExactModel);
             this.usbGroup.Controls.Add(this.VID);
             this.usbGroup.Controls.Add(this.selectionExcludeModel);
-            this.usbGroup.Location = new System.Drawing.Point(383, 250);
+            this.usbGroup.Location = new System.Drawing.Point(383, 292);
             this.usbGroup.Name = "usbGroup";
             this.usbGroup.Size = new System.Drawing.Size(161, 168);
             this.usbGroup.TabIndex = 4;
@@ -275,7 +279,7 @@ namespace ASCOM.SXCamera
             this.binGroup.Controls.Add(this.xBinLabel);
             this.binGroup.Controls.Add(this.maxXBin);
             this.binGroup.Controls.Add(this.binLabel);
-            this.binGroup.Location = new System.Drawing.Point(15, 250);
+            this.binGroup.Location = new System.Drawing.Point(15, 292);
             this.binGroup.Margin = new System.Windows.Forms.Padding(2);
             this.binGroup.Name = "binGroup";
             this.binGroup.Padding = new System.Windows.Forms.Padding(2);
@@ -437,7 +441,7 @@ namespace ASCOM.SXCamera
             this.groupBox2.Controls.Add(this.doubleExposeShort);
             this.groupBox2.Controls.Add(this.equalizeFrames);
             this.groupBox2.Controls.Add(this.gaussianBlur);
-            this.groupBox2.Location = new System.Drawing.Point(203, 250);
+            this.groupBox2.Location = new System.Drawing.Point(202, 292);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(160, 168);
             this.groupBox2.TabIndex = 108;
@@ -545,11 +549,47 @@ namespace ASCOM.SXCamera
             this.gaussianBlur.UseVisualStyleBackColor = true;
             this.gaussianBlur.CheckedChanged += new System.EventHandler(this.gaussianBlur_CheckedChanged);
             // 
+            // waitForCooldown
+            // 
+            this.waitForCooldown.AutoSize = true;
+            this.waitForCooldown.Location = new System.Drawing.Point(15, 239);
+            this.waitForCooldown.Name = "waitForCooldown";
+            this.waitForCooldown.Size = new System.Drawing.Size(192, 17);
+            this.waitForCooldown.TabIndex = 109;
+            this.waitForCooldown.Text = "Wait for Cooldown before exposure";
+            this.waitForCooldown.UseVisualStyleBackColor = true;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(15, 263);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(203, 13);
+            this.label6.TabIndex = 110;
+            this.label6.Text = "Max exposure seconds for hardware timer";
+            // 
+            // hardwareExposureThreshold
+            // 
+            this.hardwareExposureThreshold.DecimalPlaces = 2;
+            this.hardwareExposureThreshold.Location = new System.Drawing.Point(224, 261);
+            this.hardwareExposureThreshold.Name = "hardwareExposureThreshold";
+            this.hardwareExposureThreshold.Size = new System.Drawing.Size(57, 20);
+            this.hardwareExposureThreshold.TabIndex = 111;
+            this.hardwareExposureThreshold.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.hardwareExposureThreshold.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            65536});
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(568, 430);
+            this.ClientSize = new System.Drawing.Size(569, 472);
+            this.Controls.Add(this.hardwareExposureThreshold);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.waitForCooldown);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.useDumpedData);
             this.Controls.Add(this.dumpDataEnabled);
@@ -583,6 +623,7 @@ namespace ASCOM.SXCamera
             this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.doubleExposureThreshold)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gaussianBlurRadius)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.hardwareExposureThreshold)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -629,5 +670,8 @@ namespace ASCOM.SXCamera
         public System.Windows.Forms.NumericUpDown gaussianBlurRadius;
         private System.Windows.Forms.Label label5;
         public System.Windows.Forms.CheckBox squareLodestarPixels;
+        private System.Windows.Forms.Label label6;
+        public System.Windows.Forms.CheckBox waitForCooldown;
+        public System.Windows.Forms.NumericUpDown hardwareExposureThreshold;
     }
 }
