@@ -48,6 +48,7 @@ namespace ASCOM.SXCamera
 #endif
 
         private const String KEY_USE_DUMPED_DATA = "UseDumpedData";
+        private const bool DEFAULT_USE_DUMPED_DATA = false;
 
         private const String KEY_DUMP_DATA_ENABLED = "DumpDataEnabled";
         private const bool DEFAULT_DUMP_DATA_ENABLED = false;
@@ -97,6 +98,12 @@ namespace ASCOM.SXCamera
         private const string KEY_INTERLACED_GAUSSIAN_BLUR_RADIUS = "InterlacedGaussianBlurRadius";
         private const double DEFAULT_INTERLACED_GAUSSIAN_BLUR_RADIUS = 1.0;
 
+        private const string KEY_WAIT_FOR_COOLDOWN = "WaitForCooldown";
+        private const bool DEFAULT_WAIT_FOR_COOLDOWN = true;
+
+        private const string KEY_HARDWARE_EXPOSURE_THRESHOLD = "HardwareExposureThreshold";
+        private const double DEFAULT_HARDWARE_EXPOSURE_THRESHOLD = 2.0;
+
         private const string KEY_RELEASE_TYPE = "ReleaseType";
         private const Int64 DEFAULT_RELEASE_TYPE = 0;
 
@@ -134,10 +141,10 @@ namespace ASCOM.SXCamera
             public bool interlacedGaussianBlur;
             public double interlacedGaussianBlurRadius;
 
+            public bool waitForCooldown;
+            public double hardwareExposureThreshold;
+
             internal CAMERA_VALUES(
-                            bool enableUntested,
-                            bool enableLogging,
-                            bool dumpDataEnabled,
                             string selectionMethod, UInt16 VID, UInt16 PID,
                             bool asymetricBinning, byte maxXBin, byte maxYBin,
                             bool fixedBinning, byte fixedBin,
@@ -147,10 +154,10 @@ namespace ASCOM.SXCamera
                             bool interlacedGaussianBlur, double interlacedGaussianBlurRadius
                             )
             {
-                this.enableUntested = enableUntested;
-                this.enableLogging = enableLogging;
-                this.dumpDataEnabled = dumpDataEnabled;
-                this.useDumpedData = false; // defaults to false for all cameras
+                this.enableUntested = DEFAULT_ENABLE_UNTESTED;
+                this.enableLogging  = DEFAULT_ENABLE_LOGGING;
+                this.dumpDataEnabled = DEFAULT_DUMP_DATA_ENABLED;
+                this.useDumpedData = DEFAULT_USE_DUMPED_DATA; // defaults to false for all cameras
 
                 this.selectionMethod = selectionMethod;
                 this.VID = VID;
@@ -171,6 +178,9 @@ namespace ASCOM.SXCamera
 
                 this.interlacedGaussianBlur = interlacedGaussianBlur;
                 this.interlacedGaussianBlurRadius = interlacedGaussianBlurRadius;
+
+                this.waitForCooldown = DEFAULT_WAIT_FOR_COOLDOWN;
+                this.hardwareExposureThreshold = DEFAULT_HARDWARE_EXPOSURE_THRESHOLD;
             }
         };
 
@@ -179,9 +189,6 @@ namespace ASCOM.SXCamera
             // main cameras
             //CAMERA_VALUES[0]
             new CAMERA_VALUES(
-                        DEFAULT_ENABLE_UNTESTED, 
-                        DEFAULT_ENABLE_LOGGING, 
-                        DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
@@ -192,9 +199,6 @@ namespace ASCOM.SXCamera
                     ),
             //CAMERA_VALUES[1]
             new CAMERA_VALUES(
-                        DEFAULT_ENABLE_UNTESTED, 
-                        DEFAULT_ENABLE_LOGGING, 
-                        DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXCLUDE_MODEL), 1278, 0xffff,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
@@ -206,9 +210,6 @@ namespace ASCOM.SXCamera
             // lodestars
             //CAMERA_VALUES[2]
             new CAMERA_VALUES(
-                        DEFAULT_ENABLE_UNTESTED, 
-                        DEFAULT_ENABLE_LOGGING, 
-                        DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
@@ -219,9 +220,6 @@ namespace ASCOM.SXCamera
                     ),
             //CAMERA_VALUES[3]
             new CAMERA_VALUES(
-                        DEFAULT_ENABLE_UNTESTED, 
-                        DEFAULT_ENABLE_LOGGING, 
-                        DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 507,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
@@ -233,9 +231,6 @@ namespace ASCOM.SXCamera
             // costars
             //CAMERA_VALUES[4]
             new CAMERA_VALUES(
-                        DEFAULT_ENABLE_UNTESTED, 
-                        DEFAULT_ENABLE_LOGGING, 
-                        DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517,
                         DEFAULT_ASYMETRIC_BINNING, 1, 1,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
@@ -246,9 +241,6 @@ namespace ASCOM.SXCamera
                     ),
             //CAMERA_VALUES[5]
             new CAMERA_VALUES(
-                        DEFAULT_ENABLE_UNTESTED, 
-                        DEFAULT_ENABLE_LOGGING, 
-                        DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 517,
                         DEFAULT_ASYMETRIC_BINNING, 1, 1,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
@@ -260,9 +252,6 @@ namespace ASCOM.SXCamera
             // superstars
             //CAMERA_VALUES[6]
             new CAMERA_VALUES(
-                        DEFAULT_ENABLE_UNTESTED, 
-                        DEFAULT_ENABLE_LOGGING, 
-                        DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 509,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
@@ -273,9 +262,6 @@ namespace ASCOM.SXCamera
                     ),
             //CAMERA_VALUES[7]
             new CAMERA_VALUES(
-                        DEFAULT_ENABLE_UNTESTED, 
-                        DEFAULT_ENABLE_LOGGING, 
-                        DEFAULT_DUMP_DATA_ENABLED,
                         Enum.GetName(typeof(CAMERA_SELECTION_METHOD), CAMERA_SELECTION_METHOD.CAMERA_SELECTION_EXACT_MODEL), 1278, 509,
                         DEFAULT_ASYMETRIC_BINNING, DEFAULT_MAX_X_BIN, DEFAULT_MAX_Y_BIN,
                         DEFAULT_FIXED_BINNING, DEFAULT_FIXED_BIN,
@@ -581,6 +567,18 @@ namespace ASCOM.SXCamera
             set { SetString(       KEY_INTERLACED_GAUSSIAN_BLUR_RADIUS, value.ToString()); }
         }
 
+        public bool waitForCooldown
+        {
+            get { return GetBool(KEY_WAIT_FOR_COOLDOWN, DEFAULT_VALUES[m_whichController].waitForCooldown); }
+            set { SetString(     KEY_WAIT_FOR_COOLDOWN, value.ToString()); }
+        }
+
+        public double hardwareExposureThreshold
+        {
+            get { return GetDouble(KEY_HARDWARE_EXPOSURE_THRESHOLD, DEFAULT_VALUES[m_whichController].hardwareExposureThreshold); }
+            set { SetString(       KEY_HARDWARE_EXPOSURE_THRESHOLD, value.ToString()); }
+        }
+
         public Int64 releaseType
         {
             get { return GetInt64(KEY_RELEASE_TYPE, DEFAULT_RELEASE_TYPE); }
@@ -676,6 +674,9 @@ namespace ASCOM.SXCamera
                 F.gaussianBlurRadius.Enabled = F.gaussianBlur.Checked;
                 F.gaussianBlurRadius.Value = (decimal)interlacedGaussianBlurRadius;
 
+                F.waitForCooldown.Checked = waitForCooldown;
+                F.hardwareExposureThreshold.Value = (decimal)hardwareExposureThreshold;
+
                 // advanced USB box
                 F.selectionAllowAny.Checked = false;
                 F.selectionExactModel.Checked = false;
@@ -734,6 +735,9 @@ namespace ASCOM.SXCamera
                     {
                         interlacedGaussianBlurRadius = (double)F.gaussianBlurRadius.Value;
                     }
+
+                    waitForCooldown = F.waitForCooldown.Checked;
+                    hardwareExposureThreshold = (double)F.hardwareExposureThreshold.Value;
 
                     // binning box
 
