@@ -683,7 +683,7 @@ namespace sx
                     description = "M26C";
                     fullWellCapacity = 25000;
                     electronsPerADU = 0.30;
-                    progressive = false;
+                    progressive = true; // not really, but we handle it separately
                     sensorName = "ICX493AQA";
                     isMonochrome = false;
                     break;
@@ -1223,6 +1223,18 @@ namespace sx
 
                     dumpReadDelayedBlock(currentExposure.toCamera, "after M25C adjustments");
                 }
+                else if ((CameraModels)cameraModel == CameraModels.MODEL_M26C)
+                {
+                    Debug.Assert((CameraModels)cameraModel == CameraModels.MODEL_M26C);
+
+                    fieldFlags = SX_CCD_FLAGS_FIELD_EVEN;
+
+                    currentExposure.toCamera.width /= 2;
+                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "first frame after M26C adjustments");
+
+                    currentExposure.toCameraSecond = currentExposure.toCamera;
+                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after M26C adjustments");
+                }
                 else if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
                 {
                     Debug.Assert(currentExposure.toCamera.x_bin == 1);
@@ -1644,445 +1656,34 @@ namespace sx
                 Debug.Assert(currentExposure.toCamera.y_bin == 1);
                 Debug.Assert(bytesPerPixel == 2);
 
-                UInt32 bytesPerLine = cameraBinnedWidth*bytesPerPixel;
+                UInt16[] uint16RawFrame1 = new UInt16[rawFrame1.Length/2];
+                UInt16[] uint16RawFrame2 = new UInt16[rawFrame2.Length/2];
 
-                int x=0;
-                int y=0;
+                Buffer.BlockCopy(rawFrame1, 0, uint16RawFrame1, 0, rawFrame1.Length);
+                Buffer.BlockCopy(rawFrame2, 0, uint16RawFrame2, 0, rawFrame2.Length);
 
-                unsafe
-                {
-                    fixed(byte *pRaw1 = rawFrame1, pRaw2 = rawFrame2)
-                    {
-                        UInt16 *pRawFrame1 = (UInt16 *)pRaw1;
-                        UInt16 *pRawFrame2 = (UInt16 *)pRaw2;
-
-                        for(y=0;y<binnedHeight;y += 2)
-                        {
-                            UInt16* pF1 = pRawFrame1 + y;
-                            UInt16* pF2 = pRawFrame2 + y;
-                            for(x=0;x<binnedWidth;x+=4)
-                            {
-                                imageData[x+0,binnedHeight - 1 - y] =                        *pF1++;
-                                imageData[cameraBinnedWidth - 1 - x, binnedHeight - 1 - y] = *pF1++;
-                                imageData[x+2,binnedHeight - 1 - y]                        = *pF1++;
-                                imageData[cameraBinnedWidth - 3 - x, binnedHeight - 1 - y] = *pF1++;
-
-                                imageData[x+0,binnedHeight - 1 - (y+1)] =                        *pF2++;
-                                imageData[cameraBinnedWidth - 1 - x, binnedHeight - 1 - (y+1)] = *pF2++;
-                                imageData[x+2,binnedHeight - 1 - (y+1)]                        = *pF2++;
-                                imageData[cameraBinnedWidth - 3 - x, binnedHeight - 1 - (y+1)] = *pF2++;
-
-                                pF1 += cameraBinnedWidth - 4;
-                                pF2 += cameraBinnedWidth - 4;
-                            }
-                        }
-                    }
-                }
-#if false
-#if true
-                //UInt16 [] frame1 = new UInt16[rawFrame1.Length/2];
-                //UInt16 [] frame2 = new UInt16[binnedWidth*binnedHeight];
-                Int32 [] frame1 = new Int32[cameraBinnedWidth*cameraBinnedHeight];
-                Int32 [] frame2 = new Int32[cameraBinnedWidth*cameraBinnedHeight];
-
-                unsafe
-                {
-                    fixed(byte *pRaw1 = rawFrame1, pRaw2 = rawFrame2)
-                    {
-                        UInt16 *pRawFrame1 = (UInt16 *)pRaw1;
-                        UInt16 *pRawFrame2 = (UInt16 *)pRaw2;
-
-                        for(uint j=0;j<rawFrame1.Length/2;j++)
-                        {
-                            frame1[j] = *pRawFrame1++;
-                            frame2[j] = *pRawFrame2++;
-                        }
-
-                    }
-                }
-
-                int x = 0, y = 0;
-                UInt32 srcIdx1;
-                UInt32 srcIdx2;
-
-                Int32[,] imageData1 = imageData;
-                Int32[,] imageData2 = new Int32[binnedWidth, binnedHeight];
+                int y = -1;
+                int x = -1;
+                int srcIdx = 0;
 
                 try
                 {
-                    for(x = 0; x < binnedWidth;x++)
+                    for(x=0;x<width;x += 4)
                     {
-                        for(y = 0; y < binnedHeight; y++)
+                        for(y=0;y<height;y += 2)
                         {
-                            imageData1[x,y] = -1;
-                            imageData2[x,y] = -1;
-                        }
-                    }
-
-#if false
-                    for(x=0;x<frame1.Length;x++)
-                    {
-                        frame1[x] = (UInt16)x;
-                        frame2[x] = (UInt16)x;
-                    }
-#endif                    
-
-                    srcIdx1=0;
-                    srcIdx2=0;
-
-                    for(y=0;y<binnedHeight;y += 2)
-                    {
-                        for(x=0;x<cameraBinnedWidth/4;x++)
-                        {
-                            if (y < 4)
-                            {
-                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], x, y+0));
-                            }
-                            imageData1[x,y+0]                        = frame1[srcIdx1++];
-                            imageData1[x+cameraBinnedWidth/4,y+0]    = frame1[srcIdx1++];
-                            imageData1[x+2*cameraBinnedWidth/4,y+0]  = frame2[srcIdx2++];
-                            imageData1[x+3*cameraBinnedWidth/4,y+0]  = frame2[srcIdx2++];
-                            if (y < 4)
-                            {
-                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], x, y+1));
-                            }
-                            imageData1[x,y+1]                        = frame1[srcIdx1++];
-                            imageData1[x+cameraBinnedWidth/4,y+1]    = frame1[srcIdx1++];
-                            imageData1[x+2*cameraBinnedWidth/4,y+1]  = frame2[srcIdx2++];
-                            imageData1[x+3*cameraBinnedWidth/4,y+1]  = frame2[srcIdx2++];
-                        }
-                    }
-
-                    srcIdx1=0;
-                    srcIdx2=0;
-
-                    for (x = 0; x < binnedWidth/2; x += 2)
-                    {
-                        for(y=0;y<binnedHeight/2;y += 1) // for(y=0;y<binnedHeight;y += 2)
-                        {
-                            if (x < 4 )
-                            {
-                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], 1*(2*x+0), binnedHeight-1-y));
-                            }
-                            Debug.Assert(imageData2[2*x+0, binnedHeight - 1 - y] == -1);
-                            imageData2[1*(2*x+0), binnedHeight - 1 - y] = frame1[srcIdx1++];
-                            srcIdx1++;
-                            if (x < 4)
-                            {
-                                Log.Write(String.Format("putting pixel {0} ({1}) at ({2}, {3})", srcIdx1, frame1[srcIdx1], 1*(2*x+1), binnedHeight-1-y));
-                            }
-                            Debug.Assert(imageData2[2*x+1, binnedHeight - 1 - y] == -1);
-                            imageData2[1*(2*x+1), binnedHeight - 1 - y] = frame1[srcIdx1++];
-                            srcIdx1++;
-                        }
-                    }
-
-                    for(x=0;x<cameraBinnedWidth/4;x++)
-                    {
-                        for(y=0;y<cameraBinnedHeight;y++)
-                        {
-                            //Debug.Assert(imageData2[x, binnedHeight-1-y] == imageData1[y,x]);
+                            imageData[x+0, y+0] = rawFrame1[srcIdx++];
+                            srcIdx++;
+                            imageData[x+2, y+0] = rawFrame1[srcIdx++];
+                            srcIdx++;
                         }
                     }
                 }
                 catch (System.Exception ex)
                 {
-                    Log.Write(String.Format("caught an exception processing M26 data x = {0}, y = {1} - {2}\n", x, y, ex.ToString()));
+                    Log.Write(String.Format("caught an exception processing M26C data"));
                     throw ex;
                 }
-#else
-#if true
-                unsafe
-                {
-                    uint x=0, y=0;
-
-                    fixed(byte *pRaw1 = rawFrame1, pRaw2 = rawFrame2)
-                    {
-                        UInt16 *pRawFrame1 = (UInt16 *)pRaw1;
-                        UInt16 *pRawFrame2 = (UInt16 *)pRaw2;
-                        UInt32 srcIdx1=0, srcIdx2=0;
-
-                        try
-                        {
-                            for(y=0;y<binnedHeight;y += 2)
-                            {
-                                for(x=0;x<cameraBinnedWidth/4;x++)
-                                {
-                                    srcIdx1++;
-                                    imageData[x,y+0]    = pRawFrame1[srcIdx1++];
-                                    srcIdx1++;
-                                    imageData[x,y+1]    = pRawFrame1[srcIdx1++];
-                                }
-                            }
-                        }
-                        catch (System.Exception ex)
-                        {
-                            Log.Write(String.Format("caught an exception processing M26 data x = {0}, y = {1} - {2}\n", x, y, ex.ToString()));
-                            throw ex;
-                        }
-                    }
-                }
-#else
-                unsafe
-                {
-                    UInt16 [] outputData = new UInt16[(2616+1)*(3900+1)];
-                    UInt16 [] scratchData = new UInt16[(2616+2)*(3900+2)];
-                    fixed(UInt16 *pImptr1=outputData, pImptr4 = scratchData)
-                    {
-                        UInt16 *Imptr1 = pImptr1;
-                        UInt16 *Imptr4 = pImptr4;
-                        fixed(byte *pImptr2 = rawFrame1, pImptr3 = rawFrame2)
-                        {
-                            UInt16 *Imptr2 = (UInt16 *)pImptr2;
-                            UInt16 *Imptr3 = (UInt16 *)pImptr3;
-// 'This routine takes the raw unbinned data starting at Imptr2& and Imptr3&, and rearranges it into the array at Imptr4&
-
-//SUB Arrayswap2 (BYVAL Imptr1&, BYVAL Imptr2&, BYVAL Imptr3&, BYVAL Imptr4&, BYVAL Linelength&, BYVAL Linecount&) EXPORT
-//DIM Impt1 AS INTEGER PTR
-                            UInt16 *Impt1;
-//DIM Impt2 AS INTEGER PTR
-                            UInt16 *Impt2;
-//DIM Impt3 AS INTEGER PTR
-                            UInt16 *Impt3;
-//DIM Impt4 AS INTEGER PTR
-                            UInt16 *Impt4;
-//DIM Impt5 AS INTEGER PTR
-                            UInt16 *Impt5;
-//DIM Impt6 AS INTEGER PTR
-                            UInt16 *Impt6;
-//DIM Impt7 AS INTEGER PTR
-                            UInt16 *Impt7;
-//DIM Impt8 AS INTEGER PTR
-                            UInt16 *Impt8;
-
-//'Linelength&=2616
-                            UInt32 Linelength = 2616;
-//LineBytes&=Linelength& * 2
-                            UInt32 LineBytes = Linelength*2;
-//Lbx3&=LineBytes&*3
-                            UInt32 lbx3 = LineBytes * 3;
-//Lbx5&=LineBytes&*5
-                            UInt32 lbx5 = LineBytes * 5;
-//'Linecount&=3900
-                            UInt32 Linecount = 3900;
-//Linecount_4&=Linecount&/4
-                            Debug.Assert(Linecount%2 == 0);
-                            UInt32 Linecount_4 = Linecount/4;
-//Linelengthx2&=Linelength&*2
-                            UInt32 Linelengthx2 = Linecount*2;
-//Linelengthx4&=Linelength&*4
-                            UInt32 Linelengthx4 = Linecount*4;
-//Linelengthx8&=Linelength&*8
-                            UInt32 Linelengthx8 = Linecount*8;
-
-//Imptr4& = Imptr4&  + 10464
-                            Imptr4 = Imptr4 + (10464)/2;
-//Impt1=Imptr4& + LineBytes&                        'OUTPUT ARRAY START
-                            Debug.Assert((LineBytes/2) % 2 == 0);
-                            Impt1=Imptr4 + (LineBytes)/2;
-//Impt2=Imptr4& + (Linecount& * LineBytes&) - Linelengthx8& + 4
-                            Debug.Assert(((Linecount * LineBytes) - Linelengthx8 + 4)%2 == 0);
-                            Impt2=Imptr4 + ((Linecount * LineBytes) - Linelengthx8 + 4)/2;
-//Impt3=Imptr4& + LineBytes& + Linelengthx4& - 4
-                            Debug.Assert((LineBytes + Linelengthx4 - 4)%2 == 0);
-                            Impt3=Imptr4 + (LineBytes + Linelengthx4 - 4)/2;
-//Impt4=Imptr4& + (Linecount& * LineBytes&) - Linelengthx4& + 4
-                            Debug.Assert(((Linecount * LineBytes) - Linelengthx4 + 4)%2 == 0);
-                            Impt4=Imptr4 + ((Linecount * LineBytes) - Linelengthx4 + 4)/2;
-
-//Impt5=Imptr2&                                 'INPUT BUFFER START
-                            Impt5=Imptr2;
-//Impt6=Imptr2&+2
-                            Impt6=Imptr2+(2)/2;
-//Impt7=Imptr2&+4
-                            Impt7=Imptr2+(4)/2;
-//Impt8=Imptr2&+6
-                            Impt8=Imptr2+(6)/2;
-
-
-//FOR y&=1 TO Linecount_4&                   'IMAGE HEIGHT / 4
-                            for (int y=0;y<Linecount_4;y++)
-                            {
-//FOR z&=1 TO Linelength& STEP 2
-                                for(int z=0;z<Linelength;z+=2)
-                                {
-//  @Impt1=@Impt7                          'Green pixels
-                                    Debug.Assert(Impt1 >= pImptr4 && Impt1 < pImptr4 + scratchData.Length);
-                                    Debug.Assert(Impt7 >= pImptr2 && Impt7 < pImptr2 + rawFrame1.Length);
-                                    *Impt1 = *Impt7;
-//     @Impt2=@Impt8                           'Blue pixels
-                                    Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
-                                    Debug.Assert(Impt8 >= pImptr2 && Impt8 < pImptr2 + rawFrame1.Length);
-                                    *Impt2 = *Impt8;
-//     @Impt3=@Impt5                           'Green pixels
-                                    Debug.Assert(Impt3 >= pImptr4 && Impt3 < pImptr4 + scratchData.Length);
-                                    Debug.Assert(Impt5 >= pImptr2 && Impt5 < pImptr2 + rawFrame1.Length);
-                                    *Impt3 = *Impt5;
-//     @Impt4=@Impt6                           'Blue pixels
-                                    Debug.Assert(Impt4 >= pImptr4 && Impt4 < pImptr4 + scratchData.Length);
-                                    Debug.Assert(Impt6 >= pImptr2 && Impt6 < pImptr2 + rawFrame1.Length);
-                                    *Impt4 = *Impt6;
-
-//     Impt1=Impt1+4                           'shift along by 2 pixels
-                                    Impt1=Impt1+(4)/2;
-//     Impt2=Impt2+4
-                                    Impt2=Impt2+(4)/2;
-//     Impt3=Impt3+4
-                                    Impt3=Impt3+(4)/2;
-//     Impt4=Impt4+4
-                                    Impt4=Impt4+(4)/2;
-//     Impt5=Impt5+8                           'shift along by 4 pixels
-                                    Impt5=Impt5+(8)/2;
-//     Impt6=Impt6+8
-                                    Impt6=Impt6+(8)/2;
-//     Impt7=Impt7+8
-                                    Impt7=Impt7+(8)/2;
-//     Impt8=Impt8+8
-                                    Impt8=Impt8+(8)/2;
-//    NEXT Z&
-                                }
-    
-//     Impt1=Impt1+Lbx3&                      'move output up by 4 rows
-                                Debug.Assert((lbx3%2) == 0);
-                                Impt1=Impt1+(lbx3)/2;
-//     Impt2=Impt2-Lbx5&
-                                Debug.Assert((lbx5%2) == 0);
-                                Impt2=Impt2-(lbx5)/2;
-//     Impt3=Impt3+Lbx3&
-                                Impt3=Impt3+(lbx3)/2;
-//     Impt4=Impt4-Lbx5&
-                                Impt4=Impt4-(lbx5)/2;
-//     Impt5=Impt5
-//     Impt6=Impt6
-//     Impt7=Impt7
-//     Impt8=Impt8
-// NEXT y&
-                            }
-// field2:
-//    Imptr4&=Imptr4& + Linelengthx2&
-                            Debug.Assert((Linelengthx2)%2 == 0);
-                            Imptr4=Imptr4 + (Linelengthx2)/2;
-//    Impt1=Imptr4& + LineBytes& + 2 -10464                            'Green pixels - OK       'OUTPUT ARRAY START
-                            Debug.Assert((LineBytes + 2 -10464)%2 == 0);
-                            Impt1=Imptr4 + (LineBytes + 2 -10464)/2;
-//    Impt2=Imptr4& + (Linecount& * LineBytes&) - Linelengthx8& + 2    'Red pixels - OK
-                            Debug.Assert(((Linecount * LineBytes) - Linelengthx8 + 2)%2 == 0);
-                            Impt2=Imptr4 + ((Linecount * LineBytes) - Linelengthx8 + 2)/2;
-//    Impt3=Imptr4& + LineBytes& + Linelengthx4& - 2 - 10464           'Green pixels - OK
-                            Debug.Assert((LineBytes + Linelengthx4 - 2 - 10464)%2 == 0);
-                            Impt3=Imptr4 + (LineBytes + Linelengthx4 - 2 - 10464)/2;
-//    Impt4=Imptr4& + (Linecount& * LineBytes&) - Linelengthx4& + 2    'Red pixels - OK
-                            Debug.Assert(((Linecount * LineBytes) - Linelengthx4 + 2)%2 == 0);
-                            Impt4=Imptr4 + ((Linecount * LineBytes) - Linelengthx4 + 2)/2;
-
-//    Impt5=Imptr3&                                 'INPUT BUFFER START
-                            Impt5=Imptr3;
-//    Impt6=Imptr3&+2
-                            Impt6=Imptr3+(2)/2;
-//    Impt7=Imptr3&+4
-                            Impt7=Imptr3+(4)/2;
-//    Impt8=Imptr3&+6
-                            Impt8=Imptr3+(6)/2;
-
-//    FOR y&=1 TO Linecount_4&                     'IMAGE HEIGHT / 4
-                            for (int y=0;y<Linecount_4;y++)
-                            {
-//    FOR z&=1 TO Linelength& STEP 2
-                                for(int z=0;z<Linelength;z+=2)
-                                {
-//        @Impt1=@Impt7
-                                    Debug.Assert(Impt1 >= pImptr4 && Impt1 < pImptr4 + scratchData.Length);
-                                    Debug.Assert(Impt7 >= pImptr3 && Impt7 < pImptr3 + rawFrame1.Length);
-                                    *Impt1 = *Impt7;
-//        @Impt2=@Impt8
-                                    Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
-                                    Debug.Assert(Impt8 >= pImptr3 && Impt8 < pImptr3 + rawFrame1.Length);
-                                    *Impt2 = *Impt8;
-//        @Impt3=@Impt5
-                                    Debug.Assert(Impt3 >= pImptr4 && Impt3 < pImptr4 + scratchData.Length);
-                                    Debug.Assert(Impt5 >= pImptr3 && Impt5 < pImptr3 + rawFrame1.Length);
-                                    *Impt3 = *Impt5;
-//        @Impt4=@Impt6
-                                    Debug.Assert(Impt4 >= pImptr4 && Impt4 < pImptr4 + scratchData.Length);
-                                    Debug.Assert(Impt6 >= pImptr3 && Impt6 < pImptr3 + rawFrame1.Length);
-                                    *Impt4 = *Impt6;
-
-//        Impt1=Impt1+4                           'shift along by 2 pixels
-                                    Impt1=Impt1+(4)/2;
-//        Impt2=Impt2+4
-                                    Impt2=Impt2+(4)/2;
-//        Impt3=Impt3+4
-                                    Impt3=Impt3+(4)/2;
-//        Impt4=Impt4+4
-                                    Impt4=Impt4+(4)/2;
-//        Impt5=Impt5+8                           'shift along by 4 pixels
-                                    Impt5=Impt5+(8)/2;
-//        Impt6=Impt6+8
-                                    Impt6=Impt6+(8)/2;
-//        Impt7=Impt7+8
-                                    Impt7=Impt7+(8)/2;
-//        Impt8=Impt8+8
-                                    Impt8=Impt8+(8)/2;
-//    NEXT Z&
-                                }
-//        Impt1=Impt1+Lbx3&                      'move output up by 4 rows
-                                Impt1=Impt1+(lbx3)/2;
-//        Impt2=Impt2-Lbx5&
-                                Impt2=Impt2-(lbx5)/2;
-//        Impt3=Impt3+Lbx3&
-                                Impt3=Impt3+(lbx3)/2;
-//        Impt4=Impt4-Lbx5&
-                                Impt4=Impt4-(lbx5)/2;
-//        Impt5=Impt5
-//        Impt6=Impt6
-//        Impt7=Impt7
-//        Impt8=Impt8
-//    NEXT y&
-
-                            }
-//     'This section rotates the data at Imptr4& and creates a geometrically correct 1x1 image
-
-//    derotate:
-
-//    Impt1=Imptr1&+7802
-                            Impt1=Imptr1+(7802)/2;
-//    Impt2=Imptr4&+5230      'start at end of line and work backwards
-                            Impt2=Imptr4+(5230)/2;
-
-//    FOR z&=1 TO 2616
-                            for(int z=0;z<2616;z++)
-                            {
-//    FOR y&=1 TO 3900
-                                for(int y=0;y<3900;y++)
-                                {
-//        @Impt1=@Impt2
-                                    Debug.Assert(Impt1 >= pImptr1 && Impt1 < pImptr1 + outputData.Length);
-                                    Debug.Assert(Impt2 >= pImptr4 && Impt2 < pImptr4 + scratchData.Length);
-                                    *Impt1 = *Impt2;
-//        Impt1=Impt1+2
-                                    Impt1=Impt1+(2)/2;
-//        Impt2=Impt2+5232    'move down 1 line
-                                    Impt2=Impt2+(5232)/2;
-//    NEXT y&
-                                }
-//    Impt2=Impt2-20404800-2
-                                Impt2=Impt2-(20404800-2)/2;
-//    NEXT z&
-                            }
-//    END SUB
-                        }
-                    }
-                    for(int x=0;x<3900;x++)
-                    {
-                        for(int y=0;y<2616;y++)
-                        {
-                            imageData[x,y] = scratchData[x*2616+y];
-                        }
-                    }
-                }
-#endif
-#endif
-#endif
             } // end of M26
             else if (bytesPerPixel == 1 || bytesPerPixel == 2)
             {
