@@ -683,7 +683,7 @@ namespace sx
                     description = "M26C";
                     fullWellCapacity = 25000;
                     electronsPerADU = 0.30;
-                    progressive = true; // not really, but we handle it separately
+                    progressive = false;
                     sensorName = "ICX493AQA";
                     isMonochrome = false;
                     break;
@@ -1066,6 +1066,25 @@ namespace sx
                         }
 
                     }
+                    else if ((CameraModels)cameraModel == CameraModels.MODEL_M26C)
+                    {
+                        // note: the M26C readout is sideways, so we switch width and height
+                        // here. I
+                        UInt16 adjustedHeight = (UInt16)(currentExposure.toCamera.width/4);
+                        UInt16 adjustedWidth  = (UInt16)(currentExposure.toCamera.height*2);
+
+                        Debug.Assert((CameraModels)cameraModel == CameraModels.MODEL_M26C);
+
+                        fieldFlags = SX_CCD_FLAGS_FIELD_EVEN;
+
+                        currentExposure.toCamera.width  = adjustedWidth;
+                        currentExposure.toCamera.height = adjustedHeight;
+
+                        dumpReadDelayedBlock(currentExposure.toCamera, "first frame after M26C adjustments");
+
+                        currentExposure.toCameraSecond = currentExposure.toCamera;
+                        dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after M26C adjustments");
+                    }
                     else
                     {
                         // if we are binning, it is possible that dividing the height by 2 will elminiate a
@@ -1222,18 +1241,6 @@ namespace sx
                     currentExposure.toCamera.y_offset /= 2;
 
                     dumpReadDelayedBlock(currentExposure.toCamera, "after M25C adjustments");
-                }
-                else if ((CameraModels)cameraModel == CameraModels.MODEL_M26C)
-                {
-                    Debug.Assert((CameraModels)cameraModel == CameraModels.MODEL_M26C);
-
-                    fieldFlags = SX_CCD_FLAGS_FIELD_EVEN;
-
-                    currentExposure.toCamera.width /= 2;
-                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "first frame after M26C adjustments");
-
-                    currentExposure.toCameraSecond = currentExposure.toCamera;
-                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "second frame after M26C adjustments");
                 }
                 else if ((CameraModels)cameraModel == CameraModels.MODEL_COSTAR)
                 {
@@ -1650,14 +1657,14 @@ namespace sx
                 Log.Write(String.Format("convertCameraDataToImageData(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
                 Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixels={1}, rawFrame1.Length={2} rawFrame2.Length=={3}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length, rawFrame2.Length));
 
-                Debug.Assert(currentExposure.toCamera.width == ccdWidth);
-                Debug.Assert(currentExposure.toCamera.height == ccdHeight);
+                //Debug.Assert(currentExposure.toCamera.width == ccdWidth);
+                //Debug.Assert(currentExposure.toCamera.height == ccdHeight);
                 Debug.Assert(currentExposure.toCamera.x_bin == 1);
                 Debug.Assert(currentExposure.toCamera.y_bin == 1);
                 Debug.Assert(bytesPerPixel == 2);
 
-                UInt16[] uint16RawFrame1 = new UInt16[rawFrame1.Length/2];
-                UInt16[] uint16RawFrame2 = new UInt16[rawFrame2.Length/2];
+                UInt16[] uint16RawFrame1 = new UInt16[rawFrame1.Length/(Marshal.SizeOf(typeof(UInt16)))];
+                UInt16[] uint16RawFrame2 = new UInt16[rawFrame2.Length/(Marshal.SizeOf(typeof(UInt16)))];
 
                 Buffer.BlockCopy(rawFrame1, 0, uint16RawFrame1, 0, rawFrame1.Length);
                 Buffer.BlockCopy(rawFrame2, 0, uint16RawFrame2, 0, rawFrame2.Length);
@@ -1668,14 +1675,21 @@ namespace sx
 
                 try
                 {
-                    for(x=0;x<width;x += 4)
+                    for(x=0;x<width;x+=4)
                     {
-                        for(y=0;y<height;y += 2)
+                        for(y=height-1;y>=0;y -= 2)
                         {
-                            imageData[x+0, y+0] = rawFrame1[srcIdx++];
-                            srcIdx++;
-                            imageData[x+2, y+0] = rawFrame1[srcIdx++];
-                            srcIdx++;
+                            imageData[        0 + x, y-0] = uint16RawFrame2[srcIdx+0];
+                            imageData[(width-1) - x, y-0] = uint16RawFrame2[srcIdx+1];
+                            imageData[        2 + x, y-0] = uint16RawFrame2[srcIdx+2];
+                            imageData[(width-3) - x, y-0] = uint16RawFrame2[srcIdx+3];
+
+                            imageData[        0 + x, y-1] = uint16RawFrame1[srcIdx+0];
+                            imageData[(width-1) - x, y-1] = uint16RawFrame1[srcIdx+1];
+                            imageData[        2 + x, y-1] = uint16RawFrame1[srcIdx+2];
+                            imageData[(width-3) - x, y-1] = uint16RawFrame1[srcIdx+3];
+
+                            srcIdx += 4;
                         }
                     }
                 }
@@ -2711,6 +2725,7 @@ namespace sx
                                                         secondExposureFlags,
                                                         idx,
                                                         (UInt16)Marshal.SizeOf(currentExposure.toCamera));
+                        Log.Write(String.Format("recordPixels() second frame requesting delayed read, flags = {0}\n", secondExposureFlags));
                         m_controller.Write(cmdBlock, currentExposure.toCamera);
                     }
                     else
