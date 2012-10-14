@@ -716,6 +716,8 @@ namespace ASCOM.SXGeneric
                                 dlg.ValidateNames = true;
                                 dlg.Multiselect = false;
                                 dlg.Title = "Select a dumped model file";
+                                dlg.DefaultExt = ".model";
+                                dlg.Filter = "Model Files (*.model)|*.model|All file (*.)|*.*";
 
                                 if (dlg.ShowDialog(ASCOM.SXCamera.SXCamera.m_MainForm) == DialogResult.OK)
                                 {
