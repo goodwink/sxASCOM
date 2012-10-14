@@ -1679,15 +1679,15 @@ namespace sx
                     {
                         for(y=height-1;y>=0;y -= 2)
                         {
-                            imageData[        0 + x, y-0] = uint16RawFrame2[srcIdx+0];
-                            imageData[(width-1) - x, y-0] = uint16RawFrame2[srcIdx+1];
-                            imageData[        2 + x, y-0] = uint16RawFrame2[srcIdx+2];
-                            imageData[(width-3) - x, y-0] = uint16RawFrame2[srcIdx+3];
+                            imageData[        1 + x, y-0] = uint16RawFrame1[srcIdx+0]; // green
+                            imageData[(width-2) - x, y-0] = uint16RawFrame1[srcIdx+1]; // red
+                            imageData[        3 + x, y-0] = uint16RawFrame1[srcIdx+2]; // green
+                            imageData[(width-4) - x, y-0] = uint16RawFrame1[srcIdx+3]; // red
 
-                            imageData[        0 + x, y-1] = uint16RawFrame1[srcIdx+0];
-                            imageData[(width-1) - x, y-1] = uint16RawFrame1[srcIdx+1];
-                            imageData[        2 + x, y-1] = uint16RawFrame1[srcIdx+2];
-                            imageData[(width-3) - x, y-1] = uint16RawFrame1[srcIdx+3];
+                            imageData[        0 + x, y-1] = uint16RawFrame2[srcIdx+0]; // green
+                            imageData[(width-1) - x, y-1] = uint16RawFrame2[srcIdx+1]; // blue
+                            imageData[        2 + x, y-1] = uint16RawFrame2[srcIdx+2]; // green
+                            imageData[(width-3) - x, y-1] = uint16RawFrame2[srcIdx+3]; // blue
 
                             srcIdx += 4;
                         }
