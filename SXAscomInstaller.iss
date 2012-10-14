@@ -5,9 +5,9 @@
 
 #define BUILD_TYPE "Debug"
 ; set EXPIRATION to 0 for no expiraration
-#define EXPIRATION "2012/11/01"
+#define EXPIRATION "2012/11/15"
 ; #define EXPIRATION "0"
-#define APP_VERSION "2.2.12285.2052"
+#define APP_VERSION "2.2.12288.1542"
 #define ASCOM_VERSION_REQUIRED  "5.5"
 #define DRIVER_EXE_NAME "ASCOM.SXCamera.exe"
 
@@ -44,7 +44,7 @@ Name: "{cf}\ASCOM\Uninstall\Camera\sxASCOM"
 Name: "{app}"
 
 [Files]
-Source: "SXCamera\bin\x86\{#BUILD_TYPE}\{#DRIVER_EXE_NAME}"; DestDir: "{app}"
+Source: "SXCamera\bin\{#BUILD_TYPE}\{#DRIVER_EXE_NAME}"; DestDir: "{app}"
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
 Source: "SXCamera.Readme.txt"; DestDir: "{app}"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
