@@ -53,7 +53,7 @@ namespace ASCOM.SXGeneric
         private DateTimeOffset exposureStart;
         private TimeSpan desiredExposureLength;
         private TimeSpan actualExposureLength;
-        private delegate void CaptureDelegate(double Duration, bool Light);
+        private delegate void CaptureDelegate(double Duration, bool Light, bool useHardwareTimer);
         private bool bImageValid;
         private volatile Object oCameraStateLock;
         private volatile CameraStates state;
@@ -168,6 +168,7 @@ namespace ASCOM.SXGeneric
                         case CameraStates.cameraIdle:
                             // nothing to do
                             break;
+                        case CameraStates.cameraWaiting:
                         case CameraStates.cameraExposing:
                             bAbortRequested = true;
                             break;
@@ -1666,18 +1667,10 @@ namespace ASCOM.SXGeneric
             try
             {
                 Log.Write(String.Format("Generic::hardwareCapture({0}, {1}): begins\n", Duration, Light));
+
                 exposureStart = DateTime.Now;
                 DateTimeOffset exposureEnd;
                 
-                lock (oCameraStateLock)
-                {
-                    if (bAbortRequested)
-                    {
-                        return;
-                    }
-                    state = CameraStates.cameraExposing;
-                }
-
                 sxCamera.recordPixels(true, out exposureEnd);
 
                 actualExposureLength = DateTime.Now - exposureStart;
@@ -1688,27 +1681,10 @@ namespace ASCOM.SXGeneric
 
                 bImageValid = true;
             }
-            catch (ASCOM.DriverException ex)
-            {
-                throw ex;
-            }
             catch (System.Exception ex)
             {
-                lock (oCameraStateLock)
-                {
-                    state = CameraStates.cameraError;
-                }
-                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
-            }
-            finally
-            {
-                lock (oCameraStateLock)
-                {
-                    if (state != CameraStates.cameraError)
-                    {
-                        state = CameraStates.cameraIdle;
-                    }
-                }
+                Log.Write(String.Format("Generic::hardwareCapture Caught an exception: {0}", ex));
+                throw;
             }
         }
 
@@ -1720,8 +1696,8 @@ namespace ASCOM.SXGeneric
             {
                 Log.Write(String.Format("Generic::softwareCapture({0}, {1}): begins\n", Duration, Light));
 
-                sxCamera.clearCCDAndRegisters(); // For exposures > 1 second we will clear the registers again just before
-                                                    // the exposure ends to clear any accumulated noise.
+                sxCamera.clearCCDAndRegisters(); // Clear everything - we may clear it again just before 
+                                                 // the exposure ends to clear any accumulated noise.
                 bool bRegistersCleareded = false;
 
                 if (Light && Duration > 0)
@@ -1759,6 +1735,10 @@ namespace ASCOM.SXGeneric
                     remainingExposureTime.TotalMilliseconds > 0;
                     remainingExposureTime = exposureEnd - DateTime.Now)
                 {
+                    if (bAbortRequested || bStopRequested)
+                    {
+                        return;
+                    }
                     
                     if (remainingExposureTime.TotalSeconds < 2.0 && !bRegistersCleareded)
                     {
@@ -1773,10 +1753,6 @@ namespace ASCOM.SXGeneric
                         Thread.Sleep(50);
                     }
 
-                    if (bAbortRequested || bStopRequested)
-                    {
-                        break;
-                    }
                 }
 
                 if (shutterIsOpen)
@@ -1787,10 +1763,8 @@ namespace ASCOM.SXGeneric
 
                 lock (oCameraStateLock)
                 {
-                    if (bAbortRequested)
-                    {
+                    if (bAbortRequested || bStopRequested)
                         return;
-                    }
                     state = CameraStates.cameraDownload;
                 }
 
@@ -1802,32 +1776,101 @@ namespace ASCOM.SXGeneric
                 
                 bImageValid = true;
             }
-            catch (ASCOM.DriverException ex)
+            catch (System.Exception ex)
             {
-                throw ex;
+                Log.Write(String.Format("Generic::softwareCapture Caught an exception: {0}", ex));
+                throw;
+            }
+            finally
+            {
+                if (shutterIsOpen)
+                {
+                    sxCamera.shutterClose();
+                    shutterIsOpen = false;
+                }
+            }
+        }
+
+        void doCapture(double Duration, bool Light, bool useHardwareTimer)
+        {
+            try
+            {
+                WaitForCooldown();
+
+                lock (oCameraStateLock)
+                {
+                    if (bAbortRequested || bStopRequested)
+                    {
+                        return;
+                    }
+                    state = CameraStates.cameraExposing;
+                }
+
+                if (useHardwareTimer)
+                {
+                    hardwareCapture(Duration, Light);
+                }
+                else
+                {
+                    softwareCapture(Duration, Light);
+                }
             }
             catch (System.Exception ex)
             {
-                lock (oCameraStateLock)
-                {
-                    state = CameraStates.cameraError;
-                }
-                throw new ASCOM.DriverException(SetError(String.Format("Unable to complete {0} request - ex = {1}\n", MethodBase.GetCurrentMethod().Name, ex.ToString())), ex);
+                Log.Write(String.Format("Generic::doCapture Caught an exception: {0}", ex));
+                throw;
             }
             finally
             {
                 lock (oCameraStateLock)
                 {
-                    if (state != CameraStates.cameraError)
+                    if (bImageValid || bAbortRequested || bStopRequested)
                     {
                         state = CameraStates.cameraIdle;
                     }
+                    else
+                    {
+                        state = CameraStates.cameraError;
+                    }
+                }
+            }
+        }
+
+        private void WaitForCooldown()
+        {
+            if (sxCamera.hasCoolerControl &&
+                sxCamera.coolerEnabled &&
+                m_config.waitForCooldown &&
+                CCDTemperature - SetCCDTemperature > 0.5)
+            {
+                double lastTemperature = CCDTemperature;
+                int sameCount = 0;
+
+                Log.Write(String.Format("StartExposure(): begin wait for CCD cooldown, temp={0}, target={1}",
+                        CCDTemperature, SetCCDTemperature));
+
+                while (CCDTemperature - SetCCDTemperature > 0.5 && !bAbortRequested)
+                {
+                    if (CCDTemperature < lastTemperature)
+                    {
+                        // we are making progress
+                        lastTemperature = CCDTemperature;
+                        sameCount = 0;
+                    }
+                    else
+                    {
+                        // no progress - quit if we have been stuck too long
+                        if (++sameCount > 8)
+                        {
+                            break;
+                        }
+                    }
+
+                    Thread.Sleep(125);
                 }
 
-                if (shutterIsOpen)
-                {
-                    sxCamera.shutterClose();
-                }
+                Log.Write(String.Format("StartExposure(): end wait for CCD cooldown, temperature={0} sameCount={1} bAbortRequested={2}", 
+                        lastTemperature, sameCount, bAbortRequested));
             }
         }
 
@@ -1844,7 +1887,7 @@ namespace ASCOM.SXGeneric
                 Log.Write(String.Format("Generic::StartExposure({0}, {1}) begins\n", Duration, Light));
 
                 // because of timing accuracy, we do all short exposures with the HW timer
-                if (Duration <= 1.1)
+                if (Duration <= m_config.hardwareExposureThreshold)
                 {
                     StartExposure(Duration, Light, true);
                 }
@@ -1875,6 +1918,11 @@ namespace ASCOM.SXGeneric
                     throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, Duration.ToString(), ">= 0");
                 }
 
+                if (sxCamera.mustUseHardwareTimer)
+                {
+                    useHardwareTimer = true;
+                }
+
                 Log.Write(String.Format("Generic::StartExposure({0}, {1}, {2}) begins\n", Duration, Light, useHardwareTimer));
 
                 bLastErrorValid = false;
@@ -1885,7 +1933,7 @@ namespace ASCOM.SXGeneric
                     {
                         throw new ASCOM.InvalidOperationException(SetError(String.Format("StartExposure called while in state {0}", state)));
                     }
-                    state = CameraStates.cameraExposing;
+                    state = CameraStates.cameraWaiting;
                 }
 
                 try
@@ -1934,16 +1982,9 @@ namespace ASCOM.SXGeneric
                         throw new ASCOM.InvalidValueException(MethodBase.GetCurrentMethod().Name, StartY.ToString(), "1-" + (CameraYSize/BinY).ToString(), ex);
                     }
 
-                    CaptureDelegate captureDelegate;
-
-                    if (useHardwareTimer || sxCamera.mustUseHardwareTimer)
+                    if (useHardwareTimer)
                     {
                         sxCamera.delayMs = (uint)(1000 * Duration);
-                        captureDelegate = new CaptureDelegate(hardwareCapture);
-                    }
-                    else
-                    {
-                        captureDelegate = new CaptureDelegate(softwareCapture);
                     }
 
                     // we have passed all the parameter sanity checsks, and are still 
@@ -1951,9 +1992,11 @@ namespace ASCOM.SXGeneric
                     // parameters for this exposure
                     sxCamera.freezeParameters();
 
+                    CaptureDelegate captureDelegate = new CaptureDelegate(doCapture);
+
                     Log.Write("StartExposure() before captureDelegate.BeginInvode()\n");
 
-                    captureDelegate.BeginInvoke(Duration, Light, null, null);
+                    captureDelegate.BeginInvoke(Duration, Light, useHardwareTimer, null, null);
 
                     Log.Write("StartExposure() after captureDelegate.BeginInvode()\n");
                 }
