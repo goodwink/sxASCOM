@@ -1,6 +1,6 @@
 Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
-This is the README.txt for version 2.2
+This is the README.txt for version 2.3
 
 This is an Beta build of the ASCOM driver for Starlight Xpress cameras.
 It contains new, untested or lightly tested code and will expire.
@@ -9,6 +9,7 @@ There is a PRODUCTION release available - please use that version if it meets
 your needs.
 
 This version adds:
+    - experimental support for M26C binned 1x1 full frame
     - an option to wait to begin an exposure until the CCD temperature
         is at the desired set point
     - an option to control when the driver switches from using internal
