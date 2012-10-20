@@ -43,7 +43,7 @@ Name: "{cf}\ASCOM\Uninstall\Camera\sxASCOM"
 Name: "{app}"
 
 [Files]
-Source: "SXCamera\bin\x86\{#BUILD_TYPE}\{#DRIVER_EXE_NAME}"; DestDir: "{app}"
+Source: "SXCamera\bin\{#BUILD_TYPE}\{#DRIVER_EXE_NAME}"; DestDir: "{app}"
 ; Require a read-me HTML to appear after installation, maybe driver's Help doc
 Source: "SXCamera.Readme.txt"; DestDir: "{app}"; Flags: isreadme
 ; TODO: Add other files needed by your driver here (add subfolders above)
