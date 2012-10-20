@@ -2,43 +2,17 @@ Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
 This is the README.txt for version 2.2
 
-This is an Release Candidate build of the ASCOM driver for Starlight Xpress cameras.
+This is an Beta build of the ASCOM driver for Starlight Xpress cameras.
 It contains new, untested or lightly tested code and will expire.
 
 There is a PRODUCTION release available - please use that version if it meets
 your needs.
 
 This version adds:
-    - Fixed a few pre-release minor issues
-    - Add camera data for H18
-    - Move H694/H674 from untested to tested
-    - support for cameras with shutters, including handling of darks and
-      zero length exposures.
-    - support for Superstar/H694/H694C
-      - updates installer to treat Superstar as a guide camera
-    - installer automatically removes previous version if possible
-    - interlaced camera (lodestar mostly) banding improvements:
-      - symetric binning now reads out as progressive, which
-        avoids banding problems entirely
-      - an option to make the camera looked like it does not support binning
-        while setting a fixed binning mode. This can be used to force a 
-        program which does not support binning to bin (PHD is a fine 
-        example) so you take advantage of the progressive 
-        readout of binned images
-      - several options to make banding better for unbinned images
-          - take a second exposure for the second frame.  This elminates 
-            banding but doubles exposure time.
-          - apply a gaussian blur. This is useful for applications
-            that try to follow stars
-          - equalize odd and even frame brightness.  Because of
-            chip issues, this doesn't work as well as you might think it
-            would 
-    - an option to square lodestar pixels so plate solvers can solve
-      the images.  This is done the "easy way" - it expands the pixels
-      horizontally but does not increase the apparent size of the sensor,
-      so it throws away a few pixels from the right edge. Doing it the 
-      "right way" is much harder, and for a guide camera didn't
-      seem to be worth it.
+    - an option to wait to begin an exposure until the CCD temperature
+        is at the desired set point
+    - an option to control when the driver switches from using internal
+        timing to external timing
 
 If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know
