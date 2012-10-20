@@ -55,6 +55,8 @@ def updateVersions(major, minor, revision, build):
                 updateVersion(root, name, major, minor, revision, build)
 
     updateVersion(".", "SXAscomInstaller.iss", major, minor, revision, build)
+    print('commit with:\ngit commit -a -m "changes for version {0}.{1}.{2}.{3}"'.format(major, minor, revision, build))
+    print('tag with:\ngit tag -a -m "tagging version {0}.{1}.{2}.{3}" v{0}.{1}.{2}.{3}'.format(major, minor, revision, build))
 
 
 def main():
