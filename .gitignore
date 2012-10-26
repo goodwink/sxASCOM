@@ -6,6 +6,8 @@ obj
 *.user
 *.swp
 *~
+tags
+cscope.out
 logs
 changelog.full.txt
 changelog.txt
