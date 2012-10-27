@@ -1029,7 +1029,10 @@ namespace sx
         internal UInt16 adjustReadDelayedBlockForM26C(UInt16 fieldFlags)
         {
             // this needs to be a config parameter, but for now it is here
-            bool bColorBinning = false;
+            bool bColorBinning = true;
+
+            Log.Write(String.Format("adjustReadDelayedBlockForM26C begins, x_bin={0}, x_offset={1}, y_offset={2} width={3}, height={4}, bColorBinning={5}",
+            currentExposure.userRequested.x_bin, currentExposure.toCamera.x_offset, currentExposure.toCamera.y_offset, currentExposure.userRequested.width,  currentExposure.userRequested.height, bColorBinning));
 
             // check preconditions
             Debug.Assert(currentExposure.userRequested.x_bin <= 4);
@@ -1767,10 +1770,10 @@ namespace sx
                 srcIdx = 0;
                 for(x=0;x<binnedWidth;x += 2)
                 {
+                    Int32 xRev = binnedWidth-(offset+x);
+
                     for(y=0;y<binnedHeight;y++)
                     {
-                        Int32 xRev = binnedWidth-(offset+x);
-
                         if (bin == 2)
                         {
                             if (y > 0)
@@ -1806,6 +1809,78 @@ namespace sx
 
         internal void convertCameraDataToImageDataM26C_2x2Color()
         {
+            Debug.Assert(currentExposure.toCamera.x_bin == 4);
+            Debug.Assert(currentExposure.toCamera.y_bin == 1);
+
+            Int32 bin = 2;
+
+            Int32 binnedWidth        = currentExposure.userRequested.width/bin;
+            Int32 binnedHeight       = currentExposure.userRequested.height/bin;
+
+            Int32 cameraBinnedWidth  = currentExposure.toCamera.height*4/bin;
+            Int32 cameraBinnedHeight = currentExposure.toCamera.width/(2*bin);
+
+            UInt16[] uint16RawFrame1 = new UInt16[rawFrame1.Length/(Marshal.SizeOf(typeof(UInt16)))];
+            UInt16[] uint16RawFrame2 = new UInt16[rawFrame2.Length/(Marshal.SizeOf(typeof(UInt16)))];
+
+            UInt16[,] uint16Frame1 = new UInt16[binnedWidth, binnedHeight/2];
+            UInt16[,] uint16Frame2 = new UInt16[binnedWidth, binnedHeight/2];
+
+            Buffer.BlockCopy(rawFrame1, 0, uint16RawFrame1, 0, rawFrame1.Length);
+            Buffer.BlockCopy(rawFrame2, 0, uint16RawFrame2, 0, rawFrame2.Length);
+
+            int y = -1;
+            int x = -1;
+            int srcIdx = -1;
+
+            try
+            {
+                srcIdx = 0;
+                for(x=0;x<binnedWidth;x+=2)
+                {
+                    Int32 xRev = binnedWidth-(x+1);
+
+                    for(y=0;y<binnedHeight/2;y += 1)
+                    {
+
+                        uint16Frame1[   x, y] = uint16RawFrame1[srcIdx+1]; // red
+                        uint16Frame1[xRev, y] = uint16RawFrame1[srcIdx+0]; // green
+                        srcIdx += 2;
+                    }
+                }
+
+                srcIdx = 0;
+                for(x=0;x<binnedWidth;x+=2)
+                {
+                    Int32 xRev = binnedWidth-(x+2);
+                    for(y=0;y<binnedHeight/2;y += 1)
+                    {
+                        uint16Frame2[1 + x, y] = uint16RawFrame2[srcIdx+1]; // blue
+                        uint16Frame2[ xRev, y] = uint16RawFrame2[srcIdx+0]; // green
+
+                        srcIdx += 2;
+                    }
+                }
+                
+                for(x=0;x<binnedWidth;x++)
+                {
+                    for(y=0;y<binnedHeight-2;y += 2)
+                    {
+#if false
+                        imageData[x,         y/2] = uint16Frame1[x,y/2];
+                        imageData[x,binnedHeight/2+y/2] = uint16Frame2[x,y/2];
+#else
+                        imageData[x,y+0] = uint16Frame1[x,y/2];
+                        imageData[x,y+1] = uint16Frame2[x,y/2];
+#endif
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Log.Write(String.Format("caught an exception processing 2x2 Color M26C data: {0}", ex));
+                throw;
+            }
         }
 
         internal void convertCameraDataToImageDataM26C_1x1Color()
@@ -1906,7 +1981,7 @@ namespace sx
             {
                 convertCameraDataToImageDataM26C_1x1Color();
             }
-            else if (currentExposure.toCamera.x_bin == 2 && currentExposure.toCamera.y_bin == 2)
+            else if (currentExposure.toCamera.x_bin == 4 && currentExposure.toCamera.y_bin == 1)
             {
                 convertCameraDataToImageDataM26C_2x2Color();
             }
