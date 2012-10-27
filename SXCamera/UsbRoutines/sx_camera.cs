@@ -1738,17 +1738,86 @@ namespace sx
             }
         }
 
-        internal void convertCameraDataToImageDataM26C(UInt32 binnedWidth, UInt32 binnedHeight)
+        internal void convertCameraDataToImageDataM26C_Mono()
         {
-            UInt32 cameraBinnedWidth  = currentExposure.toCamera.width;
-            UInt32 cameraBinnedHeight = currentExposure.toCamera.height;
+            Debug.Assert(currentExposure.toCamera.x_bin == 2*currentExposure.toCamera.y_bin);
+            Int32 bin = currentExposure.toCamera.x_bin;
 
-            Log.Write("convertCameraDataToImageData(): decoding M26C data\n");
-            Log.Write(String.Format("convertCameraDataToImageData(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
-            Log.Write(String.Format("convertCameraDataToImageData(): userPixels = {0}, cameraPixels={1}, rawFrame1.Length={2} rawFrame2.Length=={3}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length, rawFrame2.Length));
+            Int32 binnedWidth        = currentExposure.userRequested.width/bin;
+            Int32 binnedHeight       = currentExposure.userRequested.height/bin;
 
+            Int32 cameraBinnedWidth  = currentExposure.toCamera.height*4/bin;
+            Int32 cameraBinnedHeight = currentExposure.toCamera.width/(2*bin);
+
+            UInt16[] uint16RawFrame1 = new UInt16[rawFrame1.Length/(Marshal.SizeOf(typeof(UInt16)))];
+            Buffer.BlockCopy(rawFrame1, 0, uint16RawFrame1, 0, rawFrame1.Length);
+
+            Debug.Assert(uint16RawFrame1.Length == cameraBinnedWidth*cameraBinnedHeight);
+
+            Log.Write(String.Format("convertCameraDataToImageDataM26C_Mono(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
+            Log.Write(String.Format("convertCameraDataToImageDataM26C_Mono(): userPixels = {0}, cameraPixels={1}, rawFrame1.Length={2}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length));
+
+            Int32 y = -1;
+            Int32 x = -1;
+            Int32 srcIdx = -1;
+            Int32 offset = (binnedWidth  % 2) + 1;
+
+            try
+            {
+                srcIdx = 0;
+                for(x=0;x<binnedWidth;x += 2)
+                {
+                    for(y=0;y<binnedHeight;y++)
+                    {
+                        Int32 xRev = binnedWidth-(offset+x);
+
+                        if (bin == 2)
+                        {
+                            if (y > 0)
+                            {
+                                imageData[xRev,y-1] = uint16RawFrame1[srcIdx];
+                            }
+                        }
+                        else
+                        {
+                                if (xRev < 0)
+                                {
+                                    // with 4X binning we have an odd width, so we don't
+                                    // need to use one pixel per row. We step back here
+                                    // to deal with that
+                                    srcIdx--; 
+                                }
+                                else
+                                {
+                                    imageData[xRev,y] = uint16RawFrame1[srcIdx];
+                                }
+                        }
+                        imageData[x,y] = uint16RawFrame1[srcIdx+1];
+                        srcIdx += 2;
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Log.Write(String.Format("caught an exception processing mono M26C data: {0}", ex));
+                throw;
+            }
+        }
+
+        internal void convertCameraDataToImageDataM26C_2x2Color()
+        {
+        }
+
+        internal void convertCameraDataToImageDataM26C_1x1Color()
+        {
+            Debug.Assert(currentExposure.toCamera.x_bin == 1);
             Debug.Assert(currentExposure.toCamera.y_bin == 1);
-            Debug.Assert(bytesPerPixel == 2);
+
+            UInt32 binnedWidth        = currentExposure.userRequested.width;
+            UInt32 binnedHeight       = currentExposure.userRequested.height;
+
+            Log.Write(String.Format("convertCameraDataToImageDataM26C_1x1Color(): binnedWidth = {0} binnedHeight={1}\n", binnedWidth, binnedHeight));
+            Log.Write(String.Format("convertCameraDataToImageDataM26C_1x1Color(): userPixels = {0}, rawFrame1.Length={1} rawFrame2.Length=={2}\n", binnedWidth * binnedHeight, rawFrame1.Length, rawFrame2.Length));
 
             UInt16[] uint16RawFrame1 = new UInt16[rawFrame1.Length/(Marshal.SizeOf(typeof(UInt16)))];
             UInt16[] uint16RawFrame2 = new UInt16[rawFrame2.Length/(Marshal.SizeOf(typeof(UInt16)))];
@@ -1759,80 +1828,95 @@ namespace sx
             Buffer.BlockCopy(rawFrame1, 0, uint16RawFrame1, 0, rawFrame1.Length);
             Buffer.BlockCopy(rawFrame2, 0, uint16RawFrame2, 0, rawFrame2.Length);
 
-            if (currentExposure.toCamera.x_bin != 1)
+            int y = -1;
+            int x = -1;
+            int srcIdx = -1;
+
+            try
             {
-                Log.Write(String.Format("Skipping M26C processing of binned image"));
+                srcIdx = 0;
+                for(x=0;x<width;x+=4)
+                {
+                    for(y=0;y<height/2;y += 1)
+                    {
+                        uint16Frame1[(width-1) - x, y] = uint16RawFrame1[srcIdx+2]; // green
+                        uint16Frame1[        0 + x, y] = uint16RawFrame1[srcIdx+1]; // red
+
+                        if (y>1)
+                        {
+                            uint16Frame1[(width-3) - x, y-1] = uint16RawFrame1[srcIdx+0]; // green
+                        }
+
+                        uint16Frame1[        2 + x, y] = uint16RawFrame1[srcIdx+3]; // red
+
+                        srcIdx += 4;
+                    }
+                }
+
+                srcIdx = 0;
+                for(x=0;x<width;x+=4)
+                {
+                    for(y=0;y<height/2;y += 1)
+                    {
+                        if (y>1)
+                        {
+                            uint16Frame2[(width-2) - x, y-1] = uint16RawFrame2[srcIdx+2]; // green
+                        }
+
+                        uint16Frame2[        1 + x, y] = uint16RawFrame2[srcIdx+1]; // blue
+
+                        if (y>2)
+                        {
+                            uint16Frame2[(width-4) - x, y-2] = uint16RawFrame2[srcIdx+0]; // green
+                        }
+                        uint16Frame2[        3 + x, y] = uint16RawFrame2[srcIdx+3]; // blue
+
+                        srcIdx += 4;
+                    }
+                }
+                
+                for(x=0;x<width;x++)
+                {
+                    for(y=0;y<height-2;y += 2)
+                    {
+#if false
+                        imageData[x,         y/2] = uint16Frame1[x,y/2];
+                        imageData[x,height/2+y/2] = uint16Frame2[x,y/2];
+#else
+                        imageData[x,y+0] = uint16Frame1[x,y/2];
+                        imageData[x,y+1] = uint16Frame2[x,y/2];
+#endif
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Log.Write(String.Format("caught an exception processing 1x1 M26C data: {0}", ex));
+                throw;
+            }
+        }
+ 
+        internal void convertCameraDataToImageDataM26C()
+        {
+            Log.Write("convertCameraDataToImageData(): begins decoding M26C data\n");
+
+            Debug.Assert(bytesPerPixel == 2);
+
+            if (currentExposure.toCamera.x_bin == 1)
+            {
+                convertCameraDataToImageDataM26C_1x1Color();
+            }
+            else if (currentExposure.toCamera.x_bin == 2 && currentExposure.toCamera.y_bin == 2)
+            {
+                convertCameraDataToImageDataM26C_2x2Color();
             }
             else
             {
-                int y = -1;
-                int x = -1;
-                int srcIdx = -1;
-
-                try
-                {
-                    srcIdx = 0;
-                    for(x=0;x<width;x+=4)
-                    {
-                        for(y=0;y<height/2;y += 1)
-                        {
-                            uint16Frame1[(width-1) - x, y] = uint16RawFrame1[srcIdx+2]; // green
-                            uint16Frame1[        0 + x, y] = uint16RawFrame1[srcIdx+1]; // red
-
-                            if (y>1)
-                            {
-                                uint16Frame1[(width-3) - x, y-1] = uint16RawFrame1[srcIdx+0]; // green
-                            }
-
-                            uint16Frame1[        2 + x, y] = uint16RawFrame1[srcIdx+3]; // red
-
-                            srcIdx += 4;
-                        }
-                    }
-
-                    srcIdx = 0;
-                    for(x=0;x<width;x+=4)
-                    {
-                        for(y=0;y<height/2;y += 1)
-                        {
-                            if (y>1)
-                            {
-                                uint16Frame2[(width-2) - x, y-1] = uint16RawFrame2[srcIdx+2]; // green
-                            }
-
-                            uint16Frame2[        1 + x, y] = uint16RawFrame2[srcIdx+1]; // blue
-
-                            if (y>2)
-                            {
-                                uint16Frame2[(width-4) - x, y-2] = uint16RawFrame2[srcIdx+0]; // green
-                            }
-                            uint16Frame2[        3 + x, y] = uint16RawFrame2[srcIdx+3]; // blue
-
-                            srcIdx += 4;
-                        }
-                    }
-                    
-                    for(x=0;x<width;x++)
-                    {
-                        for(y=0;y<height-2;y += 2)
-                        {
-#if false
-                            imageData[x,         y/2] = uint16Frame1[x,y/2];
-                            imageData[x,height/2+y/2] = uint16Frame2[x,y/2];
-#else
-                            imageData[x,y+0] = uint16Frame1[x,y/2];
-                            imageData[x,y+1] = uint16Frame2[x,y/2];
-#endif
-                        }
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Log.Write(String.Format("caught an exception processing M26C data: {0}", ex));
-                    throw;
-                }
+                convertCameraDataToImageDataM26C_Mono();
             }
-        }
+
+            Log.Write("convertCameraDataToImageData(): done decoding M26C data\n");
+       }
 
         internal void convertCameraDataToImageData(bool bIsInterlaced)
         {
@@ -1859,7 +1943,7 @@ namespace sx
             }
             else if (idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M26C)
             {
-                convertCameraDataToImageDataM26C(binnedWidth, binnedHeight);
+                convertCameraDataToImageDataM26C();
             }
             else if (bytesPerPixel == 1 || bytesPerPixel == 2)
             {
