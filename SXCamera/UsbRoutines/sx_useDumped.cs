@@ -128,11 +128,13 @@ namespace sx
 
                 getDumpedExposure();
 
-                Int32 binnedWidth = currentExposure.toCamera.width / currentExposure.toCamera.x_bin;
-                Int32 binnedHeight = currentExposure.toCamera.height / currentExposure.toCamera.y_bin;
-                Int32 imagePixels = binnedWidth * binnedHeight;
+                Int32 imagePixels = (currentExposure.toCamera.width * currentExposure.toCamera.height) / 
+                                    (currentExposure.toCamera.x_bin * currentExposure.toCamera.y_bin);
 
-                rawFrame1 = new byte[binnedWidth*binnedHeight*bytesPerPixel];
+                Log.Write(String.Format("undumping imagePixels={0} bytesPerPixel={1}", imagePixels, bytesPerPixel));
+
+                rawFrame1 = new byte[imagePixels*bytesPerPixel];
+
                 try
                 {
                     using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.frame1.raw", cameraModel) , FileMode.Open)))
@@ -143,16 +145,22 @@ namespace sx
 
                     if (idx == 0 && interlaced)
                     {
-                        binnedWidth = currentExposure.toCameraSecond.width / currentExposure.toCameraSecond.x_bin;
-                        binnedHeight = currentExposure.toCameraSecond.height / currentExposure.toCameraSecond.y_bin;
-                        imagePixels = binnedWidth * binnedHeight;
+                        imagePixels = (currentExposure.toCameraSecond.width * currentExposure.toCameraSecond.height) / 
+                                            (currentExposure.toCameraSecond.x_bin * currentExposure.toCameraSecond.y_bin);
 
-                        rawFrame2 = new byte[binnedWidth*binnedHeight*bytesPerPixel];
-
-                        using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.frame2.raw", cameraModel) , FileMode.Open)))
+                        try
                         {
-                            binReader.Read(rawFrame2, 0, rawFrame2.Length);
-                            Log.Write(String.Format("undumped {0} bytes into rawFrame2\n", rawFrame2.Length));
+                            using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.frame2.raw", cameraModel) , FileMode.Open)))
+                            {
+                                rawFrame2 = new byte[imagePixels*bytesPerPixel];
+                                binReader.Read(rawFrame2, 0, rawFrame2.Length);
+                                Log.Write(String.Format("undumped {0} bytes into rawFrame2\n", rawFrame2.Length));
+                            }
+                        }
+                        catch (System.IO.FileNotFoundException)
+                        {
+                            rawFrame2 = null;
+                            Log.Write(String.Format("unable to open rawframe2 - skipping"));
                         }
                     }
                     convertCameraDataToImageData(interlaced);
