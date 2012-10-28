@@ -21,7 +21,7 @@
 // For more information please contact bretm@daddog.com
 
 //#define INTERLACED_DEBUG
-#define M26C_ADJUST
+//#define M26C_SUBFRAMES
 
 using System;
 using System.IO;
@@ -1041,7 +1041,11 @@ namespace sx
             Debug.Assert(currentExposure.userRequested.x_bin <= 4);
             Debug.Assert(currentExposure.userRequested.x_bin != 3);
 
-            // the M26C readout is sideways, so we switch width and height
+            // the M26C readout is sideways, so we have to switch all the x and y
+            // parameters.  
+
+            // Start with width and height
+#if M26C_SUBFRAMES
             currentExposure.toCamera.width  = currentExposure.userRequested.height;
             currentExposure.toCamera.height = currentExposure.userRequested.width;
 
@@ -1049,15 +1053,24 @@ namespace sx
             currentExposure.toCamera.x_offset = currentExposure.userRequested.y_offset;
             currentExposure.toCamera.y_offset = currentExposure.userRequested.x_offset;
 
-            // we only do square binning, so there is no reason to switch the bin values
-            Debug.Assert(currentExposure.toCamera.x_bin == currentExposure.toCamera.y_bin);
-
             // with M26C we have to read out 4 pixels at a time
             // so we make sure that everything is aligned to 4 pixel boundaries. 
-            // This might move the image as many as 3 pixels, but we just ignore that
+            // This might move the image as many as 3 pixels, but that isn't very
+            // far so we just ignore it
 
             currentExposure.toCamera.y_offset -= (UInt16)(currentExposure.toCamera.y_offset % 4);
             currentExposure.toCamera.height   += (UInt16)(currentExposure.toCamera.height   % 4);
+#else
+            // We are providing subframes in software
+            currentExposure.toCamera.width  = frameHeight;
+            currentExposure.toCamera.height = frameWidth;
+
+            currentExposure.toCamera.x_offset = 0;
+            currentExposure.toCamera.y_offset = 0;
+#endif
+
+            // we only do square binning, so there is no reason to switch the bin values
+            Debug.Assert(currentExposure.toCamera.x_bin == currentExposure.toCamera.y_bin);
 
             Debug.Assert(currentExposure.toCamera.x_offset % 4 == 0);
             Debug.Assert(currentExposure.toCamera.width % 4 == 0);
@@ -1283,6 +1296,9 @@ namespace sx
 
         internal UInt16 adjustReadDelayedBlockForMainCamera(UInt16 fieldFlags)
         {
+            // M26C has it's own routine and we should not get here for M26C
+            Debug.Assert((CameraModels)cameraModel == CameraModels.MODEL_M26C);
+
             // cameras with a Bayer matrix need the offsets to be even so that the subframe returned 
             // has the same color representation as a full frame.  Since this (at most) offsets 
             // the image by 1 pixel on each axis, we just do it for all cameras
@@ -1325,9 +1341,6 @@ namespace sx
             {
                 case CameraModels.MODEL_M25C:
                     fieldFlags = adjustReadDelayedBlockForM25C(fieldFlags);
-                    break;
-                case CameraModels.MODEL_M26C:
-                    fieldFlags =  adjustReadDelayedBlockForM26C(fieldFlags);
                     break;
                 case CameraModels.MODEL_COSTAR:
                     fieldFlags =  adjustReadDelayedBlockForCostar(fieldFlags);
@@ -1372,7 +1385,14 @@ namespace sx
             // is monochrome and progressive so it requires no adjustments
             if (idx == 0)
             {
-                fieldFlags = adjustReadDelayedBlockForMainCamera(fieldFlags);
+                if ((CameraModels)cameraModel == CameraModels.MODEL_M26C)
+                {
+                    fieldFlags =  adjustReadDelayedBlockForM26C(fieldFlags);
+                }
+                else
+                {
+                    fieldFlags = adjustReadDelayedBlockForMainCamera(fieldFlags);
+                }
             }
 
             return fieldFlags;
@@ -1749,9 +1769,6 @@ namespace sx
             Debug.Assert(currentExposure.toCamera.x_bin == 2*currentExposure.toCamera.y_bin);
             Int32 bin = currentExposure.toCamera.x_bin;
 
-            Int32 binnedWidth        = currentExposure.userRequested.width/bin;
-            Int32 binnedHeight       = currentExposure.userRequested.height/bin;
-
             Int32 cameraBinnedWidth  = currentExposure.toCamera.height*4/bin;
             Int32 cameraBinnedHeight = currentExposure.toCamera.width/(2*bin);
 
@@ -1760,28 +1777,30 @@ namespace sx
 
             Debug.Assert(uint16RawFrame1.Length == cameraBinnedWidth*cameraBinnedHeight);
 
+            UInt16[,] uint16Frame1 = new UInt16[cameraBinnedWidth, cameraBinnedHeight];
+
             Log.Write(String.Format("convertCameraDataToImageDataM26C_Mono(): cameraBinnedWidth = {0} cameraBinnedHeight={1}\n", cameraBinnedWidth, cameraBinnedHeight));
-            Log.Write(String.Format("convertCameraDataToImageDataM26C_Mono(): userPixels = {0}, cameraPixels={1}, rawFrame1.Length={2}\n", binnedWidth * binnedHeight, cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length));
+            Log.Write(String.Format("convertCameraDataToImageDataM26C_Mono(): cameraPixels={0}, rawFrame1.Length={1}\n", cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length));
 
             Int32 y = -1;
             Int32 x = -1;
             Int32 srcIdx = -1;
-            Int32 offset = (binnedWidth  % 2) + 1;
+            Int32 offset = (cameraBinnedWidth  % 2) + 1;
 
             try
             {
                 srcIdx = 0;
-                for(x=0;x<binnedWidth;x += 2)
+                for(x=0;x<cameraBinnedWidth;x += 2)
                 {
-                    Int32 xRev = binnedWidth-(offset+x);
+                    Int32 xRev = cameraBinnedWidth-(offset+x);
 
-                    for(y=0;y<binnedHeight;y++)
+                    for(y=0;y<cameraBinnedHeight;y++)
                     {
                         if (bin == 2)
                         {
                             if (y > 0)
                             {
-                                imageData[xRev,y-1] = uint16RawFrame1[srcIdx];
+                                uint16Frame1[xRev,y-1] = uint16RawFrame1[srcIdx];
                             }
                         }
                         else
@@ -1795,11 +1814,31 @@ namespace sx
                                 }
                                 else
                                 {
-                                    imageData[xRev,y] = uint16RawFrame1[srcIdx];
+                                    uint16Frame1[xRev,y] = uint16RawFrame1[srcIdx];
                                 }
                         }
-                        imageData[x,y] = uint16RawFrame1[srcIdx+1];
+                        uint16Frame1[x,y] = uint16RawFrame1[srcIdx+1];
                         srcIdx += 2;
+                    }
+                }
+
+                Int32 userBinnedWidth        = currentExposure.userRequested.width/bin;
+                Int32 userBinnedHeight       = currentExposure.userRequested.height/bin;
+
+                // now copy the results to the output array.  
+                int xOffset = currentExposure.userRequested.x_offset/bin; 
+                int yOffset = currentExposure.userRequested.y_offset/bin;
+
+                // Align the offsets to correspond with the the bayer matrix
+
+                xOffset -= xOffset % 2;
+                yOffset -= yOffset % 2;
+
+                for(x=0;x<userBinnedWidth;x++)
+                {
+                    for(y=0;y<userBinnedHeight;y++)
+                    {
+                        imageData[x,y] = uint16Frame1[xOffset+x,yOffset+y];
                     }
                 }
             }
@@ -1817,17 +1856,14 @@ namespace sx
 
             Int32 bin = 2;
 
-            Int32 binnedWidth        = currentExposure.userRequested.width/bin;
-            Int32 binnedHeight       = currentExposure.userRequested.height/bin;
-
             Int32 cameraBinnedWidth  = currentExposure.toCamera.height*4/bin;
             Int32 cameraBinnedHeight = currentExposure.toCamera.width/(2*bin);
 
             UInt16[] uint16RawFrame1 = new UInt16[rawFrame1.Length/(Marshal.SizeOf(typeof(UInt16)))];
             UInt16[] uint16RawFrame2 = new UInt16[rawFrame2.Length/(Marshal.SizeOf(typeof(UInt16)))];
 
-            UInt16[,] uint16Frame1 = new UInt16[binnedWidth, binnedHeight/2];
-            UInt16[,] uint16Frame2 = new UInt16[binnedWidth, binnedHeight/2];
+            UInt16[,] uint16Frame1 = new UInt16[cameraBinnedWidth, cameraBinnedHeight/2];
+            UInt16[,] uint16Frame2 = new UInt16[cameraBinnedWidth, cameraBinnedHeight/2];
 
             Buffer.BlockCopy(rawFrame1, 0, uint16RawFrame1, 0, rawFrame1.Length);
             Buffer.BlockCopy(rawFrame2, 0, uint16RawFrame2, 0, rawFrame2.Length);
@@ -1839,11 +1875,11 @@ namespace sx
             try
             {
                 srcIdx = 0;
-                for(x=0;x<binnedWidth;x+=2)
+                for(x=0;x<cameraBinnedWidth;x+=2)
                 {
-                    Int32 xRev = binnedWidth-(x+1);
+                    Int32 xRev = cameraBinnedWidth-(x+1);
 
-                    for(y=0;y<binnedHeight/2;y += 1)
+                    for(y=0;y<cameraBinnedHeight/2;y += 1)
                     {
 
                         uint16Frame1[   x, y] = uint16RawFrame1[srcIdx+1]; // red
@@ -1853,10 +1889,10 @@ namespace sx
                 }
 
                 srcIdx = 0;
-                for(x=0;x<binnedWidth;x+=2)
+                for(x=0;x<cameraBinnedWidth;x+=2)
                 {
-                    Int32 xRev = binnedWidth-(x+2);
-                    for(y=0;y<binnedHeight/2;y += 1)
+                    Int32 xRev = cameraBinnedWidth-(x+2);
+                    for(y=0;y<cameraBinnedHeight/2;y += 1)
                     {
                         uint16Frame2[1 + x, y] = uint16RawFrame2[srcIdx+1]; // blue
                         uint16Frame2[ xRev, y] = uint16RawFrame2[srcIdx+0]; // green
@@ -1865,17 +1901,27 @@ namespace sx
                     }
                 }
                 
-                for(x=0;x<binnedWidth;x++)
+                Int32 userBinnedWidth        = currentExposure.userRequested.width/bin;
+                Int32 userBinnedHeight       = currentExposure.userRequested.height/bin;
+
+                // now copy the results to the output array.  
+                int xOffset = currentExposure.userRequested.x_offset/bin; 
+                int yOffset = currentExposure.userRequested.y_offset/bin;
+
+                // Align the offsets to correspond with the the bayer matrix
+
+                xOffset -= xOffset % 2;
+                yOffset -= yOffset % 2;
+
+                for(x=0;x<userBinnedWidth;x++)
                 {
-                    for(y=0;y<binnedHeight-2;y += 2)
+                    for(y=0;y<userBinnedHeight-2;y += 2)
                     {
-#if false
-                        imageData[x,         y/2] = uint16Frame1[x,y/2];
-                        imageData[x,binnedHeight/2+y/2] = uint16Frame2[x,y/2];
-#else
-                        imageData[x,y+0] = uint16Frame1[x,y/2];
-                        imageData[x,y+1] = uint16Frame2[x,y/2];
-#endif
+                        imageData[x,y+0] = uint16Frame1[xOffset+x,(yOffset+y)/2];
+                        if (y+1 < userBinnedHeight)
+                        {
+                            imageData[x,y+1] = uint16Frame2[xOffset+x,(yOffset+y)/2];
+                        }
                     }
                 }
             }
@@ -1891,17 +1937,19 @@ namespace sx
             Debug.Assert(currentExposure.toCamera.x_bin == 1);
             Debug.Assert(currentExposure.toCamera.y_bin == 1);
 
-            UInt32 binnedWidth        = currentExposure.userRequested.width;
-            UInt32 binnedHeight       = currentExposure.userRequested.height;
+            UInt32 cameraBinnedWidth        = currentExposure.toCamera.height*4U;
+            UInt32 cameraBinnedHeight       = currentExposure.toCamera.width/2U;
 
-            Log.Write(String.Format("convertCameraDataToImageDataM26C_1x1Color(): binnedWidth = {0} binnedHeight={1}\n", binnedWidth, binnedHeight));
-            Log.Write(String.Format("convertCameraDataToImageDataM26C_1x1Color(): userPixels = {0}, rawFrame1.Length={1} rawFrame2.Length=={2}\n", binnedWidth * binnedHeight, rawFrame1.Length, rawFrame2.Length));
+            Log.Write(String.Format("convertCameraDataToImageDataM26C_1x1Color(): binnedWidth = {0} binnedHeight={1}\n", 
+                        cameraBinnedWidth, cameraBinnedHeight));
+            Log.Write(String.Format("convertCameraDataToImageDataM26C_1x1Color(): pixels = {0}, rawFrame1.Length={1} rawFrame2.Length=={2}\n", 
+                        cameraBinnedWidth * cameraBinnedHeight, rawFrame1.Length, rawFrame2.Length));
 
             UInt16[] uint16RawFrame1 = new UInt16[rawFrame1.Length/(Marshal.SizeOf(typeof(UInt16)))];
             UInt16[] uint16RawFrame2 = new UInt16[rawFrame2.Length/(Marshal.SizeOf(typeof(UInt16)))];
 
-            UInt16[,] uint16Frame1 = new UInt16[binnedWidth, binnedHeight/2];
-            UInt16[,] uint16Frame2 = new UInt16[binnedWidth, binnedHeight/2];
+            UInt16[,] uint16Frame1 = new UInt16[cameraBinnedWidth, cameraBinnedHeight/2];
+            UInt16[,] uint16Frame2 = new UInt16[cameraBinnedWidth, cameraBinnedHeight/2];
 
             Buffer.BlockCopy(rawFrame1, 0, uint16RawFrame1, 0, rawFrame1.Length);
             Buffer.BlockCopy(rawFrame2, 0, uint16RawFrame2, 0, rawFrame2.Length);
@@ -1913,16 +1961,16 @@ namespace sx
             try
             {
                 srcIdx = 0;
-                for(x=0;x<width;x+=4)
+                for(x=0;x<cameraBinnedWidth;x+=4)
                 {
-                    for(y=0;y<height/2;y += 1)
+                    for(y=0;y<cameraBinnedHeight/2;y += 1)
                     {
-                        uint16Frame1[(width-1) - x, y] = uint16RawFrame1[srcIdx+2]; // green
+                        uint16Frame1[(cameraBinnedWidth-1) - x, y] = uint16RawFrame1[srcIdx+2]; // green
                         uint16Frame1[        0 + x, y] = uint16RawFrame1[srcIdx+1]; // red
 
                         if (y>1)
                         {
-                            uint16Frame1[(width-3) - x, y-1] = uint16RawFrame1[srcIdx+0]; // green
+                            uint16Frame1[(cameraBinnedWidth-3) - x, y-1] = uint16RawFrame1[srcIdx+0]; // green
                         }
 
                         uint16Frame1[        2 + x, y] = uint16RawFrame1[srcIdx+3]; // red
@@ -1932,20 +1980,20 @@ namespace sx
                 }
 
                 srcIdx = 0;
-                for(x=0;x<width;x+=4)
+                for(x=0;x<cameraBinnedWidth;x+=4)
                 {
-                    for(y=0;y<height/2;y += 1)
+                    for(y=0;y<cameraBinnedHeight/2;y += 1)
                     {
                         if (y>1)
                         {
-                            uint16Frame2[(width-2) - x, y-1] = uint16RawFrame2[srcIdx+2]; // green
+                            uint16Frame2[(cameraBinnedWidth-2) - x, y-1] = uint16RawFrame2[srcIdx+2]; // green
                         }
 
                         uint16Frame2[        1 + x, y] = uint16RawFrame2[srcIdx+1]; // blue
 
                         if (y>2)
                         {
-                            uint16Frame2[(width-4) - x, y-2] = uint16RawFrame2[srcIdx+0]; // green
+                            uint16Frame2[(cameraBinnedWidth-4) - x, y-2] = uint16RawFrame2[srcIdx+0]; // green
                         }
                         uint16Frame2[        3 + x, y] = uint16RawFrame2[srcIdx+3]; // blue
 
@@ -1953,17 +2001,27 @@ namespace sx
                     }
                 }
                 
-                for(x=0;x<width;x++)
+                // now copy the results to the output array.  
+                int userBinnedWidth        = currentExposure.userRequested.width;
+                int userBinnedHeight       = currentExposure.userRequested.height;
+
+                int xOffset = currentExposure.userRequested.x_offset; 
+                int yOffset = currentExposure.userRequested.y_offset;
+
+                // Align the offsets to correspond with the the bayer matrix
+
+                xOffset -= xOffset % 2;
+                yOffset -= yOffset % 2;
+
+                for(x=0;x<userBinnedWidth;x++)
                 {
-                    for(y=0;y<height-2;y += 2)
+                    for(y=0;y<userBinnedHeight-2;y += 2)
                     {
-#if false
-                        imageData[x,         y/2] = uint16Frame1[x,y/2];
-                        imageData[x,height/2+y/2] = uint16Frame2[x,y/2];
-#else
-                        imageData[x,y+0] = uint16Frame1[x,y/2];
-                        imageData[x,y+1] = uint16Frame2[x,y/2];
-#endif
+                        imageData[x,y+0] = uint16Frame1[xOffset+x,(yOffset+y)/2];
+                        if (y+1 < userBinnedHeight)
+                        {
+                            imageData[x,y+1] = uint16Frame2[xOffset+x,(yOffset+y)/2];
+                        }
                     }
                 }
             }
@@ -2944,121 +3002,116 @@ namespace sx
 
         public void recordPixels(bool bDelayed, out DateTimeOffset exposureEnd)
         {
-            if (m_useDumped)
-            {
-                recordPixelsDumped(bDelayed, out exposureEnd);
-            }
-            else
-            {
-                recordPixelsUSB(bDelayed, out exposureEnd);
-            }
-        }
-
-        public void recordPixelsUSB(bool bDelayed, out DateTimeOffset exposureEnd)
-        {
             SX_CMD_BLOCK cmdBlock;
 
             Log.Write(String.Format("recordPixels entered - bDelayed = {0}\n", bDelayed));
             UInt16 firstExposureFlags = adjustReadDelayedBlock();
             UInt16 secondExposureFlags = (UInt16)((SX_CCD_FLAGS_FIELD_EVEN | SX_CCD_FLAGS_FIELD_ODD) & ~firstExposureFlags);
 
-            Debug.Assert(currentExposure.toCamera.x_bin != 7 && currentExposure.toCamera.y_bin != 7);
-
-            if (m_dump)
+            if (m_useDumped)
             {
-                dumpCurrentExposure();
+                recordPixelsDumped(bDelayed, out exposureEnd);
             }
-
-            // We invalidate the data here, so that there is no chance we have to wait for someone
-            // to download an image later in the routine when the data is ready for download
-            lock (oImageDataLock)
+            else
             {
-                imageDataValid = false;
-            }
+                Debug.Assert(currentExposure.toCamera.x_bin != 7 && currentExposure.toCamera.y_bin != 7);
 
-            lock (m_controller.Lock)
-            {
-                Log.Write("recordPixels() has locked\n");
-                if (bDelayed)
+                if (m_dump)
                 {
-                    m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
-                                                    SX_CMD_READ_PIXELS_DELAYED,
-                                                    firstExposureFlags,
-                                                    idx,
-                                                    (UInt16)Marshal.SizeOf(currentExposure.toCamera));
-                    m_controller.Write(cmdBlock, currentExposure.toCamera);
-                }
-                else
-                {
-                    SX_READ_BLOCK readBlock;
-
-                    initReadBlock(currentExposure.toCamera, out readBlock);
-
-                    m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
-                                                    SX_CMD_READ_PIXELS,
-                                                    firstExposureFlags,
-                                                    idx,
-                                                    (UInt16)Marshal.SizeOf(readBlock));
-                    m_controller.Write(cmdBlock, readBlock);
+                    dumpCurrentExposure();
                 }
 
-                Log.Write(String.Format("recordPixels() requested read, flags = {0}\n", firstExposureFlags)); 
-                exposureEnd = DateTimeOffset.Now;
-            
-                if (idx == 0 && interlaced && secondExposureFlags == 0 && (CameraModels)cameraModel != CameraModels.MODEL_M26C)
+                // We invalidate the data here, so that there is no chance we have to wait for someone
+                // to download an image later in the routine when the data is ready for download
+                lock (oImageDataLock)
                 {
-                    // undo the interlaced as progressive changes we made above
-                    currentExposure.toCamera.y_bin = currentExposure.toCamera.x_bin;
-                    currentExposure.toCamera.height *= currentExposure.toCamera.x_bin;
-                    rawFrame2 = null;
+                    imageDataValid = false;
                 }
 
-                Log.Write("recordPixelsDelayed requesting download\n");
-                rawFrame1 = downloadPixels(currentExposure.toCamera);
-                Log.Write("recordPixels() download completed\n");
-
-                if (idx == 0 && secondExposureFlags != 0)
+                lock (m_controller.Lock)
                 {
-                    SX_READ_BLOCK readBlock;
-                    Log.Write("recordPixels() preparing for second frame download\n");
-
-                    Debug.Assert(secondExposureFlags != 0);
-                    Debug.Assert(secondExposureFlags != firstExposureFlags);
-
-                    if (bDelayed && currentExposure.toCamera.delay < interlacedDoubleExposureThreshold)
+                    Log.Write("recordPixels() has locked\n");
+                    if (bDelayed)
                     {
                         m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
                                                         SX_CMD_READ_PIXELS_DELAYED,
-                                                        secondExposureFlags,
+                                                        firstExposureFlags,
                                                         idx,
                                                         (UInt16)Marshal.SizeOf(currentExposure.toCamera));
-                        Log.Write(String.Format("recordPixels() second frame requesting delayed read, flags = {0}\n", secondExposureFlags));
                         m_controller.Write(cmdBlock, currentExposure.toCamera);
                     }
                     else
                     {
-                        clearRegisters();
+                        SX_READ_BLOCK readBlock;
+
                         initReadBlock(currentExposure.toCamera, out readBlock);
+
                         m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
                                                         SX_CMD_READ_PIXELS,
-                                                        secondExposureFlags,
+                                                        firstExposureFlags,
                                                         idx,
                                                         (UInt16)Marshal.SizeOf(readBlock));
-
-                        Log.Write(String.Format("recordPixels() second frame requesting read, flags = {0}\n", secondExposureFlags));
                         m_controller.Write(cmdBlock, readBlock);
                     }
 
+                    Log.Write(String.Format("recordPixels() requested read, flags = {0}\n", firstExposureFlags)); 
                     exposureEnd = DateTimeOffset.Now;
-                    Log.Write("recordPixels() second frame requesting download\n");
-                    rawFrame2 = downloadPixels(currentExposure.toCameraSecond);
-                    Log.Write("recordPixels() second frame download completed\n");
-                }
-            }
+                
+                    if (idx == 0 && interlaced && secondExposureFlags == 0 && (CameraModels)cameraModel != CameraModels.MODEL_M26C)
+                    {
+                        // undo the interlaced as progressive changes we made above
+                        currentExposure.toCamera.y_bin = currentExposure.toCamera.x_bin;
+                        currentExposure.toCamera.height *= currentExposure.toCamera.x_bin;
+                        rawFrame2 = null;
+                    }
 
-            if (m_dump)
-            {
-                dumpFrame();
+                    Log.Write("recordPixelsDelayed requesting download\n");
+                    rawFrame1 = downloadPixels(currentExposure.toCamera);
+                    Log.Write("recordPixels() download completed\n");
+
+                    if (idx == 0 && secondExposureFlags != 0)
+                    {
+                        SX_READ_BLOCK readBlock;
+                        Log.Write("recordPixels() preparing for second frame download\n");
+
+                        Debug.Assert(secondExposureFlags != 0);
+                        Debug.Assert(secondExposureFlags != firstExposureFlags);
+
+                        if (bDelayed && currentExposure.toCamera.delay < interlacedDoubleExposureThreshold)
+                        {
+                            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
+                                                            SX_CMD_READ_PIXELS_DELAYED,
+                                                            secondExposureFlags,
+                                                            idx,
+                                                            (UInt16)Marshal.SizeOf(currentExposure.toCamera));
+                            Log.Write(String.Format("recordPixels() second frame requesting delayed read, flags = {0}\n", secondExposureFlags));
+                            m_controller.Write(cmdBlock, currentExposure.toCamera);
+                        }
+                        else
+                        {
+                            clearRegisters();
+                            initReadBlock(currentExposure.toCamera, out readBlock);
+                            m_controller.buildCommandBlock(out cmdBlock, SX_CMD_TYPE_PARMS,
+                                                            SX_CMD_READ_PIXELS,
+                                                            secondExposureFlags,
+                                                            idx,
+                                                            (UInt16)Marshal.SizeOf(readBlock));
+
+                            Log.Write(String.Format("recordPixels() second frame requesting read, flags = {0}\n", secondExposureFlags));
+                            m_controller.Write(cmdBlock, readBlock);
+                        }
+
+                        exposureEnd = DateTimeOffset.Now;
+                        Log.Write("recordPixels() second frame requesting download\n");
+                        rawFrame2 = downloadPixels(currentExposure.toCameraSecond);
+                        Log.Write("recordPixels() second frame download completed\n");
+                    }
+                }
+
+                if (m_dump)
+                {
+                    dumpFrame();
+                }
             }
 
             convertCameraDataToImageData(interlaced && secondExposureFlags != 0);
