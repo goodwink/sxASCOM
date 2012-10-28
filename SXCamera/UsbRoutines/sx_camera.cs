@@ -2159,7 +2159,7 @@ namespace sx
                 throw new System.Exception(String.Format("Unable to decode image - unknown camera or pixel type"));
             }
 
-            if (bIsInterlaced)
+            if (bIsInterlaced && !(idx == 0 && (CameraModels)cameraModel == CameraModels.MODEL_M26C))
             {
                 adjustInterlaced();
             }
