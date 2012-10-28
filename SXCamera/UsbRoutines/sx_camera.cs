@@ -170,6 +170,12 @@ namespace sx
 
         // Properties
 
+        public bool bColorBinning
+        {
+            get;
+            set;
+        }
+
         public bool bInterlacedEqualization
         {
             get;
@@ -1028,9 +1034,6 @@ namespace sx
 
         internal UInt16 adjustReadDelayedBlockForM26C(UInt16 fieldFlags)
         {
-            // this needs to be a config parameter, but for now it is here
-            bool bColorBinning = true;
-
             Log.Write(String.Format("adjustReadDelayedBlockForM26C begins, x_bin={0}, x_offset={1}, y_offset={2} width={3}, height={4}, bColorBinning={5}",
             currentExposure.userRequested.x_bin, currentExposure.toCamera.x_offset, currentExposure.toCamera.y_offset, currentExposure.userRequested.width,  currentExposure.userRequested.height, bColorBinning));
 

@@ -755,6 +755,7 @@ namespace ASCOM.SXGeneric
                             StartY = 0;
                             bHasGuideCamera = sxCamera.hasGuideCamera;
 
+                            sxCamera.bColorBinning = m_config.colorBinning;
                             sxCamera.bInterlacedEqualization = m_config.interlacedEqualizeFrames;
                             sxCamera.bSquareLodestarPixels = m_config.squareLodestarPixels;
 
