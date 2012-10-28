@@ -41,10 +41,12 @@ namespace sx
         internal UInt16 cmd_length;
     }
 
+
     internal class USBInterface
     {
         // Hardware info
         internal const String GUID_STRING = "{606377C1-2270-11d4-BFD8-00207812F5D5}";
+        internal const Int32 MaxIoSize = 64*1024*1024;
 
         // Variables
         internal SafeFileHandle deviceHandle;
@@ -324,20 +326,21 @@ namespace sx
             Write(block, null);
         }
 
-        private unsafe void readBytes(byte *buf, Int32 numBytesToRead)
+        private unsafe void readBytes(byte *buf, Int32 bytesRemaining)
         {
             int error = 0;
-            Log.Write(String.Format("readBytes(): begins for {0} bytes\n", numBytesToRead));
+            Log.Write(String.Format("readBytes(): begins for {0} bytes\n", bytesRemaining));
 
-            while (numBytesToRead > 0)
+            while (bytesRemaining > 0)
             {
+                Int32 bytesThisRead = Math.Min(bytesRemaining, MaxIoSize);
                 Int32 bytesRead;
 
-                if (FileIO.ReadFile(deviceHandle, buf, numBytesToRead, &bytesRead, 0))
+                if (FileIO.ReadFile(deviceHandle, buf, bytesThisRead, &bytesRead, 0))
                 {
                     buf += bytesRead;
-                    numBytesToRead -= bytesRead;
-                    Log.Write(String.Format("readBytes(): ReadFile() read {0} bytes - numBytesToRead={1}\n", bytesRead, numBytesToRead));
+                    bytesRemaining -= bytesRead;
+                    Log.Write(String.Format("readBytes(): ReadFile() read {0} bytes - bytesRemaining={1}\n", bytesRead, bytesRemaining));
                 }
                 else
                 {
@@ -345,9 +348,9 @@ namespace sx
                     System.ComponentModel.Win32Exception ex = new System.ComponentModel.Win32Exception(error);
                     string errMsg = ex.Message;
 
-                    Log.Write(String.Format("ReadFile: error={0} ({1}) numBytesToRead={2}\n", error, errMsg, numBytesToRead));
+                    Log.Write(String.Format("ReadFile: error={0} ({1}) bytesThisRead={2} bytesRemaining={3}", error, errMsg, bytesThisRead, bytesRemaining));
 
-                    throw new System.IO.IOException(String.Format("ReadFile: error={0} ({1}) numBytesToRead={2}\n", error, errMsg, numBytesToRead));
+                    throw new System.IO.IOException(String.Format("ReadFile: error={0} ({1}) bytesThisRead={2} bytesRemaining={3}", error, errMsg, bytesThisRead, bytesRemaining));
                 }
             }
 
