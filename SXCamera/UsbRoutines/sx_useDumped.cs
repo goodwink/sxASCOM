@@ -105,10 +105,25 @@ namespace sx
             {
                 using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.exposure", cameraModel) , FileMode.Open)))
                 {
-                    currentExposure = (EXPOSURE_INFO)getDumpedObject(binReader, typeof(EXPOSURE_INFO));
-                    dumpReadDelayedBlock(currentExposure.userRequested, "getDumpedExposure() read userRequested");
-                    dumpReadDelayedBlock(currentExposure.toCamera, "getDumpedExposure() read toCamera");
-                    dumpReadDelayedBlock(currentExposure.toCameraSecond, "getDumpedExposure() read toCameraSecond");
+                    EXPOSURE_INFO dumpedExposure = (EXPOSURE_INFO)getDumpedObject(binReader, typeof(EXPOSURE_INFO));
+
+                    if (dumpedExposure.toCamera.x_offset == currentExposure.toCamera.x_offset &&
+                        dumpedExposure.toCamera.y_offset == currentExposure.toCamera.y_offset &&
+                        dumpedExposure.toCamera.width    == currentExposure.toCamera.width &&
+                        dumpedExposure.toCamera.height   == currentExposure.toCamera.height &&
+                        dumpedExposure.toCamera.x_bin    == currentExposure.toCamera.x_bin &&
+                        dumpedExposure.toCamera.y_bin    == currentExposure.toCamera.y_bin)
+                    {
+                        Log.Write(String.Format("Dumped toCamera exposure matches current toCamera - not replacing current"));
+                    }
+                    else
+                    {
+                        currentExposure = dumpedExposure;
+
+                        dumpReadDelayedBlock(currentExposure.userRequested, "getDumpedExposure() read userRequested");
+                        dumpReadDelayedBlock(currentExposure.toCamera, "getDumpedExposure() read toCamera");
+                        dumpReadDelayedBlock(currentExposure.toCameraSecond, "getDumpedExposure() read toCameraSecond");
+                    }
 
                 }
             }
@@ -145,13 +160,13 @@ namespace sx
 
                     if (idx == 0 && interlaced)
                     {
-                        imagePixels = (currentExposure.toCameraSecond.width * currentExposure.toCameraSecond.height) / 
-                                            (currentExposure.toCameraSecond.x_bin * currentExposure.toCameraSecond.y_bin);
-
                         try
                         {
                             using (BinaryReader binReader = new BinaryReader(File.Open(m_dumpedPath + String.Format("ascom-sx-{0}.frame2.raw", cameraModel) , FileMode.Open)))
                             {
+                                imagePixels = (currentExposure.toCameraSecond.width * currentExposure.toCameraSecond.height) / 
+                                                    (currentExposure.toCameraSecond.x_bin * currentExposure.toCameraSecond.y_bin);
+
                                 rawFrame2 = new byte[imagePixels*bytesPerPixel];
                                 binReader.Read(rawFrame2, 0, rawFrame2.Length);
                                 Log.Write(String.Format("undumped {0} bytes into rawFrame2\n", rawFrame2.Length));
@@ -163,14 +178,11 @@ namespace sx
                             Log.Write(String.Format("unable to open rawframe2 - skipping"));
                         }
                     }
-                    convertCameraDataToImageData(interlaced);
-                    imageDataValid = true;
                 }
                 catch (System.Exception ex)
                 {
                     Log.Write(String.Format("Caught an exception trying to restore dumped frames: {0}\n", ex.ToString()));
                 }
-
             }
         }
     }
