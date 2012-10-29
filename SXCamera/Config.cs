@@ -57,6 +57,9 @@ namespace ASCOM.SXCamera
         private const string KEY_VID = "VID";
         private const string KEY_PID = "PID";
 
+        private const string KEY_COLOR_BINNING = "ColorBinning";
+        private const bool DEFAULT_COLOR_BINNING = true;
+
         private const string KEY_ASYMETRIC_BINNING = "AsymetricBinning";
         private const bool DEFAULT_ASYMETRIC_BINNING = false;
 
@@ -125,6 +128,7 @@ namespace ASCOM.SXCamera
             public UInt16 VID;
             public UInt16 PID;
 
+            public bool colorBinning;
             public bool asymetricBinning;
             public byte maxXBin;
             public byte maxYBin;
@@ -163,6 +167,7 @@ namespace ASCOM.SXCamera
                 this.VID = VID;
                 this.PID = PID;
 
+                this.colorBinning = DEFAULT_COLOR_BINNING;
                 this.asymetricBinning = asymetricBinning;
                 this.maxXBin = maxXBin;
                 this.maxYBin = maxYBin;
@@ -501,6 +506,12 @@ namespace ASCOM.SXCamera
             get { return GetString("", "default"); }
         }
 
+        public bool colorBinning
+        {
+            get { return GetBool(KEY_COLOR_BINNING, DEFAULT_VALUES[m_whichController].colorBinning); }
+            set { SetString(     KEY_COLOR_BINNING, value.ToString()); }
+        }
+
         public bool asymetricBinning
         {
             get { return GetBool(KEY_ASYMETRIC_BINNING, DEFAULT_VALUES[m_whichController].asymetricBinning); }
@@ -640,6 +651,8 @@ namespace ASCOM.SXCamera
                     F.binGroup.Enabled = false;
                 }
 
+                F.colorBinning.Checked = colorBinning;
+
                 if (asymetricBinning)
                 {
                     F.asymetricBinning.Checked = true;
@@ -741,6 +754,7 @@ namespace ASCOM.SXCamera
 
                     // binning box
 
+                    colorBinning = F.colorBinning.Checked;
                     fixedBinning = F.fixedBinning.Checked;
 
                     if (fixedBinning)

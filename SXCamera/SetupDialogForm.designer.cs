@@ -71,6 +71,7 @@ namespace ASCOM.SXCamera
             this.waitForCooldown = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
             this.hardwareExposureThreshold = new System.Windows.Forms.NumericUpDown();
+            this.colorBinning = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
             this.usbGroup.SuspendLayout();
             this.binGroup.SuspendLayout();
@@ -271,6 +272,7 @@ namespace ASCOM.SXCamera
             // 
             // binGroup
             // 
+            this.binGroup.Controls.Add(this.colorBinning);
             this.binGroup.Controls.Add(this.label2);
             this.binGroup.Controls.Add(this.fixedBin);
             this.binGroup.Controls.Add(this.fixedBinning);
@@ -291,7 +293,7 @@ namespace ASCOM.SXCamera
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(24, 116);
+            this.label2.Location = new System.Drawing.Point(23, 141);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(53, 13);
             this.label2.TabIndex = 11;
@@ -299,7 +301,7 @@ namespace ASCOM.SXCamera
             // 
             // fixedBin
             // 
-            this.fixedBin.Location = new System.Drawing.Point(81, 114);
+            this.fixedBin.Location = new System.Drawing.Point(80, 139);
             this.fixedBin.Maximum = new decimal(new int[] {
             8,
             0,
@@ -323,7 +325,7 @@ namespace ASCOM.SXCamera
             // fixedBinning
             // 
             this.fixedBinning.AutoSize = true;
-            this.fixedBinning.Location = new System.Drawing.Point(7, 92);
+            this.fixedBinning.Location = new System.Drawing.Point(6, 115);
             this.fixedBinning.Name = "fixedBinning";
             this.fixedBinning.Size = new System.Drawing.Size(89, 17);
             this.fixedBinning.TabIndex = 9;
@@ -334,7 +336,7 @@ namespace ASCOM.SXCamera
             // asymetricBinning
             // 
             this.asymetricBinning.AutoSize = true;
-            this.asymetricBinning.Location = new System.Drawing.Point(7, 19);
+            this.asymetricBinning.Location = new System.Drawing.Point(6, 45);
             this.asymetricBinning.Name = "asymetricBinning";
             this.asymetricBinning.Size = new System.Drawing.Size(153, 17);
             this.asymetricBinning.TabIndex = 8;
@@ -344,7 +346,7 @@ namespace ASCOM.SXCamera
             // 
             // maxYBin
             // 
-            this.maxYBin.Location = new System.Drawing.Point(62, 46);
+            this.maxYBin.Location = new System.Drawing.Point(68, 69);
             this.maxYBin.Margin = new System.Windows.Forms.Padding(2);
             this.maxYBin.Maximum = new decimal(new int[] {
             8,
@@ -369,7 +371,7 @@ namespace ASCOM.SXCamera
             // xBinLabel
             // 
             this.xBinLabel.AutoSize = true;
-            this.xBinLabel.Location = new System.Drawing.Point(4, 71);
+            this.xBinLabel.Location = new System.Drawing.Point(3, 93);
             this.xBinLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.xBinLabel.Name = "xBinLabel";
             this.xBinLabel.Size = new System.Drawing.Size(55, 13);
@@ -378,7 +380,7 @@ namespace ASCOM.SXCamera
             // 
             // maxXBin
             // 
-            this.maxXBin.Location = new System.Drawing.Point(62, 69);
+            this.maxXBin.Location = new System.Drawing.Point(68, 93);
             this.maxXBin.Margin = new System.Windows.Forms.Padding(2);
             this.maxXBin.Maximum = new decimal(new int[] {
             8,
@@ -403,7 +405,7 @@ namespace ASCOM.SXCamera
             // binLabel
             // 
             this.binLabel.AutoSize = true;
-            this.binLabel.Location = new System.Drawing.Point(4, 46);
+            this.binLabel.Location = new System.Drawing.Point(3, 71);
             this.binLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.binLabel.Name = "binLabel";
             this.binLabel.Size = new System.Drawing.Size(45, 13);
@@ -582,6 +584,16 @@ namespace ASCOM.SXCamera
             0,
             65536});
             // 
+            // colorBinning
+            // 
+            this.colorBinning.AutoSize = true;
+            this.colorBinning.Location = new System.Drawing.Point(6, 19);
+            this.colorBinning.Name = "colorBinning";
+            this.colorBinning.Size = new System.Drawing.Size(137, 17);
+            this.colorBinning.TabIndex = 12;
+            this.colorBinning.Text = "M26C 2x2 color binning";
+            this.colorBinning.UseVisualStyleBackColor = true;
+            // 
             // SetupDialogForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -673,5 +685,6 @@ namespace ASCOM.SXCamera
         private System.Windows.Forms.Label label6;
         public System.Windows.Forms.CheckBox waitForCooldown;
         public System.Windows.Forms.NumericUpDown hardwareExposureThreshold;
+        public System.Windows.Forms.CheckBox colorBinning;
     }
 }
