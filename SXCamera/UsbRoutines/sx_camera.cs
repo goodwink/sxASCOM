@@ -1297,7 +1297,7 @@ namespace sx
         internal UInt16 adjustReadDelayedBlockForMainCamera(UInt16 fieldFlags)
         {
             // M26C has it's own routine and we should not get here for M26C
-            Debug.Assert((CameraModels)cameraModel == CameraModels.MODEL_M26C);
+            Debug.Assert((CameraModels)cameraModel != CameraModels.MODEL_M26C);
 
             // cameras with a Bayer matrix need the offsets to be even so that the subframe returned 
             // has the same color representation as a full frame.  Since this (at most) offsets 
