@@ -1869,7 +1869,7 @@ namespace ASCOM.SXGeneric
                         }
                     }
 
-                    Thread.Sleep(125);
+                    Thread.Sleep(250);
                 }
 
                 Log.Write(String.Format("StartExposure(): end wait for CCD cooldown, temperature={0} sameCount={1} bAbortRequested={2}", 
