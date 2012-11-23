@@ -141,7 +141,7 @@ namespace sx
 
     internal enum CameraPids
     {
-        PID_SUPERSTAR = 0509,
+        PID_SUPERSTAR = 509,
     }
 
     public partial class Camera
