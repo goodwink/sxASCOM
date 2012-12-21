@@ -60,8 +60,8 @@ def updateVersions(major, minor, revision, build):
 
 
 def main():
-    if len(sys.argv) != 1 and len(sys.argv) != 3:
-        print("usage: {0} [major minor]".format(sys.argv[0]), file=sys.stderr)
+    if len(sys.argv) != 1 and len(sys.argv) != 4:
+        print("usage: {0} [major minor sub]".format(sys.argv[0]), file=sys.stderr)
         sys.exit(1)
 
     description = runCmdOK("git describe")
@@ -71,14 +71,15 @@ def main():
     else:
         (version, commits, hex) = description.split("-")
 
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
         major = int(sys.argv[1])
         minor = int(sys.argv[2])
+        sub = int(sys.argv[3])
     else:
-        (major, minor, rest) = version[1:].split(".",2)
+        (major, minor, sub, rest) = version[1:].split(".",2)
 
     now = datetime.datetime.now()
-    updateVersions(major, minor, now.strftime("%y%j"), now.strftime("%H%M"))
+    updateVersions(major, minor, sub, now.strftime("%y%j"), )
 
 if __name__ == "__main__":
     main()
