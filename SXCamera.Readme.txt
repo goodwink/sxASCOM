@@ -1,18 +1,26 @@
 Copyright (C) 2010-2011 Dad Dog Development Ltd.
 
-This is the README.txt for version 2.2
+This is the README.txt for version 5.5.1
 
-This is an Beta build of the ASCOM driver for Starlight Xpress cameras.
-It contains new, untested or lightly tested code and will expire.
+I have changed my version numbering scheme - this is the the versino that 
+would have been 2.3 before.  The first two numbers now indicate the miniumum
+version of ASCOM that must be installed.
 
-There is a PRODUCTION release available - please use that version if it meets
-your needs.
+This is a Release Candidate build of the ASCOM driver for Starlight Xpress cameras.
+It contains code which has been tested and is believed to be of
+production quality. 
+
+It will be promoted to be a PRODUCTION release once I have ASCOM conform tool
+output for a number of the cameras that it supports.  If you are running a 
+camera which is not yet listed as having a conform report, please volunteer 
+to run conform on the yahoo group.
 
 This version adds:
     - an option to wait to begin an exposure until the CCD temperature
         is at the desired set point
     - an option to control when the driver switches from using internal
         timing to external timing
+    - M26C support
 
 If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know

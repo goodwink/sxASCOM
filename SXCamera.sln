@@ -26,12 +26,10 @@ Global
 		{D627D2EE-AB94-4B12-BF2F-F8AA89339811}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D627D2EE-AB94-4B12-BF2F-F8AA89339811}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{D627D2EE-AB94-4B12-BF2F-F8AA89339811}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D627D2EE-AB94-4B12-BF2F-F8AA89339811}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D627D2EE-AB94-4B12-BF2F-F8AA89339811}.Release|x86.ActiveCfg = Release|Any CPU
 		{9143E9E6-D429-4CCA-A082-CBCC39687FD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9143E9E6-D429-4CCA-A082-CBCC39687FD2}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{9143E9E6-D429-4CCA-A082-CBCC39687FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9143E9E6-D429-4CCA-A082-CBCC39687FD2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9143E9E6-D429-4CCA-A082-CBCC39687FD2}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
