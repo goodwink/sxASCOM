@@ -1,12 +1,11 @@
 To do a release, be sure to:
 
 - merge changes into the develop branch
-- bump the version number 
-  - bump_version.py
 - change the expiration date (if enabled) in SXAscomInstaller.iss
 - edit SXCamera.Readme
-- commit changes
-  git commit -a -m "Changes required for V1.3.10"
+- bump the version number 
+  - bump_version.py
+  - commit changes using printed git commands
 - create a change log with:
   git log --pretty=format:"%s (%ai by %aN <%aE>)" --no-merges releases/2.2/master..HEAD  > changelog.txt
   echo >> changelog.txt

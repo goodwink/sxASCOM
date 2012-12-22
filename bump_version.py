@@ -42,6 +42,7 @@ def updateVersion(dirName, fileName, major, minor, revision, build):
             line = re.sub(r'APP_VERSION ".*"', 'APP_VERSION "{0}.{1}.{2}.{3}"'.format(major, minor, revision, build), line)
             lines.append(line)
         file.seek(0)
+        file.truncate(0)
         file.writelines(lines)
 
 
@@ -57,11 +58,13 @@ def updateVersions(major, minor, revision, build):
     updateVersion(".", "SXAscomInstaller.iss", major, minor, revision, build)
     print('commit with:\ngit commit -a -m "changes for version {0}.{1}.{2}.{3}"'.format(major, minor, revision, build))
     print('tag with:\ngit tag -a -m "tagging version {0}.{1}.{2}.{3}" v{0}.{1}.{2}.{3}'.format(major, minor, revision, build))
+    print('zip with:\nc:\progra~1\winzip\wzzip SXAscomInstaller-v{0}.{1}.{2}.{3}.zip SXAscomInstaller-v{0}.{1}.{2}.{3}.exe'.format(major,minor,revision,build))
+
 
 
 def main():
-    if len(sys.argv) != 1 and len(sys.argv) != 3:
-        print("usage: {0} [major minor]".format(sys.argv[0]), file=sys.stderr)
+    if len(sys.argv) != 1 and len(sys.argv) != 4:
+        print("usage: {0} [major minor revision]".format(sys.argv[0]), file=sys.stderr)
         sys.exit(1)
 
     description = runCmdOK("git describe")
@@ -71,14 +74,15 @@ def main():
     else:
         (version, commits, hex) = description.split("-")
 
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 4:
         major = int(sys.argv[1])
         minor = int(sys.argv[2])
+        revision = int(sys.argv[3])
     else:
-        (major, minor, rest) = version[1:].split(".",2)
+        (major, minor, revision, rest) = version[1:].split(".",3)
 
     now = datetime.datetime.now()
-    updateVersions(major, minor, now.strftime("%y%j"), now.strftime("%H%M"))
+    updateVersions(major, minor, revision, now.strftime("%y%j"))
 
 if __name__ == "__main__":
     main()
