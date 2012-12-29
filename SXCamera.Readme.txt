@@ -21,6 +21,7 @@ This version adds:
     - an option to control when the driver switches from using internal
         timing to external timing
     - M26C support
+    - Changes M26C and H35 from untested to tested
 
 If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know
