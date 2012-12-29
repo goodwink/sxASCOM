@@ -74,15 +74,22 @@ def main():
     else:
         (version, commits, hex) = description.split("-")
 
-    if len(sys.argv) == 4:
+    now = datetime.datetime.now()
+    timestamp = now.strftime("%y%j")
+
+    if len(sys.argv) == 5:
+        major = int(sys.argv[1])
+        minor = int(sys.argv[2])
+        revision = int(sys.argv[3])
+        timestamp = int(sys.argv[4])
+    elif len(sys.argv) == 4:
         major = int(sys.argv[1])
         minor = int(sys.argv[2])
         revision = int(sys.argv[3])
     else:
         (major, minor, revision, rest) = version[1:].split(".",3)
 
-    now = datetime.datetime.now()
-    updateVersions(major, minor, revision, now.strftime("%y%j"))
+    updateVersions(major, minor, revision, timestamp)
 
 if __name__ == "__main__":
     main()
