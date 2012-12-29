@@ -64,18 +64,10 @@ namespace ASCOM.SXCamera
         private const bool DEFAULT_ASYMETRIC_BINNING = false;
 
         private const string KEY_MAX_Y_BIN = "MaxYBin";
-#if DEBUG
         private const byte DEFAULT_MAX_Y_BIN = 8;
-#else
-        private const byte DEFAULT_MAX_Y_BIN = 4;
-#endif
 
         private const string KEY_MAX_X_BIN = "MaxXBin";
-#if DEBUG
         private const byte DEFAULT_MAX_X_BIN = 8;
-#else
-        private const byte DEFAULT_MAX_X_BIN = 4;
-#endif
 
         private const string KEY_FIXED_BINNING = "FixedBinning";
         private const bool DEFAULT_FIXED_BINNING = false;
