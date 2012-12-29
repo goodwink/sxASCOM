@@ -921,7 +921,7 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    double dRet =  MaxADU * ElectronsPerADU / (BinXActual * BinYActual);
+                    double dRet =  sxCamera.fullWellCapacity / (BinXActual * BinYActual);
 
                     Log.Write(String.Format("Generic::FullWellCapacity get returns {0}\n", dRet));
 
@@ -1268,7 +1268,27 @@ namespace ASCOM.SXGeneric
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    int ret = sxCamera.fullWellCapacity;
+                    Debug.Assert(sxCamera.bytesPerPixel < 8);
+
+                    // in theory MaxADU should be fullWellCapacity/ElectronsPerADU, but 
+                    // both those numbers are "round" estimates, so it is possible that the 
+                    // theoretical value exceeds the value that will fit into the number
+                    // of bits that we have for a pixel. If that is the case, we return
+                    // the max representable value instead of the computed value
+
+                    ulong maxRepresentableValue = (1ul << (8 * sxCamera.bytesPerPixel)) - 1;
+                    ulong calculatedValue = (ulong)(sxCamera.fullWellCapacity/ElectronsPerADU);
+
+                    int ret;
+
+                    if (calculatedValue < maxRepresentableValue)
+                    {
+                        ret = (int)calculatedValue;
+                    }
+                    else
+                    {
+                        ret = (int)maxRepresentableValue;
+                    }
 
                     Log.Write(String.Format("Generic::MaxADU get returns {0}\n", ret));
 
