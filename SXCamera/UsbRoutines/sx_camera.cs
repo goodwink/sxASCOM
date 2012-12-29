@@ -640,7 +640,6 @@ namespace sx
                     isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H35:
-                    bUntested = true;
                     description = "H35";
                     fullWellCapacity = 50000;
                     electronsPerADU = 0.9;
@@ -686,7 +685,6 @@ namespace sx
                     isMonochrome = false;
                     break;
                 case CameraModels.MODEL_M26C:
-                    bUntested = true;
                     description = "M26C";
                     fullWellCapacity = 25000;
                     electronsPerADU = 0.30;
