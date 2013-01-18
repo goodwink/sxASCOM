@@ -41,7 +41,6 @@ def updateVersion(dirName, fileName, major, minor, revision, build):
             line = re.sub(r'AssemblyFileVersion([^)]*)', 'AssemblyFileVersion("{0}.{1}.{2}.{3}"'.format(major, minor, revision, build), line)
             line = re.sub(r'APP_VERSION ".*"', 'APP_VERSION "{0}.{1}.{2}.{3}"'.format(major, minor, revision, build), line)
             lines.append(line)
-        file.seek(0)
         file.truncate(0)
         file.writelines(lines)
 
