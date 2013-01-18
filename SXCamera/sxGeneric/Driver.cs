@@ -45,8 +45,8 @@ namespace ASCOM.SXGeneric
         ICamera
     {
         // Constants
-        private const double ImageCommandTime = 0.001; // this is about how long it takes to send the "Download Image" command
-
+        private const int ClearInterval = 30;
+        
         // members
         protected sx.Controller m_controller;
         protected sx.Camera sxCamera;
@@ -1700,35 +1700,22 @@ namespace ASCOM.SXGeneric
             {
                 Log.Write(String.Format("Generic::softwareCapture({0}, {1}): begins\n", Duration, Light));
 
+                sxCamera.clearRegisters();
                 sxCamera.clearCCDAndRegisters(); // Clear everything - we may clear it again just before 
                                                  // the exposure ends to clear any accumulated noise.
-                bool bRegistersCleareded = false;
-
                 if (Light && Duration > 0)
                 {
                     shutterIsOpen = true;
                     sxCamera.shutterOpen();
                 }
 
-                if (Duration > ImageCommandTime)
-                {
-                    Duration -= ImageCommandTime;
-                }
-                else
-                {
-                    Duration = 0;
-                }
                 desiredExposureLength = TimeSpan.FromSeconds(Duration);
 
-                if (desiredExposureLength.TotalSeconds < 2.0)
-                {
-                    sxCamera.clearRegisters();
-                    // For short exposures we don't do the clear the registers inside the loop
-                    bRegistersCleareded = true;
-                }
+                bool bLastClearDone = (desiredExposureLength.TotalSeconds < 2.0);
                 
                 exposureStart = DateTime.Now;
                 DateTimeOffset exposureEnd = exposureStart + desiredExposureLength;
+                DateTimeOffset nextClearTime = exposureStart.AddSeconds(ClearInterval);
 
                 // We sleep for most of the exposure, then spin for the last little bit
                 // because this helps us end closer to the right time
@@ -1739,24 +1726,30 @@ namespace ASCOM.SXGeneric
                     remainingExposureTime.TotalMilliseconds > 0;
                     remainingExposureTime = exposureEnd - DateTime.Now)
                 {
+                    DateTime now = DateTime.Now;
+
                     if (bAbortRequested || bStopRequested)
                     {
                         return;
                     }
                     
-                    if (remainingExposureTime.TotalSeconds < 2.0 && !bRegistersCleareded)
+                    if (remainingExposureTime.TotalSeconds > 4.0 && now >= nextClearTime)
                     {
                         Log.Write("softwareCapture(): doing clearAllRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         sxCamera.clearRegisters();
-                        bRegistersCleareded = true;
+                        nextClearTime = now.AddSeconds(ClearInterval);
+                    }
+                    else if (remainingExposureTime.TotalSeconds < 2.0 && !bLastClearDone)
+                    {
+                        Log.Write("softwareCapture(): doing last clearAllRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        sxCamera.clearRegisters();
+                        bLastClearDone = true;
                     }
                     else if (remainingExposureTime.TotalMilliseconds > 75)
                     {
                         // sleep in small chunks so that we are responsive to abort and stop requests
-                        //Log.Write("Before sleep, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         Thread.Sleep(50);
                     }
-
                 }
 
                 if (shutterIsOpen)
@@ -1768,7 +1761,9 @@ namespace ASCOM.SXGeneric
                 lock (oCameraStateLock)
                 {
                     if (bAbortRequested || bStopRequested)
+                    {
                         return;
+                    }
                     state = CameraStates.cameraDownload;
                 }
 
