@@ -23,6 +23,8 @@ This version adds:
     - M26C support
     - Changes M26C and H35 from untested to tested
     - Fixed a problem with FullWellDepth property
+    - More frequent flushing for long exposures
+    - the driver is now build with MSVS 2010
 
 If you have problems, please join the sxAscom Yahoo group at 
 http://groups.yahoo.com/group/sx-ascom/join and let me know
