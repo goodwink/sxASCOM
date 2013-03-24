@@ -138,6 +138,9 @@ namespace sx
         // ------------------ H694/H694C
         MODEL_H694  = 0x57,
         MODEL_H694C = 0xB7,
+        // ------------------ H814/H814C
+        MODEL_H814  = 0x28,
+        MODEL_H814C = 0xA8
     }
 
     internal enum CameraPids
@@ -780,6 +783,22 @@ namespace sx
                     electronsPerADU = 0.3;
                     progressive = true;
                     sensorName = "ICX694AQG";
+                    isMonochrome = true;
+                    break;
+                case CameraModels.MODEL_H814:
+                    description = "H814";
+                    fullWellCapacity = 18000;
+                    electronsPerADU = 0.25;
+                    progressive = true;
+                    sensorName = "ICX814ALG";
+                    isMonochrome = true;
+                    break;
+                case CameraModels.MODEL_H814C:
+                    description = "H814C";
+                    fullWellCapacity = 18000;
+                    electronsPerADU = 0.25;
+                    progressive = true;
+                    sensorName = "ICX814AQG";
                     isMonochrome = true;
                     break;
                 default:
