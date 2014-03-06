@@ -72,6 +72,7 @@ namespace ASCOM.sxCameraBase
         #region Camera Constants
         // Constants
         private const double ImageCommandTime = 0.001; // this is about how long it takes to send the "Download Image" command
+        private const int ClearInterval = 30;
         #endregion
 
         #region Camera member variables
@@ -217,35 +218,28 @@ namespace ASCOM.sxCameraBase
 
         internal void softwareCapture(double Duration, bool Light)
         {
+            bool shutterIsOpen = false;
+
             try
             {
-                Log.Write(String.Format("sxCameraBase::softwareCapture({0}, {1}): begins\n", Duration, Light));
+                Log.Write(String.Format("Generic::softwareCapture({0}, {1}): begins\n", Duration, Light));
 
-                sxCamera.clearCCDAndRegisters(); // For exposures > 1 second we will clear the registers again just before
-                                                    // the exposure ends to clear any accumulated noise.
-                bool bAllRegistersCleareded = false;
-                bool bVerticalRegistersCleareded = false;
+                sxCamera.clearRegisters();
+                sxCamera.clearCCDAndRegisters(); // Clear everything - we may clear it again just before 
+                                                 // the exposure ends to clear any accumulated noise.
+                if (Light && Duration > 0)
+                {
+                    shutterIsOpen = true;
+                    sxCamera.shutterOpen();
+                }
 
-                if (Duration > ImageCommandTime)
-                {
-                    Duration -= ImageCommandTime;
-                }
-                else
-                {
-                    Duration = 0;
-                }
                 desiredExposureLength = TimeSpan.FromSeconds(Duration);
 
-                if (desiredExposureLength.TotalSeconds < 2.0)
-                {
-                    sxCamera.clearAllRegisters();
-                    // For short exposures we don't do the clear the registers inside the loop
-                    bAllRegistersCleareded = true;
-                    bVerticalRegistersCleareded = true; 
-                }
+                bool bLastClearDone = (desiredExposureLength.TotalSeconds < 2.0);
                 
                 exposureStart = DateTime.Now;
                 DateTimeOffset exposureEnd = exposureStart + desiredExposureLength;
+                DateTimeOffset nextClearTime = exposureStart.AddSeconds(ClearInterval);
 
                 // We sleep for most of the exposure, then spin for the last little bit
                 // because this helps us end closer to the right time
@@ -256,35 +250,41 @@ namespace ASCOM.sxCameraBase
                     remainingExposureTime.TotalMilliseconds > 0;
                     remainingExposureTime = exposureEnd - DateTime.Now)
                 {
+                    DateTime now = DateTime.Now;
+
+                    if (bAbortRequested || bStopRequested)
+                    {
+                        return;
+                    }
                     
-                    if (remainingExposureTime.TotalSeconds < 2.0 && !bAllRegistersCleareded)
+                    if (remainingExposureTime.TotalSeconds > 4.0 && now >= nextClearTime)
                     {
                         Log.Write("softwareCapture(): doing clearAllRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
-                        sxCamera.clearAllRegisters();
-                        bAllRegistersCleareded = true;
+                        sxCamera.clearRegisters();
+                        nextClearTime = now.AddSeconds(ClearInterval);
                     }
-                    else if (remainingExposureTime.TotalSeconds < 1.0 && !bVerticalRegistersCleareded)
+                    else if (remainingExposureTime.TotalSeconds < 2.0 && !bLastClearDone)
                     {
-                        Log.Write("softwareCapture(): doing clearVerticalRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
-                        sxCamera.clearVerticalRegisters();
-                        bVerticalRegistersCleareded = true;
+                        Log.Write("softwareCapture(): doing last clearAllRegisters() inside of loop, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
+                        sxCamera.clearRegisters();
+                        bLastClearDone = true;
                     }
                     else if (remainingExposureTime.TotalMilliseconds > 75)
                     {
                         // sleep in small chunks so that we are responsive to abort and stop requests
-                        //Log.Write("Before sleep, remaining exposure=" + remainingExposureTime.TotalSeconds + "\n");
                         Thread.Sleep(50);
                     }
+                }
 
-                    if (bAbortRequested || bStopRequested)
-                    {
-                        break;
-                    }
+                if (shutterIsOpen)
+                {
+                    sxCamera.shutterClose();
+                    shutterIsOpen = false;
                 }
 
                 lock (oCameraStateLock)
                 {
-                    if (bAbortRequested)
+                    if (bAbortRequested || bStopRequested)
                     {
                         return;
                     }
@@ -295,7 +295,7 @@ namespace ASCOM.sxCameraBase
 
                 actualExposureLength = exposureEnd - exposureStart;
 
-                Log.Write(String.Format("sxCameraBase::softwareCapture(): delay ends, actualExposureLength={0}, requested={1}\n", actualExposureLength.TotalSeconds, Duration));
+                Log.Write(String.Format("Generic::softwareCapture(): delay ends, actualExposureLength={0}, requested={1}\n", actualExposureLength.TotalSeconds, Duration));
                 
                 bImageValid = true;
             }
@@ -304,20 +304,14 @@ namespace ASCOM.sxCameraBase
                 String msg = SetError(String.Format("{0} caught and is rethrowing exception {1}", MethodBase.GetCurrentMethod().Name, ex));
                 Log.Write(msg);
 
-                lock (oCameraStateLock)
-                {
-                    state = CameraStates.cameraError;
-                }
                 throw ex;
             }
             finally
             {
-                lock (oCameraStateLock)
+                if (shutterIsOpen)
                 {
-                    if (state != CameraStates.cameraError)
-                    {
-                        state = CameraStates.cameraIdle;
-                    }
+                    sxCamera.shutterClose();
+                    shutterIsOpen = false;
                 }
             }
         }
