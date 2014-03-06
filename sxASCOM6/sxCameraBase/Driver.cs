@@ -1606,16 +1606,7 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    throw new PropertyNotImplementedException("BayerOffsetX is not implemented"); 
-#if false
-                    if (sxCamera.isMonochrome)
-                    {
-                        throw new ASCOM.InvalidValueException("BayerOffsetX is undefined for monochrome cameras");
-                    }
-                    Log.Write(String.Format("sxCameraBase::BayerOffsetX get returns hard coded 0"));
-
-                    return 0;
-#endif
+                    return sxCamera.bayerOffsetX;
                 }
                 catch (System.Exception ex)
                 {
@@ -1634,16 +1625,7 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    throw new PropertyNotImplementedException("BayerOffsetX is not implemented"); 
-#if false
-                    if (sxCamera.isMonochrome)
-                    {
-                        throw new ASCOM.InvalidValueException("BayerOffsetY is undefined for monochrome cameras");
-                    }
-                    Log.Write(String.Format("sxCameraBase::BayerOffsetY get returns hard coded 0"));
-
-                    return 0;
-#endif
+                    return sxCamera.bayerOffsetY;
                 }
                 catch (System.Exception ex)
                 {
@@ -1935,9 +1917,6 @@ namespace ASCOM.sxCameraBase
                 {
                     verifyConnected(MethodBase.GetCurrentMethod().Name);
 
-                    throw new PropertyNotImplementedException("SensorType is not implemented");
-#if false
-
                     SensorType ret;
 
                     if (sxCamera.isMonochrome)
@@ -1948,6 +1927,10 @@ namespace ASCOM.sxCameraBase
                     {
                         ret = SensorType.RGGB;
                     }
+                    else if (sxCamera.isCMYG)
+                    {
+                        ret = SensorType.CMYG2;
+                    }
                     else
                     {
                         throw new ASCOM.DriverException(SetError(String.Format("SensorType get was unable to determine sensor type")));
@@ -1956,8 +1939,6 @@ namespace ASCOM.sxCameraBase
                     Log.Write(String.Format("SensorType get returns {0}", ret));
 
                     return ret;
-#endif
-
                 }
                 catch (System.Exception ex)
                 {

@@ -257,7 +257,59 @@ namespace sx
         {
             get
             {
-                return ! isMonochrome;
+                // All of the Sony sensors follow this convention and all RGGB SX cameras currently use Sony sensors
+                return sensorName.EndsWith("AQ") || sensorName.EndsWith("AQA") || sensorName.EndsWith("AQG");
+            }
+        }
+
+        public bool isCMYG
+        {
+            get
+            {
+                // All of the Sony sensors follow this convention and all CMYG SX cameras currently use Sony sensors
+                return sensorName.EndsWith("AK") || sensorName.EndsWith("AKA") || sensorName.EndsWith("AKG");
+            }
+        }
+
+        public short bayerOffsetX
+        {
+            get
+            {
+                if (isRGGB)
+                {
+                    // All of the Sony sensors follow this convention and all RGGB SX cameras currently use Sony sensors
+                    return 0;
+                }
+                else if (isCMYG)
+                {
+                    // All of the Sony sensors follow this convention and all CMYG SX cameras currently use Sony sensors
+                    return 0;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
+        public short bayerOffsetY
+        {
+            get
+            {
+                if (isRGGB)
+                {
+                    // All of the Sony sensors follow this convention and all RGGB SX cameras currently use Sony sensors
+                    return 1;
+                }
+                else if (isCMYG)
+                {
+                    // All of the Sony sensors follow this convention and all CMYG SX cameras currently use Sony sensors
+                    return 2;
+                }
+                else
+                {
+                    return 0;
+                }
             }
         }
 
@@ -623,7 +675,7 @@ namespace sx
                     fullWellCapacity = 27000;
                     electronsPerADU = 0.45;
                     progressive = true;
-                    sensorName = "ICX285AK";
+                    sensorName = "ICX285AQ";
                     isMonochrome = false;
                     break;
                 case CameraModels.MODEL_H16:
@@ -659,6 +711,7 @@ namespace sx
                     sensorName = "KAI-16000";
                     isMonochrome = true;
                     break;
+                //FIXME: Is there a new CMOS COSTAR?
                 case CameraModels.MODEL_COSTAR:
                     description = "CoStar";
                     fullWellCapacity = 20000;
