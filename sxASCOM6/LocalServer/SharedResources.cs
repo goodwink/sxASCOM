@@ -50,12 +50,13 @@ namespace ASCOM.StarlightXpress
         private static object m_lock = null;
         private static bool bSerializeControllers = true;
         public static sx.Controller [] controllers;
-        private const uint maxControllers = 6;
+        private const uint maxControllers = 8;
 
         static SharedResources()								// Static initialization
         {
             Log.Write("SharedResources()\n");
             Log.Write(String.Format("Driver version = {0}\n", versionNumber));
+            Log.Write(String.Format("Max controllers = {0}\n", maxControllers));
 
             if (bSerializeControllers)
             {

@@ -29,6 +29,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sxLogging", "sxLogging\sxLo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sxUsbCameraBase", "sxUsbCameraBase\sxUsbCameraBase.csproj", "{86C890DA-93C2-4726-8958-5DB94D9F570D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sxUsbCamera7", "sxUsbCamera7\sxUsbCamera7.csproj", "{1AE01C0F-702A-4340-87C6-66E0441DC291}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sxUsbCamera8", "sxUsbCamera8\sxUsbCamera8.csproj", "{1AE01C0F-802A-4340-87C6-66E0441DC291}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +127,18 @@ Global
 		{86C890DA-93C2-4726-8958-5DB94D9F570D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86C890DA-93C2-4726-8958-5DB94D9F570D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{86C890DA-93C2-4726-8958-5DB94D9F570D}.Release|x86.ActiveCfg = Release|Any CPU
+		{1AE01C0F-702A-4340-87C6-66E0441DC291}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AE01C0F-702A-4340-87C6-66E0441DC291}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AE01C0F-702A-4340-87C6-66E0441DC291}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1AE01C0F-702A-4340-87C6-66E0441DC291}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AE01C0F-702A-4340-87C6-66E0441DC291}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AE01C0F-702A-4340-87C6-66E0441DC291}.Release|x86.ActiveCfg = Release|Any CPU
+		{1AE01C0F-802A-4340-87C6-66E0441DC291}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AE01C0F-802A-4340-87C6-66E0441DC291}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AE01C0F-802A-4340-87C6-66E0441DC291}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1AE01C0F-802A-4340-87C6-66E0441DC291}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AE01C0F-802A-4340-87C6-66E0441DC291}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AE01C0F-802A-4340-87C6-66E0441DC291}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

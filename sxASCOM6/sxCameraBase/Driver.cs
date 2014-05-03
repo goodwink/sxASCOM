@@ -313,6 +313,14 @@ namespace ASCOM.sxCameraBase
                     sxCamera.shutterClose();
                     shutterIsOpen = false;
                 }
+
+                lock (oCameraStateLock)
+                {
+                    if (state != CameraStates.cameraError)
+                    {
+                        state = CameraStates.cameraIdle;
+                    }
+                }
             }
         }
 

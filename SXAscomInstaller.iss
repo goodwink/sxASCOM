@@ -59,6 +59,8 @@ Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera3.Camera.dll"; 
 Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera4.Camera.dll";            DestDir: "{app}\sxASCOM"
 Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera5.Camera.dll";            DestDir: "{app}\sxASCOM"
 Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera6.Camera.dll";            DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera7.Camera.dll";            DestDir: "{app}\sxASCOM"
+Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxUsbCamera8.Camera.dll";            DestDir: "{app}\sxASCOM"
 Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxGuideCamera1.Camera.dll";          DestDir: "{app}\sxASCOM"
 Source: "sxASCOM6\LocalServer\bin\{#BUILD_TYPE}\ASCOM.sxGuideCamera2.Camera.dll";          DestDir: "{app}\sxASCOM"
 
@@ -255,12 +257,15 @@ begin
                  P.IsRegistered('ASCOM.sxUsbCamera3.Camera') or 
                  P.IsRegistered('ASCOM.sxUsbCamera4.Camera') or 
                  P.IsRegistered('ASCOM.sxUsbCamera5.Camera') or 
-                 P.IsRegistered('ASCOM.sxUsbCamera6.Camera') or 
+                 P.IsRegistered('ASCOM.sxUsbCamera6.Camera') or
+                 P.IsRegistered('ASCOM.sxUsbCamera7.Camera') or
+                 P.IsRegistered('ASCOM.sxUsbCamera8.Camera') or 
                  P.IsRegistered('ASCOM.sxGuideCamera1.Camera') or
                  P.IsRegistered('ASCOM.sxGuideCamera1.Camera')
                 then
                     begin
-                        MsgBox('A previous version of this driver that cannot be automatically removed was detected. You must uninstall the previous version from the control panel before installation can proceed.', mbInformation, MB_OK);
+                        Result := TRUE;
+                        //MsgBox('A previous version of this driver that cannot be automatically removed was detected. You must uninstall the previous version from the control panel before installation can proceed.', mbInformation, MB_OK);
                     end
                 else
                     begin

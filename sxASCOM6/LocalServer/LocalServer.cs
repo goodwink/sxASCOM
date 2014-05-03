@@ -365,6 +365,9 @@ namespace ASCOM.StarlightXpress
             bool registerCoStar1 = false;
             bool registerCoStar2 = false;
 
+            bool registerSuperStar0 = false;
+            bool registerSuperStar1 = false;
+
             bool registerAutoGuide0 = false;
             bool registerAutoGuide1 = false;
 
@@ -389,6 +392,15 @@ namespace ASCOM.StarlightXpress
                     case "/costar2":
                         registerCoStar1 = true;
                         registerCoStar2 = true;
+                        break;
+                    case "-superstar":
+                    case "/superstar":
+                        registerSuperStar0 = true;
+                        break;
+                    case "-superstar2":
+                    case "/superstar2":
+                        registerSuperStar0 = true;
+                        registerSuperStar1 = true;
                         break;
                     case "-main":
                     case "/main":
@@ -528,6 +540,27 @@ namespace ASCOM.StarlightXpress
                         {
                             registerThisOne = true;
                             chooserName = "Starlight Xpress CoStar Guider #2";
+                        }
+                        break;
+                    case "ascom.sxusbcamera7.camera":
+                        registerThisOne = registerSuperStar0;
+                        if (registerThisOne)
+                        {
+                            if (registerSuperStar1)
+                            {
+                                chooserName = "Starlight Xpress SuperStar Guider #1";
+                            }
+                            else
+                            {
+                                chooserName = "Starlight Xpress SuperStar Guider";
+                            }
+                        }
+                        break;
+                    case "ascom.sxusbcamera8.camera":
+                        registerThisOne = registerSuperStar1;
+                        if (registerThisOne)
+                        {
+                            chooserName = "Starlight Xpress SuperStar Guider #2";
                         }
                         break;
                     case "ascom.sxguidecamera1.camera":

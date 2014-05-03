@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A00E1795-283F-4EBB-90D3-29C69FF5D8B1}</ProjectGuid>
+    <ProjectGuid>{1AE01C0F-702A-4340-87C6-66E0441DC291}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ASCOM.StarlightXpress</RootNamespace>
-    <AssemblyName>ASCOM.sxUsbCamera5.Camera</AssemblyName>
+    <AssemblyName>ASCOM.sxUsbCamera7.Camera</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>

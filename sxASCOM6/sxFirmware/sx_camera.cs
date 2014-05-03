@@ -658,16 +658,19 @@ namespace sx
                     if ((CameraPids)m_controller.pid == CameraPids.PID_SUPERSTAR)
                     {
                         description = "SuperStar";
+                        sensorName = "ICX205AL";
+                        fullWellCapacity = 27000; //FIXME: ??
+                        electronsPerADU = 0.45; //FIXME: ??
                     }
                     else
                     {
                         description = "H9";
+                        sensorName = "ICX285AL";
+                        fullWellCapacity = 27000;
+                        electronsPerADU = 0.45;
                     }
 
-                    fullWellCapacity = 27000;
-                    electronsPerADU = 0.45;
                     progressive = true;
-                    sensorName = "ICX285AL";
                     isMonochrome = true;
                     break;
                 case CameraModels.MODEL_H9C:
@@ -724,6 +727,7 @@ namespace sx
                     mustUseHardwareTimer = true;
                     hasBiasData = true;
                     break;
+                //FIXME: Handle Lodestar C
                 case CameraModels.MODEL_LODESTAR:
                     description = "Lodestar";
                     fullWellCapacity = 50000;
